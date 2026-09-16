@@ -3,6 +3,10 @@ import { LIVE_FOLDERS, deptOf } from '@/lib/domain/folders';
 import { figures, type Block } from '@/lib/domain/time';
 import { weekBounds } from '@/lib/domain/dates';
 
+const displayDate = (value: string) => new Intl.DateTimeFormat('en-US', {
+  month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC'
+}).format(new Date(`${String(value).slice(0, 10)}T00:00:00Z`));
+
 export default async function MemberHome() {
   const profile = await currentProfile();
   const sb = supabaseServer();
@@ -22,7 +26,7 @@ export default async function MemberHome() {
       <h1 style={{ fontSize: 34, marginTop: 8 }}>{profile?.name}</h1>
       <p style={{ color: 'var(--dim)' }}>
         Case {profile?.case_no}
-        {profile?.represented_since ? ` · represented since ${profile.represented_since}` : ''}
+        {profile?.represented_since ? ` · represented since ${displayDate(profile.represented_since)}` : ''}
       </p>
 
       <h2 style={{ marginTop: 40, fontSize: 20 }}>This week</h2>
@@ -43,8 +47,8 @@ export default async function MemberHome() {
         </div>
       ) : (
         <p className="note" style={{ maxWidth: 'var(--text)' }}>
-          Nothing is on file yet. Your agent starts Time with you at the first review, and
-          anything you say before then is kept.
+          No Time records are on file for this week. Your agent records the information you
+          establish during your review.
         </p>
       )}
 
@@ -63,8 +67,8 @@ export default async function MemberHome() {
                 <p className="q">
                   {x.name === 'Time' && has ? `${Math.round(f.free)} hours of this week are yours.` : null}
                   {x.name === 'Standards' ? `${standards ?? 0} active.` : null}
-                  {x.name === 'Salary' ? 'Collecting. Needs a month of Time behind it.' : null}
-                  {x.name === 'Inventory' ? 'Opens once Time is running.' : null}
+                  {x.name === 'Salary' ? 'Not established yet.' : null}
+                  {x.name === 'Inventory' ? 'Not established yet.' : null}
                   {x.name === 'Time' && !has ? 'Not established yet.' : null}
                 </p>
                 {live && (
