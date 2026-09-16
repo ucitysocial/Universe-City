@@ -7,7 +7,7 @@ export default function Membership() {
       <section>
         <div className="wrap">
           <p className="kick">Membership</p>
-          <h1 style={{ marginTop: 12, maxWidth: '16ch' }}>$48 a month.</h1>
+          <h1 style={{ marginTop: 12, maxWidth: '16ch' }}>$12 a week.</h1>
           <p className="lede" style={{ maxWidth: 'var(--text)' }}>
             Membership includes Time, Inventory, Salary and Standards, plus one fifteen minute
             review with your agent every week.
