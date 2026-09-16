@@ -100,11 +100,7 @@ export default function Signup() {
     <div className="wrap">
       <div className="panel signup-panel">
         <p className="kick">Enrollment</p>
-        <h2 style={{ marginTop: 8 }}>Create your account.</h2>
-        <p className="note" style={{ marginTop: 6, marginBottom: 20 }}>
-          This information opens your Universe City file. Your birthday assigns your zodiac badge.
-          No payment is taken on this step.
-        </p>
+        <h2 style={{ marginTop: 8, marginBottom: 20 }}>Create your account.</h2>
         {err && <p className="err">{err}</p>}
         <form onSubmit={submit}>
           <div className="field-row">
