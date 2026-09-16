@@ -79,6 +79,18 @@ a{color:inherit}
 @keyframes turnPrev{0%{transform:perspective(1200px) rotateY(0);opacity:1}45%{transform:perspective(1200px) rotateY(8deg) translateX(8px);opacity:.72}55%{transform:perspective(1200px) rotateY(-7deg) translateX(-8px);opacity:.72}100%{transform:perspective(1200px) rotateY(0);opacity:1}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 @media(max-width:760px){.sitebar .right a:not(.keep){display:none}.shell{width:min(100% - 16px,680px);margin-top:18px}.book-head{align-items:start;flex-direction:column}.book-head p{display:none}.book{display:block;min-height:0}.book::before{display:none}.page{min-height:620px;padding:28px 24px 54px}.page.left{display:none}.page.right{border:0}.page.mobile-show{display:block}.page.mobile-hide{display:none}.edge{width:42px;height:76px}.edge.prev{left:-4px}.edge.next{right:-4px}.controls{padding:0 2px}.turn-next .right{animation:mobileNext .42s cubic-bezier(.4,0,.2,1)}.turn-prev .right{animation:mobilePrev .42s cubic-bezier(.4,0,.2,1)}@keyframes mobileNext{0%{transform:translateX(0);opacity:1}48%{transform:translateX(-18px);opacity:.25}52%{transform:translateX(18px);opacity:.25}100%{transform:translateX(0);opacity:1}}@keyframes mobilePrev{0%{transform:translateX(0);opacity:1}48%{transform:translateX(18px);opacity:.25}52%{transform:translateX(-18px);opacity:.25}100%{transform:translateX(0);opacity:1}}}
+
+/* Founder book stability pass */
+.page-inner{transform-origin:top left;will-change:transform}
+.book.turn-next .page,.book.turn-prev .page{animation:none!important;opacity:1!important;transform:none!important}
+.book::after{content:"";position:absolute;top:0;bottom:0;left:50%;width:50%;background:linear-gradient(90deg,var(--paper),var(--paper2));z-index:40;pointer-events:none;opacity:0;transform-style:preserve-3d;backface-visibility:hidden}
+.book.turn-next::after{transform-origin:left center;animation:ucSheetNext .36s cubic-bezier(.45,.02,.18,1)}
+.book.turn-prev::after{left:0;transform-origin:right center;animation:ucSheetPrev .36s cubic-bezier(.45,.02,.18,1)}
+@keyframes ucSheetNext{0%{opacity:0;transform:perspective(1400px) rotateY(0)}8%{opacity:1}100%{opacity:1;transform:perspective(1400px) rotateY(-179deg)}}
+@keyframes ucSheetPrev{0%{opacity:0;transform:perspective(1400px) rotateY(0)}8%{opacity:1}100%{opacity:1;transform:perspective(1400px) rotateY(179deg)}}
+@media(max-width:760px){
+html,body{height:100%;overflow:hidden}.sitebar{height:56px;position:relative}.shell{height:calc(100svh - 56px);width:calc(100% - 14px);margin:0 auto;padding:8px 0 6px;display:flex;flex-direction:column;overflow:hidden}.book-kicker{display:none}.book-head{min-height:38px;flex:0 0 38px;margin:0;justify-content:center}.book-head h1{font-size:18px;line-height:1.1;margin:0}.book-head p{display:none!important}.book-wrap{flex:1 1 auto;min-height:0;overflow:hidden}.book{height:100%!important;min-height:0!important;max-height:none!important;display:block;overflow:hidden}.book::before{display:none}.book::after{left:0;width:100%}.page{height:100%!important;min-height:0!important;padding:18px 18px 36px!important;overflow:hidden!important}.page.left{display:none!important}.page.right{display:block!important;border:0}.page h2{font-size:clamp(22px,6.8vw,31px)!important;line-height:1.02;margin-bottom:10px}.page p{font-size:clamp(11px,3.15vw,14px)!important;line-height:1.42!important;margin-bottom:8px!important}.page .lead{font-size:clamp(14px,4vw,18px)!important;line-height:1.3!important}.chapter{font-size:9px!important;margin-bottom:9px!important}.pull{font-size:clamp(16px,4.5vw,21px)!important;line-height:1.2;margin:11px 0!important;padding-top:9px!important}.photo{max-height:27%!important;width:100%;object-fit:cover;margin:3px 0 8px!important}.caption{font-size:9px!important;line-height:1.25;margin:-4px 0 8px!important}.page-no{bottom:10px!important}.controls{height:38px;flex:0 0 38px;padding:4px 0 0!important;align-items:center}.controls button{min-height:32px;padding:6px 10px;font-size:11px}.edge{height:62px!important;width:38px!important}}
+
 </style>
 </head>
 <body>
@@ -107,6 +119,15 @@ a{color:inherit}
   const isMobile=()=>window.matchMedia("(max-width:760px)").matches;
   function pageMarkup(p,n){return `<div class="chapter">${p.chapter}</div><h2>${p.title}</h2>${p.html}<div class="page-no">${String(n).padStart(2,"0")} / ${pages.length}</div>`}
   function applyPage(el,p,n,side){el.className="page "+side+" "+(p.cls||"");el.innerHTML=pageMarkup(p,n)}
+  function fitPage(el){
+    const inner=el.querySelector(".page-inner");
+    if(!inner) return;
+    inner.style.transform="";inner.style.width="100%";
+    const available=Math.max(1,el.clientHeight-34);
+    const needed=inner.scrollHeight;
+    if(needed>available){const scale=Math.max(.68,Math.min(1,available/needed));inner.style.transform=`scale(${scale})`;inner.style.width=`${100/scale}%`;}
+  }
+
   function render(){if(isMobile()){const p=pages[mobilePage];left.className="page left mobile-hide";left.innerHTML="";applyPage(right,p,mobilePage+1,"right");right.classList.add("mobile-show");status.textContent=`Page ${mobilePage+1} of ${pages.length}`;prev.disabled=edgePrev.disabled=mobilePage===0;next.disabled=edgeNext.disabled=mobilePage===pages.length-1;next.textContent=mobilePage===pages.length-1?"End":"Turn page";return}const li=spread*2,ri=li+1;applyPage(left,pages[li],li+1,"left");applyPage(right,pages[ri],ri+1,"right");status.textContent=`Spread ${spread+1} of ${Math.ceil(pages.length/2)}`;prev.disabled=edgePrev.disabled=spread===0;next.disabled=edgeNext.disabled=spread===Math.ceil(pages.length/2)-1;next.textContent=next.disabled?"End":"Turn page"}
   function go(dir){if(animating)return;const mobile=isMobile(),max=mobile?pages.length-1:Math.ceil(pages.length/2)-1,current=mobile?mobilePage:spread,target=current+dir;if(target<0||target>max)return;animating=true;book.classList.remove("turn-next","turn-prev");void book.offsetWidth;book.classList.add(dir>0?"turn-next":"turn-prev");window.setTimeout(()=>{if(mobile)mobilePage=target;else spread=target;render()},270);window.setTimeout(()=>{book.classList.remove("turn-next","turn-prev");animating=false},580)}
   next.addEventListener("click",()=>go(1));prev.addEventListener("click",()=>go(-1));edgeNext.addEventListener("click",()=>go(1));edgePrev.addEventListener("click",()=>go(-1));
