@@ -28,7 +28,7 @@ export default async function Join() {
         <ApplicationFolderShowcase />
       </div>
 
-      <aside className="join-card">
+      <aside className="join-card" style={{ alignSelf: 'center' }}>
         <p className="kick">Application</p>
         <ol className="join-steps">
           <li><span>01</span><p>Create your account and file.</p></li>
