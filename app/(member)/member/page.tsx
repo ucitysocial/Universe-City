@@ -52,7 +52,7 @@ export default async function MemberHome() {
         </p>
       )}
 
-      <h2 style={{ marginTop: 44, fontSize: 20 }}>Your systems</h2>
+      <h2 style={{ marginTop: 44, fontSize: 20 }}>Your folders</h2>
       <div className="grid4" style={{ marginTop: 16 }}>
         {LIVE_FOLDERS.map(x => {
           const d = deptOf(x.dept);
