@@ -63,3 +63,4 @@ jobs:
           git add -A ucitysocial scripts .github/workflows/apply-ucitysocial-language.yml .github/workflows/apply-refined-ucitysocial.yml
           git commit -m 'copy: refine ucitysocial product story and language'
           git push origin HEAD:site/refine-language-product
+# transfer verified
