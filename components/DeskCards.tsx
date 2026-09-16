@@ -25,8 +25,8 @@ export default function DeskCards() {
 }
 
 const copy: Record<string, string> = {
-  Time: 'Where your time actually goes, and what is already committed.',
-  Inventory: 'What your household needs, what is running low, and what keeps getting replaced.',
-  Salary: 'What your work returns against what your life costs and what you want to earn.',
-  Standards: 'The rules and minimums you set for your own life, written down and dated.'
+  Time: 'Where your time goes and which hours are already committed.',
+  Inventory: 'What you own, what is running low and what keeps getting replaced.',
+  Salary: 'What your work returns compared with what your life costs.',
+  Standards: 'The minimums and exceptions you set for your own life.'
 };
