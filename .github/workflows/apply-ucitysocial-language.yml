@@ -1,0 +1,69 @@
+name: Apply ucitysocial language pass
+
+on:
+  push:
+    branches:
+      - site/refine-language-product
+
+permissions:
+  contents: write
+
+jobs:
+  apply-site-pass:
+    if: github.event.head_commit.message == 'chore: run ucitysocial language pass'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
+        with:
+          ref: site/refine-language-product
+          persist-credentials: true
+          fetch-depth: 0
+
+      - name: Rebuild and apply patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat scripts/ucitysocial-language.patch.gz.b64.part* | base64 -d | gunzip > /tmp/ucitysocial-language.patch
+          git apply --check /tmp/ucitysocial-language.patch
+          git apply /tmp/ucitysocial-language.patch
+
+      - name: Verify public language cleanup
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          files = list(Path('ucitysocial').glob('*.html'))
+          text = '\n'.join(p.read_text(errors='ignore') for p in files).lower()
+          forbidden = [
+              'unlock your potential', 'mindset', 'best self', 'level up', 'crush it',
+              'you have got this', 'one month, one part of your life',
+              'agency assessment comes first', 'one folder a month',
+              'start agency assessment', 'self-managed tier', 'agent tier'
+          ]
+          found = [term for term in forbidden if term in text]
+          if found:
+              raise SystemExit('Language audit failed: ' + ', '.join(found))
+          required = [
+              'each folder starts differently',
+              'four folders start together',
+              '$12 a week. one membership.',
+              'time', 'inventory', 'salary', 'standards'
+          ]
+          missing = [term for term in required if term not in text]
+          if missing:
+              raise SystemExit('Product copy audit failed; missing: ' + ', '.join(missing))
+          print(f'Checked {len(files)} HTML files: language/product audit passed.')
+          PY
+
+      - name: Remove one-time migration files and commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f scripts/ucitysocial-language.patch.gz.b64.part*
+          rm -f .github/workflows/apply-ucitysocial-language.yml
+          git config user.name 'ucitysocial'
+          git config user.email 'media@babs.fm'
+          git add -A ucitysocial scripts .github/workflows/apply-ucitysocial-language.yml
+          git commit -m 'copy: align ucitysocial with agent model and language standard'
+          git push origin HEAD:site/refine-language-product
