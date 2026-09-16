@@ -1,5 +1,5 @@
 import DeskCards from '@/components/DeskCards';
-import { DEPARTMENTS } from '@/lib/domain/folders';
+import { DEPARTMENTS, LIVE_FOLDERS } from '@/lib/domain/folders';
 
 const DEPARTMENT_DESCRIPTIONS: Record<string, string> = {
   I: 'Understand your current situation.',
@@ -8,10 +8,17 @@ const DEPARTMENT_DESCRIPTIONS: Record<string, string> = {
   IV: 'Set your priorities.'
 };
 
+const CHANGE_EXAMPLES: Record<string, string> = {
+  I: 'A new shift changes Time.',
+  II: 'A household purchase changes Inventory.',
+  III: 'A change in pay or living costs changes Salary.',
+  IV: 'A new minimum changes Standards.'
+};
+
 export default function HowItWorks() {
   return (
     <>
-      <section>
+      <section className="how-hero">
         <div className="wrap">
           <p className="kick">How it works</p>
           <h1 style={{ marginTop: 12, maxWidth: '18ch' }}>Universe City starts with four folders.</h1>
@@ -22,7 +29,7 @@ export default function HowItWorks() {
         </div>
       </section>
 
-      <section>
+      <section className="how-folders-section">
         <div className="wrap">
           <p className="kick">Four folders</p>
           <h2 style={{ marginTop: 10 }}>One in each department.</h2>
@@ -34,28 +41,41 @@ export default function HowItWorks() {
         </div>
       </section>
 
-      <section className="dark">
+      <section className="how-departments-section">
         <div className="wrap">
-          <p className="kick">The four departments</p>
-          <ul className="rows">
-            {DEPARTMENTS.map(d => (
-              <li key={d.key}>
-                <span className="rn" style={{ color: d.color, filter: 'brightness(2)' }}>{d.key}</span>
-                <span><strong>{d.name}</strong>. {DEPARTMENT_DESCRIPTIONS[d.key]}</span>
-              </li>
-            ))}
-          </ul>
+          <p className="kick">Four departments</p>
+          <h2 style={{ marginTop: 10 }}>Each folder belongs to one department.</h2>
+          <div className="how-department-grid">
+            {DEPARTMENTS.map(d => {
+              const folder = LIVE_FOLDERS.find(f => f.dept === d.key);
+              return (
+                <article className="how-department-card" style={{ background: d.color }} key={d.key}>
+                  <div className="how-department-number">{d.key}</div>
+                  <div>
+                    <p className="how-department-label">Department</p>
+                    <h3>{d.name}</h3>
+                    <p className="how-department-description">{DEPARTMENT_DESCRIPTIONS[d.key]}</p>
+                    {folder && <p className="how-department-folder">Folder 01 · {folder.name}</p>}
+                  </div>
+                </article>
+              );
+            })}
+          </div>
         </div>
       </section>
 
-      <section>
-        <div className="wrap prose">
+      <section className="how-current-section">
+        <div className="wrap">
           <p className="kick">Keeping them current</p>
-          <h2 style={{ marginTop: 10 }}>Each folder is updated when the information inside it changes.</h2>
-          <p style={{ marginTop: 18 }}>
-            A new shift updates Time. A household purchase updates Inventory. A change in pay or
-            living costs updates Salary. A new minimum updates Standards.
-          </p>
+          <h2 style={{ marginTop: 10, maxWidth: '24ch' }}>The folders change when the information inside them changes.</h2>
+          <div className="how-change-grid">
+            {DEPARTMENTS.map(d => (
+              <div className="how-change-card" style={{ borderTopColor: d.color }} key={d.key}>
+                <span className="how-change-number" style={{ color: d.color }}>{d.key}</span>
+                <p>{CHANGE_EXAMPLES[d.key]}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
     </>
