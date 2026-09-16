@@ -4,36 +4,36 @@ import DeskCards from '@/components/DeskCards';
 export default function Home() {
   return (
     <>
-      <section>
-        <div className="wrap">
-          <h1 style={{ maxWidth: '16ch' }}>
+      <section className="hero-section">
+        <div className="wrap hero-copy">
+          <h1>
             Artists have teams. Athletes have teams.
           </h1>
           <p className="lede">
             You are running a whole life by yourself. Universe City is an agency for everyday
             people. You get four working systems and a real person who holds your file.
           </p>
-          <div style={{ display: 'flex', gap: 14, marginTop: 34, flexWrap: 'wrap' }}>
-            <Link className="btn" href="/join">Join for $48 a month</Link>
+          <div className="hero-actions">
+            <Link className="btn" href="/join">Start your file</Link>
             <Link className="btn ghost" href="/how-it-works">See how it works</Link>
           </div>
         </div>
       </section>
 
-      <section>
+      <section className="systems-section">
         <div className="wrap">
           <p className="kick">Four systems</p>
-          <h2 style={{ marginTop: 10, maxWidth: '22ch' }}>
+          <h2 className="systems-heading">
             Nothing here is advice. Every one of them leaves you something.
           </h2>
           <DeskCards />
         </div>
       </section>
 
-      <section className="dark">
-        <div className="wrap">
+      <section className="dark agent-section">
+        <div className="wrap agent-copy">
           <p className="kick">The part that is not software</p>
-          <h2 style={{ marginTop: 10, maxWidth: '20ch' }}>
+          <h2>
             Fifteen minutes a week with your agent.
           </h2>
           <p className="lede">
@@ -49,19 +49,23 @@ export default function Home() {
         </div>
       </section>
 
-      <section>
-        <div className="wrap" style={{ display: 'flex', gap: 40, flexWrap: 'wrap', alignItems: 'flex-start' }}>
-          <div className="prose">
+      <section className="membership-section">
+        <div className="wrap membership-layout">
+          <div className="membership-copy">
             <p className="kick">Membership</p>
-            <div className="price">
-              <span className="n vt" style={{ color: 'var(--I)' }}>$48</span>
-              <span className="lab" style={{ color: 'var(--dim)' }}>a month</span>
-            </div>
+            <h2>One membership. Four systems. One weekly review.</h2>
             <p>
               Time, Inventory, Salary and Standards, and one fifteen minute review every week
               with your agent. One price. Cancel whenever you want, and your record stays yours.
             </p>
-            <Link className="btn" href="/join" style={{ marginTop: 22 }}>Join Universe City</Link>
+          </div>
+
+          <div className="membership-price-card">
+            <div className="price">
+              <span className="n vt">$48</span>
+              <span className="lab">a month</span>
+            </div>
+            <Link className="membership-cta" href="/join">Start your file</Link>
           </div>
         </div>
       </section>
