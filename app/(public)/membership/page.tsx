@@ -19,7 +19,7 @@ export default function Membership() {
             <li><span className="rn">IV</span><span><strong>Standards.</strong> Your minimums, exceptions and the date each standard was set.</span></li>
             <li><span className="rn">&#9733;</span><span><strong>Weekly review.</strong> Fifteen minutes with your agent.</span></li>
           </ul>
-          <Link className="btn" href="/join" style={{ marginTop: 30 }}>Enroll</Link>
+          <Link className="btn" href="/join" style={{ marginTop: 30 }}>Apply</Link>
           <p className="note">Cancel any time. Your file stays on record.</p>
         </div>
       </section>
