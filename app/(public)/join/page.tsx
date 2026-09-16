@@ -15,8 +15,8 @@ export default async function Join() {
         <p className="kick">Membership</p>
         <h1>Join Universe City.</h1>
         <p className="lede">
-          $48 a month includes Time, Inventory, Salary and Standards, plus one fifteen minute
-          review with your agent every week.
+          $48 a month includes four folders: Time, Inventory, Salary and Standards. You also get
+          one fifteen minute review with your agent every week.
         </p>
 
         <div className="join-systems">
@@ -33,7 +33,7 @@ export default async function Join() {
           <li><span>01</span><p>Create your file.</p></li>
           <li><span>02</span><p>Pay for membership.</p></li>
           <li><span>03</span><p>Add your starting information.</p></li>
-          <li><span>04</span><p>Review all four systems with your agent each week.</p></li>
+          <li><span>04</span><p>Review all four folders with your agent each week.</p></li>
         </ol>
 
         {profile ? (
