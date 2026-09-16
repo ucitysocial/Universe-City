@@ -20,7 +20,7 @@ export default function Checkout() {
     <>
       {err && <p className="err">{err}</p>}
       <button className="btn" style={{ width: '100%' }} onClick={go} disabled={busy}>
-        {busy ? 'Opening checkout' : 'Start my membership'}
+        {busy ? 'Opening checkout' : 'Complete enrollment'}
       </button>
       <p className="note">
         Stripe processes your card information. Universe City does not receive your card number.
