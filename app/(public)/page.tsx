@@ -36,14 +36,11 @@ export default function Home() {
           <h2>
             Fifteen minutes a week with your agent.
           </h2>
-          <p className="lede">
-            Your agent comes to the review with your file already in front of them.
-          </p>
           <ul className="rows">
-            <li><span className="rn">01</span><span>Your agent can see what happened.</span></li>
-            <li><span className="rn">02</span><span>You check what changed together.</span></li>
-            <li><span className="rn">03</span><span>Anything wrong in the file is corrected.</span></li>
-            <li><span className="rn">04</span><span>You decide what needs attention next.</span></li>
+            <li><span className="rn">01</span><span>Your file changes as your life changes.</span></li>
+            <li><span className="rn">02</span><span>Time changes with your schedule. Inventory changes with your home.</span></li>
+            <li><span className="rn">03</span><span>Salary changes with your work. Standards change with what you require.</span></li>
+            <li><span className="rn">04</span><span>Each week, your agent reviews the whole file with you and identifies what needs attention next.</span></li>
           </ul>
         </div>
       </section>
