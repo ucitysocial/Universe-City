@@ -87,11 +87,11 @@ export default function Signup() {
 
   if (sent) return (
     <div className="wrap"><div className="panel">
-      <p className="kick">Universe City</p>
+      <p className="kick">Enrollment</p>
       <h2 style={{ marginTop: 8 }}>Check your email</h2>
       <p className="note">
-        We sent a confirmation link to {email}. Open the link to finish creating your file. No
-        payment has been taken.
+        We sent a confirmation link to {email}. Open the link to continue enrollment. No payment
+        has been taken.
       </p>
     </div></div>
   );
@@ -99,11 +99,11 @@ export default function Signup() {
   return (
     <div className="wrap">
       <div className="panel signup-panel">
-        <p className="kick">Universe City</p>
-        <h2 style={{ marginTop: 8 }}>Create your file</h2>
+        <p className="kick">Enrollment</p>
+        <h2 style={{ marginTop: 8 }}>Create your account.</h2>
         <p className="note" style={{ marginTop: 6, marginBottom: 20 }}>
-          Enter the information that belongs on your file. Your birthday is used to assign your zodiac badge.
-          No payment is taken here.
+          This information opens your Universe City file. Your birthday assigns your zodiac badge.
+          No payment is taken on this step.
         </p>
         {err && <p className="err">{err}</p>}
         <form onSubmit={submit}>
@@ -167,7 +167,7 @@ export default function Signup() {
           </div>
 
           <button className="btn" style={{ width: '100%' }} disabled={busy}>
-            {busy ? 'Creating file' : 'Create my file'}
+            {busy ? 'Creating account' : 'Continue enrollment'}
           </button>
         </form>
       </div>
