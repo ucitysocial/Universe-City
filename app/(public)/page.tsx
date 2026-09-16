@@ -10,8 +10,8 @@ export default function Home() {
             A life management agency for everyday people.
           </h1>
           <p className="lede">
-            You work on Time, Inventory, Salary and Standards with your agent. Each system stays
-            current as your life changes, and you review all four together every week.
+            You start with one folder in each department. They are Time, Inventory, Salary and
+            Standards. Your agent works across all four with you and reviews them every week.
           </p>
           <div className="hero-actions">
             <Link className="btn" href="/join">Start your file</Link>
@@ -22,9 +22,9 @@ export default function Home() {
 
       <section className="systems-section">
         <div className="wrap">
-          <p className="kick">Four systems</p>
+          <p className="kick">Four folders</p>
           <h2 className="systems-heading">
-            Start with Time, Inventory, Salary and Standards.
+            One folder in each department.
           </h2>
           <DeskCards />
         </div>
@@ -37,14 +37,13 @@ export default function Home() {
             Fifteen minutes a week with your agent.
           </h2>
           <p className="lede">
-            Your agent reviews each system with you. Changes are added without removing what was
-            there before.
+            Your agent comes to the review with your file already in front of them.
           </p>
           <ul className="rows">
-            <li><span className="rn">01</span><span>Time changes when your schedule changes.</span></li>
-            <li><span className="rn">02</span><span>Inventory changes when your household changes.</span></li>
-            <li><span className="rn">03</span><span>Salary changes when your work or living costs change.</span></li>
-            <li><span className="rn">04</span><span>Standards change when what you require changes.</span></li>
+            <li><span className="rn">01</span><span>Your agent can see what happened.</span></li>
+            <li><span className="rn">02</span><span>You check what changed together.</span></li>
+            <li><span className="rn">03</span><span>Anything wrong in the file is corrected.</span></li>
+            <li><span className="rn">04</span><span>You decide what needs attention next.</span></li>
           </ul>
         </div>
       </section>
@@ -53,7 +52,7 @@ export default function Home() {
         <div className="wrap membership-layout">
           <div className="membership-copy">
             <p className="kick">Membership</p>
-            <h2>$48 a month includes four systems and one weekly review.</h2>
+            <h2>$48 a month includes four folders and one weekly review.</h2>
             <p>
               Time, Inventory, Salary and Standards are included. Your agent reviews all four with
               you for fifteen minutes each week.
