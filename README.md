@@ -13,7 +13,7 @@ A responsive website. Public site, member area, private agent console.
    block revision trigger.
 2. Make yourself an agent:
    `update profiles set role = 'agent' where email = 'you@example.com';`
-3. Stripe. One product, one recurring price at $48 a month. Put the price id in
+3. Stripe. One product, one recurring price at $12 a week. Put the price id in
    `STRIPE_PRICE_MEMBERSHIP`. Point a webhook at `/api/stripe/webhook` for
    `checkout.session.completed`, `customer.subscription.updated` and
    `customer.subscription.deleted`.
