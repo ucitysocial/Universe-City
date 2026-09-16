@@ -13,41 +13,43 @@ export default function SiteHeader({ signedIn }: { signedIn: boolean }) {
           <span className="brand-sub">Life Management Agency</span>
         </div>
 
-        <div className="header-actions">
+        <nav className="primary-nav" aria-label="Primary navigation">
+          <Link href="/how-it-works">How it works</Link>
+          <Link href="/membership">Membership</Link>
           {signedIn
-            ? <Link className="client-link" href="/member">Your file</Link>
-            : <Link className="client-link" href="/join">Become a client</Link>}
+            ? <Link href="/member">Your file</Link>
+            : <Link href="/login">Log in</Link>}
+          <Link className="header-cta" href={signedIn ? '/member' : '/join'}>
+            {signedIn ? 'Open your file' : 'Start your file'}
+          </Link>
+        </nav>
+
+        <div className="more-wrap">
           <button
             className="menu-star"
             onClick={() => setOpen(v => !v)}
             aria-expanded={open}
-            aria-label={open ? 'Close menu' : 'Open menu'}
+            aria-label={open ? 'Close secondary menu' : 'Open secondary menu'}
           >
-            {open ? '×' : '★'}
+            ★
           </button>
-        </div>
-      </div>
 
-      {open && (
-        <div className="site-menu" onClick={() => setOpen(false)}>
-          <div className="wrap menu-grid">
-            <div>
-              <p className="menu-label">The system</p>
+          {open && (
+            <div className="compact-menu" onClick={() => setOpen(false)}>
+              <p className="menu-label">Explore</p>
+              <Link href="/">Home</Link>
               <Link href="/how-it-works">How it works</Link>
               <Link href="/membership">Membership</Link>
-            </div>
-            <div>
-              <p className="menu-label">Universe City</p>
               {signedIn
                 ? <Link href="/member">Your file</Link>
                 : <>
-                    <Link href="/login">Sign in</Link>
-                    <Link href="/join">Become a client</Link>
+                    <Link href="/login">Log in</Link>
+                    <Link className="compact-cta" href="/join">Start your file</Link>
                   </>}
             </div>
-          </div>
+          )}
         </div>
-      )}
+      </div>
     </header>
   );
 }
