@@ -128,8 +128,11 @@ export default function Signup() {
 
           {zodiac && (
             <div className="zodiac-preview" aria-live="polite">
-              <span className="zodiac-symbol" aria-hidden="true">{ZODIAC[zodiac].symbol}</span>
-              <span><strong>{zodiac}</strong><small>Your zodiac badge</small></span>
+              <span className="zodiac-badge">
+                <span className="zodiac-symbol" aria-hidden="true">{ZODIAC[zodiac].symbol}</span>
+                <span className="zodiac-label">{zodiac}</span>
+              </span>
+              <span className="zodiac-preview-note">Assigned from your birthday</span>
             </div>
           )}
 
