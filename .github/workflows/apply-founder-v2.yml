@@ -1,4 +1,4 @@
-name: Apply founder interaction v2
+name: Diagnose founder interaction payload
 
 on:
   push:
@@ -12,36 +12,17 @@ permissions:
   contents: write
 
 jobs:
-  apply:
+  diagnose:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out branch
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           ref: site/refine-language-product
-          fetch-depth: 0
-
-      - name: Rebuild founder page
+      - name: Check payload
         shell: bash
         run: |
           set -euo pipefail
-          cat scripts/founder-v2.xz.b64.part* | base64 -d > /tmp/founder-v2.html.xz
-          xz -dc /tmp/founder-v2.html.xz > ucitysocial/founder.html
-          node - <<'NODE'
-          const fs=require('fs');
-          const s=fs.readFileSync('ucitysocial/founder.html','utf8');
-          const scripts=[...s.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m=>m[1]);
-          for (const x of scripts) new Function(x);
-          if(!s.includes('id="edgeNext"') || !s.includes('pointerdown')) throw new Error('Founder interaction update missing');
-          NODE
-          rm -f scripts/founder-v2.xz.b64.part* .github/workflows/apply-founder-v2.yml
-
-      - name: Commit founder interaction
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config user.name 'ucitysocial'
-          git config user.email 'media@babs.fm'
-          git add ucitysocial/founder.html scripts .github/workflows/apply-founder-v2.yml
-          git commit -m 'site: improve founder page-turn interaction'
-          git push origin HEAD:site/refine-language-product
+          wc -c scripts/founder-v2.xz.b64.part*
+          sha256sum scripts/founder-v2.xz.b64.part*
+          cat scripts/founder-v2.xz.b64.part* > /tmp/all.b64
+          sha256sum /tmp/all.b64
