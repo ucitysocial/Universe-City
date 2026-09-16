@@ -10,8 +10,8 @@ export default function Home() {
             Artists have teams. Athletes have teams.
           </h1>
           <p className="lede">
-            You are running a whole life by yourself. Universe City is an agency for everyday
-            people. You get four working systems and a real person who holds your file.
+            Universe City is a life management agency for everyday people. We keep the record,
+            organize four working systems, and review your file with you every week.
           </p>
           <div className="hero-actions">
             <Link className="btn" href="/join">Start your file</Link>
@@ -24,7 +24,7 @@ export default function Home() {
         <div className="wrap">
           <p className="kick">Four systems</p>
           <h2 className="systems-heading">
-            Nothing here is advice. Every one of them leaves you something.
+            Four systems are running now.
           </h2>
           <DeskCards />
         </div>
@@ -32,19 +32,19 @@ export default function Home() {
 
       <section className="dark agent-section">
         <div className="wrap agent-copy">
-          <p className="kick">The part that is not software</p>
+          <p className="kick">Weekly review</p>
           <h2>
             Fifteen minutes a week with your agent.
           </h2>
           <p className="lede">
-            A person reads your file, not a dashboard. We go through what changed, what is still
-            a guess, and what to do about it. Software keeps the record between those conversations.
+            Your agent reviews what changed, what is confirmed, what is still uncertain, and what
+            needs attention next.
           </p>
           <ul className="rows">
-            <li><span className="rn">01</span><span>You tell us about your week, in your own words.</span></li>
-            <li><span className="rn">02</span><span>It goes on file as what it is. Observed, planned, or still an estimate.</span></li>
-            <li><span className="rn">03</span><span>Once a week we sit down for fifteen minutes and work out what it means.</span></li>
-            <li><span className="rn">04</span><span>Nothing is ever recorded that you did not say.</span></li>
+            <li><span className="rn">01</span><span>You tell us what happened.</span></li>
+            <li><span className="rn">02</span><span>The record shows what is known and what is still uncertain.</span></li>
+            <li><span className="rn">03</span><span>Your agent reviews the file with you once a week.</span></li>
+            <li><span className="rn">04</span><span>Corrections update the record without erasing history.</span></li>
           </ul>
         </div>
       </section>
@@ -55,8 +55,8 @@ export default function Home() {
             <p className="kick">Membership</p>
             <h2>One membership. Four systems. One weekly review.</h2>
             <p>
-              Time, Inventory, Salary and Standards, and one fifteen minute review every week
-              with your agent. One price. Cancel whenever you want, and your record stays yours.
+              Time, Inventory, Salary and Standards, plus one fifteen minute review every week
+              with your agent.
             </p>
           </div>
 
