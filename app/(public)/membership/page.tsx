@@ -7,11 +7,11 @@ export default function Membership() {
       <section>
         <div className="wrap">
           <p className="kick">Membership</p>
-          <h1 style={{ marginTop: 12, maxWidth: '16ch' }}>One membership. One price.</h1>
-          <div className="price" style={{ marginTop: 26 }}>
-            <span className="n vt" style={{ color: 'var(--I)' }}>$48</span>
-            <span className="lab" style={{ color: 'var(--dim)' }}>a month</span>
-          </div>
+          <h1 style={{ marginTop: 12, maxWidth: '16ch' }}>$48 a month.</h1>
+          <p className="lede" style={{ maxWidth: 'var(--text)' }}>
+            Membership includes Time, Inventory, Salary and Standards, plus one fifteen minute
+            review with your agent every week.
+          </p>
           <ul className="rows" style={{ maxWidth: 'var(--text)' }}>
             <li><span className="rn">I</span><span><strong>Time.</strong> Your week, recorded and organized.</span></li>
             <li><span className="rn">II</span><span><strong>Inventory.</strong> What you own, what is low and what needs replacing.</span></li>
@@ -20,12 +20,13 @@ export default function Membership() {
             <li><span className="rn">&#9733;</span><span><strong>Weekly review.</strong> Fifteen minutes with your agent.</span></li>
           </ul>
           <Link className="btn" href="/join" style={{ marginTop: 30 }}>Start your file</Link>
-          <p className="note">Cancel any time. Your record stays on file.</p>
+          <p className="note">Cancel any time. Your file stays on record.</p>
         </div>
       </section>
       <section>
         <div className="wrap">
           <p className="kick">Four systems</p>
+          <h2 style={{ marginTop: 10 }}>What you work on each week.</h2>
           <DeskCards />
         </div>
       </section>
