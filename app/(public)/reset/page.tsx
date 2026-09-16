@@ -25,7 +25,8 @@ export default function Reset() {
       <h2 style={{ marginTop: 8 }}>Reset your password</h2>
       {sent ? (
         <p className="note" style={{ marginTop: 16 }}>
-          If there is a file under {email}, a link is on its way. It works once and it expires.
+          If an account exists for {email}, we sent a password reset link. The link can be used
+          once and expires.
         </p>
       ) : (
         <>
@@ -37,7 +38,7 @@ export default function Reset() {
                      onChange={e => setEmail(e.target.value)} required />
             </div>
             <button className="btn" style={{ width: '100%' }} disabled={busy}>
-              {busy ? 'Sending' : 'Send me a link'}
+              {busy ? 'Sending link' : 'Send reset link'}
             </button>
           </form>
         </>
