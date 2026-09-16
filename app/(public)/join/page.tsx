@@ -10,40 +10,50 @@ export default async function Join() {
   if (profile?.membership === 'active') redirect('/member');
 
   return (
-    <div className="wrap">
-      <div className="panel" style={{ maxWidth: 560 }}>
-        <p className="kick">Join Universe City</p>
-        <h2 style={{ marginTop: 8 }}>$48 a month</h2>
-        <ul className="rows" style={{ marginTop: 18 }}>
-          <li><span className="rn">I</span><span>Time</span></li>
-          <li><span className="rn">II</span><span>Inventory</span></li>
-          <li><span className="rn">III</span><span>Salary</span></li>
-          <li><span className="rn">IV</span><span>Standards</span></li>
-          <li><span className="rn">&#9733;</span><span>Fifteen minutes every week with your agent</span></li>
-        </ul>
+    <div className="wrap join-layout">
+      <div className="join-main">
+        <p className="kick">Membership</p>
+        <h1>Start your Universe City file.</h1>
+        <p className="lede">
+          Membership is $48 a month. It includes four working systems and one fifteen minute
+          review with your agent every week.
+        </p>
+
+        <div className="join-systems">
+          <div className="join-system"><span className="rn">I</span><div><strong>Time</strong><p>Your week, recorded and organized.</p></div></div>
+          <div className="join-system"><span className="rn">II</span><div><strong>Inventory</strong><p>Household needs, low items and replenishment.</p></div></div>
+          <div className="join-system"><span className="rn">III</span><div><strong>Salary</strong><p>Current income, actual costs, required income and desired income.</p></div></div>
+          <div className="join-system"><span className="rn">IV</span><div><strong>Standards</strong><p>Your rules, minimums and exceptions.</p></div></div>
+        </div>
+      </div>
+
+      <aside className="join-card">
+        <p className="kick">What happens next</p>
+        <ol className="join-steps">
+          <li><span>01</span><p>Create your file.</p></li>
+          <li><span>02</span><p>Complete membership payment.</p></li>
+          <li><span>03</span><p>Start with Time.</p></li>
+          <li><span>04</span><p>Review your file with your agent every week.</p></li>
+        </ol>
 
         {profile ? (
           <>
-            <p className="note" style={{ margin: '20px 0' }}>
-              Your file exists, {profile.name ?? 'and it is yours'}. Case {profile.case_no}.
-              The next step is payment, and then your agent sets up Time with you.
+            <p className="note join-note">
+              Case {profile.case_no} is ready. Complete membership payment to continue.
             </p>
             <Checkout />
           </>
         ) : (
           <>
-            <p className="note" style={{ margin: '20px 0' }}>
-              Create your file first. It takes a moment and nothing is charged on that screen.
-            </p>
-            <Link className="btn" href="/signup" style={{ width: '100%', textAlign: 'center' }}>
+            <Link className="btn join-primary" href="/signup">
               Create my file
             </Link>
             <p className="note">
-              Already have one? <Link href="/login?next=/join">Log in</Link>.
+              Already have a file? <Link href="/login?next=/join">Log in</Link>.
             </p>
           </>
         )}
-      </div>
+      </aside>
     </div>
   );
 }
