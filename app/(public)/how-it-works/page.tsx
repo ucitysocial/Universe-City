@@ -8,11 +8,11 @@ const DEPARTMENT_DESCRIPTIONS: Record<string, string> = {
   IV: 'Set your priorities.'
 };
 
-const CHANGE_EXAMPLES: Record<string, string> = {
-  I: 'A new shift changes Time.',
-  II: 'A household purchase changes Inventory.',
-  III: 'A change in pay or living costs changes Salary.',
-  IV: 'A new minimum changes Standards.'
+const FOLDER_CHANGE_COPY: Record<string, string> = {
+  I: 'Time changes with your schedule.',
+  II: 'Inventory changes with your home.',
+  III: 'Salary changes with your work.',
+  IV: 'Standards change with what you require.'
 };
 
 export default function HowItWorks() {
@@ -44,7 +44,7 @@ export default function HowItWorks() {
       <section className="how-departments-section">
         <div className="wrap">
           <p className="kick">Four departments</p>
-          <h2 style={{ marginTop: 10 }}>Each folder belongs to one department.</h2>
+          <h2 style={{ marginTop: 10, maxWidth: '25ch' }}>Each folder belongs to one department and changes as your life changes.</h2>
           <div className="how-department-grid">
             {DEPARTMENTS.map(d => {
               const folder = LIVE_FOLDERS.find(f => f.dept === d.key);
@@ -52,10 +52,14 @@ export default function HowItWorks() {
                 <article className="how-department-card" style={{ background: d.color }} key={d.key}>
                   <div className="how-department-number">{d.key}</div>
                   <div>
-                    <p className="how-department-label">Department</p>
                     <h3>{d.name}</h3>
                     <p className="how-department-description">{DEPARTMENT_DESCRIPTIONS[d.key]}</p>
-                    {folder && <p className="how-department-folder">Folder 01 · {folder.name}</p>}
+                    {folder && (
+                      <div className="how-department-folder">
+                        <span>Folder 01 · {folder.name}</span>
+                        <p>{FOLDER_CHANGE_COPY[d.key]}</p>
+                      </div>
+                    )}
                   </div>
                 </article>
               );
@@ -64,26 +68,10 @@ export default function HowItWorks() {
         </div>
       </section>
 
-      <section className="how-current-section">
-        <div className="wrap">
-          <p className="kick">Keeping them current</p>
-          <h2 style={{ marginTop: 10, maxWidth: '24ch' }}>The folders change when the information inside them changes.</h2>
-          <div className="how-change-grid">
-            {DEPARTMENTS.map(d => (
-              <div className="how-change-card" style={{ borderTopColor: d.color }} key={d.key}>
-                <span className="how-change-number" style={{ color: d.color }}>{d.key}</span>
-                <p>{CHANGE_EXAMPLES[d.key]}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       <style>{`
         .how-hero{background:var(--hero)}
         .how-folders-section{background:#fff}
         .how-departments-section{background:var(--paper)}
-        .how-current-section{background:#fff}
 
         .how-department-grid{
           display:grid;
@@ -93,7 +81,7 @@ export default function HowItWorks() {
         }
         .how-department-card{
           color:#fff;
-          min-height:220px;
+          min-height:240px;
           padding:26px;
           display:grid;
           grid-template-columns:56px 1fr;
@@ -107,16 +95,9 @@ export default function HowItWorks() {
           line-height:1;
           opacity:.9;
         }
-        .how-department-label{
-          font-size:10px;
-          font-weight:700;
-          letter-spacing:.18em;
-          text-transform:uppercase;
-          opacity:.68;
-        }
         .how-department-card h3{
           font-size:25px;
-          margin-top:5px;
+          margin-top:0;
           color:#fff;
         }
         .how-department-description{
@@ -126,44 +107,26 @@ export default function HowItWorks() {
         }
         .how-department-folder{
           margin-top:24px;
-          padding-top:12px;
-          border-top:1px solid rgba(255,255,255,.4);
-          font-size:12px;
+          padding-top:14px;
+          border-top:1px solid rgba(255,255,255,.42);
+        }
+        .how-department-folder>span{
+          display:block;
+          font-size:11px;
           font-weight:700;
-          letter-spacing:.08em;
+          letter-spacing:.1em;
           text-transform:uppercase;
         }
-
-        .how-change-grid{
-          display:grid;
-          grid-template-columns:repeat(4,minmax(0,1fr));
-          gap:14px;
-          margin-top:32px;
+        .how-department-folder p{
+          margin-top:7px;
+          font-size:15px;
+          line-height:1.45;
         }
-        .how-change-card{
-          border:1px solid var(--rule);
-          border-top:7px solid;
-          background:var(--paper);
-          padding:18px;
-          min-height:132px;
-        }
-        .how-change-number{
-          display:block;
-          font-family:'VT323',monospace;
-          font-size:24px;
-          line-height:1;
-          margin-bottom:14px;
-        }
-        .how-change-card p{font-size:14px;line-height:1.5}
 
         @media (max-width:760px){
           .how-department-grid{grid-template-columns:1fr}
           .how-department-card{min-height:0;padding:22px;grid-template-columns:42px 1fr}
           .how-department-number{font-size:34px}
-          .how-change-grid{grid-template-columns:1fr 1fr}
-        }
-        @media (max-width:480px){
-          .how-change-grid{grid-template-columns:1fr}
         }
       `}</style>
     </>
