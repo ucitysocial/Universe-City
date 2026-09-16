@@ -33,8 +33,8 @@ export default function Signup() {
       <p className="kick">Universe City</p>
       <h2 style={{ marginTop: 8 }}>Check your email</h2>
       <p className="note">
-        We sent a confirmation link to {email}. Open it to finish creating your file. No payment
-        has been taken.
+        We sent a confirmation link to {email}. Open the link to finish creating your file. No
+        payment has been taken.
       </p>
     </div></div>
   );
@@ -45,7 +45,8 @@ export default function Signup() {
         <p className="kick">Universe City</p>
         <h2 style={{ marginTop: 8 }}>Create your file</h2>
         <p className="note" style={{ marginTop: 6, marginBottom: 20 }}>
-          Enter your name and email, then choose a password. No payment is taken here.
+          Enter your name and email. Choose a password with at least eight characters. No payment
+          is taken here.
         </p>
         {err && <p className="err">{err}</p>}
         <form onSubmit={submit}>
@@ -64,7 +65,7 @@ export default function Signup() {
                    value={password} onChange={e => setPassword(e.target.value)} required />
           </div>
           <button className="btn" style={{ width: '100%' }} disabled={busy}>
-            {busy ? 'One moment' : 'Create my file'}
+            {busy ? 'Creating file' : 'Create my file'}
           </button>
         </form>
       </div>
