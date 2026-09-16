@@ -7,24 +7,22 @@ export default function HowItWorks() {
       <section>
         <div className="wrap">
           <p className="kick">How it works</p>
-          <h1 style={{ marginTop: 12, maxWidth: '18ch' }}>An agency keeps a file. So do we.</h1>
+          <h1 style={{ marginTop: 12, maxWidth: '18ch' }}>Universe City keeps the record.</h1>
           <p className="lede">
-            Most tools ask you to build the thing yourself and then blame you when the grid stays
-            empty. Universe City works the other way round. You talk, it gets recorded, and the
-            systems assemble out of what you actually said.
+            You tell us what is happening. Universe City keeps the record. Your systems are built
+            from what you tell us.
           </p>
         </div>
       </section>
 
       <section>
         <div className="wrap">
-          <p className="kick">What you get at launch</p>
-          <h2 style={{ marginTop: 10 }}>Four systems, running.</h2>
+          <p className="kick">What is running now</p>
+          <h2 style={{ marginTop: 10 }}>Four working systems.</h2>
           <DeskCards />
           <p className="note" style={{ marginTop: 26, maxWidth: 'var(--text)' }}>
-            Universe City is built as four departments of twelve folders each. Forty eight in
-            total, and they all exist in the architecture. Four of them are operational today.
-            Depth before breadth, because a folder that does not leave you a system is a topic.
+            Universe City has 48 folders across four departments. Four are operational in this
+            version: Time, Inventory, Salary and Standards.
           </p>
         </div>
       </section>
@@ -45,12 +43,12 @@ export default function HowItWorks() {
 
       <section>
         <div className="wrap prose">
-          <p className="kick">What we will never do</p>
-          <h2 style={{ marginTop: 10 }}>Nothing goes on file that you did not say.</h2>
+          <p className="kick">The record</p>
+          <h2 style={{ marginTop: 10 }}>Known facts stay separate from estimates.</h2>
           <p style={{ marginTop: 18 }}>
-            No times are invented. An estimate stays an estimate until you say what actually
-            happened. Software can propose a change to your record. It cannot make one. Your agent
-            approves anything consequential, and you can see every version of every correction.
+            We do not invent times or turn estimates into observed facts. Changes that require
+            interpretation are proposed before they become part of the record. Corrections keep
+            their history.
           </p>
         </div>
       </section>
