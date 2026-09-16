@@ -15,7 +15,7 @@ export default async function Join() {
         <p className="kick">Membership</p>
         <h1>Join Universe City.</h1>
         <p className="lede">
-          $48 a month includes four folders: Time, Inventory, Salary and Standards. You also get
+          $12 a week includes four folders: Time, Inventory, Salary and Standards. You also get
           one fifteen minute review with your agent every week.
         </p>
 
