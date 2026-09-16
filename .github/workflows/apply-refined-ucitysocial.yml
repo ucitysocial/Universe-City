@@ -9,6 +9,25 @@ permissions:
   contents: write
 
 jobs:
+  diagnose:
+    if: "${{ github.event.head_commit.message == 'chore: diagnose refined source' }}"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
+        with:
+          ref: site/refine-language-product
+          fetch-depth: 0
+      - name: Inspect transfer chunks
+        shell: bash
+        run: |
+          set -euo pipefail
+          wc -c scripts/ucity-refined-xz.b64.part*
+          sha256sum scripts/ucity-refined-xz.b64.part*
+          cat scripts/ucity-refined-xz.b64.part* | base64 -d > /tmp/ucity-refined.tar.xz
+          wc -c /tmp/ucity-refined.tar.xz
+          sha256sum /tmp/ucity-refined.tar.xz
+
   apply:
     if: "${{ github.event.head_commit.message == 'chore: apply refined ucitysocial source' }}"
     runs-on: ubuntu-latest
