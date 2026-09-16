@@ -27,15 +27,20 @@ export default async function MemberHome() {
     <>
       <p className="kick">Your file</p>
       <h1 style={{ fontSize: 34, marginTop: 8 }}>{profile?.name}</h1>
-      <p style={{ color: 'var(--dim)' }}>
-        Case {profile?.case_no}
-        {profile?.represented_since ? ` · represented since ${displayDate(profile.represented_since)}` : ''}
-        {badge && (
-          <span className="zodiac-badge">
-            <span className="zodiac-symbol" aria-hidden="true">{badge.symbol}</span>{zodiac}
+      <div className="file-identity">
+        <p>
+          Case {profile?.case_no}
+          {profile?.represented_since ? ` · represented since ${displayDate(profile.represented_since)}` : ''}
+        </p>
+        {badge && zodiac && (
+          <span className="zodiac-badge" title={`${zodiac} zodiac badge`}>
+            <span className="zodiac-symbol-cell">
+              <span className="zodiac-symbol" aria-hidden="true">{badge.symbol}</span>
+            </span>
+            <span className="zodiac-label">{zodiac}</span>
           </span>
         )}
-      </p>
+      </div>
 
       <h2 style={{ marginTop: 40, fontSize: 20 }}>This week</h2>
       {has ? (
