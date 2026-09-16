@@ -13,7 +13,6 @@ permissions:
 
 jobs:
   apply:
-    if: ${{ !contains(github.event.head_commit.message, 'site: improve founder page-turn interaction') }}
     runs-on: ubuntu-latest
     steps:
       - name: Check out branch
