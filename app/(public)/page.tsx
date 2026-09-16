@@ -41,10 +41,10 @@ export default function Home() {
             needs attention next.
           </p>
           <ul className="rows">
-            <li><span className="rn">01</span><span>The systems show what happened.</span></li>
-            <li><span className="rn">02</span><span>The record shows what is known and what is still uncertain.</span></li>
-            <li><span className="rn">03</span><span>Your agent reviews the file with you once a week.</span></li>
-            <li><span className="rn">04</span><span>Corrections update the record without erasing history.</span></li>
+            <li><span className="rn">01</span><span>Your file changes as your life changes.</span></li>
+            <li><span className="rn">02</span><span>Time changes with your schedule. Inventory changes with your home.</span></li>
+            <li><span className="rn">03</span><span>Salary changes with your work. Standards change with what you require.</span></li>
+            <li><span className="rn">04</span><span>Each week, your agent reviews the whole file with you and identifies what needs attention next.</span></li>
           </ul>
         </div>
       </section>
