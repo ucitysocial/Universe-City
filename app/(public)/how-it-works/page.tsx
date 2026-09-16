@@ -78,6 +78,94 @@ export default function HowItWorks() {
           </div>
         </div>
       </section>
+
+      <style>{`
+        .how-hero{background:var(--hero)}
+        .how-folders-section{background:#fff}
+        .how-departments-section{background:var(--paper)}
+        .how-current-section{background:#fff}
+
+        .how-department-grid{
+          display:grid;
+          grid-template-columns:repeat(2,minmax(0,1fr));
+          gap:18px;
+          margin-top:34px;
+        }
+        .how-department-card{
+          color:#fff;
+          min-height:220px;
+          padding:26px;
+          display:grid;
+          grid-template-columns:56px 1fr;
+          gap:18px;
+          border:2px solid var(--ink);
+          box-shadow:4px 4px 0 var(--ink);
+        }
+        .how-department-number{
+          font-family:'VT323',monospace;
+          font-size:42px;
+          line-height:1;
+          opacity:.9;
+        }
+        .how-department-label{
+          font-size:10px;
+          font-weight:700;
+          letter-spacing:.18em;
+          text-transform:uppercase;
+          opacity:.68;
+        }
+        .how-department-card h3{
+          font-size:25px;
+          margin-top:5px;
+          color:#fff;
+        }
+        .how-department-description{
+          margin-top:14px;
+          max-width:34ch;
+          font-size:16px;
+        }
+        .how-department-folder{
+          margin-top:24px;
+          padding-top:12px;
+          border-top:1px solid rgba(255,255,255,.4);
+          font-size:12px;
+          font-weight:700;
+          letter-spacing:.08em;
+          text-transform:uppercase;
+        }
+
+        .how-change-grid{
+          display:grid;
+          grid-template-columns:repeat(4,minmax(0,1fr));
+          gap:14px;
+          margin-top:32px;
+        }
+        .how-change-card{
+          border:1px solid var(--rule);
+          border-top:7px solid;
+          background:var(--paper);
+          padding:18px;
+          min-height:132px;
+        }
+        .how-change-number{
+          display:block;
+          font-family:'VT323',monospace;
+          font-size:24px;
+          line-height:1;
+          margin-bottom:14px;
+        }
+        .how-change-card p{font-size:14px;line-height:1.5}
+
+        @media (max-width:760px){
+          .how-department-grid{grid-template-columns:1fr}
+          .how-department-card{min-height:0;padding:22px;grid-template-columns:42px 1fr}
+          .how-department-number{font-size:34px}
+          .how-change-grid{grid-template-columns:1fr 1fr}
+        }
+        @media (max-width:480px){
+          .how-change-grid{grid-template-columns:1fr}
+        }
+      `}</style>
     </>
   );
 }
