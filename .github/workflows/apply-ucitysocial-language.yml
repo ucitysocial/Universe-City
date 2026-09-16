@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   apply-site-pass:
-    if: github.event.head_commit.message == 'chore: run ucitysocial language pass'
+    if: "github.event.head_commit.message == 'chore: run ucitysocial language pass'"
     runs-on: ubuntu-latest
     steps:
       - name: Check out branch
