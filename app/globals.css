@@ -72,6 +72,20 @@ section.dark{background:var(--ink2);color:#fff;border-bottom:none}
 .membership-cta{align-self:flex-start;background:#fff;color:var(--I);text-decoration:none;font-weight:700;padding:12px 16px}
 .membership-cta:hover{text-decoration:underline;text-underline-offset:4px}
 
+/* ---------------- join ---------------- */
+.join-layout{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(320px,.8fr);gap:56px;align-items:start;padding-top:72px;padding-bottom:88px}
+.join-main h1{margin-top:10px;max-width:15ch}
+.join-systems{margin-top:36px;border-top:1px solid var(--rule)}
+.join-system{display:grid;grid-template-columns:42px 1fr;gap:14px;padding:18px 0;border-bottom:1px solid var(--rule)}
+.join-system .rn{font-family:'VT323',monospace;color:var(--dim);font-size:22px;line-height:1.2}
+.join-system p{margin-top:3px;color:var(--dim);font-size:15px}
+.join-card{background:var(--systems);border:2px solid var(--ink);padding:28px;position:sticky;top:92px}
+.join-steps{list-style:none;margin-top:16px}
+.join-steps li{display:grid;grid-template-columns:32px 1fr;gap:12px;padding:12px 0;border-bottom:1px solid var(--rule)}
+.join-steps li span{font-family:'VT323',monospace;color:var(--I);font-size:20px;line-height:1.2}
+.join-note{margin:22px 0 16px}
+.join-primary{width:100%;text-align:center;margin-top:24px}
+
 h1{font-size:clamp(34px,5vw,62px);line-height:1.04;letter-spacing:-.02em;font-weight:600}
 h2{font-size:clamp(24px,3vw,34px);line-height:1.15;font-weight:600}
 h3{font-size:19px;font-weight:600}
@@ -136,6 +150,8 @@ section.dark .rows li{border-color:rgba(255,255,255,.25)}
   .systems-section,.agent-section,.membership-section{padding:58px 0}
   .membership-layout{grid-template-columns:1fr;gap:28px}
   .membership-price-card{min-height:200px}
+  .join-layout{grid-template-columns:1fr;gap:32px;padding-top:48px;padding-bottom:64px}
+  .join-card{position:static}
   .grid4{grid-template-columns:1fr}
   .work{grid-template-columns:1fr}
   .side{border-right:none;border-bottom:3px solid var(--ink);padding:16px}
