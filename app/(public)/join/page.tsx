@@ -13,17 +13,18 @@ export default async function Join() {
     <div className="wrap join-layout">
       <div className="join-main">
         <p className="kick">Membership</p>
-        <h1>Apply to Universe City.</h1>
+        <h1>You do not have to manage every detail by yourself.</h1>
         <p className="lede">
-          $12 a week includes four folders: Time, Inventory, Salary and Standards. You also get
-          one fifteen minute review with your agent every week.
+          For $12 a week, Universe City helps you keep four parts of your life organized. Your
+          agent reviews the whole file with you every week, updates what changed and identifies
+          what needs attention next.
         </p>
 
         <div className="join-systems">
-          <div className="join-system"><span className="rn">I</span><div><strong>Time</strong><p>Your week, recorded and organized.</p></div></div>
-          <div className="join-system"><span className="rn">II</span><div><strong>Inventory</strong><p>What you own, what is low and what needs replacing.</p></div></div>
-          <div className="join-system"><span className="rn">III</span><div><strong>Salary</strong><p>Your income, your costs and what an hour of work returns.</p></div></div>
-          <div className="join-system"><span className="rn">IV</span><div><strong>Standards</strong><p>Your minimums, exceptions and the date each standard was set.</p></div></div>
+          <div className="join-system"><span className="rn">I</span><div><strong>Time</strong><p>See where your week is committed, what changed and how much time is still yours.</p></div></div>
+          <div className="join-system"><span className="rn">II</span><div><strong>Inventory</strong><p>Know what you have, what is running low and what needs to be replaced.</p></div></div>
+          <div className="join-system"><span className="rn">III</span><div><strong>Salary</strong><p>Compare what your work pays you with what your life costs.</p></div></div>
+          <div className="join-system"><span className="rn">IV</span><div><strong>Standards</strong><p>Keep your minimums and exceptions written down so you can use them when decisions come up.</p></div></div>
         </div>
       </div>
 
