@@ -49,7 +49,7 @@ export default function Home() {
         <div className="wrap membership-layout">
           <div className="membership-copy">
             <p className="kick">Membership</p>
-            <h2>$48 a month includes four folders and one weekly review.</h2>
+            <h2>$12 a week includes four folders and one weekly review.</h2>
             <p>
               Time, Inventory, Salary and Standards are included. Your agent reviews all four with
               you for fifteen minutes each week.
@@ -58,8 +58,8 @@ export default function Home() {
 
           <div className="membership-price-card">
             <div className="price">
-              <span className="n vt">$48</span>
-              <span className="lab">a month</span>
+              <span className="n vt">$12</span>
+              <span className="lab">a week</span>
             </div>
             <Link className="membership-cta" href="/join">Start your file</Link>
           </div>
