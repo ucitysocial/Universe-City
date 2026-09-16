@@ -25,8 +25,8 @@ export default function Membership() {
       </section>
       <section>
         <div className="wrap">
-          <p className="kick">Four systems</p>
-          <h2 style={{ marginTop: 10 }}>What you work on each week.</h2>
+          <p className="kick">Four folders</p>
+          <h2 style={{ marginTop: 10 }}>One folder in each department.</h2>
           <DeskCards />
         </div>
       </section>
