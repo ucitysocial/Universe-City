@@ -2,6 +2,11 @@ import { currentProfile, supabaseServer } from '@/lib/supabase/server';
 import { LIVE_FOLDERS, deptOf } from '@/lib/domain/folders';
 import { figures, type Block } from '@/lib/domain/time';
 import { weekBounds } from '@/lib/domain/dates';
+import { ZODIAC, type ZodiacSign } from '@/lib/domain/zodiac';
+
+const displayDate = (value: string) => new Intl.DateTimeFormat('en-US', {
+  month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC'
+}).format(new Date(`${String(value).slice(0, 10)}T00:00:00Z`));
 
 export default async function MemberHome() {
   const profile = await currentProfile();
@@ -15,15 +20,27 @@ export default async function MemberHome() {
 
   const f = figures((blocks ?? []) as Block[]);
   const has = (blocks?.length ?? 0) > 0;
+  const zodiac = profile?.zodiac as ZodiacSign | undefined;
+  const badge = zodiac ? ZODIAC[zodiac] : null;
 
   return (
     <>
       <p className="kick">Your file</p>
       <h1 style={{ fontSize: 34, marginTop: 8 }}>{profile?.name}</h1>
-      <p style={{ color: 'var(--dim)' }}>
-        Case {profile?.case_no}
-        {profile?.represented_since ? ` · represented since ${profile.represented_since}` : ''}
-      </p>
+      <div className="file-identity">
+        <p>
+          Case {profile?.case_no}
+          {profile?.represented_since ? ` · represented since ${displayDate(profile.represented_since)}` : ''}
+        </p>
+        {badge && zodiac && (
+          <span className="zodiac-badge" title={`${zodiac} zodiac badge`}>
+            <span className="zodiac-symbol-cell">
+              <span className="zodiac-symbol" aria-hidden="true">{badge.symbol}</span>
+            </span>
+            <span className="zodiac-label">{zodiac}</span>
+          </span>
+        )}
+      </div>
 
       <h2 style={{ marginTop: 40, fontSize: 20 }}>This week</h2>
       {has ? (
@@ -43,12 +60,12 @@ export default async function MemberHome() {
         </div>
       ) : (
         <p className="note" style={{ maxWidth: 'var(--text)' }}>
-          Nothing is on file yet. Your agent starts Time with you at the first review, and
-          anything you say before then is kept.
+          No Time records are on file for this week. Your agent records the information you
+          establish during your review.
         </p>
       )}
 
-      <h2 style={{ marginTop: 44, fontSize: 20 }}>Your systems</h2>
+      <h2 style={{ marginTop: 44, fontSize: 20 }}>Your folders</h2>
       <div className="grid4" style={{ marginTop: 16 }}>
         {LIVE_FOLDERS.map(x => {
           const d = deptOf(x.dept);
@@ -63,8 +80,8 @@ export default async function MemberHome() {
                 <p className="q">
                   {x.name === 'Time' && has ? `${Math.round(f.free)} hours of this week are yours.` : null}
                   {x.name === 'Standards' ? `${standards ?? 0} active.` : null}
-                  {x.name === 'Salary' ? 'Collecting. Needs a month of Time behind it.' : null}
-                  {x.name === 'Inventory' ? 'Opens once Time is running.' : null}
+                  {x.name === 'Salary' ? 'Not established yet.' : null}
+                  {x.name === 'Inventory' ? 'Not established yet.' : null}
                   {x.name === 'Time' && !has ? 'Not established yet.' : null}
                 </p>
                 {live && (

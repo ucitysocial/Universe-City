@@ -2,48 +2,50 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { currentProfile } from '@/lib/supabase/server';
 import Checkout from '@/components/Checkout';
+import ApplicationFolderShowcase from '@/components/ApplicationFolderShowcase';
 
-/** Join is the conversion flow, in order. Account first, then payment. */
+/** Application flow. Account first, then membership activation. */
 export default async function Join() {
   const profile = await currentProfile();
 
   if (profile?.membership === 'active') redirect('/member');
 
   return (
-    <div className="wrap">
-      <div className="panel" style={{ maxWidth: 560 }}>
-        <p className="kick">Join Universe City</p>
-        <h2 style={{ marginTop: 8 }}>$48 a month</h2>
-        <ul className="rows" style={{ marginTop: 18 }}>
-          <li><span className="rn">I</span><span>Time</span></li>
-          <li><span className="rn">II</span><span>Inventory</span></li>
-          <li><span className="rn">III</span><span>Salary</span></li>
-          <li><span className="rn">IV</span><span>Standards</span></li>
-          <li><span className="rn">&#9733;</span><span>Fifteen minutes every week with your agent</span></li>
-        </ul>
+    <div className="wrap join-layout">
+      <div className="join-main">
+        <p className="kick">Membership</p>
+        <h1>Get an agent for the parts of life you manage every day.</h1>
+
+        <ApplicationFolderShowcase />
+      </div>
+
+      <aside className="join-card" style={{ alignSelf: 'center' }}>
+        <p className="kick">Application</p>
+        <ol className="join-steps">
+          <li><span>01</span><p>Create your account and file.</p></li>
+          <li><span>02</span><p>Activate your $12 membership.</p></li>
+          <li><span>03</span><p>Start talking with your agent across all four folders.</p></li>
+          <li><span>04</span><p>Use your weekly review to manage changes, decisions and what comes next.</p></li>
+        </ol>
 
         {profile ? (
           <>
-            <p className="note" style={{ margin: '20px 0' }}>
-              Your file exists, {profile.name ?? 'and it is yours'}. Case {profile.case_no}.
-              The next step is payment, and then your agent sets up Time with you.
+            <p className="note join-note">
+              Case {profile.case_no} is ready. Continue your application to activate membership.
             </p>
             <Checkout />
           </>
         ) : (
           <>
-            <p className="note" style={{ margin: '20px 0' }}>
-              Create your file first. It takes a moment and nothing is charged on that screen.
-            </p>
-            <Link className="btn" href="/signup" style={{ width: '100%', textAlign: 'center' }}>
-              Create my file
+            <Link className="btn join-primary" href="/signup">
+              Begin application
             </Link>
             <p className="note">
-              Already have one? <Link href="/login?next=/join">Log in</Link>.
+              Already have an account? <Link href="/login?next=/join">Log in</Link>.
             </p>
           </>
         )}
-      </div>
+      </aside>
     </div>
   );
 }

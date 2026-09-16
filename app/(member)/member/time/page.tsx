@@ -6,8 +6,8 @@ import { weekBounds, today } from '@/lib/domain/dates';
 const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 const c12 = (m: number) => {
   m = ((m % 1440) + 1440) % 1440;
-  let h = Math.floor(m / 60); const s = h < 12 ? 'am' : 'pm'; h = h % 12 || 12;
-  return h + (m % 60 ? ':' + String(m % 60).padStart(2, '0') : '') + s;
+  let h = Math.floor(m / 60); const s = h < 12 ? 'AM' : 'PM'; h = h % 12 || 12;
+  return h + (m % 60 ? ':' + String(m % 60).padStart(2, '0') : ':00') + ' ' + s;
 };
 
 export default async function TimePage() {
@@ -29,8 +29,8 @@ export default async function TimePage() {
       <p className="kick">Department I &middot; folder 01</p>
       <h1 style={{ fontSize: 32, marginTop: 8 }}>Time</h1>
       <p style={{ color: 'var(--dim)', maxWidth: 'var(--text)' }}>
-        A seven day operating schedule. How many hours a week are yours, and where in the week
-        they sit.
+        A seven-day operating schedule. It shows how many hours a week are yours and where those
+        hours sit.
       </p>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', background: 'var(--ink2)',
@@ -50,8 +50,8 @@ export default async function TimePage() {
 
       {blocks.length === 0 ? (
         <p className="note" style={{ maxWidth: 'var(--text)' }}>
-          Nothing on file for this week. Time is built out of conversation rather than from an
-          empty grid, so this fills in as you and your agent go through your days.
+          No Time records are on file for this week. Your agent records confirmed and estimated
+          blocks from the information you provide.
         </p>
       ) : (
         <div style={{ maxWidth: 820 }}>
@@ -90,9 +90,9 @@ export default async function TimePage() {
             );
           })}
           <p className="note" style={{ marginTop: 16 }}>
-            Each row is one day, midnight to midnight. The figure is the hours that were yours.
-            Black is sleep. {Object.entries(STATUSES).length} statuses, and an hour nobody recorded
-            is unaccounted rather than free.
+            Each row is one day from midnight to midnight. The figure is the number of hours that
+            were yours. Black is sleep. There are {Object.entries(STATUSES).length} statuses. An
+            hour that has not been recorded is unaccounted, not free.
           </p>
         </div>
       )}

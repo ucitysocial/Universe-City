@@ -7,25 +7,26 @@ export default function Membership() {
       <section>
         <div className="wrap">
           <p className="kick">Membership</p>
-          <h1 style={{ marginTop: 12, maxWidth: '16ch' }}>One membership. One price.</h1>
-          <div className="price" style={{ marginTop: 26 }}>
-            <span className="n vt" style={{ color: 'var(--I)' }}>$48</span>
-            <span className="lab" style={{ color: 'var(--dim)' }}>a month</span>
-          </div>
+          <h1 style={{ marginTop: 12, maxWidth: '16ch' }}>$12.</h1>
+          <p className="lede" style={{ maxWidth: 'var(--text)' }}>
+            Membership includes Time, Inventory, Salary and Standards, plus one fifteen minute
+            review with your agent every week.
+          </p>
           <ul className="rows" style={{ maxWidth: 'var(--text)' }}>
-            <li><span className="rn">I</span><span>Time. A seven day operating schedule built out of conversation.</span></li>
-            <li><span className="rn">II</span><span>Inventory. What runs out, what it costs, and when it is due again.</span></li>
-            <li><span className="rn">III</span><span>Salary. What an hour of your work actually returns.</span></li>
-            <li><span className="rn">IV</span><span>Standards. Your minimums, written down and dated.</span></li>
-            <li><span className="rn">&#9733;</span><span>Fifteen minutes every week with your agent.</span></li>
+            <li><span className="rn">I</span><span><strong>Time.</strong> Your agent establishes and maintains your calendar.</span></li>
+            <li><span className="rn">II</span><span><strong>Inventory.</strong> Your agent maintains the household items you normally need available.</span></li>
+            <li><span className="rn">III</span><span><strong>Salary.</strong> Your agent maintains a working view of income and regular expenses.</span></li>
+            <li><span className="rn">IV</span><span><strong>Standards.</strong> Your agent records the rules you confirm, why they matter and the impact you expect.</span></li>
+            <li><span className="rn">&#9733;</span><span><strong>Weekly review.</strong> Fifteen minutes with your agent.</span></li>
           </ul>
-          <Link className="btn" href="/join" style={{ marginTop: 30 }}>Join Universe City</Link>
-          <p className="note">Cancel any time. Your record stays yours either way.</p>
+          <Link className="btn" href="/join" style={{ marginTop: 30 }}>Apply</Link>
+          <p className="note">Cancel any time. Your file stays on record.</p>
         </div>
       </section>
       <section>
         <div className="wrap">
-          <p className="kick">What is running today</p>
+          <p className="kick">Four folders</p>
+          <h2 style={{ marginTop: 10 }}>One folder in each department.</h2>
           <DeskCards />
         </div>
       </section>

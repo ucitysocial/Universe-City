@@ -1,0 +1,72 @@
+name: Import ucitysocial source
+
+on:
+  push:
+    branches:
+      - style/global-palette
+    paths:
+      - .github/workflows/import-ucitysocial.yml
+
+permissions:
+  contents: write
+
+jobs:
+  import-site:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out working branch
+        uses: actions/checkout@v4
+        with:
+          ref: style/global-palette
+          fetch-depth: 0
+
+      - name: Import deployed ucitysocial.com files
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ucitysocial
+          base="https://ucitysocial.com"
+          files=(
+            index.html
+            agency-assessment.html
+            housing-stability.html
+            career-development.html
+            life-management.html
+            founder.html
+            join.html
+            brittnay.jpg
+            podcast-2018.jpg
+          )
+          for file in "${files[@]}"; do
+            echo "Importing $file"
+            curl --fail --location --silent --show-error "$base/$file" -o "ucitysocial/$file"
+          done
+
+      - name: Verify imported site
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s ucitysocial/index.html
+          test -s ucitysocial/agency-assessment.html
+          test -s ucitysocial/housing-stability.html
+          test -s ucitysocial/career-development.html
+          test -s ucitysocial/life-management.html
+          test -s ucitysocial/founder.html
+          test -s ucitysocial/join.html
+          test -s ucitysocial/brittnay.jpg
+          test -s ucitysocial/podcast-2018.jpg
+          grep -q "Universe City" ucitysocial/index.html
+
+      - name: Commit imported source
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ucitysocial
+          if git diff --cached --quiet; then
+            echo "No source changes to commit."
+            exit 0
+          fi
+          git commit -m "site: import ucitysocial.com source"
+          git push origin HEAD:style/global-palette
