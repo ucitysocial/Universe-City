@@ -44,27 +44,6 @@ export default function Home() {
           </ul>
         </div>
       </section>
-
-      <section className="membership-section">
-        <div className="wrap membership-layout">
-          <div className="membership-copy">
-            <p className="kick">Membership</p>
-            <h2>$12 a week includes four folders and one weekly review.</h2>
-            <p>
-              Time, Inventory, Salary and Standards are included. Your agent reviews all four with
-              you for fifteen minutes each week.
-            </p>
-          </div>
-
-          <div className="membership-price-card">
-            <div className="price">
-              <span className="n vt">$12</span>
-              <span className="lab">a week</span>
-            </div>
-            <Link className="membership-cta" href="/join">Start your file</Link>
-          </div>
-        </div>
-      </section>
     </>
   );
 }
