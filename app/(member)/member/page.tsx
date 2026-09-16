@@ -2,6 +2,7 @@ import { currentProfile, supabaseServer } from '@/lib/supabase/server';
 import { LIVE_FOLDERS, deptOf } from '@/lib/domain/folders';
 import { figures, type Block } from '@/lib/domain/time';
 import { weekBounds } from '@/lib/domain/dates';
+import { ZODIAC, type ZodiacSign } from '@/lib/domain/zodiac';
 
 const displayDate = (value: string) => new Intl.DateTimeFormat('en-US', {
   month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC'
@@ -19,6 +20,8 @@ export default async function MemberHome() {
 
   const f = figures((blocks ?? []) as Block[]);
   const has = (blocks?.length ?? 0) > 0;
+  const zodiac = profile?.zodiac as ZodiacSign | undefined;
+  const badge = zodiac ? ZODIAC[zodiac] : null;
 
   return (
     <>
@@ -27,6 +30,11 @@ export default async function MemberHome() {
       <p style={{ color: 'var(--dim)' }}>
         Case {profile?.case_no}
         {profile?.represented_since ? ` · represented since ${displayDate(profile.represented_since)}` : ''}
+        {badge && (
+          <span className="zodiac-badge">
+            <span className="zodiac-symbol" aria-hidden="true">{badge.symbol}</span>{zodiac}
+          </span>
+        )}
       </p>
 
       <h2 style={{ marginTop: 40, fontSize: 20 }}>This week</h2>
