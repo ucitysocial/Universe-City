@@ -87,11 +87,10 @@ export default function Signup() {
 
   if (sent) return (
     <div className="wrap"><div className="panel">
-      <p className="kick">Enrollment</p>
+      <p className="kick">Application</p>
       <h2 style={{ marginTop: 8 }}>Check your email</h2>
       <p className="note">
-        We sent a confirmation link to {email}. Open the link to continue enrollment. No payment
-        has been taken.
+        We sent a confirmation link to {email}. Open the link to continue your application.
       </p>
     </div></div>
   );
@@ -99,7 +98,7 @@ export default function Signup() {
   return (
     <div className="wrap">
       <div className="panel signup-panel">
-        <p className="kick">Enrollment</p>
+        <p className="kick">Application</p>
         <h2 style={{ marginTop: 8, marginBottom: 20 }}>Create your account.</h2>
         {err && <p className="err">{err}</p>}
         <form onSubmit={submit}>
@@ -163,7 +162,7 @@ export default function Signup() {
           </div>
 
           <button className="btn" style={{ width: '100%' }} disabled={busy}>
-            {busy ? 'Creating account' : 'Continue enrollment'}
+            {busy ? 'Creating account' : 'Create my file'}
           </button>
         </form>
       </div>
