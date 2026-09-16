@@ -15,10 +15,6 @@ export default async function Join() {
       <div className="join-main">
         <p className="kick">Membership</p>
         <h1>Get an agent for the parts of life you manage every day.</h1>
-        <p className="join-review-line" style={{ marginTop: 20, maxWidth: '62ch', color: 'var(--dim)', fontSize: 15 }}>
-          Your fifteen minute weekly review is the checkpoint to work through changes, decisions and
-          what needs attention next.
-        </p>
 
         <ApplicationFolderShowcase />
       </div>
