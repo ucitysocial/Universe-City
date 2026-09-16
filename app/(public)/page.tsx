@@ -37,14 +37,14 @@ export default function Home() {
             Fifteen minutes a week with your agent.
           </h2>
           <p className="lede">
-            Your agent reviews what changed in your file. The review separates confirmed
-            information from estimates and records corrections.
+            Your file changes as your life changes. Once a week, your agent reviews those changes
+            with you and updates the record.
           </p>
           <ul className="rows">
-            <li><span className="rn">01</span><span>The systems show what happened.</span></li>
-            <li><span className="rn">02</span><span>The record shows what is confirmed and what is still estimated.</span></li>
-            <li><span className="rn">03</span><span>Your agent reviews the file with you once a week.</span></li>
-            <li><span className="rn">04</span><span>Corrections update the record without erasing its history.</span></li>
+            <li><span className="rn">01</span><span>Time changes when your schedule changes.</span></li>
+            <li><span className="rn">02</span><span>Inventory changes when your household changes.</span></li>
+            <li><span className="rn">03</span><span>Salary changes when your work or living costs change.</span></li>
+            <li><span className="rn">04</span><span>Standards change when what you require changes.</span></li>
           </ul>
         </div>
       </section>
