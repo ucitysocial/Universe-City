@@ -20,7 +20,7 @@ export default function SiteHeader({ signedIn }: { signedIn: boolean }) {
             ? <Link href="/member">Your file</Link>
             : <Link href="/login">Log in</Link>}
           <Link className="header-cta" href={signedIn ? '/member' : '/join'}>
-            {signedIn ? 'Open your file' : 'Enroll'}
+            {signedIn ? 'Open your file' : 'Apply'}
           </Link>
         </nav>
 
@@ -44,7 +44,7 @@ export default function SiteHeader({ signedIn }: { signedIn: boolean }) {
                 ? <Link href="/member">Your file</Link>
                 : <>
                     <Link href="/login">Log in</Link>
-                    <Link className="compact-cta" href="/join">Enroll</Link>
+                    <Link className="compact-cta" href="/join">Apply</Link>
                   </>}
             </div>
           )}
