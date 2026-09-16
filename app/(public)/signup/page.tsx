@@ -33,7 +33,8 @@ export default function Signup() {
       <p className="kick">Universe City</p>
       <h2 style={{ marginTop: 8 }}>Check your email</h2>
       <p className="note">
-        We sent a link to {email}. Open it and your file is created. Nothing is charged yet.
+        We sent a confirmation link to {email}. Open it to finish creating your file. No payment
+        has been taken.
       </p>
     </div></div>
   );
@@ -44,12 +45,12 @@ export default function Signup() {
         <p className="kick">Universe City</p>
         <h2 style={{ marginTop: 8 }}>Create your file</h2>
         <p className="note" style={{ marginTop: 6, marginBottom: 20 }}>
-          Two things and a password. Nothing is charged on this screen.
+          Enter your name and email, then choose a password. No payment is taken here.
         </p>
         {err && <p className="err">{err}</p>}
         <form onSubmit={submit}>
           <div className="field">
-            <label htmlFor="n">What should we call you</label>
+            <label htmlFor="n">Name</label>
             <input id="n" value={name} onChange={e => setName(e.target.value)} required />
           </div>
           <div className="field">
