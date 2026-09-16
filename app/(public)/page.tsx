@@ -7,11 +7,11 @@ export default function Home() {
       <section className="hero-section">
         <div className="wrap hero-copy">
           <h1>
-            Artists have teams. Athletes have teams.
+            A life management agency for everyday people.
           </h1>
           <p className="lede">
-            Universe City is a life management agency for everyday people. We keep the record,
-            organize four working systems, and review your file with you every week.
+            Universe City keeps a record of what is happening in your life. Four systems organize
+            that record. Your agent reviews it with you every week.
           </p>
           <div className="hero-actions">
             <Link className="btn" href="/join">Start your file</Link>
@@ -24,7 +24,7 @@ export default function Home() {
         <div className="wrap">
           <p className="kick">Four systems</p>
           <h2 className="systems-heading">
-            Four systems are running now.
+            Four systems are included in membership.
           </h2>
           <DeskCards />
         </div>
@@ -37,14 +37,14 @@ export default function Home() {
             Fifteen minutes a week with your agent.
           </h2>
           <p className="lede">
-            Your agent reviews what changed, what is confirmed, what is still uncertain, and what
-            needs attention next.
+            Your agent reviews what changed in your file. The review separates confirmed
+            information from estimates and records corrections.
           </p>
           <ul className="rows">
-            <li><span className="rn">01</span><span>Your file changes as your life changes.</span></li>
-            <li><span className="rn">02</span><span>Time changes with your schedule. Inventory changes with your home.</span></li>
-            <li><span className="rn">03</span><span>Salary changes with your work. Standards change with what you require.</span></li>
-            <li><span className="rn">04</span><span>Each week, your agent reviews the whole file with you and identifies what needs attention next.</span></li>
+            <li><span className="rn">01</span><span>The systems show what happened.</span></li>
+            <li><span className="rn">02</span><span>The record shows what is confirmed and what is still estimated.</span></li>
+            <li><span className="rn">03</span><span>Your agent reviews the file with you once a week.</span></li>
+            <li><span className="rn">04</span><span>Corrections update the record without erasing its history.</span></li>
           </ul>
         </div>
       </section>
@@ -53,10 +53,10 @@ export default function Home() {
         <div className="wrap membership-layout">
           <div className="membership-copy">
             <p className="kick">Membership</p>
-            <h2>One membership. Four systems. One weekly review.</h2>
+            <h2>Membership includes four systems and one weekly review.</h2>
             <p>
-              Time, Inventory, Salary and Standards, plus one fifteen minute review every week
-              with your agent.
+              Time, Inventory, Salary and Standards are included. Your agent reviews the file with
+              you for fifteen minutes each week.
             </p>
           </div>
 
