@@ -40,12 +40,12 @@ export default function Login() {
                    onChange={e => setPassword(e.target.value)} required />
           </div>
           <button className="btn" style={{ width: '100%' }} disabled={busy}>
-            {busy ? 'One moment' : 'Open my file'}
+            {busy ? 'Opening file' : 'Open my file'}
           </button>
         </form>
         <p className="note">
-          No account yet? <Link href="/join">Join Universe City</Link>.
-          <br />Forgotten your password? <Link href="/reset">Reset it</Link>.
+          Need an account? <Link href="/join">Join Universe City</Link>.
+          <br />Forgot your password? <Link href="/reset">Reset it</Link>.
         </p>
       </div>
     </div>
