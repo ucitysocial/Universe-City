@@ -119,12 +119,26 @@ h3{font-size:19px;font-weight:600}
 /* ---------------- forms ---------------- */
 .panel{max-width:440px;margin:64px auto;border:3px solid var(--ink);background:var(--card);
        box-shadow:var(--shadow);padding:28px}
+.signup-panel{max-width:620px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .field{margin-bottom:18px}
 .field label{display:block;font-size:11px;font-weight:600;letter-spacing:.16em;
              text-transform:uppercase;color:var(--dim);margin-bottom:6px}
 .field input{width:100%;border:2px solid var(--ink);padding:12px;background:var(--paper);font-size:16px}
 .note{font-size:14px;color:var(--dim);margin-top:14px}
 .err{border-left:5px solid var(--I);background:var(--paper2);padding:10px 12px;font-size:15px;margin-bottom:16px}
+.zodiac-preview{display:flex;align-items:center;gap:12px;border:1px solid var(--rule);background:var(--paper);padding:11px 14px;margin:-4px 0 18px}
+.zodiac-symbol{font-family:'VT323',monospace;font-size:30px;line-height:1}
+.zodiac-preview>span:last-child{display:flex;flex-direction:column;line-height:1.25}
+.zodiac-preview small{color:var(--dim);font-size:11px;margin-top:2px}
+.password-strength{display:flex;align-items:center;gap:10px;margin-top:8px;color:var(--dim);font-size:12px}
+.strength-bars{display:grid;grid-template-columns:repeat(4,28px);gap:4px}
+.strength-bars span{height:5px;background:var(--paper3)}
+.strength-bars span.on{background:var(--ink)}
+.match-note{font-size:12px;color:var(--I);margin-top:6px}
+.match-note.ok{color:var(--IV)}
+.zodiac-badge{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--rule);background:var(--paper);padding:4px 9px;margin-left:10px;font-size:12px;font-weight:600;vertical-align:middle}
+.zodiac-badge .zodiac-symbol{font-size:20px}
 
 /* ---------------- member and agent shells ---------------- */
 .work{display:grid;grid-template-columns:230px minmax(0,1fr);min-height:100dvh}
@@ -157,6 +171,7 @@ h3{font-size:19px;font-weight:600}
   .membership-price-card{min-height:200px}
   .join-layout{grid-template-columns:1fr;gap:32px;padding-top:48px;padding-bottom:64px}
   .join-card{position:static}
+  .field-row{grid-template-columns:1fr;gap:0}
   .grid4{grid-template-columns:1fr}
   .work{grid-template-columns:1fr}
   .side{border-right:none;border-bottom:3px solid var(--ink);padding:16px}
