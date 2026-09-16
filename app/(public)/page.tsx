@@ -6,8 +6,7 @@ export default function Home() {
     <>
       <section>
         <div className="wrap">
-          <p className="kick">Universe City &middot; Life Management Agency</p>
-          <h1 style={{ marginTop: 14, maxWidth: '16ch' }}>
+          <h1 style={{ maxWidth: '16ch' }}>
             Artists have teams. Athletes have teams.
           </h1>
           <p className="lede">
