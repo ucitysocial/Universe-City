@@ -14,7 +14,7 @@ export default function Home() {
             Standards. Your agent works across all four with you and reviews them every week.
           </p>
           <div className="hero-actions">
-            <Link className="btn" href="/join">Enroll</Link>
+            <Link className="btn" href="/join">Apply</Link>
             <Link className="btn ghost" href="/how-it-works">See how it works</Link>
           </div>
         </div>
