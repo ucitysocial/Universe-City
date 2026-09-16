@@ -14,10 +14,10 @@ export default function HowItWorks() {
       <section>
         <div className="wrap">
           <p className="kick">How it works</p>
-          <h1 style={{ marginTop: 12, maxWidth: '18ch' }}>Universe City keeps the record.</h1>
+          <h1 style={{ marginTop: 12, maxWidth: '18ch' }}>You work on four parts of your life with an agent.</h1>
           <p className="lede">
-            You tell Universe City what is happening. We record the information you establish.
-            Your systems organize that record.
+            Time, Inventory, Salary and Standards each have their own system. You add information
+            as things change. Your agent reviews all four with you every week.
           </p>
         </div>
       </section>
@@ -28,8 +28,8 @@ export default function HowItWorks() {
           <h2 style={{ marginTop: 10 }}>Four working systems.</h2>
           <DeskCards />
           <p className="note" style={{ marginTop: 26, maxWidth: 'var(--text)' }}>
-            Universe City has 48 folders across four departments. Four are available in this
-            version: Time, Inventory, Salary and Standards.
+            Universe City has 48 folders across four departments. Time, Inventory, Salary and
+            Standards are available in this version.
           </p>
         </div>
       </section>
@@ -50,12 +50,12 @@ export default function HowItWorks() {
 
       <section>
         <div className="wrap prose">
-          <p className="kick">The record</p>
-          <h2 style={{ marginTop: 10 }}>Confirmed information stays separate from estimates.</h2>
+          <p className="kick">Keeping it current</p>
+          <h2 style={{ marginTop: 10 }}>Your systems change when your life changes.</h2>
           <p style={{ marginTop: 18 }}>
-            We do not invent times or turn estimates into observed facts. Changes that require
-            interpretation are proposed before they become part of the record. Corrections keep
-            their history.
+            A new shift changes Time. A household purchase changes Inventory. A change in pay or
+            living costs updates Salary. A new minimum updates Standards. Earlier entries stay in
+            the history.
           </p>
         </div>
       </section>
