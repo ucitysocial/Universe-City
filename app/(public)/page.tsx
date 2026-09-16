@@ -10,8 +10,8 @@ export default function Home() {
             A life management agency for everyday people.
           </h1>
           <p className="lede">
-            Universe City keeps a record of what is happening in your life. Four systems organize
-            that record. Your agent reviews it with you every week.
+            You work on Time, Inventory, Salary and Standards with your agent. Each system stays
+            current as your life changes, and you review all four together every week.
           </p>
           <div className="hero-actions">
             <Link className="btn" href="/join">Start your file</Link>
@@ -24,7 +24,7 @@ export default function Home() {
         <div className="wrap">
           <p className="kick">Four systems</p>
           <h2 className="systems-heading">
-            Four systems are included in membership.
+            Start with Time, Inventory, Salary and Standards.
           </h2>
           <DeskCards />
         </div>
@@ -37,8 +37,8 @@ export default function Home() {
             Fifteen minutes a week with your agent.
           </h2>
           <p className="lede">
-            Your file changes as your life changes. Once a week, your agent reviews those changes
-            with you and updates the record.
+            Your agent reviews each system with you. Changes are added without removing what was
+            there before.
           </p>
           <ul className="rows">
             <li><span className="rn">01</span><span>Time changes when your schedule changes.</span></li>
@@ -53,9 +53,9 @@ export default function Home() {
         <div className="wrap membership-layout">
           <div className="membership-copy">
             <p className="kick">Membership</p>
-            <h2>Membership includes four systems and one weekly review.</h2>
+            <h2>$48 a month includes four systems and one weekly review.</h2>
             <p>
-              Time, Inventory, Salary and Standards are included. Your agent reviews the file with
+              Time, Inventory, Salary and Standards are included. Your agent reviews all four with
               you for fifteen minutes each week.
             </p>
           </div>
