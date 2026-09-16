@@ -282,6 +282,30 @@ a.btn.dark{background:var(--pa);color:#fff;box-shadow:5px 5px 0 var(--ink)}
 .system .joined{margin-top:var(--s3);border:2px dashed rgba(244,239,233,.4);
  padding:clamp(14px,1.8vw,22px);text-align:center;font-family:var(--record);
  font-size:clamp(16px,1.4vw,21px);letter-spacing:.2em;color:rgba(244,239,233,.75)}
+
+/* ===== 4 DEPARTMENTS — clickable cards ===== */
+.deptcards{padding:var(--s5) 0;background:var(--paper);border-bottom:2px solid var(--ink)}
+.deptcards h2{max-width:16ch}
+.deptgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(14px,2vw,24px);margin-top:var(--s4)}
+@media(max-width:860px){.deptgrid{grid-template-columns:1fr}}
+.deptcard{display:flex;flex-direction:column;min-height:100%;padding:clamp(20px,2.4vw,30px);background:var(--paper);border:2px solid var(--ink);border-top:8px solid var(--c);color:var(--ink);text-decoration:none;box-shadow:7px 7px 0 var(--ink);transition:transform .16s ease,box-shadow .16s ease,background .2s ease}
+.deptcard:hover{transform:translate(-2px,-2px);box-shadow:10px 10px 0 var(--ink);background:#fffaf5}
+.deptcard:focus-visible{outline:3px solid var(--c);outline-offset:5px}
+.deptcard .dtop{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:var(--s2)}
+.deptcard .roman{font-family:var(--record);font-size:clamp(34px,4vw,54px);line-height:.8;color:var(--c)}
+.deptcard .count{font-family:var(--record);font-size:14px;letter-spacing:.18em;color:var(--dim)}
+.deptcard h3{font-size:clamp(24px,2.3vw,34px)}
+.deptcard>p{margin-top:6px;color:#57433e}
+.folderlist{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0;margin-top:var(--s3);border-top:1px solid var(--rule)}
+@media(max-width:500px){.folderlist{grid-template-columns:1fr}}
+.folderlist span{display:flex;gap:9px;align-items:baseline;padding:8px 6px;border-bottom:1px solid var(--rule);font-size:13px;line-height:1.25}
+.folderlist span:nth-child(odd){border-right:1px solid var(--rule)}
+@media(max-width:500px){.folderlist span:nth-child(odd){border-right:0}}
+.folderlist b{font-family:var(--record);font-weight:400;letter-spacing:.08em;color:var(--dim);min-width:21px}
+.folderlist .one{font-weight:700;color:var(--c)}
+.folderlist .one b{color:var(--c)}
+.deptcard .deep{margin-top:auto;padding-top:var(--s3);font-size:14px;font-weight:700;color:var(--c)}
+
 /* ===== 4 DEPARTMENTS — bands ===== */
 .prinintro{background:var(--paper3)}
 .prinintro section{background:transparent!important}
@@ -794,7 +818,7 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
 <nav><div class="w">
  <span class="wm">universe<i>&#9733;</i>city<em>LIFE MANAGEMENT AGENCY</em></span>
  <span class="links">
-  <a href="join.html" class="cta">See membership</a>
+  <a href="https://deploy-preview-2--universecitystage.netlify.app/join" class="cta">Apply</a>
   <button id="menuBtn" aria-label="Open menu" aria-expanded="false">&#9733;</button>
  </span>
 </div></nav>
@@ -822,15 +846,14 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
     <div class="mlbl">UNIVERSE CITY</div>
     <a href="founder.html">About the founder</a>
     <a href="#business">How it operates</a>
-    <a href="#trust">The trust</a>
     <a href="join.html">Membership</a>
+    <a href="https://deploy-preview-2--universecitystage.netlify.app/login">Member sign in</a>
     <a href="#">The show</a>
     <a href="#">For employers</a>
    </div>
    <div>
     <div class="mlbl">OPEN BOOKS</div>
     <a href="#">Quarterly report</a>
-    <a href="#">The trust</a>
     <a href="#">Client rates</a>
     <a href="#">Sign in</a>
    </div>
@@ -895,122 +918,57 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
  </div>
 </div></section>
 
-<!-- 4 DEPARTMENTS -->
-<div id="departments" class="prinintro">
- <section style="padding:clamp(38px,4.4vw,70px) 0 var(--s3);border-bottom:0;background:transparent"><div class="w archintro">
-  <div class="archcopy">
-   <span class="k rv" style="color:var(--pa)">the architecture</span>
-   <h2 class="rv d1">Four departments</h2>
-   <ul class="starlist rv d2">
-    <li>Universe City has <b>4 departments</b>: Agency Assessment, Housing Stability, Career Development, and Life Management.</li>
-    <li>Each department contains <b>12 folders</b>. There are forty-eight folders in the full file.</li>
-    <li>Membership starts with one active folder in each department: <b>Time, Inventory, Salary, and Standards</b>.</li>
-    <li>Each folder has its own intake method and working output. The folders remain current as your life changes.</li>
-   </ul>
+<!-- ABOUT TEASER -->
+<section class="about" id="about"><div class="w">
+ <div class="abgrid">
+  <div class="portrait rv">
+   <div class="slides"><div class="slide on">
+    <img src="brittnay.jpg" alt="Brittnay Folkes" width="1000" height="1333"></div></div>
+   <div class="cap"><span>BRITTNAY FOLKES</span><span>FOUNDER &middot; DENVER</span></div>
   </div>
-<div class="archviz zwheel rv d2" id="zwheel">
-   <svg id="zsvg" viewBox="0 0 460 460" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Universe City chart wheel: four concentric rings of twelve folders. Inner ring Agency Assessment, then Housing Stability, Career Development, and Life Management on the outside.">
-<g class="zsegs">
-<path class="zseg f1" d="M231.73 164.02 L232.62 130.03 A100.00 100.00 0 0 1 277.72 142.12 L261.49 172.00 A66.00 66.00 0 0 0 231.73 164.02 Z" fill="#5C0F1B" data-rn="I" data-dept="Agency Assessment" data-fn="1" data-folder="Time"/>
-<path class="zseg" d="M264.48 173.73 L282.25 144.74 A100.00 100.00 0 0 1 315.26 177.75 L286.27 195.52 A66.00 66.00 0 0 0 264.48 173.73 Z" fill="#5C0F1B" data-rn="I" data-dept="Agency Assessment" data-fn="2" data-folder="Health"/>
-<path class="zseg" d="M288.00 198.51 L317.88 182.28 A100.00 100.00 0 0 1 329.97 227.38 L295.98 228.27 A66.00 66.00 0 0 0 288.00 198.51 Z" fill="#5C0F1B" data-rn="I" data-dept="Agency Assessment" data-fn="3" data-folder="Language"/>
-<path class="zseg" d="M295.98 231.73 L329.97 232.62 A100.00 100.00 0 0 1 317.88 277.72 L288.00 261.49 A66.00 66.00 0 0 0 295.98 231.73 Z" fill="#5C0F1B" data-rn="I" data-dept="Agency Assessment" data-fn="4" data-folder="Background"/>
-<path class="zseg" d="M286.27 264.48 L315.26 282.25 A100.00 100.00 0 0 1 282.25 315.26 L264.48 286.27 A66.00 66.00 0 0 0 286.27 264.48 Z" fill="#5C0F1B" data-rn="I" data-dept="Agency Assessment" data-fn="5" data-folder="Identification"/>
-<path class="zseg" d="M261.49 288.00 L277.72 317.88 A100.00 100.00 0 0 1 232.62 329.97 L231.73 295.98 A66.00 66.00 0 0 0 261.49 288.00 Z" fill="#5C0F1B" data-rn="I" data-dept="Agency Assessment" data-fn="6" data-folder="Finance"/>
-<path class="zseg" d="M228.27 295.98 L227.38 329.97 A100.00 100.00 0 0 1 182.28 317.88 L198.51 288.00 A66.00 66.00 0 0 0 228.27 295.98 Z" fill="#5C0F1B" data-rn="I" data-dept="Agency Assessment" data-fn="7" data-folder="Legal"/>
-<path class="zseg" d="M195.52 286.27 L177.75 315.26 A100.00 100.00 0 0 1 144.74 282.25 L173.73 264.48 A66.00 66.00 0 0 0 195.52 286.27 Z" fill="#5C0F1B" data-rn="I" data-dept="Agency Assessment" data-fn="8" data-folder="Mediation"/>
-<path class="zseg" d="M172.00 261.49 L142.12 277.72 A100.00 100.00 0 0 1 130.03 232.62 L164.02 231.73 A66.00 66.00 0 0 0 172.00 261.49 Z" fill="#5C0F1B" data-rn="I" data-dept="Agency Assessment" data-fn="9" data-folder="Education"/>
-<path class="zseg" d="M164.02 228.27 L130.03 227.38 A100.00 100.00 0 0 1 142.12 182.28 L172.00 198.51 A66.00 66.00 0 0 0 164.02 228.27 Z" fill="#5C0F1B" data-rn="I" data-dept="Agency Assessment" data-fn="10" data-folder="Employment"/>
-<path class="zseg" d="M173.73 195.52 L144.74 177.75 A100.00 100.00 0 0 1 177.75 144.74 L195.52 173.73 A66.00 66.00 0 0 0 173.73 195.52 Z" fill="#5C0F1B" data-rn="I" data-dept="Agency Assessment" data-fn="11" data-folder="Regulation"/>
-<path class="zseg" d="M198.51 172.00 L182.28 142.12 A100.00 100.00 0 0 1 227.38 130.03 L228.27 164.02 A66.00 66.00 0 0 0 198.51 172.00 Z" fill="#5C0F1B" data-rn="I" data-dept="Agency Assessment" data-fn="12" data-folder="Community"/>
-<path class="zseg f1" d="M232.70 127.04 L233.59 93.05 A137.00 137.00 0 0 1 295.37 109.60 L279.15 139.48 A103.00 103.00 0 0 0 232.70 127.04 Z" fill="#A07818" data-rn="II" data-dept="Housing Stability" data-fn="1" data-folder="Inventory"/>
-<path class="zseg" d="M283.82 142.18 L301.58 113.19 A137.00 137.00 0 0 1 346.81 158.42 L317.82 176.18 A103.00 103.00 0 0 0 283.82 142.18 Z" fill="#A07818" data-rn="II" data-dept="Housing Stability" data-fn="2" data-folder="Storage"/>
-<path class="zseg" d="M320.52 180.85 L350.40 164.63 A137.00 137.00 0 0 1 366.95 226.41 L332.96 227.30 A103.00 103.00 0 0 0 320.52 180.85 Z" fill="#A07818" data-rn="II" data-dept="Housing Stability" data-fn="3" data-folder="Sanitation"/>
-<path class="zseg" d="M332.96 232.70 L366.95 233.59 A137.00 137.00 0 0 1 350.40 295.37 L320.52 279.15 A103.00 103.00 0 0 0 332.96 232.70 Z" fill="#A07818" data-rn="II" data-dept="Housing Stability" data-fn="4" data-folder="Organization"/>
-<path class="zseg" d="M317.82 283.82 L346.81 301.58 A137.00 137.00 0 0 1 301.58 346.81 L283.82 317.82 A103.00 103.00 0 0 0 317.82 283.82 Z" fill="#A07818" data-rn="II" data-dept="Housing Stability" data-fn="5" data-folder="Information"/>
-<path class="zseg" d="M279.15 320.52 L295.37 350.40 A137.00 137.00 0 0 1 233.59 366.95 L232.70 332.96 A103.00 103.00 0 0 0 279.15 320.52 Z" fill="#A07818" data-rn="II" data-dept="Housing Stability" data-fn="6" data-folder="Administration"/>
-<path class="zseg" d="M227.30 332.96 L226.41 366.95 A137.00 137.00 0 0 1 164.63 350.40 L180.85 320.52 A103.00 103.00 0 0 0 227.30 332.96 Z" fill="#A07818" data-rn="II" data-dept="Housing Stability" data-fn="7" data-folder="Law"/>
-<path class="zseg" d="M176.18 317.82 L158.42 346.81 A137.00 137.00 0 0 1 113.19 301.58 L142.18 283.82 A103.00 103.00 0 0 0 176.18 317.82 Z" fill="#A07818" data-rn="II" data-dept="Housing Stability" data-fn="8" data-folder="Privacy"/>
-<path class="zseg" d="M139.48 279.15 L109.60 295.37 A137.00 137.00 0 0 1 93.05 233.59 L127.04 232.70 A103.00 103.00 0 0 0 139.48 279.15 Z" fill="#A07818" data-rn="II" data-dept="Housing Stability" data-fn="9" data-folder="Transportation"/>
-<path class="zseg" d="M127.04 227.30 L93.05 226.41 A137.00 137.00 0 0 1 109.60 164.63 L139.48 180.85 A103.00 103.00 0 0 0 127.04 227.30 Z" fill="#A07818" data-rn="II" data-dept="Housing Stability" data-fn="10" data-folder="Maintenance"/>
-<path class="zseg" d="M142.18 176.18 L113.19 158.42 A137.00 137.00 0 0 1 158.42 113.19 L176.18 142.18 A103.00 103.00 0 0 0 142.18 176.18 Z" fill="#A07818" data-rn="II" data-dept="Housing Stability" data-fn="11" data-folder="Technology"/>
-<path class="zseg" d="M180.85 139.48 L164.63 109.60 A137.00 137.00 0 0 1 226.41 93.05 L227.30 127.04 A103.00 103.00 0 0 0 180.85 139.48 Z" fill="#A07818" data-rn="II" data-dept="Housing Stability" data-fn="12" data-folder="Communal Space"/>
-<path class="zseg f1" d="M233.66 90.05 L234.55 56.06 A174.00 174.00 0 0 1 313.03 77.09 L296.80 106.97 A140.00 140.00 0 0 0 233.66 90.05 Z" fill="#4A2A78" data-rn="III" data-dept="Career Development" data-fn="1" data-folder="Salary"/>
-<path class="zseg" d="M303.15 110.63 L320.91 81.64 A174.00 174.00 0 0 1 378.36 139.09 L349.37 156.85 A140.00 140.00 0 0 0 303.15 110.63 Z" fill="#4A2A78" data-rn="III" data-dept="Career Development" data-fn="2" data-folder="Schedule"/>
-<path class="zseg" d="M353.03 163.20 L382.91 146.97 A174.00 174.00 0 0 1 403.94 225.45 L369.95 226.34 A140.00 140.00 0 0 0 353.03 163.20 Z" fill="#4A2A78" data-rn="III" data-dept="Career Development" data-fn="3" data-folder="Skill"/>
-<path class="zseg" d="M369.95 233.66 L403.94 234.55 A174.00 174.00 0 0 1 382.91 313.03 L353.03 296.80 A140.00 140.00 0 0 0 369.95 233.66 Z" fill="#4A2A78" data-rn="III" data-dept="Career Development" data-fn="4" data-folder="Scope"/>
-<path class="zseg" d="M349.37 303.15 L378.36 320.91 A174.00 174.00 0 0 1 320.91 378.36 L303.15 349.37 A140.00 140.00 0 0 0 349.37 303.15 Z" fill="#4A2A78" data-rn="III" data-dept="Career Development" data-fn="5" data-folder="Integrity"/>
-<path class="zseg" d="M296.80 353.03 L313.03 382.91 A174.00 174.00 0 0 1 234.55 403.94 L233.66 369.95 A140.00 140.00 0 0 0 296.80 353.03 Z" fill="#4A2A78" data-rn="III" data-dept="Career Development" data-fn="6" data-folder="Professionalism"/>
-<path class="zseg" d="M226.34 369.95 L225.45 403.94 A174.00 174.00 0 0 1 146.97 382.91 L163.20 353.03 A140.00 140.00 0 0 0 226.34 369.95 Z" fill="#4A2A78" data-rn="III" data-dept="Career Development" data-fn="7" data-folder="Resources"/>
-<path class="zseg" d="M156.85 349.37 L139.09 378.36 A174.00 174.00 0 0 1 81.64 320.91 L110.63 303.15 A140.00 140.00 0 0 0 156.85 349.37 Z" fill="#4A2A78" data-rn="III" data-dept="Career Development" data-fn="8" data-folder="KPIs"/>
-<path class="zseg" d="M106.97 296.80 L77.09 313.03 A174.00 174.00 0 0 1 56.06 234.55 L90.05 233.66 A140.00 140.00 0 0 0 106.97 296.80 Z" fill="#4A2A78" data-rn="III" data-dept="Career Development" data-fn="9" data-folder="Advancement"/>
-<path class="zseg" d="M90.05 226.34 L56.06 225.45 A174.00 174.00 0 0 1 77.09 146.97 L106.97 163.20 A140.00 140.00 0 0 0 90.05 226.34 Z" fill="#4A2A78" data-rn="III" data-dept="Career Development" data-fn="10" data-folder="Leadership"/>
-<path class="zseg" d="M110.63 156.85 L81.64 139.09 A174.00 174.00 0 0 1 139.09 81.64 L156.85 110.63 A140.00 140.00 0 0 0 110.63 156.85 Z" fill="#4A2A78" data-rn="III" data-dept="Career Development" data-fn="11" data-folder="Info Technology"/>
-<path class="zseg" d="M163.20 106.97 L146.97 77.09 A174.00 174.00 0 0 1 225.45 56.06 L226.34 90.05 A140.00 140.00 0 0 0 163.20 106.97 Z" fill="#4A2A78" data-rn="III" data-dept="Career Development" data-fn="12" data-folder="Networking"/>
-<path class="zseg f1" d="M234.63 53.06 L235.52 19.07 A211.00 211.00 0 0 1 330.68 44.57 L314.46 74.45 A177.00 177.00 0 0 0 234.63 53.06 Z" fill="#2A4B3C" data-rn="IV" data-dept="Life Management" data-fn="1" data-folder="Standards"/>
-<path class="zseg" d="M322.48 79.08 L340.25 50.09 A211.00 211.00 0 0 1 409.91 119.75 L380.92 137.52 A177.00 177.00 0 0 0 322.48 79.08 Z" fill="#2A4B3C" data-rn="IV" data-dept="Life Management" data-fn="2" data-folder="Survival"/>
-<path class="zseg" d="M385.55 145.54 L415.43 129.32 A211.00 211.00 0 0 1 440.93 224.48 L406.94 225.37 A177.00 177.00 0 0 0 385.55 145.54 Z" fill="#2A4B3C" data-rn="IV" data-dept="Life Management" data-fn="3" data-folder="Perception"/>
-<path class="zseg" d="M406.94 234.63 L440.93 235.52 A211.00 211.00 0 0 1 415.43 330.68 L385.55 314.46 A177.00 177.00 0 0 0 406.94 234.63 Z" fill="#2A4B3C" data-rn="IV" data-dept="Life Management" data-fn="4" data-folder="Instinct"/>
-<path class="zseg" d="M380.92 322.48 L409.91 340.25 A211.00 211.00 0 0 1 340.25 409.91 L322.48 380.92 A177.00 177.00 0 0 0 380.92 322.48 Z" fill="#2A4B3C" data-rn="IV" data-dept="Life Management" data-fn="5" data-folder="Identity"/>
-<path class="zseg" d="M314.46 385.55 L330.68 415.43 A211.00 211.00 0 0 1 235.52 440.93 L234.63 406.94 A177.00 177.00 0 0 0 314.46 385.55 Z" fill="#2A4B3C" data-rn="IV" data-dept="Life Management" data-fn="6" data-folder="Ethics"/>
-<path class="zseg" d="M225.37 406.94 L224.48 440.93 A211.00 211.00 0 0 1 129.32 415.43 L145.54 385.55 A177.00 177.00 0 0 0 225.37 406.94 Z" fill="#2A4B3C" data-rn="IV" data-dept="Life Management" data-fn="7" data-folder="Equilibrium"/>
-<path class="zseg" d="M137.52 380.92 L119.75 409.91 A211.00 211.00 0 0 1 50.09 340.25 L79.08 322.48 A177.00 177.00 0 0 0 137.52 380.92 Z" fill="#2A4B3C" data-rn="IV" data-dept="Life Management" data-fn="8" data-folder="Boundary"/>
-<path class="zseg" d="M74.45 314.46 L44.57 330.68 A211.00 211.00 0 0 1 19.07 235.52 L53.06 234.63 A177.00 177.00 0 0 0 74.45 314.46 Z" fill="#2A4B3C" data-rn="IV" data-dept="Life Management" data-fn="9" data-folder="Discernment"/>
-<path class="zseg" d="M53.06 225.37 L19.07 224.48 A211.00 211.00 0 0 1 44.57 129.32 L74.45 145.54 A177.00 177.00 0 0 0 53.06 225.37 Z" fill="#2A4B3C" data-rn="IV" data-dept="Life Management" data-fn="10" data-folder="Prioritization"/>
-<path class="zseg" d="M79.08 137.52 L50.09 119.75 A211.00 211.00 0 0 1 119.75 50.09 L137.52 79.08 A177.00 177.00 0 0 0 79.08 137.52 Z" fill="#2A4B3C" data-rn="IV" data-dept="Life Management" data-fn="11" data-folder="Systems"/>
-<path class="zseg" d="M145.54 74.45 L129.32 44.57 A211.00 211.00 0 0 1 224.48 19.07 L225.37 53.06 A177.00 177.00 0 0 0 145.54 74.45 Z" fill="#2A4B3C" data-rn="IV" data-dept="Life Management" data-fn="12" data-folder="Socializing"/>
-</g>
-<circle cx="230" cy="230" r="62" class="zhub"/>
-<text class="zk" id="zk" x="230" y="214" text-anchor="middle">&#9733;</text>
-<text class="zn" id="zn" x="230" y="235" text-anchor="middle">UNIVERSE CITY</text>
-<text class="zs" id="zs" x="230" y="251" text-anchor="middle">4 &#183; 12 &#183; 48</text>
-<text class="ztop" x="230" y="20" text-anchor="middle">&#9733;</text>
-</svg>
-   <div class="zlegend">
-    <span style="--c:#5C0F1B">I &#183; Agency Assessment</span>
-    <span style="--c:#A07818">II &#183; Housing Stability</span>
-    <span style="--c:#4A2A78">III &#183; Career Development</span>
-    <span style="--c:#2A4B3C">IV &#183; Life Management</span>
-   </div>
-   <p class="zfoot">Each ring is one department. Folder 01 is the starting folder in each department.</p>
+  <div class="story">
+   <span class="k rv">why this exists</span>
+   <h2 class="rv d1">Why I built<br>Universe City</h2>
+   <p class="lead rv d2 mt3">My mom handled parts of everyday life with me before I knew how to manage them myself.</p><p class="rv d2">She died in 2016. Afterward, I understood how much administrative work she had been doing with me.</p>
+   <p class="rv d2">Universe City is designed to provide that kind of structure without trying to replace the relationship.</p>
+   <p class="rv d2 px">Universe City provides life management. It does not provide therapy or case management.</p>
+   <div class="btns rv d3"><a href="founder.html" class="btn" style="background:var(--paper);color:var(--ink);box-shadow:5px 5px 0 var(--pa)">Read the full story</a></div>
   </div>
- 
- </div></section>
-
- <div class="bands">
-  <div class="band" style="--c:var(--pa)" data-rn="I"><div class="w">
-   <div class="lft rv"><div class="rn">DEPARTMENT I</div><h2>Agency Assessment</h2>
-    <p>Understand your current situation.</p></div>
-   <div class="rgt rv d1"><div class="m1">FOLDER 01</div><div class="mn">Time</div>
-    <div class="gv">Your agent helps you establish and maintain a calendar. Start with work, sleep, commuting, meals, getting ready, appointments, responsibilities, rest, and the things you want more time for. Your agent turns that information into a daily schedule and updates it when your life changes.</div>
-    <a href="agency-assessment.html">Open Agency Assessment &rarr;</a></div>
-  </div></div>
-
-  <div class="band" style="--c:var(--hs)" data-rn="II"><div class="w">
-   <div class="lft rv"><div class="rn">DEPARTMENT II</div><h2>Housing Stability</h2>
-    <p>Manage your living environment.</p></div>
-   <div class="rgt rv d1"><div class="m1">FOLDER 01</div><div class="mn">Inventory</div>
-    <div class="gv">Your agent helps establish what a normally stocked household looks like for you. Start with groceries, household supplies, hygiene products, and other items you replace regularly. For each item, establish the quantity you normally keep and how long that amount usually lasts. Your agent maintains the baseline as purchases and needs change.</div>
-    <a href="housing-stability.html">Open Housing Stability &rarr;</a></div>
-  </div></div>
-
-  <div class="band" style="--c:var(--cd)" data-rn="III"><div class="w">
-   <div class="lft rv"><div class="rn">DEPARTMENT III</div><h2>Career Development</h2>
-    <p>Expand your work options.</p></div>
-   <div class="rgt rv d1"><div class="m1">FOLDER 01</div><div class="mn">Salary</div>
-    <div class="gv">Your agent helps maintain a working view of income and regular expenses. Start with the last full month: what came in, what bills were paid, and what your normal costs required. The folder shows what is due, what remains, and how a change in pay or expenses changes the current picture.</div>
-    <a href="career-development.html">Open Career Development &rarr;</a></div>
-  </div></div>
-
-  <div class="band" style="--c:var(--lm)" data-rn="IV"><div class="w">
-   <div class="lft rv"><div class="rn">DEPARTMENT IV</div><h2>Life Management</h2>
-    <p>Set your priorities.</p></div>
-   <div class="rgt rv d1"><div class="m1">FOLDER 01</div><div class="mn">Standards</div>
-    <div class="gv">Your agent helps you identify the rules you intend to maintain because they matter to how you live. Start with routines and decisions you return to when you want to function consistently. Each confirmed standard records the rule, its intention, the value behind it, and the impact you expect when you maintain it.</div>
-    <a href="life-management.html">Open Life Management &rarr;</a></div>
-  </div></div>
  </div>
-</div>
+</div></section>
+
+<!-- 4 DEPARTMENTS -->
+<section class="deptcards" id="departments"><div class="w">
+ <span class="k rv" style="color:var(--pa)">the departments</span>
+ <h2 class="rv d1">Four departments. Forty-eight folders.</h2>
+ <p class="lead rv d2 mt3" style="max-width:56ch">Choose a department to see all twelve folders and the job each folder gives your agent.</p>
+ <div class="deptgrid stagger rv d2">
+  <a class="deptcard" href="agency-assessment.html" style="--c:var(--pa)">
+   <div class="dtop"><span class="roman">I</span><span class="count">12 FOLDERS</span></div>
+   <h3>Agency Assessment</h3><p>Understand your current situation.</p>
+   <div class="folderlist"><span class="one"><b>01</b>Time</span><span><b>02</b>Health</span><span><b>03</b>Language</span><span><b>04</b>Background</span><span><b>05</b>Identification</span><span><b>06</b>Finance</span><span><b>07</b>Legal</span><span><b>08</b>Mediation</span><span><b>09</b>Education</span><span><b>10</b>Employment</span><span><b>11</b>Regulation</span><span><b>12</b>Community</span></div>
+   <div class="deep">Open all 12 folders &rarr;</div>
+  </a>
+  <a class="deptcard" href="housing-stability.html" style="--c:var(--hs)">
+   <div class="dtop"><span class="roman">II</span><span class="count">12 FOLDERS</span></div>
+   <h3>Housing Stability</h3><p>Manage your living environment.</p>
+   <div class="folderlist"><span class="one"><b>01</b>Inventory</span><span><b>02</b>Storage</span><span><b>03</b>Sanitation</span><span><b>04</b>Organization</span><span><b>05</b>Information</span><span><b>06</b>Administration</span><span><b>07</b>Law</span><span><b>08</b>Privacy</span><span><b>09</b>Transportation</span><span><b>10</b>Maintenance</span><span><b>11</b>Technology</span><span><b>12</b>Communal Space</span></div>
+   <div class="deep">Open all 12 folders &rarr;</div>
+  </a>
+  <a class="deptcard" href="career-development.html" style="--c:var(--cd)">
+   <div class="dtop"><span class="roman">III</span><span class="count">12 FOLDERS</span></div>
+   <h3>Career Development</h3><p>Expand your work options.</p>
+   <div class="folderlist"><span class="one"><b>01</b>Salary</span><span><b>02</b>Schedule</span><span><b>03</b>Skill</span><span><b>04</b>Scope</span><span><b>05</b>Integrity</span><span><b>06</b>Professionalism</span><span><b>07</b>Resources</span><span><b>08</b>KPIs</span><span><b>09</b>Advancement</span><span><b>10</b>Leadership</span><span><b>11</b>Info Technology</span><span><b>12</b>Networking</span></div>
+   <div class="deep">Open all 12 folders &rarr;</div>
+  </a>
+  <a class="deptcard" href="life-management.html" style="--c:var(--lm)">
+   <div class="dtop"><span class="roman">IV</span><span class="count">12 FOLDERS</span></div>
+   <h3>Life Management</h3><p>Set your priorities.</p>
+   <div class="folderlist"><span class="one"><b>01</b>Standards</span><span><b>02</b>Survival</span><span><b>03</b>Perception</span><span><b>04</b>Instinct</span><span><b>05</b>Identity</span><span><b>06</b>Ethics</span><span><b>07</b>Equilibrium</span><span><b>08</b>Boundary</span><span><b>09</b>Discernment</span><span><b>10</b>Prioritization</span><span><b>11</b>Systems</span><span><b>12</b>Socializing</span></div>
+   <div class="deep">Open all 12 folders &rarr;</div>
+  </a>
+ </div>
+</div></section>
 
 <!-- 5 DECISION ROOM -->
 <section class="room" id="room"><div class="w">
@@ -1093,10 +1051,10 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
 <section class="start" id="start"><div class="w">
  <div>
   <span class="k rv" style="color:rgba(244,239,233,.55)">membership</span>
-  <h2 class="rv d1">$12 a week starts with four active folders</h2>
+  <h2 class="rv d1">$12 starts with four active folders</h2>
   <p class="lead rv d2 mt3">Time. Inventory. Salary. Standards.</p>
   <p class="rv d2">Your agent helps establish each folder, maintains changes with you, and works across the four when one decision touches more than one part of your life. Membership includes a fifteen-minute weekly review.</p>
-  <div class="btns rv d3"><a href="join.html" class="btn">See membership</a></div>
+  <div class="btns rv d3"><a href="https://deploy-preview-2--universecitystage.netlify.app/join" class="btn">Begin application</a><a href="join.html" class="btn o">See membership</a></div>
  </div>
  <div class="box rv d3">
   <h3>What the four folders maintain</h3>
@@ -1202,44 +1160,21 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
  </div></div>
 </div></section>
 
-<!-- 11 PRICING -->
-<!-- ABOUT TEASER -->
-<section class="about" id="about"><div class="w">
- <div class="abgrid">
-  <div class="portrait rv">
-   <div class="slides"><div class="slide on">
-    <img src="brittnay.jpg" alt="Brittnay Folkes" width="1000" height="1333"></div></div>
-   <div class="cap"><span>BRITTNAY FOLKES</span><span>FOUNDER &middot; DENVER</span></div>
-  </div>
-  <div class="story">
-   <span class="k rv">why this exists</span>
-   <h2 class="rv d1">Why I built<br>Universe City</h2>
-   <p class="lead rv d2 mt3">My mom handled parts of everyday life with me before I knew how to manage them myself.</p><p class="rv d2">She died in 2016. Afterward, I understood how much administrative work she had been doing with me.</p>
-   <p class="rv d2">Universe City is designed to provide that kind of structure without trying to replace the relationship.</p>
-   <p class="rv d2 px">Universe City provides life management. It does not provide therapy or case management.</p>
-   <div class="btns rv d3"><a href="founder.html" class="btn" style="background:var(--paper);color:var(--ink);box-shadow:5px 5px 0 var(--pa)">Read the full story</a></div>
-  </div>
- </div>
-</div></section>
-
 <!-- BUSINESS MODEL -->
 <section class="biz" id="business"><div class="w">
  <span class="k rv">membership model</span> <span class="devtag rv">In development</span>
- <h2 class="head rv d1">$12 a week. One membership.</h2>
+ <h2 class="head rv d1">$12. One membership.</h2>
  <p class="lead rv d2 mt3 px" style="max-width:48ch">Membership starts with one Universe City agent working across Time, Inventory, Salary, and Standards.</p>
  <div class="bgrid rv d2">
   <div class="c"><div class="n">AGENT</div><h3>One agent across four folders</h3>
    <p>Your agent establishes the starting folders with you and maintains them as your schedule, household needs, income, expenses, and standards change.</p></div>
   <div class="c"><div class="n">15 MIN</div><h3>A weekly file review</h3>
    <p>Once a week, you review the four folders together. The review confirms changes, decisions, and the work that needs attention next.</p></div>
-  <div class="c"><div class="n">12%</div><h3>Membership revenue to the trust</h3>
-   <p>Twelve percent of membership revenue goes to the separate nonprofit before operating costs are paid.</p></div>
  </div>
  <div class="never rv d3">
   <div class="t">TWO RULES THAT DO NOT MOVE</div>
   <ul style="grid-template-columns:1fr">
    <li><b>01</b><span><b style="font-family:var(--voice);font-size:14.5px;color:var(--ink)">Nobody we refer you to pays us.</b> Universe City keeps a network of local businesses, clinics, attorneys, mechanics, landlords, and services that clients need. None of them pay to be in it. They are listed on what clients reported after being sent there. No fee, no commission, ever.</span></li>
-   <li><b>02</b><span><b style="font-family:var(--voice);font-size:14.5px;color:var(--ink)">The books are published every quarter.</b> Membership revenue, what the trust holds, what it funded, and what the founder is paid. The report is published four times a year.</span></li>
   </ul>
  </div>
  <div class="never rv d3" style="margin-top:var(--s2)">
@@ -1255,53 +1190,6 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
  </div>
 </div></section>
 
-<!-- TRUST -->
-<section class="trustsec" id="trust"><div class="w">
- <span class="k rv">the trust</span>
- <h2 class="head rv d1">Twelve percent of every membership goes to a nonprofit</h2>
- <p class="lead rv d2 mt3" style="max-width:56ch">Twelve percent of membership revenue is transferred before operating costs, wages, or founder pay. The nonprofit keeps separate books from the company.</p>
- <div class="ents">
-  <div class="entity rv d2">
-   <div class="lbl">THE COMPANY</div>
-   <h3>Universe City</h3>
-   <p>A social enterprise, structured as an LLC. It runs the folders, the software, the memberships, and the agents. It is a for-profit company and it says so.</p>
-  </div>
-  <div class="entity rv d3">
-   <div class="lbl">THE NONPROFIT &middot; EST. MARCH 2023</div>
-   <h3>Universe City Community Development Corporation</h3>
-   <p>A 501(c)(3) community development corporation. A CDC is a nonprofit that exists to develop one specific place and the people living in it. CDCs build and hold housing, run community facilities, make grants, and fund local services. They are governed by residents of the area they serve rather than by outside donors.</p>
-  </div>
- </div>
- <div class="usehead rv d2">
-  <h3>What the trust can be used for</h3>
-  <p class="mt2">Funds are held by city. Money contributed by clients in Denver is spent in Denver, on what Denver clients vote for. Every vote and every disbursement is published, and the CDC keeps separate books so it can be audited apart from the company.</p>
- </div>
- <div class="uses rv d3">
-  <div><b>Grants to clients</b><span>Written directly to a client who needs one. A deposit, a car repair, a certification, a replacement document, a month of rent.</span></div>
-  <div><b>Third spaces</b><span>Rooms with a scanner, a printer, a kitchen, laundry, a quiet room, and a mailing address that does not change. Leased first, owned later.</span></div>
-  <div><b>Housing and schools</b><span>The long end of what a CDC does. Property acquired, held, and built for the people whose memberships funded it.</span></div>
- </div>
- <div class="calc rv d3" id="calc">
-  <div class="ch">WHAT THE TRUST HOLDS AT SCALE</div>
-  <div class="cb"><div class="grid">
-   <div>
-    <div class="sl">
-     <div class="lab"><b>Active members</b><span class="v" id="vMembers">500</span></div>
-     <div class="n">Each $12 weekly payment contributes $1.44 to the trust.</div>
-     <input type="range" id="sMembers" min="0" max="20000" step="50" value="500" aria-label="Active members">
-     <div class="ends"><span>0</span><span>20,000</span></div>
-    </div>
-   </div>
-   <div class="out">
-    <div><em id="oM">$0</em><span>Average monthly trust revenue</span></div>
-    <div><em id="oY">$0</em><span>Annual trust revenue</span></div>
-   </div>
-  </div>
-  <p class="note">At $12 a week, twelve percent is $1.44 per weekly payment. A member who pays for all fifty-two weeks contributes $74.88 in a year.</p>
-  </div>
- </div>
-</div></section>
-
 <footer><div class="w cols">
  <div>
   <div style="font-size:20px;font-weight:600;letter-spacing:.01em">universe<span style="margin:0 2px;font-size:.9em;vertical-align:1px">&#9733;</span>city</div>
@@ -1311,7 +1199,8 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
  <div><div class="lbl">HOW IT WORKS</div>
   <a href="#what">Why an agent</a><a href="#system">Starting folders</a><a href="#departments">Four departments</a><a href="agency-assessment.html">Agency Assessment folders</a></div>
  <div><div class="lbl">OPEN BOOKS</div>
-  <a href="#">Quarterly report</a><a href="#trust">The trust</a><a href="join.html">Membership</a></div>
+  <a href="#">Quarterly report</a><a href="join.html">Membership</a>
+    <a href="https://deploy-preview-2--universecitystage.netlify.app/login">Member sign in</a></div>
  <div><div class="lbl">MORE</div>
   <a href="founder.html">About the founder</a><a href="#">The show</a><a href="#">For employers</a><a href="#">Sign in</a></div>
 </div></footer>
@@ -1432,9 +1321,9 @@ if(stage){
 (function(){
  var MAP=[
   ['#what','Why an agent'],['#departments','Four departments'],['#system','Starting folders'],
-  ['.room','Folders together'],['#first','Membership'],['#start','$12 a week'],['#time','Time example'],
+  ['.room','Folders together'],['#first','Membership'],['#start','$12'],['#time','Time example'],
   ['.reveal','Your calendar'],['.grow','How Time develops'],['#about','Why it exists'],
-  ['#business','Membership model'],['#trust','The trust']
+  ['#business','Membership model']
  ];
  var rail=document.getElementById('rail');
  if(!rail) return;
@@ -1503,28 +1392,6 @@ if(stage){
  window.addEventListener('scroll',onScroll,{passive:true});
  onScroll();
 })();
-
-/* ---------- trust calculator ---------- */
-var sMembers=document.getElementById('sMembers');
-if(sMembers){
-  var vMembers=document.getElementById('vMembers'),
-      oM=document.getElementById('oM'), oY=document.getElementById('oY');
-  function money(n){
-    if(n>=1000000) return '$'+(n/1000000).toFixed(n<10000000?2:1)+'M';
-    if(n>=1000) return '$'+Math.round(n/1000)+'k';
-    return '$'+Math.round(n);
-  }
-  function calc(){
-    var members=+sMembers.value;
-    var yearly=members*12*52*0.12;
-    var monthly=yearly/12;
-    vMembers.textContent=members.toLocaleString();
-    oM.textContent=money(monthly);
-    oY.textContent=money(yearly);
-  }
-  sMembers.addEventListener('input',calc);
-  calc();
-}
 
 /* ---------- portrait slideshow ---------- */
 var port=document.getElementById('port');
