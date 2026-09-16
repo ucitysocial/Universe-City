@@ -56,14 +56,18 @@ language plpgsql as $$
 begin
   if new.first_name is not null then new.first_name := nullif(trim(new.first_name), ''); end if;
   if new.last_name is not null then new.last_name := nullif(trim(new.last_name), ''); end if;
-  new.name := nullif(trim(concat_ws(' ', new.first_name, new.last_name)), '');
+
+  if new.first_name is not null or new.last_name is not null then
+    new.name := nullif(trim(concat_ws(' ', new.first_name, new.last_name)), '');
+  end if;
+
   new.zodiac := uc_zodiac_from_date(new.birth_date);
   return new;
 end $$;
 
 drop trigger if exists profiles_derive_identity on profiles;
 create trigger profiles_derive_identity
-  before insert or update of first_name, last_name, birth_date on profiles
+  before insert or update on profiles
   for each row execute function uc_derive_profile_identity();
 
 -- Keep signup metadata and the profile row in one transaction through the auth trigger.
