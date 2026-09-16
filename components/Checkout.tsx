@@ -22,7 +22,9 @@ export default function Checkout() {
       <button className="btn" style={{ width: '100%' }} onClick={go} disabled={busy}>
         {busy ? 'Opening checkout' : 'Start my membership'}
       </button>
-      <p className="note">Card handled by Stripe. We never see the number.</p>
+      <p className="note">
+        Stripe processes your card information. Universe City does not receive your card number.
+      </p>
     </>
   );
 }
