@@ -12,7 +12,6 @@ permissions:
 
 jobs:
   cleanup:
-    if: ${{ !contains(github.event.head_commit.message, 'site: clean founder book typography') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
