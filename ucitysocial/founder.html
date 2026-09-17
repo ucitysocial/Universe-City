@@ -91,6 +91,30 @@ a{color:inherit}
 @media(max-width:760px){
 html,body{height:100%;overflow:hidden}.sitebar{height:56px;position:relative}.shell{height:calc(100svh - 56px);width:calc(100% - 14px);margin:0 auto;padding:8px 0 6px;display:flex;flex-direction:column;overflow:hidden}.book-kicker{display:none}.book-head{min-height:38px;flex:0 0 38px;margin:0;justify-content:center}.book-head h1{font-size:18px;line-height:1.1;margin:0}.book-head p{display:none!important}.book-wrap{flex:1 1 auto;min-height:0;overflow:hidden}.book{height:100%!important;min-height:0!important;max-height:none!important;display:block;overflow:hidden}.book::before{display:none}.book::after{left:0;width:100%}.page{height:100%!important;min-height:0!important;padding:18px 18px 36px!important;overflow:hidden!important}.page.left{display:none!important}.page.right{display:block!important;border:0}.page h2{font-size:clamp(22px,6.8vw,31px)!important;line-height:1.02;margin-bottom:10px}.page p{font-size:clamp(11px,3.15vw,14px)!important;line-height:1.42!important;margin-bottom:8px!important}.page .lead{font-size:clamp(14px,4vw,18px)!important;line-height:1.3!important}.chapter{font-size:9px!important;margin-bottom:9px!important}.pull{font-size:clamp(16px,4.5vw,21px)!important;line-height:1.2;margin:11px 0!important;padding-top:9px!important}.photo{max-height:27%!important;width:100%;object-fit:cover;margin:3px 0 8px!important}.caption{font-size:9px!important;line-height:1.25;margin:-4px 0 8px!important}.page-no{bottom:10px!important}.controls{height:38px;flex:0 0 38px;padding:4px 0 0!important;align-items:center}.controls button{min-height:32px;padding:6px 10px;font-size:11px}.edge{height:62px!important;width:38px!important}}
 
+
+/* ===== Founder book editorial typesetting cleanup ===== */
+.page{padding:clamp(38px,3.6vw,54px) clamp(42px,4.4vw,66px) 58px}
+.page-inner{width:100%;max-width:520px;margin:0 auto;transform-origin:top left}
+.chapter{margin:0 0 26px;padding:0 0 10px;border-bottom:1px solid rgba(20,10,12,.18);font-family:var(--record);font-size:10px;line-height:1.3;letter-spacing:.19em;color:#705f5a}
+.page h2{max-width:13ch;margin:0 0 26px 22px;font-size:clamp(29px,2.7vw,41px);line-height:1.075;letter-spacing:-.028em;font-weight:700;text-wrap:balance}
+.page p{max-width:39em;margin:0 0 15px;font-size:clamp(14px,1vw,16px);line-height:1.62;letter-spacing:-.006em}
+.page p:not(.lead):not(.coverline){text-indent:1.35em}
+.page .lead{max-width:35em;margin:0 0 22px 22px;padding:1px 0 1px 16px;border-left:3px solid currentColor;font-size:clamp(16px,1.32vw,20px);line-height:1.46;font-weight:600;text-indent:0}
+.pull{max-width:31em;margin:26px 0 0 22px;padding:17px 0 0 18px;border-top:1px solid rgba(20,10,12,.42);border-left:3px solid currentColor;font-size:clamp(18px,1.65vw,25px);line-height:1.3;letter-spacing:-.018em;font-weight:700}
+.tint-burgundy .chapter{color:var(--burgundy);border-bottom-color:rgba(92,15,27,.25)}
+.tint-gold .chapter{color:#795b10;border-bottom-color:rgba(160,120,24,.28)}
+.tint-purple .chapter{color:var(--purple);border-bottom-color:rgba(74,42,120,.24)}
+.tint-green .chapter{color:var(--green);border-bottom-color:rgba(42,75,60,.24)}
+.cover{padding:clamp(40px,4vw,60px)}
+.cover .page-inner{height:100%;max-width:none;margin:0;display:flex;flex-direction:column;justify-content:space-between}
+.cover .chapter{border:0;padding:0;margin-bottom:30px;color:rgba(244,239,233,.62)}
+.cover h2{margin:0;max-width:7ch;font-size:clamp(42px,4.8vw,68px);line-height:.98;letter-spacing:-.04em}
+.cover .coverline{margin:0;text-indent:0;font-size:clamp(21px,2.1vw,31px);line-height:1.16;max-width:12ch}
+.cover small{display:block;margin-top:30px;line-height:1.45}
+.page-no{font-size:10px;letter-spacing:.14em}
+@media(max-width:760px){
+.page{padding:16px 18px 34px!important}.page-inner{max-width:none;margin:0}.chapter{margin:0 0 11px!important;padding:0 0 7px;font-size:8.5px!important;line-height:1.25;letter-spacing:.16em}.page h2{max-width:14ch;margin:0 0 13px 10px!important;font-size:clamp(22px,6.3vw,29px)!important;line-height:1.06!important;letter-spacing:-.025em}.page p{margin:0 0 8px!important;font-size:clamp(11.5px,3.05vw,13.5px)!important;line-height:1.48!important;letter-spacing:0}.page p:not(.lead):not(.coverline){text-indent:1.05em}.page .lead{margin:0 0 11px 10px!important;padding-left:11px;border-left-width:2px;font-size:clamp(14px,3.8vw,16.5px)!important;line-height:1.36!important;text-indent:0}.pull{margin:13px 0 0 10px!important;padding:10px 0 0 11px!important;border-left-width:2px;font-size:clamp(15px,4.15vw,19px)!important;line-height:1.23!important}.cover{padding:22px 20px 34px!important}.cover h2{margin:0!important;font-size:clamp(34px,10vw,48px)!important;max-width:7ch}.cover .coverline{font-size:clamp(19px,5.5vw,26px)!important;line-height:1.14!important;text-indent:0}.cover small{margin-top:20px;font-size:9px;line-height:1.35}}
+
 </style>
 </head>
 <body>
