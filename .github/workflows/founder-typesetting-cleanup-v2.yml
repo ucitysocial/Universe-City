@@ -24,32 +24,11 @@ jobs:
           set -euo pipefail
           python - <<'PY'
           from pathlib import Path
+          import base64,zlib
+          payload='eNqdVmuPqzYQ/b6/guqqUnIFXD8wEFClSpX6PxxwEnrBRsTZTRrlv3dsIDwTtY020WKbmXPmccYfP747v5mP86e6yFw0zl6pn47INh/n66tHn5/UhXhcmKMwZzj0PfrNWX+9j3O73m89F8t79cPHx7x4cFkvp+xIOaO45d3sQZ8N2WL+egxsNeMR/O8x13Yx7/UTRu8Dp3DiXg4fzsplc2tFWj+KIWzPhr5pqD7/hTo9C0HGuV2wN+nLI+O/0B7tEocwwMbkR4bM4r3Zfy8s2h7wQ/bYwrwN6xw8FLoG8RvwQ0D/OohKoAGf7I0y5hVbI4LGoX4IjMVwrOM4q7zZr6esJ9r1vPvYKbxwuuzkSktoLFmH+fG4GncjaZfoRGJS85hRzhyyuL6NwQ1vHTdtS+YEf9xWF6T4x+3AuFTpL7hQGZX6rRjioOI+YtE1g+8Drbgr/P3gpyf7uFhL98yhJRZZx+/krgnccdn+OrT9rRGpbxmqaYI5k4jTHfCvZwh3lZ8X6xkFLM7lMkIlqnO0QlTWyfls0KwJ1Qi0RwS+63U5ga3etg3aKqPVDRz1jN5w26Z7F/sRtO6L8dQ6qQ2rlICyw46QomkEjdB2hgQT6BaowKFHq5SlS01tlI4C33EyXGyRaCz0gP4bF4uKuHP8Zg+RDWQYvl5cU1E+qKQtm0rYZbU4nR2ET8Y1Hm2jKKp8llI1hXU9ZqV4jlE2nXQ8Hcg8p9fOeG8Kf2JdFyc7Yu8w5o3O6ZVQGpffjzoEcB8mAtyO/c5YuO1pfu+o2rj+62jiVv53u14KqfO/lJkB2N4E1ub6VZVQffWOGNFvyjThflF6z2nDOdsejUmSOdeFm76vKZPz/CtVFSv6G4Y9r6w8kkQ9dmcCOsxUJ0Z/pOdYT/SUf0a9Wx5GwsoUz/h0WGz5J8B3FqYjhOMX7sO5ZboOLMZ3TcvB7KyyKdaLNwe3LxzQ02p4MoN75yXzKMhq3ig/OEtpTh3FQc4wVh8UMv0UZqBheYbYIRHeOjOMdCx3Xra94TlVh/b7ZZy3S8RXux6lYsx8WkiF1TtzJpYzbvGM4jm4Nwr8d4cZAfPbM5HnRGJ7Mli7w8nHTqsxhGPBZbqVwFvypTgqE0Y1c4IKn7Q4XnWIFGEG/6MgN3ZrQ5jS1L21wExheRD/ma0sTN44wX/rTjPg29MqQrtrWkL2TZ5+axj/R+MpBL77OgREAAA=='
+          css=zlib.decompress(base64.b64decode(payload)).decode()
           p=Path('ucitysocial/founder.html')
           s=p.read_text()
-          css='''
-/* ===== Founder book editorial typesetting cleanup ===== */
-.page{padding:clamp(38px,3.6vw,54px) clamp(42px,4.4vw,66px) 58px}
-.page-inner{width:100%;max-width:520px;margin:0 auto;transform-origin:top left}
-.chapter{margin:0 0 26px;padding:0 0 10px;border-bottom:1px solid rgba(20,10,12,.18);font-family:var(--record);font-size:10px;line-height:1.3;letter-spacing:.19em;color:#705f5a}
-.page h2{max-width:13ch;margin:0 0 26px 22px;font-size:clamp(29px,2.7vw,41px);line-height:1.075;letter-spacing:-.028em;font-weight:700;text-wrap:balance}
-.page p{max-width:39em;margin:0 0 15px;font-size:clamp(14px,1vw,16px);line-height:1.62;letter-spacing:-.006em}
-.page p:not(.lead):not(.coverline){text-indent:1.35em}
-.page .lead{max-width:35em;margin:0 0 22px 22px;padding:1px 0 1px 16px;border-left:3px solid currentColor;font-size:clamp(16px,1.32vw,20px);line-height:1.46;font-weight:600;text-indent:0}
-.pull{max-width:31em;margin:26px 0 0 22px;padding:17px 0 0 18px;border-top:1px solid rgba(20,10,12,.42);border-left:3px solid currentColor;font-size:clamp(18px,1.65vw,25px);line-height:1.3;letter-spacing:-.018em;font-weight:700}
-.tint-burgundy .chapter{color:var(--burgundy);border-bottom-color:rgba(92,15,27,.25)}
-.tint-gold .chapter{color:#795b10;border-bottom-color:rgba(160,120,24,.28)}
-.tint-purple .chapter{color:var(--purple);border-bottom-color:rgba(74,42,120,.24)}
-.tint-green .chapter{color:var(--green);border-bottom-color:rgba(42,75,60,.24)}
-.cover{padding:clamp(40px,4vw,60px)}
-.cover .page-inner{height:100%;max-width:none;margin:0;display:flex;flex-direction:column;justify-content:space-between}
-.cover .chapter{border:0;padding:0;margin-bottom:30px;color:rgba(244,239,233,.62)}
-.cover h2{margin:0;max-width:7ch;font-size:clamp(42px,4.8vw,68px);line-height:.98;letter-spacing:-.04em}
-.cover .coverline{margin:0;text-indent:0;font-size:clamp(21px,2.1vw,31px);line-height:1.16;max-width:12ch}
-.cover small{display:block;margin-top:30px;line-height:1.45}
-.page-no{font-size:10px;letter-spacing:.14em}
-@media(max-width:760px){
-.page{padding:16px 18px 34px!important}.page-inner{max-width:none;margin:0}.chapter{margin:0 0 11px!important;padding:0 0 7px;font-size:8.5px!important;line-height:1.25;letter-spacing:.16em}.page h2{max-width:14ch;margin:0 0 13px 10px!important;font-size:clamp(22px,6.3vw,29px)!important;line-height:1.06!important;letter-spacing:-.025em}.page p{margin:0 0 8px!important;font-size:clamp(11.5px,3.05vw,13.5px)!important;line-height:1.48!important;letter-spacing:0}.page p:not(.lead):not(.coverline){text-indent:1.05em}.page .lead{margin:0 0 11px 10px!important;padding-left:11px;border-left-width:2px;font-size:clamp(14px,3.8vw,16.5px)!important;line-height:1.36!important;text-indent:0}.pull{margin:13px 0 0 10px!important;padding:10px 0 0 11px!important;border-left-width:2px;font-size:clamp(15px,4.15vw,19px)!important;line-height:1.23!important}.cover{padding:22px 20px 34px!important}.cover h2{margin:0!important;font-size:clamp(34px,10vw,48px)!important;max-width:7ch}.cover .coverline{font-size:clamp(19px,5.5vw,26px)!important;line-height:1.14!important;text-indent:0}.cover small{margin-top:20px;font-size:9px;line-height:1.35}}
-'''
           if 'Founder book editorial typesetting cleanup' not in s:
               s=s.replace('</style>',css+'\n</style>',1)
           p.write_text(s)
