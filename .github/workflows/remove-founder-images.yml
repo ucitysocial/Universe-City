@@ -1,0 +1,31 @@
+name: Remove founder images
+on:
+  push:
+    branches:
+      - site/remove-founder-images
+jobs:
+  patch:
+    if: github.event.head_commit.message != 'site: remove founder images'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Remove image markup and styles
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          p = Path('ucitysocial/founder.html')
+          s = p.read_text()
+          s = re.sub(r'\n?\.story-photo\{.*?\}\n\.story-photo img\{.*?\}\n\.story-photo figcaption\{.*?\}\n@media\(max-width:760px\)\{\.story-photo\{.*?\}\}\n', '\n', s, flags=re.S)
+          s = re.sub(r'<figure class="story-photo(?: portrait)?">.*?</figure>', '', s, flags=re.S)
+          p.write_text(s)
+          PY
+      - name: Commit changes
+        run: |
+          git config user.name "ucitysocial"
+          git config user.email "media@babs.fm"
+          git add ucitysocial/founder.html
+          git commit -m "site: remove founder images"
+          git push
