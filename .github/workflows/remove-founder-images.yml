@@ -5,7 +5,7 @@ on:
       - site/remove-founder-images
 jobs:
   patch:
-    if: github.event.head_commit.message != 'site: remove founder images'
+    if: ${{ github.event.head_commit.message != 'site: remove founder images' }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
