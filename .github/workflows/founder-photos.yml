@@ -1,0 +1,49 @@
+name: Place founder photos
+on:
+  push:
+    branches:
+      - site/founder-typesetting-cleanup
+    paths:
+      - '.github/workflows/founder-photos.yml'
+permissions:
+  contents: write
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: site/founder-typesetting-cleanup
+          fetch-depth: 0
+      - name: Update founder book
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('ucitysocial/founder.html')
+          s=p.read_text()
+          s=s.replace('<div class="book-head"><div><p class="book-kicker">Founder archive · 2016—present</p><h1>Founder Story</h1></div><p>A personal account of the grief, questions, systems thinking and years of work that became Universe City.</p></div>','<div class="book-head"><div><p class="book-kicker">Founder archive · 2016—present</p><h1>Founder Story</h1></div></div>')
+          css='''\n.story-photo{float:right;width:38%;max-width:205px;margin:2px 0 15px 20px}\n.story-photo img{display:block;width:100%;height:auto;max-height:225px;object-fit:cover;border:1px solid rgba(20,10,12,.18)}\n.story-photo figcaption{font:9px/1.35 var(--record);letter-spacing:.06em;color:var(--muted);margin-top:6px}\n@media(max-width:760px){.story-photo{float:none;width:100%;max-width:none;margin:0 0 10px}.story-photo img{width:100%;height:128px;max-height:128px;object-fit:cover}.story-photo.portrait img{object-position:center 27%}}\n'''
+          if '.story-photo{' not in s:
+              s=s.replace('</style>',css+'\n</style>',1)
+          old='<p class="lead">What shook me first was not losing someone who handled the administrative work of my life. I lost my guiding light.</p><p>I lost my support system.'
+          new='<p class="lead">What shook me first was not losing someone who handled the administrative work of my life. I lost my guiding light.</p><figure class="story-photo"><img src="./founder-family.jpg" alt="Family photograph"><figcaption>My mom, my sister and me.</figcaption></figure><p>I lost my support system.'
+          s=s.replace(old,new)
+          old2='<p>My mom loved the moon and the constellations.</p><p>As Blank University became Universe City, I started using the constellations as structure.'
+          new2='<p>My mom loved the moon and the constellations.</p><figure class="story-photo portrait"><img src="./founder-mom.jpg" alt="Portrait photograph"><figcaption>My mom. Her love of the moon and constellations lives inside Universe City.</figcaption></figure><p>As Blank University became Universe City, I started using the constellations as structure.'
+          s=s.replace(old2,new2)
+          p.write_text(s)
+          PY
+          grep -q 'founder-family.jpg' ucitysocial/founder.html
+          grep -q 'founder-mom.jpg' ucitysocial/founder.html
+      - name: Commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'ucitysocial'
+          git config user.email 'media@babs.fm'
+          git rm .github/workflows/founder-photos.yml
+          git add ucitysocial/founder.html
+          git commit -m 'site: add founder photos and simplify header'
+          git push origin HEAD:site/founder-typesetting-cleanup
