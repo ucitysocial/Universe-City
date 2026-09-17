@@ -1,10 +1,15 @@
 name: Founder editorial layout
+
 on:
   push:
-    branches: [site/founder-typesetting-cleanup]
-    paths: ['.github/workflows/founder-editorial-layout.yml']
+    branches:
+      - site/founder-typesetting-cleanup
+    paths:
+      - '.github/workflows/founder-editorial-layout.yml'
+
 permissions:
   contents: write
+
 jobs:
   refine:
     runs-on: ubuntu-latest
@@ -13,15 +18,16 @@ jobs:
         with:
           ref: site/founder-typesetting-cleanup
           fetch-depth: 0
+
       - name: Apply editorial layout
         shell: bash
         run: |
           set -euo pipefail
           python - <<'PY'
           from pathlib import Path
-          p=Path('ucitysocial/founder.html')
-          s=p.read_text()
-          css=r'''
+          p = Path('ucitysocial/founder.html')
+          s = p.read_text()
+          css = '''
 /* ===== Founder editorial reading layout ===== */
 :root{--reading:Georgia,"Times New Roman",serif}
 .page{padding:54px 64px 64px!important}
@@ -37,22 +43,27 @@ jobs:
 .cover h2{font-family:var(--sans)!important;max-width:8ch!important;margin:0!important;font-size:clamp(44px,4.6vw,66px)!important;line-height:1!important}
 .cover .coverline{font-family:var(--sans)!important;font-size:clamp(22px,2vw,30px)!important;line-height:1.15!important;font-style:normal!important}
 @media(max-width:760px){
-  .page{padding:18px 20px 36px!important}
-  .page-inner{max-width:none!important}
-  .chapter{margin:0 0 12px!important;padding-bottom:7px!important;font-size:8.5px!important}
-  .page h2{max-width:18ch!important;margin:0 0 14px!important;font-size:clamp(23px,6vw,29px)!important;line-height:1.08!important}
-  .page p{max-width:none!important;margin-bottom:.8em!important;font-size:clamp(12.5px,3.35vw,14.5px)!important;line-height:1.48!important}
-  .page .lead{max-width:none!important;margin-bottom:.9em!important;font-size:clamp(14px,3.7vw,16px)!important;line-height:1.42!important}
-  .pull{max-width:none!important;margin-top:14px!important;padding-top:10px!important;font-size:clamp(15px,4vw,18px)!important;line-height:1.32!important}
-  .cover h2{font-size:clamp(34px,9.5vw,46px)!important}
+.page{padding:18px 20px 36px!important}
+.page-inner{max-width:none!important}
+.chapter{margin:0 0 12px!important;padding-bottom:7px!important;font-size:8.5px!important}
+.page h2{max-width:18ch!important;margin:0 0 14px!important;font-size:clamp(23px,6vw,29px)!important;line-height:1.08!important}
+.page p{max-width:none!important;margin-bottom:.8em!important;font-size:clamp(12.5px,3.35vw,14.5px)!important;line-height:1.48!important}
+.page .lead{max-width:none!important;margin-bottom:.9em!important;font-size:clamp(14px,3.7vw,16px)!important;line-height:1.42!important}
+.pull{max-width:none!important;margin-top:14px!important;padding-top:10px!important;font-size:clamp(15px,4vw,18px)!important;line-height:1.32!important}
+.cover h2{font-size:clamp(34px,9.5vw,46px)!important}
 }
 '''
-          s=s.replace('</style>',css+'\n</style>',1)
+          if 'Founder editorial reading layout' not in s:
+              s = s.replace('</style>', css + '\n</style>', 1)
           p.write_text(s)
           PY
-      - name: Commit
+
+          grep -q "Founder editorial reading layout" ucitysocial/founder.html
+
+      - name: Commit changes
         shell: bash
         run: |
+          set -euo pipefail
           git config user.name 'ucitysocial'
           git config user.email 'media@babs.fm'
           git rm .github/workflows/founder-editorial-layout.yml
