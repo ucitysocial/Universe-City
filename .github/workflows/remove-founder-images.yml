@@ -5,7 +5,6 @@ on:
       - site/remove-founder-images
 jobs:
   patch:
-    if: ${{ github.event.head_commit.message != 'site: remove founder images' }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -22,10 +21,13 @@ jobs:
           s = re.sub(r'<figure class="story-photo(?: portrait)?">.*?</figure>', '', s, flags=re.S)
           p.write_text(s)
           PY
-      - name: Commit changes
+      - name: Commit changes if needed
         run: |
           git config user.name "ucitysocial"
           git config user.email "media@babs.fm"
           git add ucitysocial/founder.html
+          if git diff --cached --quiet; then
+            exit 0
+          fi
           git commit -m "site: remove founder images"
           git push
