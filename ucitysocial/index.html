@@ -80,7 +80,7 @@ p+p{margin-top:var(--s2)}
 #rail.dark a .nm{background:var(--paper);color:var(--ink)}
 
 /* section entry flare */
-section,.hero,.arrival,.about,.biz,.trustsec,.start{position:relative}
+section,.hero,.arrival,.about,.biz,.trustsec{position:relative}
 .flare{position:absolute;left:0;right:0;top:0;height:2px;background:var(--pa);
  transform:scaleX(0);transform-origin:left;transition:transform 1s cubic-bezier(.2,.8,.2,1)}
 .flare.in{transform:scaleX(1)}
@@ -730,16 +730,7 @@ a.btn.dark{background:var(--pa);color:#fff;box-shadow:5px 5px 0 var(--ink)}
 .portrait .arw.l{left:10px}.portrait .arw.r{right:10px}
 .portrait .cap{z-index:4}
 
-/* ===== 10 START + PRICING ===== */
-.start{background:var(--pa);color:var(--paper);padding:clamp(38px,4.4vw,70px) 0 var(--s5);border-bottom:2px solid var(--ink)}
-.start h2{color:#fff;max-width:16ch}
-.start p{color:rgba(244,239,233,.82)}
-.start .w{display:grid;grid-template-columns:1.2fr 1fr;gap:clamp(24px,4vw,70px);align-items:center}
-@media(max-width:900px){.start .w{grid-template-columns:1fr}}
-.start .box{border:2px solid rgba(244,239,233,.5);padding:clamp(18px,2.2vw,30px);background:rgba(0,0,0,.18)}
-.start .box h3{color:#fff}
-.start .box p{font-size:14px;margin-top:9px}
-
+/* pricing */
 .pricing{color:var(--ink);background:var(--paper);padding:clamp(38px,4.4vw,70px) 0 var(--s5)}
 .pricing .k{color:var(--pa)}
 .tierwrap{position:relative;margin-top:var(--s4)}
@@ -1036,34 +1027,20 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
  <div class="joined rv d3">FOUR STARTING FOLDERS &middot; FOUR INTAKE METHODS &middot; ONE FILE</div>
 </div></section>
 
-<!-- STARTING MEMBERSHIP -->
+<!-- STARTING FOLDERS -->
 <section class="first" id="first"><div class="w">
  <div>
-  <span class="k rv">starting membership</span>
+  <span class="k rv">starting folders</span>
   <h2 class="rv d1">Four folders<br>start together</h2>
  </div>
  <div class="rv d2">
-  <p class="lead">Membership starts with Time, Inventory, Salary, and Standards.</p>
+  <p class="lead">Your file starts with Time, Inventory, Salary, and Standards.</p>
   <p>The folders do not wait on one another. They can use confirmed information from the rest of the file as that information is established.</p>
-  <p>Your agent maintains all four and reviews the file with you each week.</p>
+  <p>Your agent maintains all four together as your life changes.</p>
  </div>
 </div></section>
 
-<!-- 7 TIME -->
-<section class="start" id="start"><div class="w">
- <div>
-  <span class="k rv" style="color:rgba(244,239,233,.55)">membership</span>
-  <h2 class="rv d1">$48 starts with four active folders</h2>
-  <p class="lead rv d2 mt3">Time. Inventory. Salary. Standards.</p>
-  <p class="rv d2">Your agent helps establish each folder, maintains changes with you, and works across the four when one decision touches more than one part of your life. Membership includes a fifteen-minute weekly review.</p>
-  <div class="btns rv d3"><a href="https://ucitysocial.com/apply" class="btn">Begin application</a><a href="/membership" class="btn o">See membership</a></div>
- </div>
- <div class="box rv d3">
-  <h3>What the four folders maintain</h3>
-  <p>A calendar, a household baseline, an income-and-expenses view, and confirmed personal standards.</p>
- </div>
-</div></section>
-
+<!-- TIME EXAMPLE -->
 <section class="time" id="time"><div class="w">
  <span class="k rv">closer look &middot; Time</span>
  <h2 class="rv d1">Build a calendar from the life you already live</h2>
@@ -1162,16 +1139,20 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
  </div></div>
 </div></section>
 
-<!-- BUSINESS MODEL -->
+<!-- MEMBERSHIP -->
 <section class="biz" id="business"><div class="w">
- <span class="k rv">membership model</span> <span class="devtag rv">In development</span>
+ <span class="k rv">membership</span>
  <h2 class="head rv d1">$48. One membership.</h2>
- <p class="lead rv d2 mt3 px" style="max-width:48ch">Membership starts with one Universe City agent working across Time, Inventory, Salary, and Standards.</p>
+ <p class="lead rv d2 mt3 px" style="max-width:48ch">One Universe City agent working across Time, Inventory, Salary, and Standards, with a fifteen-minute file review each week.</p>
  <div class="bgrid rv d2">
   <div class="c"><div class="n">AGENT</div><h3>One agent across four folders</h3>
    <p>Your agent establishes the starting folders with you and maintains them as your schedule, household needs, income, expenses, and standards change.</p></div>
   <div class="c"><div class="n">15 MIN</div><h3>A weekly file review</h3>
    <p>Once a week, you review the four folders together. The review confirms changes, decisions, and the work that needs attention next.</p></div>
+ </div>
+ <div class="btns rv d3" style="margin-bottom:var(--s4)">
+  <a href="https://ucitysocial.com/apply" class="btn dark">Apply</a>
+  <a href="/membership" class="btn">Membership details</a>
  </div>
  <div class="never rv d3">
   <div class="t">TWO RULES THAT DO NOT MOVE</div>
@@ -1218,7 +1199,7 @@ document.querySelectorAll('.rv').forEach(function(el){ io.observe(el) });
 
 /* draw a coloured rule across the top of each chapter as it enters */
 if(!reduce){
-  document.querySelectorAll('section, .arrival, .about, .biz, .trustsec, .start').forEach(function(sec){
+  document.querySelectorAll('section, .arrival, .about, .biz, .trustsec').forEach(function(sec){
     if(sec.querySelector(':scope > .flare')) return;
     var f=document.createElement('i'); f.className='flare';
     var c=getComputedStyle(sec).getPropertyValue('--c').trim();
@@ -1323,9 +1304,9 @@ if(stage){
 (function(){
  var MAP=[
   ['#what','Why an agent'],['#departments','Four departments'],['#system','Starting folders'],
-  ['.room','Folders together'],['#first','Membership'],['#start','$48'],['#time','Time example'],
+  ['.room','Folders together'],['#first','Starting folders'],['#time','Time example'],
   ['.reveal','Your calendar'],['.grow','How Time develops'],['#about','Why it exists'],
-  ['#business','Membership model']
+  ['#business','Membership']
  ];
  var rail=document.getElementById('rail');
  if(!rail) return;
@@ -1363,7 +1344,7 @@ if(stage){
   cut.className='starcut';
   var cls=prev.className||'';
   if(DARKBG.some(function(d){return cls.indexOf(d)>-1})) cut.classList.add('dark');
-  if(cls.indexOf('start')>-1||cls.indexOf('trustsec')>-1) cut.classList.add('pa');
+  if(cls.indexOf('trustsec')>-1) cut.classList.add('pa');
   var b=document.createElement('button');
   b.type='button';
   b.innerHTML='&#9733;';
