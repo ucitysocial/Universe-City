@@ -1,10 +1,8 @@
 'use client';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { supabaseBrowser } from '@/lib/supabase/client';
 
 export default function Signup() {
-  const router = useRouter();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -15,16 +13,17 @@ export default function Signup() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true); setErr(null);
+    const publicAppUrl = process.env.NEXT_PUBLIC_PUBLIC_APP_URL ?? location.origin;
     const { data, error } = await supabaseBrowser().auth.signUp({
       email, password,
       options: {
         data: { name },
-        emailRedirectTo: `${location.origin}/auth/callback?next=/join`
+        emailRedirectTo: `${publicAppUrl}/auth/callback?next=/apply`
       }
     });
     setBusy(false);
     if (error) { setErr(error.message); return; }
-    if (data.session) { router.push('/join'); router.refresh(); return; }
+    if (data.session) { location.assign(`${publicAppUrl}/apply`); return; }
     setSent(true);
   }
 
