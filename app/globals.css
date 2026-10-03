@@ -93,6 +93,150 @@ section.dark .rows li{border-color:var(--rule)}
 .join-note{margin:22px 0 16px}
 .join-primary{width:100%;text-align:center;margin-top:24px}
 
+/* application folder carousel */
+.application-folders{
+  --folder-color:var(--I);
+  margin-top:34px;
+  max-width:720px;
+}
+.application-folder-tabs{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  border:2px solid var(--ink);
+  background:var(--surface);
+}
+.application-folder-tabs button{
+  appearance:none;
+  border:0;
+  border-right:1px solid var(--rule);
+  background:var(--surface);
+  color:var(--ink);
+  min-width:0;
+  padding:11px 12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  font-size:13px;
+  font-weight:600;
+  line-height:1.2;
+  cursor:pointer;
+}
+.application-folder-tabs button:last-child{border-right:0}
+.application-folder-tabs button span{
+  font-family:'VT323',monospace;
+  font-size:18px;
+  line-height:1;
+  color:var(--dim);
+}
+.application-folder-tabs button:hover{background:var(--paper)}
+.application-folder-tabs button.active{
+  background:var(--folder-color);
+  color:#fff;
+}
+.application-folder-tabs button.active span{color:rgba(255,255,255,.78)}
+.application-folder-tabs button:focus-visible{
+  position:relative;
+  z-index:1;
+  outline:3px solid var(--folder-color);
+  outline-offset:-3px;
+}
+.application-folder-stage{
+  border-left:5px solid var(--folder-color);
+  padding:24px 0 2px 22px;
+  min-height:300px;
+  display:flex;
+  flex-direction:column;
+}
+.application-folder-heading .kick{
+  color:var(--folder-color);
+  margin-bottom:4px;
+}
+.application-folder-number{
+  font-family:'VT323',monospace;
+  font-size:19px;
+  line-height:1.1;
+  color:var(--dim);
+}
+.application-folder-heading h2{
+  margin-top:2px;
+  font-size:clamp(30px,3.2vw,44px);
+}
+.application-folder-slide{
+  margin-top:14px;
+  max-width:650px;
+}
+.application-folder-step{
+  font-family:'VT323',monospace;
+  font-size:18px;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--folder-color);
+  margin-bottom:6px;
+}
+.application-folder-slide h3{
+  font-size:18px;
+  line-height:1.35;
+}
+.application-folder-slide>p:last-child{
+  margin-top:5px;
+  color:var(--dim);
+  max-width:60ch;
+}
+.application-folder-controls{
+  margin-top:auto;
+  padding-top:22px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.application-folder-controls>button{
+  appearance:none;
+  border:2px solid var(--ink);
+  background:#fff;
+  color:var(--ink);
+  min-width:38px;
+  height:38px;
+  padding:0 10px;
+  display:grid;
+  place-items:center;
+  font-weight:600;
+  line-height:1;
+  cursor:pointer;
+}
+.application-folder-controls>button:hover{
+  background:var(--ink);
+  color:#fff;
+}
+.application-folder-dots{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  margin:0 2px;
+}
+.application-folder-dots button{
+  appearance:none;
+  border:0;
+  width:22px;
+  height:5px;
+  background:var(--rule);
+  cursor:pointer;
+  padding:0;
+}
+.application-folder-dots button[aria-current="true"]{
+  background:var(--folder-color);
+}
+.application-folder-dots button:focus-visible{
+  outline:2px solid var(--folder-color);
+  outline-offset:3px;
+}
+.application-folder-pause{
+  width:auto!important;
+  min-width:70px!important;
+  font-size:12px;
+  margin-left:2px;
+}
+
 h1{font-size:clamp(34px,5vw,62px);line-height:1.04;letter-spacing:-.02em;font-weight:600}
 h2{font-size:clamp(24px,3vw,34px);line-height:1.15;font-weight:600}
 h3{font-size:19px;font-weight:600}
@@ -172,6 +316,11 @@ h3{font-size:19px;font-weight:600}
   .membership-price-card{min-height:200px}
   .join-layout{grid-template-columns:1fr;gap:32px;padding-top:48px;padding-bottom:64px}
   .join-card{position:static}
+  .application-folder-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .application-folder-tabs button:nth-child(2){border-right:0}
+  .application-folder-tabs button:nth-child(-n+2){border-bottom:1px solid var(--rule)}
+  .application-folder-stage{min-height:320px;padding-left:16px}
+  .application-folder-controls{flex-wrap:wrap}
   .field-row{grid-template-columns:1fr;gap:0}
   .grid4{grid-template-columns:1fr}
   .work{grid-template-columns:1fr}
