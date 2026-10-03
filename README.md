@@ -2,6 +2,19 @@
 
 A responsive website. Public site, member area, private agent console.
 
+
+## Repository map
+
+This repository currently contains two front-end surfaces while the public site is being consolidated:
+
+- `ucitysocial/` — the current public marketing site source used for the main Universe City story, departments, founder page, and membership explainer.
+- `app/` — the Next.js application: authentication, join/payment flow, member area, agent console, and API routes.
+- `components/` and `lib/` — shared application UI and domain/server logic.
+- `supabase/` — database migrations and security tests.
+
+Do not create a second copy of the marketing pages at the repository root. Update `ucitysocial/` until the marketing site is intentionally ported into the Next.js app.
+
+
     npm install
     cp .env.example .env.local        # fill it in
     npm run dev
