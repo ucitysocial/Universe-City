@@ -79,21 +79,21 @@ section.dark .rows li{border-color:var(--rule)}
 .membership-cta{align-self:flex-start;background:var(--I);color:#fff;text-decoration:none;font-weight:700;padding:12px 16px}
 .membership-cta:hover{text-decoration:underline;text-underline-offset:4px}
 
-/* ---------------- join ---------------- */
-.join-layout{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(320px,.8fr);gap:56px;align-items:start;padding-top:72px;padding-bottom:88px}
-.join-back{display:inline-flex;align-items:center;gap:7px;margin-bottom:24px;color:var(--dim);font-size:13px;font-weight:600;text-decoration:none}
-.join-back:hover{color:var(--ink);text-decoration:underline;text-underline-offset:4px}
-.join-main h1{margin-top:10px;max-width:15ch}
-.join-systems{margin-top:36px;border-top:1px solid var(--rule)}
-.join-system{display:grid;grid-template-columns:42px 1fr;gap:14px;padding:18px 0;border-bottom:1px solid var(--rule)}
-.join-system .rn{font-family:'VT323',monospace;color:var(--dim);font-size:22px;line-height:1.2}
-.join-system p{margin-top:3px;color:var(--dim);font-size:15px}
-.join-card{background:var(--paper);border:2px solid var(--ink);padding:28px;position:sticky;top:92px}
-.join-steps{list-style:none;margin-top:16px}
-.join-steps li{display:grid;grid-template-columns:32px 1fr;gap:12px;padding:12px 0;border-bottom:1px solid var(--rule)}
-.join-steps li span{font-family:'VT323',monospace;color:var(--I);font-size:20px;line-height:1.2}
-.join-note{margin:22px 0 16px}
-.join-primary{width:100%;text-align:center;margin-top:24px}
+/* ---------------- application ---------------- */
+.application-layout{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(320px,.8fr);gap:56px;align-items:start;padding-top:72px;padding-bottom:88px}
+.application-back{display:inline-flex;align-items:center;gap:7px;margin-bottom:24px;color:var(--dim);font-size:13px;font-weight:600;text-decoration:none}
+.application-back:hover{color:var(--ink);text-decoration:underline;text-underline-offset:4px}
+.application-main h1{margin-top:10px;max-width:15ch}
+.application-systems{margin-top:36px;border-top:1px solid var(--rule)}
+.application-system{display:grid;grid-template-columns:42px 1fr;gap:14px;padding:18px 0;border-bottom:1px solid var(--rule)}
+.application-system .rn{font-family:'VT323',monospace;color:var(--dim);font-size:22px;line-height:1.2}
+.application-system p{margin-top:3px;color:var(--dim);font-size:15px}
+.application-card{background:var(--paper);border:2px solid var(--ink);padding:28px;position:sticky;top:92px}
+.application-steps{list-style:none;margin-top:16px}
+.application-steps li{display:grid;grid-template-columns:32px 1fr;gap:12px;padding:12px 0;border-bottom:1px solid var(--rule)}
+.application-steps li span{font-family:'VT323',monospace;color:var(--I);font-size:20px;line-height:1.2}
+.application-note{margin:22px 0 16px}
+.application-primary{width:100%;text-align:center;margin-top:24px}
 
 /* application folder carousel */
 .application-folders{
@@ -316,8 +316,8 @@ h3{font-size:19px;font-weight:600}
   .agent-copy{padding:30px 24px}
   .membership-layout{grid-template-columns:1fr;gap:28px}
   .membership-price-card{min-height:200px}
-  .join-layout{grid-template-columns:1fr;gap:32px;padding-top:48px;padding-bottom:64px}
-  .join-card{position:static}
+  .application-layout{grid-template-columns:1fr;gap:32px;padding-top:48px;padding-bottom:64px}
+  .application-card{position:static}
   .application-folder-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}
   .application-folder-tabs button:nth-child(2){border-right:0}
   .application-folder-tabs button:nth-child(-n+2){border-bottom:1px solid var(--rule)}
