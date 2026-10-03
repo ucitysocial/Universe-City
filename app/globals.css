@@ -81,6 +81,8 @@ section.dark .rows li{border-color:var(--rule)}
 
 /* ---------------- join ---------------- */
 .join-layout{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(320px,.8fr);gap:56px;align-items:start;padding-top:72px;padding-bottom:88px}
+.join-back{display:inline-flex;align-items:center;gap:7px;margin-bottom:24px;color:var(--dim);font-size:13px;font-weight:600;text-decoration:none}
+.join-back:hover{color:var(--ink);text-decoration:underline;text-underline-offset:4px}
 .join-main h1{margin-top:10px;max-width:15ch}
 .join-systems{margin-top:36px;border-top:1px solid var(--rule)}
 .join-system{display:grid;grid-template-columns:42px 1fr;gap:14px;padding:18px 0;border-bottom:1px solid var(--rule)}
