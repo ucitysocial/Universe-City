@@ -4,12 +4,13 @@ import { useState } from 'react';
 
 export default function SiteHeader({ signedIn }: { signedIn: boolean }) {
   const [open, setOpen] = useState(false);
+  const mainSiteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://ucitysocial.com';
 
   return (
     <header className="site-head">
       <div className="wrap bar">
         <div className="brand-lockup">
-          <Link href="/" className="mark">universe&#9733;city</Link>
+          <a href={mainSiteUrl} className="mark">universe&#9733;city</a>
           <span className="brand-sub">Life Management Agency</span>
         </div>
 
@@ -37,7 +38,7 @@ export default function SiteHeader({ signedIn }: { signedIn: boolean }) {
           {open && (
             <div className="compact-menu" onClick={() => setOpen(false)}>
               <p className="menu-label">Explore</p>
-              <Link href="/">Home</Link>
+              <a href={mainSiteUrl}>Home</a>
               <Link href="/how-it-works">How it works</Link>
               <Link href="/membership">Membership</Link>
               {signedIn
