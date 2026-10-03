@@ -12,18 +12,18 @@ export default async function Apply() {
   if (profile?.membership === 'active') redirect('/member');
 
   return (
-    <div className="wrap join-layout">
-      <div className="join-main">
-        <a className="join-back" href={mainSiteUrl}>&larr; Back to Universe City</a>
+    <div className="wrap application-layout">
+      <div className="application-main">
+        <a className="application-back" href={mainSiteUrl}>&larr; Back to Universe City</a>
         <p className="kick">Membership</p>
         <h1>Get an agent for the parts of life you manage every day.</h1>
 
         <ApplicationFolderShowcase />
       </div>
 
-      <aside className="join-card" style={{ alignSelf: 'center' }}>
+      <aside className="application-card" style={{ alignSelf: 'center' }}>
         <p className="kick">Application</p>
-        <ol className="join-steps">
+        <ol className="application-steps">
           <li><span>01</span><p>Create your account and file.</p></li>
           <li><span>02</span><p>Activate your $48 membership.</p></li>
           <li><span>03</span><p>Start working with your agent across all four folders.</p></li>
@@ -32,14 +32,14 @@ export default async function Apply() {
 
         {profile ? (
           <>
-            <p className="note join-note">
+            <p className="note application-note">
               Case {profile.case_no} is ready. Continue your application to activate membership.
             </p>
             <Checkout />
           </>
         ) : (
           <>
-            <Link className="btn join-primary" href="/signup">
+            <Link className="btn application-primary" href="/signup">
               Begin application
             </Link>
             <p className="note">
