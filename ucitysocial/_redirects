@@ -1,0 +1,10 @@
+# Keep the public Universe City domain visible while serving the application.
+/apply https://universecitystage.netlify.app/join 200
+/login https://universecitystage.netlify.app/login 200
+/signup https://universecitystage.netlify.app/signup 200
+/reset/* https://universecitystage.netlify.app/reset/:splat 200
+/auth/* https://universecitystage.netlify.app/auth/:splat 200
+/api/* https://universecitystage.netlify.app/api/:splat 200
+/member/* https://universecitystage.netlify.app/member/:splat 200
+/agent/* https://universecitystage.netlify.app/agent/:splat 200
+/_next/* https://universecitystage.netlify.app/_next/:splat 200
