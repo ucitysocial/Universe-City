@@ -80,7 +80,7 @@ p+p{margin-top:var(--s2)}
 #rail.dark a .nm{background:var(--paper);color:var(--ink)}
 
 /* section entry flare */
-section,.hero,.arrival,.about,.biz,.trustsec,.start{position:relative}
+section,.hero,.arrival,.about,.biz,.trustsec{position:relative}
 .flare{position:absolute;left:0;right:0;top:0;height:2px;background:var(--pa);
  transform:scaleX(0);transform-origin:left;transition:transform 1s cubic-bezier(.2,.8,.2,1)}
 .flare.in{transform:scaleX(1)}
@@ -730,16 +730,7 @@ a.btn.dark{background:var(--pa);color:#fff;box-shadow:5px 5px 0 var(--ink)}
 .portrait .arw.l{left:10px}.portrait .arw.r{right:10px}
 .portrait .cap{z-index:4}
 
-/* ===== 10 START + PRICING ===== */
-.start{background:var(--pa);color:var(--paper);padding:clamp(38px,4.4vw,70px) 0 var(--s5);border-bottom:2px solid var(--ink)}
-.start h2{color:#fff;max-width:16ch}
-.start p{color:rgba(244,239,233,.82)}
-.start .w{display:grid;grid-template-columns:1.2fr 1fr;gap:clamp(24px,4vw,70px);align-items:center}
-@media(max-width:900px){.start .w{grid-template-columns:1fr}}
-.start .box{border:2px solid rgba(244,239,233,.5);padding:clamp(18px,2.2vw,30px);background:rgba(0,0,0,.18)}
-.start .box h3{color:#fff}
-.start .box p{font-size:14px;margin-top:9px}
-
+/* pricing */
 .pricing{color:var(--ink);background:var(--paper);padding:clamp(38px,4.4vw,70px) 0 var(--s5)}
 .pricing .k{color:var(--pa)}
 .tierwrap{position:relative;margin-top:var(--s4)}
@@ -1208,7 +1199,7 @@ document.querySelectorAll('.rv').forEach(function(el){ io.observe(el) });
 
 /* draw a coloured rule across the top of each chapter as it enters */
 if(!reduce){
-  document.querySelectorAll('section, .arrival, .about, .biz, .trustsec, .start').forEach(function(sec){
+  document.querySelectorAll('section, .arrival, .about, .biz, .trustsec').forEach(function(sec){
     if(sec.querySelector(':scope > .flare')) return;
     var f=document.createElement('i'); f.className='flare';
     var c=getComputedStyle(sec).getPropertyValue('--c').trim();
@@ -1313,9 +1304,9 @@ if(stage){
 (function(){
  var MAP=[
   ['#what','Why an agent'],['#departments','Four departments'],['#system','Starting folders'],
-  ['.room','Folders together'],['#first','Membership'],['#start','$48'],['#time','Time example'],
+  ['.room','Folders together'],['#first','Starting folders'],['#time','Time example'],
   ['.reveal','Your calendar'],['.grow','How Time develops'],['#about','Why it exists'],
-  ['#business','Membership model']
+  ['#business','Membership']
  ];
  var rail=document.getElementById('rail');
  if(!rail) return;
@@ -1353,7 +1344,7 @@ if(stage){
   cut.className='starcut';
   var cls=prev.className||'';
   if(DARKBG.some(function(d){return cls.indexOf(d)>-1})) cut.classList.add('dark');
-  if(cls.indexOf('start')>-1||cls.indexOf('trustsec')>-1) cut.classList.add('pa');
+  if(cls.indexOf('trustsec')>-1) cut.classList.add('pa');
   var b=document.createElement('button');
   b.type='button';
   b.innerHTML='&#9733;';
