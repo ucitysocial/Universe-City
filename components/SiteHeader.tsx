@@ -4,23 +4,52 @@ import { useState } from 'react';
 
 export default function SiteHeader({ signedIn }: { signedIn: boolean }) {
   const [open, setOpen] = useState(false);
+  const mainSiteUrl = process.env.NEXT_PUBLIC_MARKETING_SITE_URL ?? 'https://ucitysocial.com';
+
   return (
     <header className="site-head">
-      <div className="wrap bar" style={{ position: 'relative' }}>
-        <Link href="/" className="mark">universe&#9733;city</Link>
-        <button className="navtoggle lab" onClick={() => setOpen(v => !v)} aria-expanded={open}>
-          Menu
-        </button>
-        <nav className={'site-nav' + (open ? ' open' : '')} onClick={() => setOpen(false)}>
-          <Link href="/how-it-works">How it works</Link>
-          <Link href="/membership">Membership</Link>
+      <div className="wrap bar">
+        <div className="brand-lockup">
+          <a href={mainSiteUrl} className="mark">universe&#9733;city</a>
+          <span className="brand-sub">Life Management Agency</span>
+        </div>
+
+        <nav className="primary-nav" aria-label="Primary navigation">
+          <a href={mainSiteUrl + '#what'}>How it works</a>
+          <a href={mainSiteUrl + '/join'}>Membership</a>
           {signedIn
-            ? <Link className="btn ghost" href="/member">Your file</Link>
-            : <>
-                <Link href="/login">Log in</Link>
-                <Link className="btn" href="/join">Join</Link>
-              </>}
+            ? <Link href="/member">Your file</Link>
+            : <Link href="/login">Log in</Link>}
+          {signedIn
+            ? <Link className="header-cta" href="/member">Open your file</Link>
+            : <a className="header-cta" href={mainSiteUrl + '/apply'}>Apply</a>}
         </nav>
+
+        <div className="more-wrap">
+          <button
+            className="menu-star"
+            onClick={() => setOpen(v => !v)}
+            aria-expanded={open}
+            aria-label={open ? 'Close secondary menu' : 'Open secondary menu'}
+          >
+            ★
+          </button>
+
+          {open && (
+            <div className="compact-menu" onClick={() => setOpen(false)}>
+              <p className="menu-label">Explore</p>
+              <a href={mainSiteUrl}>Home</a>
+              <a href={mainSiteUrl + '#what'}>How it works</a>
+              <a href={mainSiteUrl + '/join'}>Membership</a>
+              {signedIn
+                ? <Link href="/member">Your file</Link>
+                : <>
+                    <Link href="/login">Log in</Link>
+                    <a className="compact-cta" href={mainSiteUrl + '/apply'}>Apply</a>
+                  </>}
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );
