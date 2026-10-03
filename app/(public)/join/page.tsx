@@ -23,9 +23,9 @@ export default async function Join() {
         <p className="kick">Application</p>
         <ol className="join-steps">
           <li><span>01</span><p>Create your account and file.</p></li>
-          <li><span>02</span><p>Activate your $12 membership.</p></li>
-          <li><span>03</span><p>Start talking with your agent across all four folders.</p></li>
-          <li><span>04</span><p>Use your weekly review to manage changes, decisions and what comes next.</p></li>
+          <li><span>02</span><p>Activate your $48 membership.</p></li>
+          <li><span>03</span><p>Start working with your agent across all four folders.</p></li>
+          <li><span>04</span><p>Use your weekly review to manage changes, decisions, and what comes next.</p></li>
         </ol>
 
         {profile ? (
