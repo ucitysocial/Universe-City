@@ -8,7 +8,7 @@ export async function POST() {
   if (!user) return NextResponse.json({ error: 'Log in first' }, { status: 401 });
 
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-  const site = process.env.NEXT_PUBLIC_SITE_URL!;
+  const site = process.env.NEXT_PUBLIC_PUBLIC_APP_URL ?? process.env.NEXT_PUBLIC_SITE_URL!;
 
   const { data: sub } = await sb.from('subscriptions')
     .select('stripe_customer_id').eq('user_id', user.id).maybeSingle();
@@ -28,7 +28,7 @@ export async function POST() {
     customer,
     line_items: [{ price: process.env.STRIPE_PRICE_MEMBERSHIP!, quantity: 1 }],
     success_url: `${site}/member?welcome=1`,
-    cancel_url: `${site}/join`,
+    cancel_url: `${site}/apply`,
     client_reference_id: user.id,
     subscription_data: { metadata: { supabase_user: user.id } }
   });
