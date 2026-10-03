@@ -7,7 +7,7 @@ const folders = [
     department: "Agency Assessment",
     number: "I",
     folder: "Time",
-    color: "var(--pa)",
+    color: "var(--I)",
     slides: [
       {
         title: "Build the calendar from a real day.",
@@ -35,7 +35,7 @@ const folders = [
     department: "Housing Stability",
     number: "II",
     folder: "Inventory",
-    color: "var(--hs)",
+    color: "var(--II)",
     slides: [
       {
         title: "Start with an empty home.",
@@ -63,7 +63,7 @@ const folders = [
     department: "Career Development",
     number: "III",
     folder: "Salary",
-    color: "var(--cd)",
+    color: "var(--III)",
     slides: [
       {
         title: "Start with the last full month.",
@@ -91,7 +91,7 @@ const folders = [
     department: "Life Management",
     number: "IV",
     folder: "Standards",
-    color: "var(--lm)",
+    color: "var(--IV)",
     slides: [
       {
         title: "Start with the rules you return to.",
@@ -169,7 +169,7 @@ export default function ApplicationFolderShowcase() {
         </div>
 
         <div className="application-folder-slide" aria-live="polite">
-          <p className="application-folder-step">{String(slideIndex + 1).padStart(2, "0")} / {String(active.slides.length).padStart(2, "0")}</p>
+          <p className="application-folder-step">Step {String(slideIndex + 1).padStart(2, "0")} of {String(active.slides.length).padStart(2, "0")}</p>
           <h3>{slide.title}</h3>
           <p>{slide.body}</p>
         </div>
