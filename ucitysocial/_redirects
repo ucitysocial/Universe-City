@@ -1,5 +1,9 @@
-# Public application routes served behind the ucitysocial.com domain.
-/apply https://universecitystage.netlify.app/join 200
+# Canonical public routes.
+/membership /membership.html 200
+/join /apply 301
+
+# Application routes stay on the ucitysocial.com domain.
+/apply https://universecitystage.netlify.app/apply 200
 /login https://universecitystage.netlify.app/login 200
 /signup https://universecitystage.netlify.app/signup 200
 /reset https://universecitystage.netlify.app/reset 200

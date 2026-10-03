@@ -16,7 +16,7 @@ export default function SiteHeader({ signedIn }: { signedIn: boolean }) {
 
         <nav className="primary-nav" aria-label="Primary navigation">
           <a href={mainSiteUrl + '#what'}>How it works</a>
-          <a href={mainSiteUrl + '/join'}>Membership</a>
+          <a href={mainSiteUrl + '/membership'}>Membership</a>
           {signedIn
             ? <Link href="/member">Your file</Link>
             : <Link href="/login">Log in</Link>}
@@ -40,7 +40,7 @@ export default function SiteHeader({ signedIn }: { signedIn: boolean }) {
               <p className="menu-label">Explore</p>
               <a href={mainSiteUrl}>Home</a>
               <a href={mainSiteUrl + '#what'}>How it works</a>
-              <a href={mainSiteUrl + '/join'}>Membership</a>
+              <a href={mainSiteUrl + '/membership'}>Membership</a>
               {signedIn
                 ? <Link href="/member">Your file</Link>
                 : <>

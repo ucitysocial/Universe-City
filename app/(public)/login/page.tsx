@@ -44,7 +44,7 @@ export default function Login() {
           </button>
         </form>
         <p className="note">
-          No account yet? <Link href="/join">Join Universe City</Link>.
+          No account yet? <Link href="/apply">Apply to Universe City</Link>.
           <br />Forgotten your password? <Link href="/reset">Reset it</Link>.
         </p>
       </div>
