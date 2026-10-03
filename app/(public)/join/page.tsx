@@ -7,12 +7,14 @@ import ApplicationFolderShowcase from '@/components/ApplicationFolderShowcase';
 /** Application flow. Account first, then membership activation. */
 export default async function Join() {
   const profile = await currentProfile();
+  const mainSiteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://ucitysocial.com';
 
   if (profile?.membership === 'active') redirect('/member');
 
   return (
     <div className="wrap join-layout">
       <div className="join-main">
+        <a className="join-back" href={mainSiteUrl}>&larr; Back to Universe City</a>
         <p className="kick">Membership</p>
         <h1>Get an agent for the parts of life you manage every day.</h1>
 
