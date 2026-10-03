@@ -15,7 +15,7 @@ export default function Home() {
             people. You get four working systems and a real person who holds your file.
           </p>
           <div style={{ display: 'flex', gap: 14, marginTop: 34, flexWrap: 'wrap' }}>
-            <Link className="btn" href="/join">Join for $48 a month</Link>
+            <Link className="btn" href="/apply">Apply for membership</Link>
             <Link className="btn ghost" href="/how-it-works">See how it works</Link>
           </div>
         </div>
@@ -62,7 +62,7 @@ export default function Home() {
               Time, Inventory, Salary and Standards, and one fifteen minute review every week
               with your agent. One price. Cancel whenever you want, and your record stays yours.
             </p>
-            <Link className="btn" href="/join" style={{ marginTop: 22 }}>Join Universe City</Link>
+            <Link className="btn" href="/apply" style={{ marginTop: 22 }}>Apply</Link>
           </div>
         </div>
       </section>
