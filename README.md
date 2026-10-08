@@ -6,6 +6,14 @@ A responsive website. Public site, member area, private agent console.
     cp .env.example .env.local        # fill it in
     npm run dev
 
+## Development workflow
+
+Before making changes, read `AGENTS.md` and `CONTRIBUTING.md`.
+
+GitHub is the live engineering record. Google Drive is the company/product record and holds the canonical operating documents and Master Index. Product behavior must not silently drift between the two.
+
+All product work should use a task branch and pull request into `main`. Every PR must complete the documentation-impact check in `.github/pull_request_template.md`.
+
 ## Order of setup
 
 1. Supabase project. Run `supabase/migrations/0001_init.sql` in the SQL editor.
