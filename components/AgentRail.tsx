@@ -47,7 +47,7 @@ export default function AgentRail({ timeStarted }: { timeStarted: boolean }) {
           <span className="thread-dot" />
           <p>
             <b>Agent stays here.</b><br />
-            As you move through your File, this space keeps the conversation in context.
+            As you move through your systems, this space keeps the conversation in context.
           </p>
         </div>
       </div>
