@@ -28,7 +28,7 @@ The sender address requires custom SMTP in Supabase Auth.
 
 Use short transactional subjects:
 
-- Confirm signup — `Confirm your Universe City File`
+- Confirm signup — `Welcome to Universe City`
 - Reset password — `Reset your Universe City password`
 - Magic link — `Open your Universe City File`
 - Invite user — `Your Universe City invitation`
