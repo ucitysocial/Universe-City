@@ -2,53 +2,44 @@
 <html lang="en">
   <body style="margin:0;background:#f4f1eb;color:#111111;font-family:Arial,Helvetica,sans-serif;">
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f4f1eb;padding:32px 14px;">
-      <tr>
-        <td align="center">
-          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:620px;background:#ffffff;border:3px solid #111111;">
-            <tr>
-              <td style="background:#111111;color:#ffffff;padding:18px 24px;font-family:monospace;font-size:22px;letter-spacing:2px;">
-                universe★city
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
-                  <tr>
-                    <td style="height:6px;background:#5C0F1B;"></td>
-                    <td style="height:6px;background:#A07818;"></td>
-                    <td style="height:6px;background:#4A2A78;"></td>
-                    <td style="height:6px;background:#2A4B3C;"></td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:36px 30px 32px;">
-                <p style="margin:0 0 8px;font-size:11px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;color:#65625e;">Your file has been opened</p>
-                <h1 style="margin:0 0 18px;font-size:31px;line-height:1.1;font-weight:600;">Confirm your email address.</h1>
-                <p style="margin:0 0 24px;font-size:16px;line-height:1.6;color:#4f4d49;">
-                  Hi {{ .Data.name }}, confirm this email address to finish creating your Universe City account.
-                  After confirmation, you will finish enrollment and enter resident orientation.
-                </p>
-                <p style="margin:0 0 28px;">
-                  <a href="{{ .ConfirmationURL }}" style="display:inline-block;background:#5C0F1B;color:#ffffff;border:3px solid #111111;padding:14px 20px;text-decoration:none;font-weight:bold;">
-                    Confirm my file
-                  </a>
-                </p>
-                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-top:1px solid #d9d7d0;padding-top:18px;">
-                  <tr><td style="padding:5px 0;color:#5C0F1B;font-weight:bold;">I &nbsp; Agency Assessment</td></tr>
-                  <tr><td style="padding:5px 0;color:#A07818;font-weight:bold;">II &nbsp; Housing Stability</td></tr>
-                  <tr><td style="padding:5px 0;color:#4A2A78;font-weight:bold;">III &nbsp; Career Development</td></tr>
-                  <tr><td style="padding:5px 0;color:#2A4B3C;font-weight:bold;">IV &nbsp; Life Management</td></tr>
-                </table>
-                <p style="margin:26px 0 0;font-size:12px;line-height:1.5;color:#77736e;">
-                  If you did not create this account, you can ignore this email.
-                </p>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
+      <tr><td align="center">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:620px;background:#ffffff;border:3px solid #111111;">
+          <tr><td style="background:#111111;color:#ffffff;padding:18px 24px;font-family:monospace;font-size:22px;letter-spacing:2px;">universe★city</td></tr>
+          <tr><td>
+            <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+              <tr>
+                <td style="height:6px;background:#5C0F1B;"></td>
+                <td style="height:6px;background:#A07818;"></td>
+                <td style="height:6px;background:#4A2A78;"></td>
+                <td style="height:6px;background:#2A4B3C;"></td>
+              </tr>
+            </table>
+          </td></tr>
+          <tr><td style="padding:36px 30px 32px;">
+            <p style="margin:0 0 8px;font-size:11px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;color:#5C0F1B;">Resident File // Email confirmation</p>
+            <h1 style="margin:0 0 18px;font-size:31px;line-height:1.1;font-weight:600;">Your File is waiting.</h1>
+            <p style="margin:0 0 24px;font-size:16px;line-height:1.65;color:#4f4d49;">
+              Confirm this email address to finish creating your Universe City account.
+              After confirmation, you can continue enrollment and enter resident orientation.
+            </p>
+            <p style="margin:0 0 30px;">
+              <a href="{{ .ConfirmationURL }}" style="display:inline-block;background:#5C0F1B;color:#ffffff;border:3px solid #111111;box-shadow:4px 4px 0 #111111;padding:14px 20px;text-decoration:none;font-weight:bold;">CONFIRM MY FILE</a>
+            </p>
+            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-top:1px solid #d9d7d0;padding-top:18px;">
+              <tr><td style="padding:5px 0;color:#5C0F1B;font-weight:bold;">I &nbsp; Agency Assessment</td></tr>
+              <tr><td style="padding:5px 0;color:#A07818;font-weight:bold;">II &nbsp; Housing Stability</td></tr>
+              <tr><td style="padding:5px 0;color:#4A2A78;font-weight:bold;">III &nbsp; Career Development</td></tr>
+              <tr><td style="padding:5px 0;color:#2A4B3C;font-weight:bold;">IV &nbsp; Life Management</td></tr>
+            </table>
+            <p style="margin:28px 0 0;font-size:12px;line-height:1.55;color:#77736e;">
+              This link is for account verification only. If you did not create a Universe City account, you can ignore this email.
+            </p>
+          </td></tr>
+          <tr><td style="padding:16px 30px;background:#f7f7f4;border-top:1px solid #d9d7d0;font-size:11px;color:#77736e;">
+            Universe City · Life Management Agency
+          </td></tr>
+        </table>
+      </td></tr>
     </table>
   </body>
 </html>
