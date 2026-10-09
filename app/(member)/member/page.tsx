@@ -17,7 +17,7 @@ export default async function MemberHome({
   const { count: allTime } = await sb.from('blocks')
     .select('id', { count: 'exact', head: true });
 
-  if ((allTime ?? 0) === 0) redirect('/member/time/setup');
+  if ((allTime ?? 0) === 0) redirect('/member/orientation');
 
   const { start, end } = weekBounds(profile?.timezone ?? 'America/Denver');
 
