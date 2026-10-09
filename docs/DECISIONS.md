@@ -182,3 +182,24 @@ The product should become quieter as it learns what is stable.
 ## Decision history
 
 Created October 9, 2026 as the initial decision register.
+
+
+### D-015 — Orientation precedes the normal resident dashboard
+
+**Status:** LOCKED direction
+
+After account creation, email confirmation, and membership activation, a new resident enters Orientation in the real resident interface. They may skip the walkthrough, and it must be replayable later.
+
+A new resident does not begin on the normal dashboard before establishing an initial Time Plan.
+
+### D-016 — Universe City engagement belongs on the Plan
+
+**Status:** LOCKED direction
+
+The resident should deliberately plan time to engage with Universe City. The first Plan asks when Daily Close belongs in the day rather than assuming the resident will remember to return.
+
+### D-017 — First Plan includes a realism check
+
+**Status:** LOCKED direction
+
+Before accepting the first Plan, Universe City asks how realistic it feels. A Plan that already feels unlikely should be simplified, moved, or deliberately supported rather than recorded as if confidence were irrelevant.
