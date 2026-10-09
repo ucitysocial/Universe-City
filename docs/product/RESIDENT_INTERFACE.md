@@ -251,3 +251,34 @@ Mobile should preserve the same conceptual model:
 But should not literally compress three desktop columns.
 
 See open questions.
+
+
+---
+
+## First resident entry
+
+**LOCKED direction**
+
+The resident journey should use the existing account + membership infrastructure:
+
+```
+Create account
+→ Confirm email
+→ Activate membership
+→ Orientation in the real resident interface
+→ Time first
+→ Build tomorrow's Plan
+→ Normal dashboard
+```
+
+Orientation should highlight the actual resident shell rather than use a disconnected slideshow.
+
+Required concepts:
+
+- walkthrough may be skipped
+- orientation can be replayed later
+- File / Workspace / Agent are introduced in place
+- Time is explicitly identified as the first focus
+- a new resident does not land on a mostly-empty normal dashboard before a first Plan exists
+
+The first normal dashboard should appear after Time has enough initial Plan data to show something meaningful.
