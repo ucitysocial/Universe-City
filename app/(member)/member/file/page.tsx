@@ -21,9 +21,9 @@ export default async function AccountPage() {
       </p>
       <div style={{ marginTop: 18 }}><Billing /></div>
 
-      <h2 style={{ marginTop: 44, fontSize: 20 }}>Your record</h2>
+      <h2 style={{ marginTop: 44, fontSize: 20 }}>Your information</h2>
       <p className="note" style={{ maxWidth: 'var(--text)' }}>
-        Everything on file is yours. If you stop your membership the record stays and the systems
+        Your information is yours. If you stop your membership, it stays with your account and the systems
         close. Nothing is deleted and nothing is rebuilt from scratch if you come back.
       </p>
     </>
