@@ -49,7 +49,7 @@ export default function HowItWorks() {
           <h2 style={{ marginTop: 10 }}>We don’t turn guesses into facts.</h2>
           <p style={{ marginTop: 18 }}>
             No times are invented. An estimate stays an estimate until you say what actually
-            happened. Software can propose a change to your record. It cannot make one. Your agent
+            happened. Software can propose a change. It cannot quietly make one. Your agent
             approves anything consequential, and you can see every version of every correction.
           </p>
         </div>
