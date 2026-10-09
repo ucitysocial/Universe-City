@@ -1,3 +1,4 @@
+import { redirect } from 'next/navigation';
 import { supabaseServer, currentProfile } from '@/lib/supabase/server';
 import { KINDS, STATUSES, figures, hours, deptOfBlock, type Block } from '@/lib/domain/time';
 import { DEPARTMENTS } from '@/lib/domain/folders';
@@ -16,7 +17,12 @@ export default async function TimePage() {
   const { start, end, days } = weekBounds(tz);
   const todayIso = today(tz);
 
-  const { data } = await supabaseServer().from('blocks')
+  const sb = supabaseServer();
+  const { count: allTime } = await sb.from('blocks')
+    .select('id', { count: 'exact', head: true });
+  if ((allTime ?? 0) === 0) redirect('/member/time/setup');
+
+  const { data } = await sb.from('blocks')
     .select('*').gte('date', start).lte('date', end).order('starts_at');
   const blocks = (data ?? []) as Block[];
   const f = figures(blocks);
