@@ -20,7 +20,7 @@ export default async function StandardsPage() {
 
       {list.length === 0 ? (
         <p className="note" style={{ maxWidth: 'var(--text)' }}>
-          None on file yet. Your agent writes the first ones down with you, and a standard only
+          No Standards yet. Your agent writes the first ones down with you, and a standard only
           counts once it is in your own words with a date on it.
         </p>
       ) : (
