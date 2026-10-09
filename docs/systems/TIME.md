@@ -364,3 +364,24 @@ See `../OPEN_QUESTIONS.md` for unresolved mechanics, especially:
 - resident-facing planning categories
 - active follow-up rules
 - definition of configured/current
+
+
+---
+
+## First Plan onboarding
+
+**LOCKED direction**
+
+The first Time experience should coach a believable Plan rather than ask the resident to dump an ideal schedule.
+
+Initial sequence:
+
+1. What already has to happen tomorrow?
+2. Is there one thing you want tomorrow to be different from usual?
+3. How realistic does this Plan feel?
+4. How should Universe City follow up?
+5. When should Universe City itself be part of the Plan for Daily Close?
+
+The first Plan should include a scheduled Universe City touchpoint so engagement time is not treated as something the resident must simply remember.
+
+A resident who says the Plan feels ambitious or unlikely should be invited to simplify or move something before saving it.
