@@ -56,7 +56,7 @@ export default async function TimePage() {
 
       {blocks.length === 0 ? (
         <p className="note" style={{ maxWidth: 'var(--text)' }}>
-          Nothing on file for this week. Time is built out of conversation rather than from an
+          Nothing established for this week yet. Time is built out of conversation rather than from an
           empty grid, so this fills in as you and your agent go through your days.
         </p>
       ) : (
