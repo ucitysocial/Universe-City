@@ -17,7 +17,7 @@ export function localParts(at: Date, timeZone: string) {
 
 export const today = (timeZone: string, at = new Date()) => localParts(at, timeZone).date;
 
-const shift = (isoDate: string, days: number) => {
+export const addDays = (isoDate: string, days: number) => {
   const [y, m, d] = isoDate.split('-').map(Number);
   const x = new Date(Date.UTC(y, m - 1, d));
   x.setUTCDate(x.getUTCDate() + days);
@@ -27,8 +27,8 @@ const shift = (isoDate: string, days: number) => {
 /** Sunday to Saturday, in their zone. */
 export function weekBounds(timeZone: string, at = new Date()) {
   const { date, weekday } = localParts(at, timeZone);
-  const start = shift(date, -weekday);
-  return { start, end: shift(start, 6), days: Array.from({ length: 7 }, (_, i) => shift(start, i)) };
+  const start = addDays(date, -weekday);
+  return { start, end: addDays(start, 6), days: Array.from({ length: 7 }, (_, i) => addDays(start, i)) };
 }
 
 export const nowMinutes = (timeZone: string, at = new Date()) => localParts(at, timeZone).minutes;
