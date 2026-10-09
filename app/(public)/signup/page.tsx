@@ -51,7 +51,7 @@ export default function Signup() {
     <div className="auth-shell">
       <section className="auth-story">
         <p className="kick">Universe City membership</p>
-        <h1>Your life gets a File.</h1>
+        <h1>Start with the life you’re actually living.</h1>
         <p className="lede">
           Start with an account. After you confirm your email and activate membership, we walk you
           through the resident interface and begin with Time.
@@ -78,7 +78,7 @@ export default function Signup() {
       <section className="auth-card">
         {!sent ? (
           <>
-            <p className="kick">Create your file</p>
+            <p className="kick">Create account</p>
             <h2>Start your account.</h2>
             <p className="note auth-card-note">
               Just your name, email and password. No card is collected on this screen.
@@ -125,7 +125,7 @@ export default function Signup() {
               </div>
 
               <button className="btn auth-submit" disabled={busy}>
-                {busy ? 'Opening your file' : 'Create my file'}
+                {busy ? 'Creating account' : 'Create account'}
               </button>
             </form>
 
