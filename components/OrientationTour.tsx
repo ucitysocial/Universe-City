@@ -17,7 +17,7 @@ export default function OrientationTour() {
   const steps = useMemo<Step[]>(() => [
     {
       target: 'file',
-      eyebrow: '01 · Your File',
+      eyebrow: '01 · Your systems',
       title: 'Everything has a place.',
       body: 'Your life is organized across four departments and 48 folders. You do not have to set them all up. Universe City builds and maintains the systems with you over time.'
     },
@@ -31,7 +31,7 @@ export default function OrientationTour() {
       target: 'agent',
       eyebrow: '03 · Your Agent',
       title: 'Talk to us without doing the filing.',
-      body: 'Your Agent stays beside your work. It can use the context of the system you are viewing, follow up on Plans, and help keep the File current.'
+      body: 'Your Agent stays beside your work. It can use the context of the system you are viewing, follow up on Plans, and help keep your systems current.'
     },
     {
       target: 'time',
