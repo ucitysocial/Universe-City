@@ -20,7 +20,7 @@ export default function Membership() {
             <li><span className="rn">&#9733;</span><span>Fifteen minutes every week with your agent.</span></li>
           </ul>
           <Link className="btn" href="/apply" style={{ marginTop: 30 }}>Apply</Link>
-          <p className="note">Cancel any time. Your record stays yours either way.</p>
+          <p className="note">Cancel any time. Your information stays yours either way.</p>
         </div>
       </section>
       <section>
