@@ -1,6 +1,9 @@
 import { supabaseServer } from '@/lib/supabase/server';
 
 export default async function StandardsPage() {
+  const { count: timeCount } = await supabaseServer().from('blocks')
+    .select('id', { count: 'exact', head: true });
+  if ((timeCount ?? 0) === 0) redirect('/member/time/setup');
   const { data } = await supabaseServer().from('standards')
     .select('*').order('created_at', { ascending: false });
   const list = data ?? [];
