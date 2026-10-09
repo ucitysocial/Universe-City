@@ -12,7 +12,7 @@ export default function Home() {
           </h1>
           <p className="lede">
             You are running a whole life by yourself. Universe City is an agency for everyday
-            people. You get four working systems and a real person who holds your file.
+            people. You get four working systems and a real person who helps keep them current.
           </p>
           <div style={{ display: 'flex', gap: 14, marginTop: 34, flexWrap: 'wrap' }}>
             <Link className="btn" href="/apply">Apply for membership</Link>
@@ -38,12 +38,12 @@ export default function Home() {
             Fifteen minutes a week with your agent.
           </h2>
           <p className="lede">
-            A person reads your file, not a dashboard. We go through what changed, what is still
-            a guess, and what to do about it. Software keeps the record between those conversations.
+            A person reviews what is changing in your life, not just a dashboard. We go through what changed, what is still
+            a guess, and what to do about it. Your systems stay current between those conversations.
           </p>
           <ul className="rows">
             <li><span className="rn">01</span><span>You tell us about your week, in your own words.</span></li>
-            <li><span className="rn">02</span><span>It goes on file as what it is. Observed, planned, or still an estimate.</span></li>
+            <li><span className="rn">02</span><span>We keep it as what it is: observed, planned, or still an estimate.</span></li>
             <li><span className="rn">03</span><span>Once a week we sit down for fifteen minutes and work out what it means.</span></li>
             <li><span className="rn">04</span><span>Nothing is ever recorded that you did not say.</span></li>
           </ul>
@@ -60,7 +60,7 @@ export default function Home() {
             </div>
             <p>
               Time, Inventory, Salary and Standards, and one fifteen minute review every week
-              with your agent. One price. Cancel whenever you want, and your record stays yours.
+              with your agent. One price. Cancel whenever you want, and your information stays yours.
             </p>
             <Link className="btn" href="/apply" style={{ marginTop: 22 }}>Apply</Link>
           </div>
