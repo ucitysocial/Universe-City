@@ -1,5 +1,6 @@
 'use client';
 
+import type { CSSProperties } from 'react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { supabaseBrowser } from '@/lib/supabase/client';
