@@ -40,7 +40,7 @@ export default function Login() {
                    onChange={e => setPassword(e.target.value)} required />
           </div>
           <button className="btn" style={{ width: '100%' }} disabled={busy}>
-            {busy ? 'One moment' : 'Open my file'}
+            {busy ? 'One moment' : 'Log in'}
           </button>
         </form>
         <p className="note">
