@@ -203,3 +203,30 @@ The resident should deliberately plan time to engage with Universe City. The fir
 **Status:** LOCKED direction
 
 Before accepting the first Plan, Universe City asks how realistic it feels. A Plan that already feels unlikely should be simplified, moved, or deliberately supported rather than recorded as if confidence were irrelevant.
+
+
+### D-018 — “File” is structural language, not the resident journey
+
+**Status:** LOCKED
+
+Universe City may use **File** as a quiet structural noun for the organized body of a resident's systems, history, and supporting information.
+
+Do not use File as the main resident-facing action or marketing concept.
+
+Avoid:
+- create your File
+- confirm your File
+- open your File
+- your File is waiting
+- repetitive “on file” copy
+
+Prefer:
+- create account
+- activate membership
+- confirm email
+- your systems
+- your Plan
+- your history
+- your information
+
+File can still appear where it genuinely names the organized structure, especially in Agent/internal context and restrained interface labeling.
