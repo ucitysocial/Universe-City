@@ -4,7 +4,7 @@ export default function OrientationPage() {
   return (
     <div className="orientation-workspace">
       <p className="kick">Welcome to Universe City</p>
-      <h1>Your File is open.</h1>
+      <h1>Welcome. We start with Time.</h1>
       <p className="lede">
         The walkthrough uses the real resident interface. Nothing here is a separate demo you have
         to relearn later.
