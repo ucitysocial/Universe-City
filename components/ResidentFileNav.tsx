@@ -27,7 +27,7 @@ export default function ResidentFileNav({
     <aside className="resident-file" data-tour="file">
       <div>
         <Link href="/member" className="mark resident-mark">universe&#9733;city</Link>
-        <p className="file-label">Resident file</p>
+        <p className="file-label">File</p>
       </div>
 
       <nav className="file-primary" aria-label="Resident navigation">
