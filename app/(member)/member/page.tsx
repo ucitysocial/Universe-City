@@ -35,7 +35,7 @@ export default async function MemberHome({
         <div className="plan-ready-banner">
           <div>
             <p className="kick">Time is running</p>
-            <h2>Your first Plan is on file.</h2>
+            <h2>Your first Plan is ready.</h2>
             <p>Live the day. Universe City now has something real to compare with what actually happens.</p>
           </div>
           <a className="btn ghost compact" href="/member/time">Open Time</a>
@@ -67,7 +67,7 @@ export default async function MemberHome({
         </div>
       ) : (
         <p className="note" style={{ maxWidth: 'var(--text)' }}>
-          Your first Plan is on file for the next day. This view will become more useful as planned
+          Your first Plan is ready for tomorrow. This view will become more useful as planned
           time turns into observed time.
         </p>
       )}
@@ -88,7 +88,7 @@ export default async function MemberHome({
                   {x.name === 'Time' && has ? `${Math.round(f.free)} hours of this week are yours.` : null}
                   {x.name === 'Standards' ? `${standards ?? 0} active.` : null}
                   {x.name === 'Salary' ? 'Collecting. Needs Time behind it.' : null}
-                  {x.name === 'Inventory' ? 'Present in your File. Not active yet.' : null}
+                  {x.name === 'Inventory' ? 'Part of your systems. Not active yet.' : null}
                   {x.name === 'Time' && !has ? 'Your first Plan is ready.' : null}
                 </p>
                 {live && (
