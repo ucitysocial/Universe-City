@@ -57,12 +57,22 @@ const FOLLOWUP: { value: Followup; label: string; hint: string }[] = [
   { value: 'both', label: 'Both', hint: 'Help me protect it, then close the loop.' }
 ];
 
-function addMinutes(time: string, amount: number) {
+function minutes(time: string) {
   const [h, m] = time.split(':').map(Number);
-  const total = h * 60 + m + amount;
+  return h * 60 + m;
+}
+
+function addMinutes(time: string, amount: number) {
+  const total = minutes(time) + amount;
   const hh = Math.floor(total / 60);
   const mm = total % 60;
   return `${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}`;
+}
+
+function normalizedEnd(start: string, end: string) {
+  if (minutes(end) > minutes(start)) return end;
+  const [h, m] = end.split(':').map(Number);
+  return `${String(h + 24).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
 }
 
 export default function FirstPlan({
@@ -141,7 +151,7 @@ export default function FirstPlan({
       user_id: userId,
       date,
       starts_at: item.start,
-      ends_at: item.end,
+      ends_at: normalizedEnd(item.start, item.end),
       label: item.label.trim(),
       kind: item.kind,
       status: 'planned',
@@ -180,7 +190,7 @@ export default function FirstPlan({
         <p className="kick">Time · First Plan</p>
         <h1>What is the plan for tomorrow?</h1>
         <p>
-          {residentName ? `${residentName}, s` : 'S'}tart with what is already true. We are not
+          {residentName ? `${residentName}, start` : 'Start'} with what is already true. We are not
           building your ideal life in one night. We are making tomorrow believable enough to learn
           from it.
         </p>
