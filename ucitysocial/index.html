@@ -853,6 +853,24 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
  .trust-founder-grid{grid-template-columns:1fr}
  .trust-founder .portrait{max-width:460px}
 }
+
+/* department promise cards */
+.department-promise-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin:clamp(30px,4vw,52px) 0}
+.department-promise{--c:var(--pa);display:flex;flex-direction:column;min-height:330px;border:1px solid var(--ink);
+ border-top:7px solid var(--c);background:var(--paper);color:var(--ink);padding:24px;text-decoration:none;
+ transition:transform .18s,box-shadow .18s,background .18s}
+.department-promise:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--ink);background:#fffaf5}
+.dp-top{display:flex;align-items:baseline;gap:12px}
+.dp-top span{font-family:var(--record);font-size:28px;line-height:1;color:var(--c)}
+.dp-top b{font-size:21px;font-weight:600}
+.department-promise>p{margin-top:13px;color:#3d2c28;line-height:1.5;max-width:46ch}
+.dp-systems{display:flex;flex-wrap:wrap;gap:7px;margin-top:24px}
+.dp-systems small,.dp-how small{width:100%;font-family:var(--record);font-size:13px;letter-spacing:.16em;color:var(--dim)}
+.dp-systems span{font-size:12.5px;border:1px solid var(--rule);padding:5px 8px;background:var(--paper2)}
+.dp-how{margin-top:20px;padding-top:16px;border-top:1px solid var(--rule)}
+.dp-how p{font-size:13.5px;line-height:1.5;color:var(--dim);margin-top:4px}
+.dp-link{margin-top:auto;padding-top:22px;font-family:var(--record);font-size:15px;letter-spacing:.06em;color:var(--c)}
+@media(max-width:820px){.department-promise-grid{grid-template-columns:1fr}.department-promise{min-height:0}}
 </style>
 </head>
 <body>
@@ -980,22 +998,41 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
 <!-- 4 MEMBERSHIP PROMISE -->
 <section class="biz membership-promise" id="business"><div class="w">
  <span class="k rv">membership</span>
- <h2 class="head rv d1">Your agent. Your workspace. Your systems.</h2>
- <p class="lead rv d2 mt3 px" style="max-width:50ch">Universe City gives you an ongoing place to manage the work of everyday life without asking you to learn our internal architecture first.</p>
+ <h2 class="head rv d1">Four departments. Systems built around your life.</h2>
+ <p class="lead rv d2 mt3 px" style="max-width:54ch">Your agent works across all four departments inside one resident workspace. Each department builds a different kind of practical system with you.</p>
 
- <div class="promise-grid rv d2">
-  <div class="promise" style="--c:var(--pa)">
-   <span>01</span><h3>Your agent</h3>
-   <p>Someone who helps organize what is happening, follow up, and keep important work moving.</p>
-  </div>
-  <div class="promise" style="--c:var(--hs)">
-   <span>02</span><h3>Your workspace</h3>
-   <p>One place for plans, updates, conversations, decisions, and the history you build over time.</p>
-  </div>
-  <div class="promise" style="--c:var(--cd)">
-   <span>03</span><h3>Your systems</h3>
-   <p>Practical structure for the parts of life you are actively managing, introduced as you need it.</p>
-  </div>
+ <div class="department-promise-grid rv d2">
+  <a class="department-promise" href="/agency-assessment" style="--c:var(--pa)">
+   <div class="dp-top"><span>I</span><b>Agency Assessment</b></div>
+   <p>Understand what is true right now and keep the working picture current.</p>
+   <div class="dp-systems"><small>SYSTEMS INCLUDE</small><span>Time</span><span>Health</span><span>Finance</span><span>Employment</span></div>
+   <div class="dp-how"><small>HOW</small><p>Establish the facts, then update them as your situation changes.</p></div>
+   <div class="dp-link">Explore all 12 systems &rarr;</div>
+  </a>
+
+  <a class="department-promise" href="/housing-stability" style="--c:var(--hs)">
+   <div class="dp-top"><span>II</span><b>Housing Stability</b></div>
+   <p>Manage the practical systems that keep your home and household functioning.</p>
+   <div class="dp-systems"><small>SYSTEMS INCLUDE</small><span>Inventory</span><span>Storage</span><span>Transportation</span><span>Technology</span></div>
+   <div class="dp-how"><small>HOW</small><p>Build useful baselines for what you have, what you need, and what needs attention.</p></div>
+   <div class="dp-link">Explore all 12 systems &rarr;</div>
+  </a>
+
+  <a class="department-promise" href="/career-development" style="--c:var(--cd)">
+   <div class="dp-top"><span>III</span><b>Career Development</b></div>
+   <p>Build clearer systems around work, income, capability, and your next move.</p>
+   <div class="dp-systems"><small>SYSTEMS INCLUDE</small><span>Salary</span><span>Schedule</span><span>Skill</span><span>Advancement</span></div>
+   <div class="dp-how"><small>HOW</small><p>Turn work information into a usable view of options, commitments, and progress.</p></div>
+   <div class="dp-link">Explore all 12 systems &rarr;</div>
+  </a>
+
+  <a class="department-promise" href="/life-management" style="--c:var(--lm)">
+   <div class="dp-top"><span>IV</span><b>Life Management</b></div>
+   <p>Create structure for the standards, priorities, and decisions that shape everyday life.</p>
+   <div class="dp-systems"><small>SYSTEMS INCLUDE</small><span>Standards</span><span>Prioritization</span><span>Systems</span><span>Socializing</span></div>
+   <div class="dp-how"><small>HOW</small><p>Define what matters, then use it as context when choices and tradeoffs come up.</p></div>
+   <div class="dp-link">Explore all 12 systems &rarr;</div>
+  </a>
  </div>
 
  <a class="btn dark rv d3" href="/apply">Start your application &rarr;</a>
