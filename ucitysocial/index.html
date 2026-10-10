@@ -823,8 +823,8 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
 .hero-flow{color:rgba(244,239,233,.9);margin-top:24px}
 
 .experience{background:var(--ink);color:var(--paper);padding:clamp(48px,6vw,82px) 0;border-bottom:2px solid var(--ink)}
-.experience h2{color:#fff;max-width:16ch}.experience .k{color:rgba(244,239,233,.48)}
-.experience .lead{color:rgba(244,239,233,.74);max-width:54ch}
+.experience h2{color:#fff;max-width:18ch}.experience .k{color:rgba(244,239,233,.48)}
+.experience .lead{color:rgba(244,239,233,.74);max-width:58ch}
 .agent-thread-demo{width:min(760px,100%);margin-top:clamp(26px,3.2vw,42px);border:1px solid rgba(244,239,233,.34);background:#0d0708}
 .agent-thread-head{padding:10px 13px;border-bottom:1px solid rgba(244,239,233,.2);display:flex;align-items:center;gap:12px;font-family:var(--record);font-size:12px;letter-spacing:.12em;color:rgba(244,239,233,.72)}
 .agent-thread-head span:first-child{color:#fff}
@@ -834,49 +834,35 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
 .agent-thread-body{padding:16px 14px 14px;display:flex;flex-direction:column;gap:11px}
 .thread-turn{display:flex;flex-direction:column;gap:4px}
 .thread-turn.resident{align-items:flex-end}.thread-turn.agent{align-items:flex-start}
-.thread-label{font-family:var(--record);font-size:11px;letter-spacing:.16em;color:rgba(244,239,233,.4)}
-.thread-bubble{max-width:78%;padding:10px 12px;border:1px solid rgba(244,239,233,.28);font-size:15px;line-height:1.45}
-.thread-turn.agent .thread-bubble{border-left:4px solid var(--pa);background:rgba(92,15,27,.18);color:var(--paper)}
+.thread-label{font-family:var(--record);font-size:11px;letter-spacing:.13em;color:rgba(244,239,233,.45)}
+.thread-bubble{max-width:80%;padding:10px 12px;border:1px solid rgba(244,239,233,.28);font-size:15px;line-height:1.45}
 .thread-turn.resident .thread-bubble{background:var(--paper);border-color:var(--paper);color:var(--ink)}
-.context-reel{position:relative;height:84px;max-width:600px;overflow:hidden}
-.context-frame{position:absolute;inset:0;padding:9px 11px;border:1px solid rgba(244,239,233,.24);background:#120b0d;opacity:0;transform:translateY(7px)}
-.context-frame.pa{border-left:4px solid var(--pa)}
-.context-frame.hs{border-left:4px solid var(--hs)}
-.context-frame.cd{border-left:4px solid var(--cd)}
-.context-frame.lm{border-left:4px solid var(--lm)}
-.context-frame span{font-family:var(--record);font-size:9.5px;letter-spacing:.11em;color:rgba(244,239,233,.46)}
-.context-frame strong{display:inline-block;margin-left:8px;font-size:11.5px;color:#fff}
-.context-frame p{font-size:12.6px;line-height:1.4;color:rgba(244,239,233,.82);margin-top:4px}
-.agent-thread-demo.in .context-frame:nth-child(1){animation:contextCycle 1.75s 6s both}
-.agent-thread-demo.in .context-frame:nth-child(2){animation:contextCycle 1.75s 7.85s both}
-.agent-thread-demo.in .context-frame:nth-child(3){animation:contextCycle 1.75s 9.7s both}
-.agent-thread-demo.in .context-frame:nth-child(4){animation:contextCycle 1.9s 11.55s both}
-@keyframes contextCycle{
- 0%{opacity:0;transform:translateY(7px)}
- 12%,82%{opacity:1;transform:none}
- 100%{opacity:0;transform:translateY(-6px)}
-}
+.thread-turn.agent .thread-bubble{background:rgba(255,255,255,.035);color:var(--paper)}
+.thread-turn.dept-message.pa .thread-bubble{border-left:4px solid var(--pa)}
+.thread-turn.dept-message.hs .thread-bubble{border-left:4px solid var(--hs)}
+.thread-turn.dept-message.cd .thread-bubble{border-left:4px solid var(--cd)}
+.thread-turn.dept-message.lm .thread-bubble{border-left:4px solid var(--lm)}
+.thread-turn.dept-message.pa .thread-label{color:#b46d79}
+.thread-turn.dept-message.hs .thread-label{color:#d4b55d}
+.thread-turn.dept-message.cd .thread-label{color:#a58bc6}
+.thread-turn.dept-message.lm .thread-label{color:#7da18e}
 .thread-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:2px}
-.thread-actions button,.thread-actions a{min-height:38px;display:inline-flex;align-items:center;justify-content:center;font-family:var(--record);font-size:11.5px;letter-spacing:.07em;text-decoration:none;padding:8px 10px;border:1px solid var(--paper);background:var(--paper);color:var(--ink);cursor:pointer}
+.thread-actions button,.thread-actions a{min-height:40px;display:inline-flex;align-items:center;justify-content:center;font-family:var(--record);font-size:11.5px;letter-spacing:.07em;text-decoration:none;padding:9px 11px;border:1px solid var(--paper);background:var(--paper);color:var(--ink);cursor:pointer}
 .thread-actions button.secondary,.thread-actions a.secondary{background:transparent;color:var(--paper);border-color:rgba(244,239,233,.45)}
 .thread-actions button:focus-visible,.thread-actions a:focus-visible{outline:2px solid #fff;outline-offset:3px}
+.thread-check{display:flex;align-items:center;gap:9px;padding:8px 10px;border:1px solid rgba(244,239,233,.16);background:rgba(244,239,233,.035);font-size:12.5px;line-height:1.35;color:rgba(244,239,233,.75)}
+.thread-check b{font-family:var(--record);font-size:13px;letter-spacing:.08em;color:#fff}
+.thread-check .tick{font-size:13px;color:#fff}
+.thread-check.pa{border-left:4px solid var(--pa)}.thread-check.hs{border-left:4px solid var(--hs)}.thread-check.cd{border-left:4px solid var(--cd)}.thread-check.lm{border-left:4px solid var(--lm)}
+.thread-followup{padding:9px 10px;border:1px solid rgba(244,239,233,.2);background:rgba(244,239,233,.05);font-size:12.5px;line-height:1.4;color:rgba(244,239,233,.78)}
+.thread-followup strong{display:block;font-family:var(--record);font-size:11px;letter-spacing:.1em;color:#fff;margin-bottom:3px}
 .thread-composer{margin-top:3px;border:1px solid rgba(244,239,233,.22);padding:9px 11px;display:flex;align-items:center;gap:10px;color:rgba(244,239,233,.42)}
 .thread-composer span{font-size:12.5px;flex:1}
 .thread-composer small{font-family:var(--record);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase}
 .agent-thread-status{border-top:1px solid rgba(244,239,233,.2);padding:8px 12px;display:flex;gap:12px;justify-content:space-between;flex-wrap:wrap;font-family:var(--record);font-size:10px;letter-spacing:.1em;color:rgba(244,239,233,.4)}
-.demo-step{opacity:0;transform:translateY(7px)}
-.agent-thread-demo.in .resident-start{animation:threadIn .36s 4.8s forwards}
-.agent-thread-demo.in .context-reel{animation:threadIn .36s 5.6s forwards}
-.agent-thread-demo.in .agent-result{animation:threadIn .36s 13.75s forwards}
-.agent-thread-demo.in .result-actions{animation:threadIn .36s 14.6s forwards}
-.agent-thread-demo.in .result-composer{animation:threadIn .36s 15s forwards}
-.thread-turn.is-new,.thread-actions.is-new,.thread-composer.is-new{animation:threadIn .3s cubic-bezier(.2,.8,.2,1) both}
-@keyframes threadIn{to{opacity:1;transform:none}}
-@media(prefers-reduced-motion:reduce){
- .demo-step,.context-frame,.thread-turn.is-new,.thread-actions.is-new,.thread-composer.is-new{opacity:1;transform:none;animation:none!important}
- .context-reel{height:auto;display:grid;gap:6px}
- .context-frame{position:static}
-}
+.thread-turn.is-new,.thread-actions.is-new,.thread-check.is-new,.thread-followup.is-new,.thread-composer.is-new{animation:threadIn .28s cubic-bezier(.2,.8,.2,1) both}
+@keyframes threadIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.thread-turn.is-new,.thread-actions.is-new,.thread-check.is-new,.thread-followup.is-new,.thread-composer.is-new{animation:none}}
 @media(max-width:640px){
  .experience h2{font-size:31px;line-height:1.02;max-width:none}
  .experience .lead{font-size:16px;line-height:1.45}
@@ -885,9 +871,6 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
  .department-dots i{width:7px;height:7px}
  .agent-thread-body{padding:12px 10px;gap:9px}
  .thread-bubble{max-width:92%;font-size:13.5px;line-height:1.4;padding:9px 10px}
- .context-reel{height:90px}
- .context-frame{padding:8px 9px}
- .context-frame p{font-size:12px;line-height:1.38}
  .thread-actions{display:grid;grid-template-columns:1fr 1fr;width:100%}
  .thread-actions button,.thread-actions a{width:100%;font-size:10.5px;padding:8px}
  .thread-composer{align-items:flex-start;flex-direction:column;gap:2px}
@@ -1200,8 +1183,8 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
 <!-- 4 AGENT EXPERIENCE -->
 <section class="experience" id="experience"><div class="w">
  <span class="k rv">your agent, working</span>
- <h2 class="rv d1">One request. Your whole life considered.</h2>
- <p class="lead rv d2 mt3">You tell your agent what you need. Your agent checks the systems that matter, works through the constraints, and comes back with the next realistic move.</p>
+ <h2 class="rv d1">One request becomes a plan you can actually follow.</h2>
+ <p class="lead rv d2 mt3">Your agent works through the parts of the decision with you, one at a time. Anything still waiting on you becomes a commitment or an active follow up so it does not disappear in the chat.</p>
 
  <div class="agent-thread-demo rv d2" id="agentDemo">
   <div class="agent-thread-head">
@@ -1209,43 +1192,24 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
    <span class="department-dots" aria-label="Four departments in context"><i class="pa"></i><i class="hs"></i><i class="cd"></i><i class="lm"></i></span>
   </div>
   <div class="agent-thread-body" id="agentDemoBody">
-   <div class="thread-turn resident demo-step resident-start">
+   <div class="thread-turn resident">
     <div class="thread-label">YOU</div>
     <div class="thread-bubble">I need groceries before the weekend.</div>
    </div>
 
-   <div class="context-reel demo-step" aria-label="Your agent checks four systems one at a time">
-    <div class="context-frame pa">
-     <span>AGENCY ASSESSMENT</span><strong>TIME</strong>
-     <p>Thursday at 6:15 PM gives you 55 minutes before your next commitment.</p>
-    </div>
-    <div class="context-frame cd">
-     <span>CAREER DEVELOPMENT</span><strong>SALARY</strong>
-     <p>You have $85 available for groceries this week.</p>
-    </div>
-    <div class="context-frame hs">
-     <span>HOUSING STABILITY</span><strong>INVENTORY</strong>
-     <p>Your grocery list is current and ready to use.</p>
-    </div>
-    <div class="context-frame lm">
-     <span>LIFE MANAGEMENT</span><strong>STANDARDS</strong>
-     <p>Friday night is protected time.</p>
-    </div>
+   <div class="thread-turn agent dept-message cd is-new">
+    <div class="thread-label">CAREER DEVELOPMENT · SALARY</div>
+    <div class="thread-bubble">You have $85 available for groceries this week. Is that the amount you want to work with?</div>
    </div>
 
-   <div class="thread-turn agent demo-step agent-result">
-    <div class="thread-label">YOUR AGENT</div>
-    <div class="thread-bubble">Thursday at 6:15 works. You have 55 minutes and $85 set aside for groceries. I would keep Friday protected.</div>
+   <div class="thread-actions is-new">
+    <button type="button" data-agent-choice="confirm-budget">CONFIRM $85</button>
+    <button type="button" class="secondary" data-agent-choice="adjust-budget">ADJUST AMOUNT</button>
    </div>
 
-   <div class="thread-actions demo-step result-actions">
-    <button type="button" data-agent-choice="confirm-thursday">CONFIRM THURSDAY</button>
-    <button type="button" class="secondary" data-agent-choice="another-time">CHOOSE ANOTHER TIME</button>
-   </div>
-
-   <div class="thread-composer demo-step result-composer" aria-hidden="true"><span>Tell your agent what changed...</span><small>Your systems stay with the conversation</small></div>
+   <div class="thread-composer is-new" aria-hidden="true"><span>Tell your agent what changed...</span><small>Open items stay active</small></div>
   </div>
-  <div class="agent-thread-status" id="agentDemoStatus"><span>ONE REQUEST</span><span>FOUR DEPARTMENTS, ONE NEXT MOVE</span></div>
+  <div class="agent-thread-status" id="agentDemoStatus"><span>SALARY</span><span>WAITING ON BUDGET CONFIRMATION</span></div>
  </div>
 </div></section>
 
@@ -1848,11 +1812,21 @@ if(dash){
  var status=document.getElementById('agentDemoStatus');
  if(!demo||!body||!status) return;
 
- function agent(text){
-  return '<div class="thread-turn agent is-new"><div class="thread-label">YOUR AGENT</div><div class="thread-bubble">'+text+'</div></div>';
+ var budget=85;
+ var groceryTime='Thursday at 6:15 PM';
+ var inventoryReviewed=false;
+
+ function msg(dept,system,text){
+  return '<div class="thread-turn agent dept-message '+dept+' is-new"><div class="thread-label">'+system+'</div><div class="thread-bubble">'+text+'</div></div>';
  }
  function resident(text){
   return '<div class="thread-turn resident is-new"><div class="thread-label">YOU</div><div class="thread-bubble">'+text+'</div></div>';
+ }
+ function check(dept,label,value){
+  return '<div class="thread-check '+dept+' is-new"><span class="tick">✓</span><b>'+label+'</b><span>'+value+'</span></div>';
+ }
+ function followup(title,text){
+  return '<div class="thread-followup is-new"><strong>'+title+'</strong>'+text+'</div>';
  }
  function actions(items){
   return '<div class="thread-actions is-new">'+items.map(function(item){
@@ -1861,7 +1835,7 @@ if(dash){
   }).join('')+'</div>';
  }
  function composer(){
-  return '<div class="thread-composer is-new" aria-hidden="true"><span>Tell your agent what changed...</span><small>Your systems stay with the conversation</small></div>';
+  return '<div class="thread-composer is-new" aria-hidden="true"><span>Tell your agent what changed...</span><small>Open items stay active</small></div>';
  }
  function setStatus(left,right){
   status.innerHTML='<span>'+left+'</span><span>'+right+'</span>';
@@ -1869,8 +1843,47 @@ if(dash){
  function clearActions(){
   body.querySelectorAll('.thread-actions,.thread-composer').forEach(function(el){el.remove();});
  }
- function appendLater(html,delay){
-  setTimeout(function(){body.insertAdjacentHTML('beforeend',html);},delay);
+ function nextTime(){
+  clearActions();
+  body.insertAdjacentHTML('beforeend',check('cd','SALARY','$'+budget+' confirmed'));
+  setTimeout(function(){
+   body.insertAdjacentHTML('beforeend',msg('pa','AGENCY ASSESSMENT · TIME','Thursday at 6:15 PM gives you 55 minutes to shop before your next commitment.'));
+   body.insertAdjacentHTML('beforeend',actions([
+    {label:'CONFIRM THURSDAY 6:15',choice:'confirm-time'},
+    {label:'MORE OPTIONS',choice:'more-times',secondary:true}
+   ]));
+   body.insertAdjacentHTML('beforeend',composer());
+   setStatus('TIME','WAITING ON COMMITMENT');
+  },420);
+ }
+ function nextInventory(){
+  clearActions();
+  body.insertAdjacentHTML('beforeend',check('pa','TIME',groceryTime+' confirmed'));
+  setTimeout(function(){
+   body.insertAdjacentHTML('beforeend',msg('hs','HOUSING STABILITY · INVENTORY','Your grocery list is ready. I added a five minute review Wednesday at 8:30 PM so we can catch anything missing before the trip.'));
+   body.insertAdjacentHTML('beforeend',followup('ACTIVE FOLLOW UP','Inventory review · Wednesday at 8:30 PM'));
+   body.insertAdjacentHTML('beforeend',actions([
+    {label:'REVIEW INVENTORY NOW',choice:'review-inventory'},
+    {label:'KEEP FOLLOW UP',choice:'keep-followup',secondary:true}
+   ]));
+   body.insertAdjacentHTML('beforeend',composer());
+   setStatus('INVENTORY','FOLLOW UP ACTIVE');
+  },420);
+ }
+ function nextStandards(){
+  clearActions();
+  var invText=inventoryReviewed?'Inventory review complete':'Inventory review stays active until Wednesday';
+  body.insertAdjacentHTML('beforeend',check('hs','INVENTORY',invText));
+  setTimeout(function(){
+   body.insertAdjacentHTML('beforeend',msg('lm','LIFE MANAGEMENT · STANDARDS','You wanted groceries handled before the weekend so meals at home are the easy option when you are tired. This commitment supports that.'));
+   body.insertAdjacentHTML('beforeend',followup('YOUR PLAN','$'+budget+' grocery budget · '+groceryTime+' · '+(inventoryReviewed?'list reviewed':'list review still active')));
+   body.insertAdjacentHTML('beforeend',actions([
+    {label:'VIEW INVENTORY',href:'/housing-stability#inventory'},
+    {label:'START OVER',choice:'reset',secondary:true}
+   ]));
+   body.insertAdjacentHTML('beforeend',composer());
+   setStatus('STANDARDS','PLAN ACTIVE UNTIL COMPLETE');
+  },420);
  }
 
  body.addEventListener('click',function(e){
@@ -1878,40 +1891,79 @@ if(dash){
   if(!control) return;
   var choice=control.getAttribute('data-agent-choice');
 
-  if(choice==='confirm-thursday'){
-   clearActions();
-   body.insertAdjacentHTML('beforeend',agent('Confirmed. Groceries are on Thursday at 6:15 PM. I will keep the task active until it is done.'));
-   appendLater(actions([
-    {label:'VIEW INVENTORY',href:'/housing-stability#inventory'},
-    {label:'START OVER',choice:'reset',secondary:true}
-   ]),650);
-   appendLater(composer(),950);
-   setStatus('COMMITMENT CONFIRMED','FOLLOW THROUGH ACTIVE');
+  if(choice==='confirm-budget'){
+   budget=85;
+   nextTime();
    return;
   }
 
-  if(choice==='another-time'){
+  if(choice==='adjust-budget'){
    clearActions();
-   body.insertAdjacentHTML('beforeend',resident('What about Friday around 7?'));
-   appendLater(agent('Friday night is protected. Saturday at 10:30 AM works without moving anything else.'),700);
-   appendLater(actions([
-    {label:'CONFIRM SATURDAY',choice:'confirm-saturday'},
-    {label:'KEEP THURSDAY',choice:'confirm-thursday',secondary:true}
-   ]),1300);
-   appendLater(composer(),1600);
-   setStatus('STANDARD PROTECTED','NEW WINDOW FOUND');
+   body.insertAdjacentHTML('beforeend',resident('I want to spend less.'));
+   setTimeout(function(){
+    body.insertAdjacentHTML('beforeend',msg('cd','CAREER DEVELOPMENT · SALARY','$65 keeps more room in this week\'s spending plan. Use $65 for groceries?'));
+    body.insertAdjacentHTML('beforeend',actions([
+     {label:'USE $65',choice:'confirm-budget-65'},
+     {label:'KEEP $85',choice:'confirm-budget',secondary:true}
+    ]));
+    body.insertAdjacentHTML('beforeend',composer());
+    setStatus('SALARY','WAITING ON BUDGET CONFIRMATION');
+   },400);
+   return;
+  }
+
+  if(choice==='confirm-budget-65'){
+   budget=65;
+   nextTime();
+   return;
+  }
+
+  if(choice==='confirm-time'){
+   groceryTime='Thursday at 6:15 PM';
+   nextInventory();
+   return;
+  }
+
+  if(choice==='more-times'){
+   clearActions();
+   body.insertAdjacentHTML('beforeend',msg('pa','AGENCY ASSESSMENT · TIME','Saturday at 10:30 AM also works. It gives you more room and does not move another commitment.'));
+   body.insertAdjacentHTML('beforeend',actions([
+    {label:'THURSDAY 6:15',choice:'confirm-time'},
+    {label:'SATURDAY 10:30',choice:'confirm-saturday',secondary:true}
+   ]));
+   body.insertAdjacentHTML('beforeend',composer());
+   setStatus('TIME','TWO REALISTIC OPTIONS');
    return;
   }
 
   if(choice==='confirm-saturday'){
+   groceryTime='Saturday at 10:30 AM';
+   nextInventory();
+   return;
+  }
+
+  if(choice==='review-inventory'){
    clearActions();
-   body.insertAdjacentHTML('beforeend',agent('Confirmed. Groceries are on Saturday at 10:30 AM. Your Inventory list stays ready for the trip.'));
-   appendLater(actions([
-    {label:'VIEW INVENTORY',href:'/housing-stability#inventory'},
-    {label:'START OVER',choice:'reset',secondary:true}
-   ]),650);
-   appendLater(composer(),950);
-   setStatus('COMMITMENT UPDATED','INVENTORY READY');
+   inventoryReviewed=true;
+   body.insertAdjacentHTML('beforeend',msg('hs','HOUSING STABILITY · INVENTORY','Inventory is open. Once the list looks right, I can clear the Wednesday review.'));
+   body.insertAdjacentHTML('beforeend',actions([
+    {label:'LIST LOOKS RIGHT',choice:'inventory-ready'},
+    {label:'KEEP FOLLOW UP',choice:'keep-followup',secondary:true}
+   ]));
+   body.insertAdjacentHTML('beforeend',composer());
+   setStatus('INVENTORY','WAITING ON REVIEW');
+   return;
+  }
+
+  if(choice==='inventory-ready'){
+   inventoryReviewed=true;
+   nextStandards();
+   return;
+  }
+
+  if(choice==='keep-followup'){
+   inventoryReviewed=false;
+   nextStandards();
    return;
   }
 
