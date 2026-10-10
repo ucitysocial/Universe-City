@@ -7,7 +7,7 @@ import ApplicationFolderShowcase from '@/components/ApplicationFolderShowcase';
 /** Application flow. Account first, then membership activation. */
 export default async function Apply() {
   const profile = await currentProfile();
-  const mainSiteUrl = process.env.NEXT_PUBLIC_MARKETING_SITE_URL ?? 'https://ucitysocial.com';
+  const mainSiteUrl = process.env.NEXT_PUBLIC_MARKETING_SITE_URL ?? 'https://www.ucitysocial.com';
 
   if (profile?.membership === 'active') redirect('/member');
 
