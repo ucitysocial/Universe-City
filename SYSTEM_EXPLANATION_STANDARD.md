@@ -115,6 +115,39 @@ Chat is the conversation layer. Systems are the working layer. Detailed lists, p
 
 The product standard is not maximum engagement. It is resident success. A strong agent helps the resident make realistic commitments, follow through on what matters, recover when plans change, and keep the systems around their life useful enough to support the next decision.
 
+## Commitments and follow ups
+
+Anything the agent is waiting on must remain active somewhere in the system.
+
+An unresolved item should become one of three things:
+
+1. A commitment with a time attached.
+2. An active follow up that still needs the resident's confirmation, review, answer, choice, upload, call, or other participation.
+3. A system update the agent can complete without asking the resident to manage it.
+
+Do not leave unresolved work buried in chat history.
+
+If the agent asks the resident to review something later, that review should be scheduled or tracked as an active follow up.
+
+If the agent is waiting for confirmation before making a meaningful commitment, the pending confirmation should remain visible until it is resolved.
+
+When an item is completed, it may collapse into a compact confirmed state so the resident can focus on the next decision.
+
+The resident should normally face one active decision at a time. Cross system context should be used by the agent, but it should be revealed only as needed to help the resident make the next decision.
+
+### Canonical interaction sequence
+
+The current grocery example demonstrates the intended interaction pattern:
+
+1. The resident states a normal need.
+2. Salary establishes the amount available and asks for confirmation.
+3. Once confirmed, Time proposes a realistic commitment and offers more options if needed.
+4. Once Time is confirmed, Inventory prepares the working list and creates a review follow up if the resident still needs to check it.
+5. Standards reconnects the commitment to the resident's stated reason for maintaining that part of life.
+6. Open commitments and follow ups remain active until completed.
+
+This is not a universal script for every system. It is the standard for breaking a multi system request into manageable decisions without overwhelming the resident.
+
 ## Maintenance and progress
 
 Universe City is designed to keep systems useful after they are first created.
