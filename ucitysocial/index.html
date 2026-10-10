@@ -821,24 +821,24 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
 .agent-thread-head{min-height:48px;padding:11px 15px;border-bottom:1px solid rgba(244,239,233,.28);display:flex;align-items:center;gap:14px;font-family:var(--record);font-size:15px;letter-spacing:.15em;color:rgba(244,239,233,.72)}
 .agent-thread-head span:first-child{color:#fff}
 .agent-thread-head span:last-child{margin-left:auto;font-size:13px;color:rgba(244,239,233,.46)}
-.agent-thread-body{padding:20px 18px 22px;display:flex;flex-direction:column;gap:7px;min-height:390px;justify-content:flex-end}
-.thread-label{font-family:var(--record);font-size:13px;letter-spacing:.18em;color:rgba(244,239,233,.42);margin-top:8px;opacity:0;transform:translateY(6px)}
-.thread-label.resident{align-self:flex-end}
-.thread-bubble{max-width:82%;padding:12px 15px;border:2px solid rgba(244,239,233,.34);font-size:clamp(15px,1.3vw,18px);line-height:1.45;opacity:0;transform:translateY(10px)}
-.thread-bubble.agent{align-self:flex-start;border-left:5px solid var(--pa);background:rgba(92,15,27,.19);color:var(--paper)}
-.thread-bubble.resident{align-self:flex-end;background:var(--paper);border-color:var(--paper);color:var(--ink)}
+.agent-thread-body{padding:20px 18px 22px;display:flex;flex-direction:column;gap:12px;min-height:500px;justify-content:flex-end}
+.thread-turn{display:flex;flex-direction:column;gap:5px;opacity:0;transform:translateY(12px)}
+.thread-turn.resident{align-items:flex-end}
+.thread-turn.agent{align-items:flex-start}
+.thread-label{font-family:var(--record);font-size:13px;letter-spacing:.18em;color:rgba(244,239,233,.42)}
+.thread-bubble{max-width:82%;padding:12px 15px;border:2px solid rgba(244,239,233,.34);font-size:clamp(15px,1.3vw,18px);line-height:1.48}
+.thread-turn.agent .thread-bubble{border-left:5px solid var(--pa);background:rgba(92,15,27,.19);color:var(--paper)}
+.thread-turn.resident .thread-bubble{background:var(--paper);border-color:var(--paper);color:var(--ink)}
 .agent-thread-status{border-top:1px solid rgba(244,239,233,.28);padding:10px 15px;display:flex;gap:14px;justify-content:space-between;flex-wrap:wrap;font-family:var(--record);font-size:12px;letter-spacing:.12em;color:rgba(244,239,233,.48)}
-.agent-thread-demo.in .thread-label,.agent-thread-demo.in .thread-bubble{animation:threadIn .38s cubic-bezier(.2,.8,.2,1) forwards}
-.agent-thread-demo.in .thread-label:nth-child(1){animation-delay:.05s}
-.agent-thread-demo.in .thread-bubble:nth-child(2){animation-delay:.12s}
-.agent-thread-demo.in .thread-label:nth-child(3){animation-delay:.42s}
-.agent-thread-demo.in .thread-bubble:nth-child(4){animation-delay:.49s}
-.agent-thread-demo.in .thread-label:nth-child(5){animation-delay:.79s}
-.agent-thread-demo.in .thread-bubble:nth-child(6){animation-delay:.86s}
-.agent-thread-demo.in .thread-label:nth-child(7){animation-delay:1.16s}
-.agent-thread-demo.in .thread-bubble:nth-child(8){animation-delay:1.23s}
+.agent-thread-demo.in .thread-turn{animation:threadIn .48s cubic-bezier(.2,.8,.2,1) forwards}
+.agent-thread-demo.in .thread-turn:nth-child(1){animation-delay:.3s}
+.agent-thread-demo.in .thread-turn:nth-child(2){animation-delay:1.8s}
+.agent-thread-demo.in .thread-turn:nth-child(3){animation-delay:3.8s}
+.agent-thread-demo.in .thread-turn:nth-child(4){animation-delay:5.4s}
+.agent-thread-demo.in .thread-turn:nth-child(5){animation-delay:8.2s}
+.agent-thread-demo.in .thread-turn:nth-child(6){animation-delay:9.7s}
 @keyframes threadIn{to{opacity:1;transform:none}}
-@media(prefers-reduced-motion:reduce){.thread-label,.thread-bubble{opacity:1;transform:none}.agent-thread-demo.in .thread-label,.agent-thread-demo.in .thread-bubble{animation:none}}
+@media(prefers-reduced-motion:reduce){.thread-turn{opacity:1;transform:none}.agent-thread-demo.in .thread-turn{animation:none}}
 @media(max-width:640px){
  .agent-thread-head{align-items:flex-start;flex-direction:column;gap:3px}
  .agent-thread-head span:last-child{margin-left:0}
@@ -1061,16 +1061,32 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
  <p class="lead rv d2 mt3">You should not have to explain your entire life again every time you need help with the next thing.</p>
 
  <div class="agent-thread-demo rv d2">
-  <div class="agent-thread-head"><span>UNIVERSE CITY</span><span>EXAMPLE THREAD &middot; CONTEXT ACTIVE</span></div>
+  <div class="agent-thread-head"><span>UNIVERSE CITY</span><span>RESIDENT THREAD &middot; CONTEXT ACTIVE</span></div>
   <div class="agent-thread-body">
-   <div class="thread-label resident">YOU</div>
-   <div class="thread-bubble resident">I need to figure out the rest of this week.</div>
-   <div class="thread-label agent">YOUR AGENT</div>
-   <div class="thread-bubble agent">We can pick up from the plan we already started. What changed?</div>
-   <div class="thread-label resident">YOU</div>
-   <div class="thread-bubble resident">Tuesday opened up. I also need time to finish the application.</div>
-   <div class="thread-label agent">YOUR AGENT</div>
-   <div class="thread-bubble agent">I have both. We can work them into the week without starting over.</div>
+   <div class="thread-turn resident">
+    <div class="thread-label">YOU</div>
+    <div class="thread-bubble">What do I still need to make room for this week?</div>
+   </div>
+   <div class="thread-turn agent">
+    <div class="thread-label">YOUR AGENT</div>
+    <div class="thread-bubble">The job application is still open, groceries moved to Thursday, and you wanted Friday night left alone.</div>
+   </div>
+   <div class="thread-turn resident">
+    <div class="thread-label">YOU</div>
+    <div class="thread-bubble">I can work on the application tomorrow, but my sister asked me to help her after work.</div>
+   </div>
+   <div class="thread-turn agent">
+    <div class="thread-label">YOUR AGENT</div>
+    <div class="thread-bubble">Tomorrow already has work until 5, 30 minutes to get home, dinner, and the 10:30 bedtime you wanted to protect. If your sister gets 6:30 to 7:30, the application can fit from 8 to 9.</div>
+   </div>
+   <div class="thread-turn resident">
+    <div class="thread-label">YOU</div>
+    <div class="thread-bubble">That works.</div>
+   </div>
+   <div class="thread-turn agent">
+    <div class="thread-label">YOUR AGENT</div>
+    <div class="thread-bubble">I have it. When you check back in, we can compare the plan with what actually happened and adjust the rest of the week.</div>
+   </div>
   </div>
   <div class="agent-thread-status"><span>CONTEXT CARRIED FORWARD</span><span>TIME &middot; CAREER DEVELOPMENT</span></div>
  </div>
