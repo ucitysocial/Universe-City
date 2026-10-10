@@ -27,7 +27,7 @@ export default function ResidentFileNav({
     <aside className="resident-file" data-tour="file">
       <div>
         <Link href="/member" className="mark resident-mark">universe&#9733;city</Link>
-        <p className="file-label">File</p>
+        <p className="file-label">Systems</p>
       </div>
 
       <nav className="file-primary" aria-label="Resident navigation">
@@ -87,7 +87,7 @@ export default function ResidentFileNav({
           <strong>{name || 'Resident'}</strong>
           <span>{caseNo}</span>
         </div>
-        <Link href="/member/file">Account</Link>
+        <Link href="/member/account">Account</Link>
         <Link href="/member/orientation?replay=1">Replay orientation</Link>
       </div>
     </aside>
