@@ -4,7 +4,7 @@ import { DEPARTMENTS } from '@/lib/domain/folders';
 export default function HowItWorks() {
   return (
     <>
-      <section>
+      <section className="hero-section">
         <div className="wrap">
           <p className="kick">How it works</p>
           <h1 style={{ marginTop: 12, maxWidth: '18ch' }}>Your life changes. Your systems should too.</h1>
@@ -16,7 +16,7 @@ export default function HowItWorks() {
         </div>
       </section>
 
-      <section>
+      <section className="systems-section">
         <div className="wrap">
           <p className="kick">What you get at launch</p>
           <h2 style={{ marginTop: 10 }}>Four systems, running.</h2>
@@ -43,7 +43,7 @@ export default function HowItWorks() {
         </div>
       </section>
 
-      <section>
+      <section className="membership-section">
         <div className="wrap prose">
           <p className="kick">What we will never do</p>
           <h2 style={{ marginTop: 10 }}>We don’t turn guesses into facts.</h2>
