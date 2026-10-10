@@ -1,27 +1,152 @@
 <!doctype html>
 <html lang="en">
   <body style="margin:0;background:#f4f1eb;color:#111111;font-family:Arial,Helvetica,sans-serif;">
-    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f4f1eb;padding:32px 14px;">
-      <tr><td align="center">
-        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:620px;background:#ffffff;border:3px solid #111111;">
-          <tr><td style="background:#111111;color:#ffffff;padding:18px 24px;font-family:monospace;font-size:22px;letter-spacing:2px;">universe★city</td></tr>
-          <tr><td><table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr>
-            <td style="height:6px;background:#5C0F1B;"></td><td style="height:6px;background:#A07818;"></td><td style="height:6px;background:#4A2A78;"></td><td style="height:6px;background:#2A4B3C;"></td>
-          </tr></table></td></tr>
-          <tr><td style="padding:36px 30px 32px;">
-            <p style="margin:0 0 8px;font-size:11px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;color:#5C0F1B;">ACCOUNT // SECURE SIGN IN</p>
-            <h1 style="margin:0 0 18px;font-size:31px;line-height:1.1;font-weight:600;">Sign in to Universe City.</h1>
-            <p style="margin:0 0 24px;font-size:16px;line-height:1.65;color:#4f4d49;">
-              Use this secure link to sign in to Universe City.
-            </p>
-            <p style="margin:0 0 30px;">
-              <a href="{{ .ConfirmationURL }}" style="display:inline-block;background:#5C0F1B;color:#ffffff;border:3px solid #111111;box-shadow:4px 4px 0 #111111;padding:14px 20px;text-decoration:none;font-weight:bold;">SIGN IN</a>
-            </p>
-            <p style="margin:0;font-size:12px;line-height:1.55;color:#77736e;">If you did not request this sign-in link, you can ignore this email.</p>
-          </td></tr>
-          <tr><td style="padding:16px 30px;background:#f7f7f4;border-top:1px solid #d9d7d0;font-size:11px;color:#77736e;">Universe City · Life Management Agency</td></tr>
-        </table>
-      </td></tr>
+    <table
+      role="presentation"
+      width="100%"
+      cellspacing="0"
+      cellpadding="0"
+      style="background:#f4f1eb;padding:32px 14px;"
+    >
+      <tr>
+        <td align="center">
+
+          <table
+            role="presentation"
+            width="100%"
+            cellspacing="0"
+            cellpadding="0"
+            style="max-width:620px;background:#ffffff;border:3px solid #111111;"
+          >
+
+            <tr>
+              <td
+                style="
+                  background:#111111;
+                  color:#ffffff;
+                  padding:18px 24px;
+                  font-family:monospace;
+                  font-size:22px;
+                  letter-spacing:2px;
+                "
+              >
+                universe★city
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <table
+                  role="presentation"
+                  width="100%"
+                  cellspacing="0"
+                  cellpadding="0"
+                >
+                  <tr>
+                    <td style="height:6px;background:#5C0F1B;"></td>
+                    <td style="height:6px;background:#A07818;"></td>
+                    <td style="height:6px;background:#4A2A78;"></td>
+                    <td style="height:6px;background:#2A4B3C;"></td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr>
+              <td style="padding:36px 30px 32px;">
+
+                <p
+                  style="
+                    margin:0 0 8px;
+                    font-size:11px;
+                    font-weight:bold;
+                    letter-spacing:2px;
+                    text-transform:uppercase;
+                    color:#5C0F1B;
+                  "
+                >
+                  SECURE SIGN IN
+                </p>
+
+                <h1
+                  style="
+                    margin:0 0 18px;
+                    font-size:31px;
+                    line-height:1.1;
+                    font-weight:600;
+                  "
+                >
+                  Your sign-in link.
+                </h1>
+
+                <p
+                  style="
+                    margin:0 0 26px;
+                    font-size:16px;
+                    line-height:1.65;
+                    color:#4f4d49;
+                  "
+                >
+                  Use the button below to sign in to your Universe City account. This link expires shortly and can only be used once.
+                </p>
+
+                <p style="margin:0 0 34px;">
+                  <a
+                    href="{{ .ConfirmationURL }}"
+                    style="
+                      display:inline-block;
+                      background:#5C0F1B;
+                      color:#ffffff;
+                      border:3px solid #111111;
+                      box-shadow:4px 4px 0 #111111;
+                      padding:14px 20px;
+                      text-decoration:none;
+                      font-weight:bold;
+                    "
+                  >
+                    SIGN IN TO UNIVERSE CITY
+                  </a>
+                </p>
+
+                <div
+                  style="
+                    border-top:1px solid #d9d7d0;
+                    padding-top:22px;
+                  "
+                >
+                  <p
+                    style="
+                      margin:0;
+                      font-size:12px;
+                      line-height:1.55;
+                      color:#77736e;
+                    "
+                  >
+                    If you did not request this sign-in link, you can ignore this email.
+                  </p>
+                </div>
+
+              </td>
+            </tr>
+
+            <tr>
+              <td
+                style="
+                  padding:16px 30px;
+                  background:#f7f7f4;
+                  border-top:1px solid #d9d7d0;
+                  font-size:11px;
+                  color:#77736e;
+                "
+              >
+                Universe City · Life Management Agency
+              </td>
+            </tr>
+
+          </table>
+
+        </td>
+      </tr>
     </table>
   </body>
 </html>
