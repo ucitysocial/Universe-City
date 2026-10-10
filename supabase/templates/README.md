@@ -34,6 +34,7 @@ Use short transactional subjects:
 - Invite user — `Your Universe City invitation`
 - Change email — `Confirm your new Universe City email`
 - Reauthentication — `{{ .Token }} is your Universe City verification code`
+- Password changed — `Your Universe City password was changed`
 
 ## Template mapping
 
@@ -43,6 +44,7 @@ Use short transactional subjects:
 - Invite user → `invite.html`
 - Change email → `email_change.html`
 - Reauthentication → `reauthentication.html`
+- Password changed notification → `password_changed.html`
 
 ## Hosted Supabase setup
 
