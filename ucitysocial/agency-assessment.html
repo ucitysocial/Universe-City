@@ -602,6 +602,62 @@ footer a:hover{opacity:1}
 .biz .lead,.pricing .lead,.mlist .lead,.pfoot .lead{color:var(--ink)}
 .mdef span{color:#3d2c28}
 .mrow .nm{color:var(--ink)}
+
+/* compact department explorer */
+.dept-hero{background:var(--c);color:var(--paper);border-bottom:2px solid var(--ink)}
+.dept-hero .w{padding-top:28px;padding-bottom:30px}
+.dept-hero-line{display:flex;align-items:flex-end;gap:24px;flex-wrap:wrap}
+.dept-hero h1{font-size:clamp(36px,4vw,54px);line-height:.98;letter-spacing:-.035em;color:#fff}
+.dept-count{margin-left:auto;font-family:var(--record);font-size:15px;letter-spacing:.14em;color:rgba(255,255,255,.72);padding-bottom:5px}
+.dept-hero p{font-size:15.5px;line-height:1.5;max-width:74ch;margin-top:12px;color:rgba(255,255,255,.84)}
+.system-explorer{padding:34px 0 52px;background:var(--paper)}
+.explorer-intro{margin-bottom:18px;max-width:820px}
+.explorer-intro h2{font-size:clamp(24px,2.3vw,30px);letter-spacing:-.025em;line-height:1.05;color:var(--ink)}
+.explorer-intro p{margin-top:8px;color:#594843;line-height:1.5;font-size:14.5px;max-width:76ch}
+.system-workspace{display:grid;grid-template-columns:310px minmax(0,1fr);border:2px solid var(--ink);min-height:570px;background:var(--paper)}
+.system-index{border-right:2px solid var(--ink);background:var(--paper2)}
+.system-index-head{padding:18px 20px;border-bottom:2px solid var(--ink);font-family:var(--record);font-size:13px;letter-spacing:.14em}
+.system-item{width:100%;border:0;border-bottom:1px solid var(--rule);background:transparent;text-align:left;padding:14px 18px;display:flex;gap:14px;align-items:center;font-family:var(--voice);font-size:14px;cursor:pointer;color:var(--ink)}
+.system-item .n{font-family:var(--record);font-size:14px;color:var(--c);width:26px}
+.system-item .arr{margin-left:auto;opacity:.35}
+.system-item[aria-selected="true"]{background:var(--c);color:#fff}
+.system-item[aria-selected="true"] .n{color:#fff}
+.system-item[aria-selected="true"] .arr{opacity:1}
+.system-item:focus-visible{outline:2px solid var(--ink);outline-offset:-3px}
+.system-panel{padding:36px 42px 34px;display:flex;flex-direction:column;transition:opacity .16s ease,transform .16s ease}
+.system-panel.switching{opacity:.18;transform:translateX(8px)}
+.system-panel-top{display:flex;justify-content:space-between;gap:20px;align-items:start;border-bottom:1px solid var(--rule);padding-bottom:22px}
+.system-no{font-family:var(--record);font-size:15px;letter-spacing:.13em;color:var(--c)}
+.system-title{font-size:clamp(36px,3.7vw,50px);line-height:1;letter-spacing:-.035em;margin-top:6px;font-weight:600}
+.system-progress{font-family:var(--record);font-size:13px;color:var(--dim);letter-spacing:.1em}
+.system-definition,.system-application,.system-example{display:grid;grid-template-columns:150px minmax(0,1fr);gap:24px}
+.system-definition{margin-top:24px}
+.system-label{font-family:var(--record);font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.system-definition p{font-size:16px;line-height:1.55;color:#4d3c37;font-style:italic;max-width:56ch}
+.system-application{margin-top:28px;padding-top:24px;border-top:2px solid var(--c)}
+.system-application .system-label{color:var(--c)}
+.system-application p{font-size:clamp(17px,1.55vw,20px);line-height:1.48;max-width:56ch;font-weight:600;letter-spacing:-.01em}
+.system-example{position:relative;margin-top:30px;color:var(--paper);padding:24px 0;z-index:0}
+.system-example::before{content:"";position:absolute;inset:0 -26px;background:var(--ink);z-index:-1}
+.system-example .system-label{color:rgba(255,255,255,.6)}
+.system-example p{font-size:15px;line-height:1.62;color:rgba(255,255,255,.88);max-width:56ch}
+.system-next-wrap{margin-top:auto;padding-top:28px;display:flex;justify-content:flex-end}
+.system-next{display:inline-block;background:var(--c);color:#fff;text-decoration:none;padding:13px 18px;font-weight:700;font-size:14px;border:0;box-shadow:5px 5px 0 var(--ink);cursor:pointer;font-family:var(--voice)}
+.system-next:active{transform:translate(3px,3px);box-shadow:2px 2px 0 var(--ink)}
+@media(max-width:800px){
+ .dept-hero .w{padding-top:22px;padding-bottom:24px}
+ .dept-hero-line{gap:8px 18px}
+ .dept-count{margin-left:0;width:100%}
+ .dept-hero p{font-size:14.5px}
+ .system-explorer{padding-top:26px}
+ .system-workspace{grid-template-columns:1fr}
+ .system-index{border-right:0;border-bottom:2px solid var(--ink)}
+ .system-item{padding:13px 15px}
+ .system-panel{padding:28px 20px}
+ .system-definition,.system-application,.system-example{grid-template-columns:1fr;gap:8px}
+ .system-example::before{inset:0 -10px}
+}
+
 </style></head>
 <body style="--c:var(--pa)">
 <nav><div class="w">
@@ -635,29 +691,37 @@ footer a:hover{opacity:1}
   <div class="mfoot"><span>&#9733;</span><span>management@ucitysocial.com</span><span>Denver, Colorado</span></div>
  </div>
 </div>
-<div class="phero" data-rn="I"><div class="w">
- <a href="/#business" class="back rv">&larr; All four departments</a>
- <span class="k rv">department I</span>
- <h1 class="rv d1">Agency Assessment</h1>
- <p class="lead rv d2 mt3" style="max-width:44ch">Understand your current situation.</p>
- <p class="rv d2" style="max-width:56ch">These twelve folders maintain person-level records about your time, health, language, background, identification, finances, legal matters, conflicts, education, employment, regulation, and community.</p>
-</div></div>
 
-<section class="mlist"><div class="w">
- <span class="k rv" style="color:var(--c)">twelve folders</span>
- <h2 class="rv d1" style="margin-bottom:8px">Each folder becomes a working system</h2>
- <p class="rv d2" style="max-width:60ch;margin-bottom:var(--s3)">The definition names the part of life. In Universe City, that idea is applied to your real information and turned into a structure you can use, update, and return to as life changes. The folders do not run in a required sequence.</p>
- <div class="mrow rv"><div class="num">01</div><div><div class="nm">Time</div><div class="mdef"><div><b>Definition</b><span>The measured period in which something takes place.</span></div><div><b>In Universe City</b><span>Time pulls fixed commitments, routines, travel, rest, and protected time into one working schedule. As commitments move, the schedule changes with them so it stays realistic.</span></div></div></div></div><div class="mrow rv"><div class="num">02</div><div><div class="nm">Health</div><div class="mdef"><div><b>Definition</b><span>The condition of a person's body and mind, and the care taken to maintain it.</span></div><div><b>In Universe City</b><span>Health brings appointments, medications, symptoms, care history, and what is due into one current health record. New information updates the picture instead of living across portals and memory.</span></div></div></div></div><div class="mrow rv"><div class="num">03</div><div><div class="nm">Language</div><div class="mdef"><div><b>Definition</b><span>The system of words a person uses to understand others and to be understood.</span></div><div><b>In Universe City</b><span>Language turns reading, writing, and speaking ability into a visible baseline with areas to strengthen. Progress is tracked against that baseline so improvement has somewhere to land.</span></div></div></div></div><div class="mrow rv"><div class="num">04</div><div><div class="nm">Background</div><div class="mdef"><div><b>Definition</b><span>A person's origins, family and history.</span></div><div><b>In Universe City</b><span>Background turns family relationships, important people, and life history into a family tree and personal timeline. The record grows as relationships and life events change.</span></div></div></div></div><div class="mrow rv"><div class="num">05</div><div><div class="nm">Identification</div><div class="mdef"><div><b>Definition</b><span>Proof that a person is who they say they are.</span></div><div><b>In Universe City</b><span>Identification tracks which documents exist, what they are for, when they expire, and how to replace them—without storing the sensitive numbers themselves. The result is a live registry of what is current, missing, or due.</span></div></div></div></div><div class="mrow rv"><div class="num">06</div><div><div class="nm">Finance</div><div class="mdef"><div><b>Definition</b><span>The management of money.</span></div><div><b>In Universe City</b><span>Finance brings income, obligations, debt, savings, and regular spending into one money picture. As amounts change, the system shows what is committed, what remains, and what needs attention.</span></div></div></div></div><div class="mrow rv"><div class="num">07</div><div><div class="nm">Legal</div><div class="mdef"><div><b>Definition</b><span>Relating to the law and to matters the law decides.</span></div><div><b>In Universe City</b><span>Legal organizes open matters, court dates, deadlines, notices, and who is handling each issue into a single log. The timeline and next required action stay visible without Universe City acting as legal counsel.</span></div></div></div></div><div class="mrow rv"><div class="num">08</div><div><div class="nm">Mediation</div><div class="mdef"><div><b>Definition</b><span>Settling a difference between two sides.</span></div><div><b>In Universe City</b><span>Mediation turns a conflict into a factual record of what happened, what was said, what each side asked for, and what was agreed. Future conversations can return to a shared history instead of memory.</span></div></div></div></div><div class="mrow rv"><div class="num">09</div><div><div class="nm">Education</div><div class="mdef"><div><b>Definition</b><span>Gaining knowledge or skill through study or instruction.</span></div><div><b>In Universe City</b><span>Education connects what you have already learned, what you can prove, and what you want to learn next. Interests become concrete routes with credentials, costs, and next steps attached.</span></div></div></div></div><div class="mrow rv"><div class="num">10</div><div><div class="nm">Employment</div><div class="mdef"><div><b>Definition</b><span>Work done for payment.</span></div><div><b>In Universe City</b><span>Employment turns scattered job history into a verified work record with dates, employers, roles, and people who can confirm them. It becomes a reusable history for applications, forms, and career decisions.</span></div></div></div></div><div class="mrow rv"><div class="num">11</div><div><div class="nm">Regulation</div><div class="mdef"><div><b>Definition</b><span>Keeping something running the way you want it to run.</span></div><div><b>In Universe City</b><span>Regulation identifies what actually restores you—rest, hobbies, outings, interests, and personal comforts—and separates that from what merely fills time. Over time, it becomes a record of what genuinely helps you reset.</span></div></div></div></div><div class="mrow rv"><div class="num">12</div><div><div class="nm">Community</div><div class="mdef"><div><b>Definition</b><span>The people in a place and the relationships between them.</span></div><div><b>In Universe City</b><span>Community maps where you live, who you know, where you participate, and what you contribute. It turns wanting more connection into a visible record of participation and community ties.</span></div></div></div></div>
+<section class="dept-hero"><div class="w">
+ <div class="dept-hero-line">
+  <h1>Agency Assessment</h1>
+  <div class="dept-count">12 SYSTEMS</div>
+ </div>
+ <p>Understand the person before trying to manage the life. These systems organize the information that shapes how everyday life actually works.</p>
 </div></section>
 
-<section class="pfoot"><div class="w">
- <span class="k rv" style="color:var(--c)">membership</span>
- <h2 class="rv d1">The systems develop as your life requires them</h2>
- <p class="rv d2 mt2" style="max-width:54ch">Universe City does not require you to finish one folder before another begins. Systems become useful as the information they manage becomes relevant, and they stay connected as your life changes.</p>
- <div class="btns rv d2"><a href="/membership" class="btn" style="background:var(--c);color:#fff;box-shadow:5px 5px 0 var(--ink)">See membership</a></div>
- <div style="margin-top:var(--s5)">
-  <span class="k rv" style="color:var(--dim)">the other three</span>
-  <div class="others rv d1"><a href="/housing-stability" style="--o:var(--hs)"><div class="rn">DEPARTMENT II</div><div class="nm">Housing Stability</div><div class="go">Folder 01 &middot; Inventory &rarr;</div></a><a href="/career-development" style="--o:var(--cd)"><div class="rn">DEPARTMENT III</div><div class="nm">Career Development</div><div class="go">Folder 01 &middot; Salary &rarr;</div></a><a href="/life-management" style="--o:var(--lm)"><div class="rn">DEPARTMENT IV</div><div class="nm">Life Management</div><div class="go">Folder 01 &middot; Standards &rarr;</div></a></div>
+<section class="system-explorer"><div class="w">
+ <div class="explorer-intro">
+  <h2>Choose a system.</h2>
+  <p>The definition names the part of life. Open a system to see what information belongs there, how that information is organized, what the system makes visible, and how it changes the way that part of life is managed.</p>
+ </div>
+
+ <div class="system-workspace">
+  <aside class="system-index" aria-label="Agency Assessment systems">
+   <div class="system-index-head">AGENCY ASSESSMENT &middot; 12 SYSTEMS</div>
+   <button class="system-item" type="button" data-i="0" aria-selected="true"><span class="n">01</span><span>Time</span><span class="arr">&rarr;</span></button><button class="system-item" type="button" data-i="1" aria-selected="false"><span class="n">02</span><span>Health</span><span class="arr">&rarr;</span></button><button class="system-item" type="button" data-i="2" aria-selected="false"><span class="n">03</span><span>Language</span><span class="arr">&rarr;</span></button><button class="system-item" type="button" data-i="3" aria-selected="false"><span class="n">04</span><span>Background</span><span class="arr">&rarr;</span></button><button class="system-item" type="button" data-i="4" aria-selected="false"><span class="n">05</span><span>Identification</span><span class="arr">&rarr;</span></button><button class="system-item" type="button" data-i="5" aria-selected="false"><span class="n">06</span><span>Finance</span><span class="arr">&rarr;</span></button><button class="system-item" type="button" data-i="6" aria-selected="false"><span class="n">07</span><span>Legal</span><span class="arr">&rarr;</span></button><button class="system-item" type="button" data-i="7" aria-selected="false"><span class="n">08</span><span>Mediation</span><span class="arr">&rarr;</span></button><button class="system-item" type="button" data-i="8" aria-selected="false"><span class="n">09</span><span>Education</span><span class="arr">&rarr;</span></button><button class="system-item" type="button" data-i="9" aria-selected="false"><span class="n">10</span><span>Employment</span><span class="arr">&rarr;</span></button><button class="system-item" type="button" data-i="10" aria-selected="false"><span class="n">11</span><span>Regulation</span><span class="arr">&rarr;</span></button><button class="system-item" type="button" data-i="11" aria-selected="false"><span class="n">12</span><span>Community</span><span class="arr">&rarr;</span></button>
+  </aside>
+
+  <main class="system-panel" id="systemPanel">
+   <div class="system-panel-top">
+    <div><div class="system-no" id="systemNo"></div><div class="system-title" id="systemTitle"></div></div>
+    <div class="system-progress" id="systemProgress"></div>
+   </div>
+   <div class="system-definition"><div class="system-label">Definition</div><p id="systemDefinition"></p></div>
+   <div class="system-application"><div class="system-label">In Universe City</div><p id="systemApplication"></p></div>
+   <div class="system-example"><div class="system-label">What that looks like</div><p id="systemExample"></p></div>
+   <div class="system-next-wrap"><a class="system-next" id="systemNext" href="#"></a></div>
+  </main>
  </div>
 </div></section>
 <footer><div class="w cols">
@@ -691,4 +755,70 @@ if(mBtn){
  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!mPan.hidden)close()});
 }
 })();
-</script></body></html>
+</script>
+<script>
+(function(){
+ var systems=[{"n":"01","name":"Time","definition":"The measured period in which something takes place.","application":"Time turns obligations, routines, priorities, and plans into a realistic calendar for what happens next. It shows what is fixed, what can move, what conflicts, and what needs time before or after it. When life changes, the plan changes with it.","example":"Your work schedule changes next week. Time shows the effect on commuting, sleep, meals, appointments, and anything else already planned, then rebuilds the week around what must stay, what can move, and what you want to protect."},{"n":"02","name":"Health","definition":"The condition of a person's body and mind, and the care taken to maintain it.","application":"Health brings care, medications, symptoms, appointments, and follow up into one current picture. It shows what is active, what is due, what changed, and what needs to be handled next.","example":"You leave urgent care with a new medication and a follow up in two weeks. Health adds both to the same place as your existing care so nothing depends on remembering it later."},{"n":"03","name":"Language","definition":"The system of words a person uses to understand others and to be understood.","application":"Language turns reading, writing, speaking, grammar, and comprehension into a baseline you can actually work from. It shows where communication is strong, where it creates friction, and what practice would make the next task easier.","example":"You want a job that requires written reports. Language can show that speaking is strong while formal writing needs work, then give that gap a place in the plan."},{"n":"04","name":"Background","definition":"A person's origins, family and history.","application":"Background organizes family relationships, important people, and major life events into a clear personal history. It gives context to the present without forcing you to reconstruct your own story every time it matters.","example":"A form asks for family history or an emergency contact. Background gives you a current map of the people, relationships, and events that belong there."},{"n":"05","name":"Identification","definition":"Proof that a person is who they say they are.","application":"Identification tracks the documents that prove who you are and what each one is needed for. It shows what exists, what expires, what is missing, and how to replace it without storing sensitive document numbers.","example":"Your license expires in four months. Identification makes the expiration visible early, keeps the renewal steps with it, and shows whether another document depends on the same update."},{"n":"06","name":"Finance","definition":"The management of money.","application":"Finance turns income, bills, debt, savings, and regular spending into a current money picture. It shows what is committed, what is available, what is changing, and what a decision would affect before the money is gone.","example":"Rent increases next month. Finance shows the new amount against everything else already committed so you can see what changes before the first higher payment hits."},{"n":"07","name":"Legal","definition":"Relating to the law and to matters the law decides.","application":"Legal organizes open legal matters around dates, documents, people, and next required actions. It keeps the process visible without Universe City deciding the legal issue for you.","example":"You receive a court notice. Legal records the date, hearing, documents, and who you contacted so the matter does not live as a loose paper on the counter."},{"n":"08","name":"Mediation","definition":"Settling a difference between two sides.","application":"Mediation turns conflict into a factual timeline of what happened, what each person said, what was requested, and what was agreed. It gives future conversations a shared record instead of competing memories.","example":"You and a roommate disagree about money owed. Mediation records the amounts, messages, and agreement so the next conversation starts from the same facts."},{"n":"09","name":"Education","definition":"Gaining knowledge or skill through study or instruction.","application":"Education connects what you already know, what you can prove, and what you want to learn next. It turns an interest into a route with requirements, cost, time, and a clear next move.","example":"You want bookkeeping skills. Education can compare a class, certificate, and self study route, then place the option you choose into the rest of your plan."},{"n":"10","name":"Employment","definition":"Work done for payment.","application":"Employment turns your work history into a reusable record of roles, dates, responsibilities, employers, and references. It keeps the facts current so applications and career decisions do not start from memory every time.","example":"An application asks for five years of work history. Employment already has the dates, roles, and contacts ready to use and verify."},{"n":"11","name":"Regulation","definition":"Keeping something running the way you want it to run.","application":"Regulation identifies the activities and conditions that help you return to a workable state. It shows what restores energy, what only distracts, and what should be planned before you are already depleted.","example":"A hard workweek leaves you wiped out. Regulation can show that a quiet evening and sleep actually restore you, while scrolling late only delays recovery, then protect the things that work."},{"n":"12","name":"Community","definition":"The people in a place and the relationships between them.","application":"Community maps the people, places, groups, and responsibilities that connect you to where you live. It turns belonging and participation into something visible enough to build on.","example":"You want to know more people nearby. Community can track the neighborhood event you attended, the person you met there, and the next place you decided to show up."}];
+ var nextDepartment="/housing-stability";
+ var nextDepartmentName="Housing Stability";
+ var buttons=[].slice.call(document.querySelectorAll('.system-item'));
+ var panel=document.getElementById('systemPanel');
+ var title=document.getElementById('systemTitle');
+ var number=document.getElementById('systemNo');
+ var progress=document.getElementById('systemProgress');
+ var definition=document.getElementById('systemDefinition');
+ var application=document.getElementById('systemApplication');
+ var example=document.getElementById('systemExample');
+ var next=document.getElementById('systemNext');
+ var current=0;
+ var reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+ function slug(s){return s.toLowerCase().replace(/[^a-z0-9]+/g,'').trim()}
+
+ function paint(i,scroll){
+  current=i;
+  var s=systems[i];
+  function apply(){
+   number.textContent='SYSTEM '+s.n;
+   title.textContent=s.name;
+   progress.textContent=s.n+' / 12';
+   definition.textContent=s.definition;
+   application.textContent=s.application;
+   example.textContent=s.example;
+   buttons.forEach(function(b,x){b.setAttribute('aria-selected',x===i?'true':'false')});
+   if(i<systems.length-1){
+    next.textContent='Next: '+systems[i+1].name+' \u2192';
+    next.href='#'+slug(systems[i+1].name);
+   }else{
+    next.textContent='Next department: '+nextDepartmentName+' \u2192';
+    next.href=nextDepartment;
+   }
+   if(history.replaceState) history.replaceState(null,'','#'+slug(s.name));
+   panel.classList.remove('switching');
+   if(scroll && window.matchMedia('(max-width:800px)').matches){
+    panel.scrollIntoView({behavior:reduce?'auto':'smooth',block:'start'});
+   }
+  }
+  if(reduce){apply();return}
+  panel.classList.add('switching');
+  setTimeout(apply,110);
+ }
+
+ buttons.forEach(function(b){
+  b.addEventListener('click',function(){paint(+b.dataset.i,true)});
+ });
+
+ next.addEventListener('click',function(e){
+  if(current<systems.length-1){
+   e.preventDefault();
+   paint(current+1,true);
+  }
+ });
+
+ var hash=(location.hash||'').slice(1);
+ var initial=systems.findIndex(function(s){return slug(s.name)===hash});
+ paint(initial>-1?initial:0,false);
+})();
+</script>
+
+</body></html>
