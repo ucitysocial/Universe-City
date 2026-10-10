@@ -36,3 +36,10 @@ It is a cache, never the source of truth.
 
 No secret ever reaches the browser. The anon key plus row level security is
 all the client gets.
+
+
+## Product language
+
+Public explanations of Universe City systems follow [SYSTEM_EXPLANATION_STANDARD.md](SYSTEM_EXPLANATION_STANDARD.md).
+
+The standard defines how to balance what a system is with how a resident actually uses it, how an agent participates, and how the system develops through continued use.
