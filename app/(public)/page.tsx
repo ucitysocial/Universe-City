@@ -54,13 +54,10 @@ export default function Home() {
         <div className="wrap" style={{ display: 'flex', gap: 40, flexWrap: 'wrap', alignItems: 'flex-start' }}>
           <div className="prose">
             <p className="kick">Membership</p>
-            <div className="price">
-              <span className="n vt" style={{ color: 'var(--I)' }}>$48</span>
-              <span className="lab" style={{ color: 'var(--dim)' }}>a month</span>
-            </div>
-            <p>
+            <h2 style={{ marginTop: 10 }}>What membership includes.</h2>
+            <p style={{ marginTop: 18 }}>
               Time, Inventory, Salary and Standards, and one fifteen minute review every week
-              with your agent. One price. Cancel whenever you want, and your information stays yours.
+              with your agent. Cancel whenever you want, and your information stays yours.
             </p>
             <Link className="btn" href="/apply" style={{ marginTop: 22 }}>Apply</Link>
           </div>
