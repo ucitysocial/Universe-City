@@ -148,9 +148,9 @@ Account actions belong in the header rather than being duplicated in the footer.
 The current homepage logic is:
 
 1. Arrival
-2. What the agent does
-3. Membership and the four departments
-4. Interactive agent example
+2. Membership and the four departments
+3. Interactive agent example
+4. The agent job
 5. Application call to action
 6. Founder and trust
 7. Footer
@@ -212,3 +212,14 @@ When decisions conflict, use this order:
 5. Older briefs, mockups, or historical code
 
 The repository should be updated when a product decision changes so old behavior does not silently return later.
+
+
+## Department explanation quality
+
+The department pages must do more than describe what a system could theoretically do.
+
+What That Looks Like should describe an actual resident interaction: what brings the resident into the system, what the agent does with existing context, what decision belongs to the resident, and what happens to unfinished work afterward.
+
+Do not end the explanation at advice. If the resident still needs to confirm, review, answer, schedule, upload, call, attend, or decide something, that work must become a commitment or active follow up.
+
+Different systems should still have different rhythms. Do not force every folder into the same sentence pattern.
