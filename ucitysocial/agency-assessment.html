@@ -47,7 +47,9 @@ p+p{margin-top:var(--s2)}
 nav{position:sticky;top:0;z-index:90;background:var(--ink);color:var(--paper)}
 nav .w{display:flex;align-items:center;gap:clamp(12px,1.8vw,26px);padding:15px var(--gut)}
 nav .wm{font-size:17px;font-weight:600;white-space:nowrap;letter-spacing:-.005em}
-nav .wm i{font-style:normal;margin:0 2px}
+nav .wm i{font-style:normal;margin:0 1px;font-size:.92em;vertical-align:1px}
+nav .wm em{font-style:normal;font-family:var(--record);font-size:14px;font-weight:400;letter-spacing:.2em;color:rgba(244,239,233,.5);white-space:nowrap;margin-left:13px}
+@media(max-width:700px){nav .wm em{display:none}}
 nav .links{margin-left:auto;display:flex;align-items:center;gap:clamp(11px,1.5vw,23px)}
 nav a{color:var(--paper);text-decoration:none;font-size:13.5px;font-weight:500;opacity:.7;white-space:nowrap}
 nav a:hover{opacity:1}
@@ -603,7 +605,7 @@ footer a:hover{opacity:1}
 </style></head>
 <body style="--c:var(--pa)">
 <nav><div class="w">
- <a href="/" class="wm" style="text-decoration:none;color:var(--paper)">universe<i>&#9733;</i>city</a>
+ <a href="/" class="wm" style="text-decoration:none;color:var(--paper)">universe<i>&#9733;</i>city<em>LIFE MANAGEMENT AGENCY</em></a>
  <span class="links">
   <a href="/apply" class="cta">Apply</a>
   <button id="menuBtn" aria-label="Open menu" aria-expanded="false">&#9733;</button>
