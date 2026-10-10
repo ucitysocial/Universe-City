@@ -12,7 +12,8 @@ export default async function Apply() {
   if (profile?.membership === 'active') redirect('/member');
 
   return (
-    <div className="wrap application-layout">
+    <div className="application-page">
+      <div className="wrap application-layout">
       <div className="application-main">
         <a className="application-back" href={mainSiteUrl}>&larr; Back to Universe City</a>
         <p className="kick">Membership</p>
@@ -48,6 +49,7 @@ export default async function Apply() {
           </>
         )}
       </aside>
+      </div>
     </div>
   );
 }
