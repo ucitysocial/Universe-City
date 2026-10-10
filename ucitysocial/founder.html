@@ -5,21 +5,39 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Founder Story · Universe City</title>
 <meta name="description" content="Brittnay Folkes on why Universe City exists.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=VT323&display=swap" rel="stylesheet">
 <style>
 :root{
   --ink:#140a0c;--paper:#f4efe9;--paper2:#e9ded6;--burgundy:#5C0F1B;
   --gold:#A07818;--purple:#4A2A78;--green:#2A4B3C;--muted:#786a65;
-  --ui:Arial,Helvetica,sans-serif;--reading:Georgia,"Times New Roman",serif;
-  --record:"Courier New",Courier,monospace;
+  --ui:'Montserrat',system-ui,-apple-system,sans-serif;--reading:Georgia,"Times New Roman",serif;
+  --record:'VT323',monospace;
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
 body{background:var(--burgundy);color:var(--ink);font-family:var(--ui);-webkit-font-smoothing:antialiased}
 a{color:inherit}
-.sitebar{height:58px;background:var(--ink);color:var(--paper);display:flex;align-items:center;padding:0 clamp(18px,4vw,52px);border-bottom:1px solid rgba(255,255,255,.1)}
-.brand{font-weight:700;text-decoration:none;letter-spacing:.01em}
-.nav{margin-left:auto;display:flex;gap:24px;align-items:center}
-.nav a{font-size:13px;text-decoration:none;opacity:.72}.nav a:hover{opacity:1}
+.sitebar{height:58px;background:var(--ink);color:var(--paper);display:flex;align-items:center;padding:0 clamp(20px,4.2vw,52px);border-bottom:1px solid rgba(255,255,255,.1);position:sticky;top:0;z-index:90}
+.sitebar-inner{width:min(1300px,100%);margin:0 auto;display:flex;align-items:center;gap:clamp(12px,1.8vw,26px)}
+.brand{font-size:17px;font-weight:600;text-decoration:none;letter-spacing:-.005em;white-space:nowrap}
+.brand span{margin:0 1px;font-size:.92em;vertical-align:1px}
+.brand em{font-style:normal;font-family:var(--record);font-size:14px;font-weight:400;letter-spacing:.2em;color:rgba(244,239,233,.5);white-space:nowrap;margin-left:13px}
+.head-actions{margin-left:auto;display:flex;align-items:center;gap:clamp(11px,1.5vw,23px)}
+.apply-link{background:var(--paper);color:var(--ink);padding:9px 16px;font-size:13.5px;font-weight:600;text-decoration:none;white-space:nowrap}
+.menu-button{font-family:var(--ui);font-size:20px;line-height:1;background:none;border:2px solid rgba(244,239,233,.5);color:var(--paper);width:42px;height:38px;cursor:pointer}
+.menu-overlay{position:fixed;inset:0;z-index:100;background:rgba(10,6,7,.34);backdrop-filter:blur(2px)}
+.menu-overlay[hidden]{display:none}
+.menu-panel{position:absolute;top:58px;right:clamp(12px,4vw,52px);width:min(344px,calc(100vw - 24px));max-height:calc(100vh - 76px);overflow-y:auto;background:var(--ink);color:var(--paper);border:2px solid rgba(244,239,233,.16);box-shadow:0 24px 64px -14px rgba(0,0,0,.6);padding:42px clamp(16px,2vw,22px) clamp(16px,2vw,22px)}
+.menu-close{position:absolute;top:9px;right:9px;width:34px;height:32px;display:grid;place-items:center;font-size:22px;line-height:1;background:transparent;border:1px solid rgba(244,239,233,.3);color:var(--paper);cursor:pointer}
+.menu-groups{display:flex;flex-direction:column;gap:clamp(14px,1.6vw,20px)}
+.menu-label{font-family:var(--record);font-size:13px;letter-spacing:.2em;color:rgba(244,239,233,.42);border-bottom:1px solid rgba(244,239,233,.18);padding-bottom:6px;margin-bottom:6px}
+.menu-panel a{display:block;color:var(--paper);text-decoration:none;font-size:15.5px;font-weight:500;padding:5px 0;opacity:.82}
+.menu-panel a:hover{opacity:1}
+.menu-foot{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-top:16px;padding-top:12px;border-top:1px solid rgba(244,239,233,.18);font-family:var(--record);font-size:13px;letter-spacing:.12em;color:rgba(244,239,233,.5)}
+.menu-foot span:first-child{font-size:18px}
+@media(max-width:700px){.brand em{display:none}}
 .shell{width:min(1280px,calc(100% - 28px));margin:26px auto 48px}
 .book-head{display:flex;justify-content:space-between;align-items:end;gap:24px;color:var(--paper);margin-bottom:14px}
 .book-kicker{font:12px/1.2 var(--record);letter-spacing:.16em;text-transform:uppercase;opacity:.7;margin:0 0 8px}
@@ -64,7 +82,7 @@ a{color:inherit}
 @media(prefers-reduced-motion:reduce){.book::after{display:none}.book.turn-next::after,.book.turn-prev::after{animation:none}}
 @media(max-width:760px){
   html,body{height:100%;overflow:hidden}
-  .sitebar{height:54px;padding:0 16px}.nav a:not(.keep){display:none}.nav{gap:12px}
+  .sitebar{height:54px;padding:0 16px}.sitebar-inner{width:100%}.brand{font-size:16px}.apply-link{font-size:12px;padding:8px 10px}.menu-button{width:38px;height:36px}.menu-panel{top:54px;right:12px}
   .shell{height:calc(100svh - 54px);width:calc(100% - 12px);margin:0 auto;padding:7px 0 5px;display:flex;flex-direction:column;overflow:hidden}
   .book-head{height:35px;flex:0 0 35px;margin:0;align-items:center}.book-kicker,.book-head>p{display:none}.book-head h1{font-size:17px}
   .book-wrap{flex:1 1 auto;min-height:0;overflow:hidden}
@@ -86,7 +104,41 @@ a{color:inherit}
 </style>
 </head>
 <body>
-<header class="sitebar"><a class="brand" href="/">Universe City</a><nav class="nav"><a href="/">Main page</a><a href="/membership">Membership</a><a class="keep" href="/#departments">Departments</a></nav></header>
+<header class="sitebar">
+  <div class="sitebar-inner">
+    <a class="brand" href="/">universe<span>&#9733;</span>city<em>LIFE MANAGEMENT AGENCY</em></a>
+    <div class="head-actions">
+      <a class="apply-link" href="/apply">Apply</a>
+      <button class="menu-button" id="menuBtn" aria-label="Open menu" aria-expanded="false">&#9733;</button>
+    </div>
+  </div>
+</header>
+<div class="menu-overlay" id="menu" hidden>
+  <div class="menu-panel">
+    <button class="menu-close" id="menuX" aria-label="Close menu">&times;</button>
+    <div class="menu-groups">
+      <div><div class="menu-label">HOW IT WORKS</div>
+        <a href="/#what">Why an agent</a>
+        <a href="/#departments">Four departments</a>
+        <a href="/#system">Starting folders</a>
+        <a href="/#time">Time example</a>
+      </div>
+      <div><div class="menu-label">DEPARTMENTS</div>
+        <a href="/agency-assessment">I · Agency Assessment</a>
+        <a href="/housing-stability">II · Housing Stability</a>
+        <a href="/career-development">III · Career Development</a>
+        <a href="/life-management">IV · Life Management</a>
+      </div>
+      <div><div class="menu-label">UNIVERSE CITY</div>
+        <a href="/founder">About the founder</a>
+        <a href="/#business">How it operates</a>
+        <a href="/membership">Membership</a>
+        <a href="/login">Member sign in</a>
+      </div>
+    </div>
+    <div class="menu-foot"><span>&#9733;</span><span>management@ucitysocial.com</span><span>Denver, Colorado</span></div>
+  </div>
+</div>
 <main class="shell">
   <div class="book-head"><div><p class="book-kicker">Founder archive · 2016—present</p><h1>Founder Story</h1></div></div>
   <div class="book-wrap"><button class="edge prev" id="edgePrev" type="button" aria-label="Previous spread">‹</button><section class="book" id="book" aria-live="polite"><article class="page left" id="leftPage"></article><article class="page right" id="rightPage"></article></section><button class="edge next" id="edgeNext" type="button" aria-label="Next spread">›</button></div>
@@ -94,6 +146,17 @@ a{color:inherit}
 </main>
 <script>
 (() => {
+  const menuBtn=document.getElementById('menuBtn');
+  const menu=document.getElementById('menu');
+  const menuX=document.getElementById('menuX');
+  function openMenu(){menu.hidden=false;menuBtn.setAttribute('aria-expanded','true');document.body.style.overflow='hidden';menuX.focus()}
+  function closeMenu(){menu.hidden=true;menuBtn.setAttribute('aria-expanded','false');document.body.style.overflow='';menuBtn.focus()}
+  menuBtn.addEventListener('click',openMenu);
+  menuX.addEventListener('click',closeMenu);
+  menu.addEventListener('click',e=>{if(e.target===menu)closeMenu()});
+  menu.querySelectorAll('a').forEach(a=>a.addEventListener('click',closeMenu));
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!menu.hidden)closeMenu()});
+
   const pages=[
     {cls:"cover",chapter:"Founder Story",title:"Brittnay Folkes",html:`<div><p class="coverline">Universe big.<br>City small.</p></div><small>Universe City · A life management agency</small>`},
     {cls:"tint-burgundy",chapter:"01 · Losing my guiding light",title:"I was 20, heading into 21.",html:`<p class="lead">What shook me first was not losing someone who handled the administrative work of my life. I lost my guiding light.</p><p>I lost my support system. The person I could call, fall back on, move back in with, love on and hug.</p><p>I lost the one person who knew me from the beginning of time.</p><div class="pull">I realized I would now be the person responsible for understanding myself as fully as she did.</div>`},
