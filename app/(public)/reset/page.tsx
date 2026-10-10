@@ -20,7 +20,7 @@ export default function Reset() {
   }
 
   return (
-    <div className="wrap"><div className="panel">
+    <div className="simple-auth-page"><div className="wrap"><div className="panel">
       <p className="kick">Universe City</p>
       <h2 style={{ marginTop: 8 }}>Reset your password</h2>
       {sent ? (
@@ -42,6 +42,6 @@ export default function Reset() {
           </form>
         </>
       )}
-    </div></div>
+    </div></div></div>
   );
 }
