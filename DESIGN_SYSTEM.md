@@ -58,3 +58,22 @@ Residents should benefit from the internal file structure without being asked to
 ## Source of truth
 
 `app/globals.css` and the palette above must stay aligned with the production marketing site. New pages should reuse existing page and surface classes before adding new one-off styles.
+
+
+## Public shell standard
+
+Every resident-facing public page uses the homepage shell as the source of truth:
+
+- 58px ink navigation bar
+- Montserrat `universe★city` wordmark
+- VT323 `LIFE MANAGEMENT AGENCY` descriptor
+- ivory Apply button
+- bordered star menu control
+- 1300px maximum content width with responsive gutters
+- the same full Explore menu structure
+- the same four-column ink footer on desktop
+- public H1/H2/Kicker sizing follows the marketing site
+
+This applies to the homepage, Membership, department pages, Founder, Apply, Signup, Login, Reset, and other future public routes.
+
+The signed-in resident and agent products may use different navigation because they are workspaces, but they must continue using the same palette, type families, borders, department colors, and hard-shadow language.
