@@ -645,17 +645,38 @@ footer a:hover{opacity:1}
 .system-next{display:inline-block;background:var(--c);color:#fff;text-decoration:none;padding:13px 18px;font-weight:700;font-size:14px;border:0;box-shadow:5px 5px 0 var(--ink);cursor:pointer;font-family:var(--voice)}
 .system-next:active{transform:translate(3px,3px);box-shadow:2px 2px 0 var(--ink)}
 @media(max-width:800px){
- .dept-hero .w{padding-top:22px;padding-bottom:24px}
- .dept-hero-line{gap:8px 18px}
- .dept-count{margin-left:0;width:100%}
- .dept-hero p{font-size:14.5px}
- .system-explorer{padding-top:26px}
- .system-workspace{grid-template-columns:1fr}
- .system-index{border-right:0;border-bottom:2px solid var(--ink)}
- .system-item{padding:13px 15px}
- .system-panel{padding:28px 20px}
- .system-definition,.system-application,.system-example{grid-template-columns:1fr;gap:8px}
- .system-example::before{inset:0 -10px}
+ .dept-hero .w{padding-top:18px;padding-bottom:20px}
+ .dept-hero-line{gap:6px 12px;align-items:center}
+ .dept-hero h1{font-size:34px}
+ .dept-count{margin-left:auto;width:auto;font-size:12px;padding-bottom:0}
+ .dept-hero p{font-size:13.5px;line-height:1.42;margin-top:8px}
+ .system-explorer{padding:20px 0 34px}
+ .explorer-intro{margin-bottom:12px}
+ .explorer-intro h2{font-size:22px}
+ .explorer-intro p{font-size:13px;line-height:1.42;margin-top:5px}
+ .system-workspace{grid-template-columns:1fr;min-height:0}
+ .system-index{display:flex;overflow-x:auto;border-right:0;border-bottom:2px solid var(--ink);scroll-snap-type:x proximity;scrollbar-width:none}
+ .system-index::-webkit-scrollbar{display:none}
+ .system-index-head{display:none}
+ .system-item{width:auto;flex:0 0 auto;padding:10px 12px;gap:7px;border-bottom:0;border-right:1px solid var(--rule);white-space:nowrap;scroll-snap-align:start;font-size:13px}
+ .system-item .n{width:auto;font-size:12px}
+ .system-item .arr{display:none}
+ .system-panel{padding:20px 16px 22px}
+ .system-panel-top{padding-bottom:14px}
+ .system-no{font-size:12px}
+ .system-title{font-size:32px;margin-top:3px}
+ .system-progress{font-size:11px}
+ .system-definition,.system-application,.system-example{grid-template-columns:1fr;gap:5px}
+ .system-definition{margin-top:17px}
+ .system-definition p{font-size:14px;line-height:1.48}
+ .system-application{margin-top:18px;padding-top:17px}
+ .system-application p{font-size:16px;line-height:1.43}
+ .system-example{margin-top:20px;padding:17px 0}
+ .system-example::before{inset:0 -8px}
+ .system-example p{font-size:14px;line-height:1.5}
+ .system-label{font-size:11px}
+ .system-next-wrap{padding-top:20px}
+ .system-next{width:100%;text-align:center;padding:11px 14px;font-size:13px}
 }
 
 </style></head>
