@@ -816,7 +816,8 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
 
 .experience{background:var(--ink);color:var(--paper);padding:clamp(54px,7vw,100px) 0;border-bottom:2px solid var(--ink)}
 .experience h2{color:#fff;max-width:18ch}.experience .k{color:rgba(244,239,233,.48)}
-.experience .lead{color:rgba(244,239,233,.74);max-width:48ch}
+.experience .lead{color:rgba(244,239,233,.74);max-width:54ch}
+.agent-principle{max-width:76ch;margin-top:18px;font-size:clamp(18px,1.8vw,24px);line-height:1.48;color:#fff}
 .agent-thread-demo{width:min(820px,100%);margin-top:clamp(30px,4vw,54px);border:2px solid rgba(244,239,233,.48);background:rgba(0,0,0,.28)}
 .agent-thread-head{min-height:48px;padding:11px 15px;border-bottom:1px solid rgba(244,239,233,.28);display:flex;align-items:center;gap:14px;font-family:var(--record);font-size:15px;letter-spacing:.15em;color:rgba(244,239,233,.72)}
 .agent-thread-head span:first-child{color:#fff}
@@ -830,15 +831,15 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
 .thread-turn.agent .thread-bubble{border-left:5px solid var(--pa);background:rgba(92,15,27,.19);color:var(--paper)}
 .thread-turn.resident .thread-bubble{background:var(--paper);border-color:var(--paper);color:var(--ink)}
 .agent-thread-status{border-top:1px solid rgba(244,239,233,.28);padding:10px 15px;display:flex;gap:14px;justify-content:space-between;flex-wrap:wrap;font-family:var(--record);font-size:12px;letter-spacing:.12em;color:rgba(244,239,233,.48)}
+.thread-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;opacity:0;transform:translateY(10px)}
+.thread-actions button,.thread-actions a{font-family:var(--record);font-size:13px;letter-spacing:.08em;text-decoration:none;padding:10px 12px;border:1px solid rgba(244,239,233,.55);background:transparent;color:var(--paper);cursor:pointer}
+.thread-actions button{background:var(--paper);color:var(--ink);border-color:var(--paper)}
 .agent-thread-demo.in .thread-turn{animation:threadIn .48s cubic-bezier(.2,.8,.2,1) forwards}
-.agent-thread-demo.in .thread-turn:nth-child(1){animation-delay:.3s}
-.agent-thread-demo.in .thread-turn:nth-child(2){animation-delay:1.8s}
-.agent-thread-demo.in .thread-turn:nth-child(3){animation-delay:3.8s}
-.agent-thread-demo.in .thread-turn:nth-child(4){animation-delay:5.4s}
-.agent-thread-demo.in .thread-turn:nth-child(5){animation-delay:8.2s}
-.agent-thread-demo.in .thread-turn:nth-child(6){animation-delay:9.7s}
+.agent-thread-demo.in .thread-turn:nth-child(1){animation-delay:.45s}
+.agent-thread-demo.in .thread-turn:nth-child(2){animation-delay:2.5s}
+.agent-thread-demo.in .thread-actions{animation:threadIn .48s cubic-bezier(.2,.8,.2,1) 4.6s forwards}
 @keyframes threadIn{to{opacity:1;transform:none}}
-@media(prefers-reduced-motion:reduce){.thread-turn{opacity:1;transform:none}.agent-thread-demo.in .thread-turn{animation:none}}
+@media(prefers-reduced-motion:reduce){.thread-turn,.thread-actions{opacity:1;transform:none}.agent-thread-demo.in .thread-turn,.agent-thread-demo.in .thread-actions{animation:none}}
 @media(max-width:640px){
  .agent-thread-head{align-items:flex-start;flex-direction:column;gap:3px}
  .agent-thread-head span:last-child{margin-left:0}
@@ -1056,39 +1057,28 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
 
 <!-- 3 AGENT EXPERIENCE -->
 <section class="experience" id="experience"><div class="w">
- <span class="k rv">your agent, with context</span>
- <h2 class="rv d1">Someone who can pick up where you left off.</h2>
- <p class="lead rv d2 mt3">You should not have to explain your entire life again every time you need help with the next thing.</p>
+ <span class="k rv">your agent has a job to do</span>
+ <h2 class="rv d1">Your life should get easier to manage.</h2>
+ <p class="lead rv d2 mt3">Each folder gives your agent a responsibility: keep that part of your life organized, current, and useful.</p>
+ <p class="agent-principle rv d2">A Universe City agent protects the resident from making plans they cannot realistically keep, helps turn what they want into commitments they can actually follow through on, and keeps the systems around those commitments current as life changes.</p>
 
  <div class="agent-thread-demo rv d2">
   <div class="agent-thread-head"><span>UNIVERSE CITY</span><span>RESIDENT THREAD &middot; CONTEXT ACTIVE</span></div>
   <div class="agent-thread-body">
    <div class="thread-turn resident">
     <div class="thread-label">YOU</div>
-    <div class="thread-bubble">What do I still need to make room for this week?</div>
+    <div class="thread-bubble">I need to get groceries before the weekend.</div>
    </div>
    <div class="thread-turn agent">
     <div class="thread-label">YOUR AGENT</div>
-    <div class="thread-bubble">The job application is still open, groceries moved to Thursday, and you wanted Friday night left alone.</div>
+    <div class="thread-bubble">Thursday after work is the best fit. I updated your shopping list from Inventory too.</div>
    </div>
-   <div class="thread-turn resident">
-    <div class="thread-label">YOU</div>
-    <div class="thread-bubble">I can work on the application tomorrow, but my sister asked me to help her after work.</div>
-   </div>
-   <div class="thread-turn agent">
-    <div class="thread-label">YOUR AGENT</div>
-    <div class="thread-bubble">Tomorrow already has work until 5, 30 minutes to get home, dinner, and the 10:30 bedtime you wanted to protect. If your sister gets 6:30 to 7:30, the application can fit from 8 to 9.</div>
-   </div>
-   <div class="thread-turn resident">
-    <div class="thread-label">YOU</div>
-    <div class="thread-bubble">That works.</div>
-   </div>
-   <div class="thread-turn agent">
-    <div class="thread-label">YOUR AGENT</div>
-    <div class="thread-bubble">I have it. When you check back in, we can compare the plan with what actually happened and adjust the rest of the week.</div>
+   <div class="thread-actions">
+    <button type="button">CONFIRM GROCERY COMMITMENT</button>
+    <a href="/housing-stability#inventory">VIEW INVENTORY</a>
    </div>
   </div>
-  <div class="agent-thread-status"><span>CONTEXT CARRIED FORWARD</span><span>TIME &middot; CAREER DEVELOPMENT</span></div>
+  <div class="agent-thread-status"><span>TIME &middot; INVENTORY</span><span>ONE NEED, TWO SYSTEMS UPDATED</span></div>
  </div>
 
  <a class="flow-link light rv d3" href="#business">See what membership gives you &rarr;</a>
