@@ -2,8 +2,8 @@
 <html lang="en"><head>
 <!-- public-routing-v2 --><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Membership &middot; Universe City</title>
-<meta name="description" content="Universe City membership starts with Time, Inventory, Salary, and Standards.">
+<title>Residency &middot; Universe City</title>
+<meta name="description" content="Universe City residency starts with Time, Inventory, Salary, and Standards.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=VT323&display=swap" rel="stylesheet">
 <style>
@@ -654,13 +654,19 @@ footer a:hover{opacity:1}
 .jt .b{padding:clamp(16px,2vw,24px);font-size:14px;color:var(--dim)}
 .jnote{margin-top:var(--s3);max-width:56ch}
 
+
+/* phone header: the longer Apply for residency button */
+@media(max-width:520px){nav .w{gap:8px;padding-left:14px;padding-right:14px}nav .links{gap:8px}nav .wm{font-size:15.5px}nav a.signin{font-size:12.5px}nav a.cta{font-size:12px;padding:8px 9px}nav .links button{width:36px;height:34px;font-size:18px}}
+@media(max-width:372px){nav a.signin{display:none}nav .wm{font-size:14.5px}}
+#menu a.menu-login{display:none}
+@media(max-width:372px){#menu a.menu-login{display:block}}
 </style></head>
 <body>
 <nav><div class="w">
  <a href="/" class="wm" style="text-decoration:none;color:var(--paper)">universe<i>&#9733;</i>city<em>LIFE MANAGEMENT AGENCY</em></a>
  <span class="links">
-  <a href="/login" class="signin">Sign in</a>
-  <a href="/apply" class="cta">Apply</a>
+  <a href="/login" class="signin">Log in</a>
+  <a href="/apply" class="cta">Apply for residency</a>
   <button id="menuBtn" aria-label="Open menu" aria-expanded="false">&#9733;</button>
  </span>
 </div></nav>
@@ -672,8 +678,9 @@ footer a:hover{opacity:1}
    <div><div class="mlbl">UNIVERSE CITY</div>
     <a href="/">Home</a>
     <a href="/#what">How it works</a>
-    <a href="/#business">Membership</a>
-    <a href="/founder">Founder</a></div>
+    <a href="/#business">Residency</a>
+    <a href="/founder">Founder</a>
+    <a href="/login" class="menu-login">Log in</a></div>
    <div><div class="mlbl">DEPARTMENTS</div>
     <a href="/agency-assessment">I &middot; Agency Assessment</a>
     <a href="/housing-stability">II &middot; Housing Stability</a>
@@ -685,34 +692,34 @@ footer a:hover{opacity:1}
 </div>
 <div class="jhero"><div class="w">
  <a href="/" class="back rv">&larr; Universe City</a>
- <span class="k rv d1">membership</span>
- <h1 class="rv d1">What membership includes.</h1>
- <p class="lead rv d2 mt3">Membership starts with one Universe City agent working across Time, Inventory, Salary, and Standards.</p>
- <p class="rv d3 mt3" style="max-width:50ch;color:rgba(244,239,233,.7)">Read how membership works here, then continue to the application or sign in to an existing member account.</p>
+ <span class="k rv d1">residency</span>
+ <h1 class="rv d1">What residency includes.</h1>
+ <p class="lead rv d2 mt3">Residency starts with one Universe City agent working across Time, Inventory, Salary, and Standards.</p>
+ <p class="rv d3 mt3" style="max-width:50ch;color:rgba(244,239,233,.7)">Read how residency works here. Then apply, or log in if you are already a resident.</p>
 </div></div>
 
 <section class="jlive"><div class="w">
  <span class="k rv">starting folders</span>
  <h2 class="rv d1">Four active folders from the start</h2>
- <p class="rv d2 mt3" style="max-width:58ch">Time maintains your calendar. Inventory maintains your household baseline. Salary maintains your income-and-expenses view. Standards records the rules you choose to maintain.</p>
+ <p class="rv d2 mt3" style="max-width:58ch">Time maintains your calendar. Inventory maintains your household baseline. Salary maintains your view of income and expenses. Standards records the rules you choose to maintain.</p>
  <div class="jgo rv d2">
-  <a href="/apply" class="solid">Begin application &rarr;</a>
-  <a href="/login" class="ghost">Member sign in</a>
+  <a href="/apply" class="solid">Apply for residency &rarr;</a>
+  <a href="/login" class="ghost">Log in</a>
  </div>
- <p class="muted rv d3 mt3">For launch updates, email <a href="mailto:management@ucitysocial.com?subject=Universe%20City%20membership%20updates" style="color:var(--pa)">management@ucitysocial.com</a>.</p>
+ <p class="muted rv d3 mt3">For launch updates, email <a href="mailto:management@ucitysocial.com?subject=Universe%20City%20residency%20updates" style="color:var(--pa)">management@ucitysocial.com</a>.</p>
 </div></section>
 
 <section class="jmodel"><div class="w">
- <span class="k rv">how membership works</span>
+ <span class="k rv">how residency works</span>
  <h2 class="rv d1">Ongoing management with a weekly review</h2>
  <p class="rv d2 mt3" style="max-width:58ch">Each starting folder has a different intake method. After the baseline is established, you tell your agent when a schedule, purchase, bill, expense, or standard changes.</p>
  <div class="jwrap rv d2">
   <div class="stampbox stampover"><svg class="stamp-svg" viewBox="0 0 660 176" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid meet"><defs><filter id="sm" x="-16%" y="-26%" width="132%" height="154%"><feTurbulence type="fractalNoise" baseFrequency="0.021" numOctaves="3" seed="4" result="warp"/><feDisplacementMap in="SourceGraphic" in2="warp" scale="7" xChannelSelector="R" yChannelSelector="G" result="warped"/><feTurbulence type="turbulence" baseFrequency="0.62 0.74" numOctaves="2" seed="13" result="grain"/><feColorMatrix in="grain" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -0.9 1.02" result="ink"/><feComposite in="warped" in2="ink" operator="in"/></filter></defs><g filter="url(#sm)"><rect x="12" y="12" width="636" height="152" rx="10" fill="none" stroke="#5C0F1B" stroke-width="6"/><rect x="24" y="24" width="612" height="128" rx="6" fill="none" stroke="#5C0F1B" stroke-width="2.4"/><text x="330" y="108" text-anchor="middle" textLength="516" lengthAdjust="spacingAndGlyphs" font-family="VT323, monospace" font-size="60" fill="#5C0F1B">IN DEVELOPMENT</text></g></svg></div>
   <div class="jtiers" aria-hidden="true">
    <div class="jt"><div class="h"><em>ONGOING<span>management</span></em><b>Keep the four folders current</b><div class="sub">Tell your agent when your life changes.</div></div><div class="b">Your agent maintains the records with you instead of asking you to rebuild the calendar, inventory, budget, or standards from the beginning.</div></div>
-   <div class="jt"><div class="h"><em>15 MIN<span>each week</span></em><b>Review what changed</b><div class="sub">One standing checkpoint across all four folders.</div></div><div class="b">Confirm what changed, work through current decisions, and identify which system needs attention next.</div></div>
+   <div class="jt"><div class="h"><em>15 MIN<span>each week</span></em><b>Review what changed</b><div class="sub">One standing checkpoint across all four folders.</div></div><div class="b">Confirm what changed, work through current decisions, and identify which folder needs attention next.</div></div>
   </div>
- </div><p class="jnote muted rv d3">The application creates your account. Existing members can sign in directly.</p>
+ </div><p class="jnote muted rv d3">The application creates your account. Residents can log in directly.</p>
 </div></section>
 
 <footer><div class="w cols">
@@ -724,7 +731,7 @@ footer a:hover{opacity:1}
  <div><div class="lbl">UNIVERSE CITY</div>
   <a href="/">Home</a>
   <a href="/#what">How it works</a>
-  <a href="/#business">Membership</a>
+  <a href="/#business">Residency</a>
   <a href="/founder">Founder</a>
  </div>
  <div><div class="lbl">DEPARTMENTS</div>

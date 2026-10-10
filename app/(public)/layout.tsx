@@ -24,7 +24,7 @@ export default async function PublicLayout({ children }: { children: React.React
             <div className="public-footer-label">UNIVERSE CITY</div>
             <a href="/">Home</a>
             <a href="/#what">How it works</a>
-            <a href="/#business">Membership</a>
+            <a href="/#business">Residency</a>
             <a href="/founder">Founder</a>
           </div>
 

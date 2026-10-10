@@ -14,30 +14,32 @@ export default function OrientationTour() {
   const router = useRouter();
   const [index, setIndex] = useState(0);
 
+  const NEXT_LABELS = ['Show the Resident Portal', 'Show your Agent', 'Show where we start', 'Plan tomorrow'];
+
   const steps = useMemo<Step[]>(() => [
     {
       target: 'file',
-      eyebrow: '01 · Your systems',
+      eyebrow: '01 · Your folders',
       title: 'Everything has a place.',
       body: 'Your life is organized across four departments and 48 folders. You do not have to set them all up. Universe City builds and maintains the systems with you over time.'
     },
     {
       target: 'workspace',
-      eyebrow: '02 · Your workspace',
+      eyebrow: '02 · Your Resident Portal',
       title: 'One thing in front of you.',
-      body: 'The center is where you see the Dashboard, a system, or a Session. It changes with what you are working on; the rest of the frame stays put.'
+      body: 'The center is where you see the Resident Portal home, a folder, or a Session. It changes with what you are working on; the rest of the frame stays put.'
     },
     {
       target: 'agent',
       eyebrow: '03 · Your Agent',
       title: 'Talk to us without doing the filing.',
-      body: 'Your Agent stays beside your work. It can use the context of the system you are viewing, follow up on Plans, and help keep your systems current.'
+      body: 'Your Agent stays beside your work. It can use the context of the folder you are viewing, follow up on Plans, and help keep your folders current.'
     },
     {
       target: 'time',
       eyebrow: '04 · We start here',
       title: 'Time comes first.',
-      body: 'Before we work on the rest of your systems, we need a believable Plan for your time. Your first job is simple: plan tomorrow.'
+      body: 'Before we work on the rest of your folders, we need a believable Plan for your time. Plan tomorrow first.'
     }
   ], []);
 
@@ -88,7 +90,7 @@ export default function OrientationTour() {
             type="button"
             onClick={() => index === steps.length - 1 ? finish() : setIndex(v => v + 1)}
           >
-            {index === steps.length - 1 ? 'Plan tomorrow' : 'Next'}
+            {NEXT_LABELS[index]}
           </button>
         </div>
       </div>

@@ -50,11 +50,11 @@ export default function Signup() {
   return (
     <div className="auth-shell">
       <section className="auth-story">
-        <p className="kick">Universe City membership</p>
+        <p className="kick">Universe City residency</p>
         <h1>Start with the life you’re actually living.</h1>
         <p className="lede">
-          Start with an account. After you confirm your email and activate membership, we walk you
-          through the resident interface and begin with Time.
+          Start with an account. After you confirm your email and begin your residency, we walk you
+          through the Resident Portal and begin with Time.
         </p>
 
         <div className="auth-departments" aria-label="Universe City departments">
@@ -69,7 +69,7 @@ export default function Signup() {
         <div className="auth-path">
           <span>Create account</span>
           <span>Confirm email</span>
-          <span>Activate membership</span>
+          <span>Begin residency</span>
           <span>Orientation</span>
           <span>Plan tomorrow</span>
         </div>
@@ -142,8 +142,8 @@ export default function Signup() {
               We sent the confirmation link to <strong>{email}</strong>.
             </p>
             <p>
-              Open it to continue enrollment. After membership activation, your first resident
-              screen is Orientation — then we start with tomorrow's Plan.
+              Open it to continue your application. After you begin your residency, your first
+              screen is Orientation. Then we start with tomorrow's Plan.
             </p>
             <div className="confirm-rule" />
             <p className="note">

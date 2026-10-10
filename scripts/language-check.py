@@ -32,7 +32,7 @@ RULES = [
         r"\b(journey|empower\w*|unlock your potential|mindset|best self|level up|crush it|you(?:'ve| have) got this)\b", re.I)),
     ("5.8 names the channel", re.compile(r"\b(in the chat|chat history|the chat\b|by text\b|over text\b)", re.I)),
     ("2 retired term", re.compile(
-        r"\b(membership|members?(?! of)|sign in|signed in|dashboard|workspace|forty eight systems|48 systems|"
+        r"\b(membership|(?<!family )members?(?! of)|sign in|signed in|dashboard|workspace|forty eight systems|48 systems|"
         r"12 systems|choose a system|KPIs|Info Technology)\b", re.I)),
     ("7.5 prohibited button word", re.compile(r"^(continue|get started|next)$", re.I)),
 ]

@@ -50,10 +50,10 @@ export const FOLDERS: Folder[] = [
   f('III', 5, 'Integrity', 'A record of commitments', 'What did I do when nobody made me'),
   f('III', 6, 'Professionalism', 'A written set of work rules', 'What do I share, and with whom'),
   f('III', 7, 'Resources', 'A work resource map', 'What can I ask for that I never have'),
-  f('III', 8, 'KPIs', 'A performance record', 'Which way is it moving'),
+  f('III', 8, 'Key Performance Indicators', 'A performance record', 'Which way is it moving'),
   f('III', 9, 'Advancement', 'An advancement plan', 'What am I missing'),
   f('III', 10, 'Leadership', 'An organizational chart', 'Who decides what'),
-  f('III', 11, 'Info Technology', 'A record of the systems I work in', 'Who do I ask when it breaks'),
+  f('III', 11, 'Information Technology', 'A record of the systems I work in', 'Who do I ask when it breaks'),
   f('III', 12, 'Networking', 'A record of the rooms I want to be in', 'What have I done about it'),
 
   f('IV', 1, 'Standards', 'A signed, dated list of my minimums', 'What will I not accept', true),

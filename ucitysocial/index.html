@@ -1058,14 +1058,20 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
  .final-actions{margin-top:20px}
  .final-apply{width:100%;text-align:center;padding:12px 16px}
 }
+
+/* phone header: the longer Apply for residency button */
+@media(max-width:520px){nav .w{gap:8px;padding-left:14px;padding-right:14px}nav .links{gap:8px}nav .wm{font-size:15.5px}nav a.signin{font-size:12.5px}nav a.cta{font-size:12px;padding:8px 9px}nav .links button{width:36px;height:34px;font-size:18px}}
+@media(max-width:372px){nav a.signin{display:none}nav .wm{font-size:14.5px}}
+#menu a.menu-login{display:none}
+@media(max-width:372px){#menu a.menu-login{display:block}}
 </style>
 </head>
 <body>
 <nav><div class="w">
  <span class="wm">universe<i>&#9733;</i>city<em>LIFE MANAGEMENT AGENCY</em></span>
  <span class="links">
-  <a href="/login" class="signin">Sign in</a>
-  <a href="/apply" class="cta">Apply</a>
+  <a href="/login" class="signin">Log in</a>
+  <a href="/apply" class="cta">Apply for residency</a>
   <button id="menuBtn" aria-label="Open menu" aria-expanded="false">&#9733;</button>
  </span>
 </div></nav>
@@ -1078,8 +1084,9 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
     <div class="mlbl">UNIVERSE CITY</div>
     <a href="/">Home</a>
     <a href="#what">How it works</a>
-    <a href="#business">Membership</a>
+    <a href="#business">Residency</a>
     <a href="/founder">Founder</a>
+    <a href="/login" class="menu-login">Log in</a>
    </div>
    <div>
     <div class="mlbl">DEPARTMENTS</div>
@@ -1104,7 +1111,7 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
  <div>
   <h1 class="rv d1">A life management agency for everyday people.</h1>
   <p class="lead px rv d2 mt3">Professional athletes and entertainers often have agents. Most people manage their own schedules, household needs, income, records, and decisions. Universe City is built to help with that work.</p>
-  <a class="flow-link hero-flow rv d3" href="#what">See why an agent &darr;</a>
+  <a class="flow-link hero-flow rv d3" href="#what">Read what an agent does &darr;</a>
  </div>
 
  <div class="stage rv d2" id="stage">
@@ -1129,11 +1136,11 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
 
 <!-- 3 MEMBERSHIP PROMISE -->
 <section class="biz membership-promise" id="business"><div class="w">
- <span class="k rv">membership</span>
- <h2 class="head rv d1">Four departments. Forty eight systems. One agent.</h2>
- <p class="lead rv d2 mt3 px" style="max-width:58ch">Universe City organizes everyday life across four departments. Each system gives your agent a defined responsibility, from your schedule and household needs to work, money, standards, and decisions.</p>
+ <span class="k rv">residency</span>
+ <h2 class="head rv d1">Four departments. Forty eight folders. One agent.</h2>
+ <p class="lead rv d2 mt3 px" style="max-width:58ch">Universe City organizes everyday life across four departments. Each folder gives your agent a defined responsibility, from your schedule and household needs to work, money, standards, and decisions.</p>
 
- <p class="system-tip rv d2">Use the arrows to explore all 12 systems in each department.</p>
+ <p class="system-tip rv d2">Use the arrows to open each of the 12 folders in a department.</p>
 
  <div class="department-promise-grid rv d2">
   <article class="department-promise" data-dept="pa" style="--c:var(--pa)">
@@ -1141,32 +1148,32 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
    <div class="dp-system-head"><span class="dp-index">01</span><h3 class="dp-name">Time</h3></div>
    <div class="dp-copy"><p class="dp-definition"></p><div class="dp-application"><small>IN UNIVERSE CITY</small><p></p></div></div>
    <div class="dp-controls"><button type="button" class="dp-prev" aria-label="Previous Agency Assessment system">&larr;</button><span class="dp-count">01 / 12</span><button type="button" class="dp-next" aria-label="Next Agency Assessment system">&rarr;</button></div>
-   <a class="dp-link" href="/agency-assessment">Full department &rarr;</a>
+   <a class="dp-link" href="/agency-assessment">Open Agency Assessment &rarr;</a>
   </article>
   <article class="department-promise" data-dept="hs" style="--c:var(--hs)">
    <div class="dp-top"><span>II</span><b>Housing Stability</b></div>
    <div class="dp-system-head"><span class="dp-index">01</span><h3 class="dp-name">Inventory</h3></div>
    <div class="dp-copy"><p class="dp-definition"></p><div class="dp-application"><small>IN UNIVERSE CITY</small><p></p></div></div>
    <div class="dp-controls"><button type="button" class="dp-prev" aria-label="Previous Housing Stability system">&larr;</button><span class="dp-count">01 / 12</span><button type="button" class="dp-next" aria-label="Next Housing Stability system">&rarr;</button></div>
-   <a class="dp-link" href="/housing-stability">Full department &rarr;</a>
+   <a class="dp-link" href="/housing-stability">Open Housing Stability &rarr;</a>
   </article>
   <article class="department-promise" data-dept="cd" style="--c:var(--cd)">
    <div class="dp-top"><span>III</span><b>Career Development</b></div>
    <div class="dp-system-head"><span class="dp-index">01</span><h3 class="dp-name">Salary</h3></div>
    <div class="dp-copy"><p class="dp-definition"></p><div class="dp-application"><small>IN UNIVERSE CITY</small><p></p></div></div>
    <div class="dp-controls"><button type="button" class="dp-prev" aria-label="Previous Career Development system">&larr;</button><span class="dp-count">01 / 12</span><button type="button" class="dp-next" aria-label="Next Career Development system">&rarr;</button></div>
-   <a class="dp-link" href="/career-development">Full department &rarr;</a>
+   <a class="dp-link" href="/career-development">Open Career Development &rarr;</a>
   </article>
   <article class="department-promise" data-dept="lm" style="--c:var(--lm)">
    <div class="dp-top"><span>IV</span><b>Life Management</b></div>
    <div class="dp-system-head"><span class="dp-index">01</span><h3 class="dp-name">Standards</h3></div>
    <div class="dp-copy"><p class="dp-definition"></p><div class="dp-application"><small>IN UNIVERSE CITY</small><p></p></div></div>
    <div class="dp-controls"><button type="button" class="dp-prev" aria-label="Previous Life Management system">&larr;</button><span class="dp-count">01 / 12</span><button type="button" class="dp-next" aria-label="Next Life Management system">&rarr;</button></div>
-   <a class="dp-link" href="/life-management">Full department &rarr;</a>
+   <a class="dp-link" href="/life-management">Open Life Management &rarr;</a>
   </article>
  </div>
 
- <p class="system-explainer rv d2">The systems hold the working detail. Your agent uses them together so one part of your life is not managed as if the rest does not exist.</p>
+ <p class="system-explainer rv d2">The folders contain the working detail. Your agent uses them together so one part of your life is not managed as if the rest does not exist.</p>
 </div></section>
 
 <!-- 4 AGENT EXPERIENCE -->
@@ -1215,7 +1222,7 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
  </div>
 
  <div class="final-actions rv d2">
-  <a href="/apply" class="final-apply">APPLY FOR UNIVERSE CITY</a>
+  <a href="/apply" class="final-apply">APPLY FOR RESIDENCY</a>
  </div>
 </div></section>
 
@@ -1256,7 +1263,7 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
  <div><div class="lbl">UNIVERSE CITY</div>
   <a href="/">Home</a>
   <a href="#what">How it works</a>
-  <a href="#business">Membership</a>
+  <a href="#business">Residency</a>
   <a href="/founder">Founder</a>
  </div>
  <div><div class="lbl">DEPARTMENTS</div>
@@ -1474,7 +1481,7 @@ desktopDepartmentSync.addEventListener('change',function(e){
 (function(){
  var MAP=[
   ['#what','Why an agent'],['#experience','Your agent'],
-  ['#business','Membership'],['#about','Why trust us'],['#apply-final','Apply']
+  ['#business','Residency'],['#about','Why trust us'],['#apply-final','Apply']
  ];
  var rail=document.getElementById('rail');
  if(!rail) return;
@@ -1846,7 +1853,7 @@ if(dash){
    body.insertAdjacentHTML('beforeend',msg('pa','AGENCY ASSESSMENT · TIME','Thursday at 6:15 PM gives you 55 minutes to shop before your next commitment.'));
    body.insertAdjacentHTML('beforeend',actions([
     {label:'CONFIRM THURSDAY 6:15',choice:'confirm-time'},
-    {label:'MORE OPTIONS',choice:'more-times',secondary:true}
+    {label:'SHOW OTHER TIMES',choice:'more-times',secondary:true}
    ]));
    body.insertAdjacentHTML('beforeend',composer());
    setStatus('TIME','WAITING ON COMMITMENT');

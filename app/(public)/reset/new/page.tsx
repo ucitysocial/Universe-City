@@ -31,7 +31,7 @@ export default function NewPassword() {
                  value={password} onChange={e => setPassword(e.target.value)} required />
         </div>
         <button className="btn" style={{ width: '100%' }} disabled={busy}>
-          {busy ? 'Saving' : 'Save password and continue'}
+          {busy ? 'Saving' : 'Save my password'}
         </button>
       </form>
     </div></div></div>

@@ -11,7 +11,7 @@ export default function Billing() {
   }
   return (
     <button className="btn ghost" onClick={open} disabled={busy}>
-      {busy ? 'Opening' : 'Payment method, invoices, cancel'}
+      {busy ? 'Opening' : 'Manage payment, invoices, and cancellation'}
     </button>
   );
 }

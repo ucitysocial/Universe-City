@@ -20,7 +20,7 @@ export default function Checkout() {
     <>
       {err && <p className="err">{err}</p>}
       <button className="btn" style={{ width: '100%' }} onClick={go} disabled={busy}>
-        {busy ? 'Opening checkout' : 'Start my membership'}
+        {busy ? 'Opening checkout' : 'Begin my residency'}
       </button>
       <p className="note">Card handled by Stripe. We never see the number.</p>
     </>

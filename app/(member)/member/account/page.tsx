@@ -14,7 +14,7 @@ export default async function AccountPage() {
         {profile?.case_no}<br />{profile?.email}
       </p>
 
-      <h2 style={{ marginTop: 40, fontSize: 20 }}>Membership</h2>
+      <h2 style={{ marginTop: 40, fontSize: 20 }}>Residency</h2>
       <p style={{ marginTop: 8 }}>
         {profile?.membership}
         {sub?.current_period_end ? ` · renews ${String(sub.current_period_end).slice(0, 10)}` : ''}
@@ -23,7 +23,7 @@ export default async function AccountPage() {
 
       <h2 style={{ marginTop: 44, fontSize: 20 }}>Your information</h2>
       <p className="note" style={{ maxWidth: 'var(--text)' }}>
-        Your information is yours. If you stop your membership, it stays with your account and the systems
+        Your information is yours. If you end your residency, it stays with your account and your folders
         close. Nothing is deleted and nothing is rebuilt from scratch if you come back.
       </p>
     </>

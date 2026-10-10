@@ -45,8 +45,8 @@ export default function Login() {
           </button>
         </form>
         <p className="note">
-          No account yet? <Link href="/apply">Apply to Universe City</Link>.
-          <br />Forgotten your password? <Link href="/reset">Reset it</Link>.
+          No account yet? <Link href="/apply">Apply for residency</Link>.
+          <br />Forgotten your password? <Link href="/reset">Reset my password</Link>.
         </p>
       </div>
       </div>

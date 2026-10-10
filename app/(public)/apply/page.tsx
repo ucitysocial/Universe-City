@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 import { currentProfile } from '@/lib/supabase/server';
 import Checkout from '@/components/Checkout';
 
-/** Application flow. Account first, then membership activation. */
+/** Application flow. Account first, then the residency begins. */
 export default async function Apply() {
   const profile = await currentProfile();
   const mainSiteUrl = process.env.NEXT_PUBLIC_MARKETING_SITE_URL ?? 'https://www.ucitysocial.com';
@@ -15,11 +15,11 @@ export default async function Apply() {
       <div className="wrap application-layout">
         <div className="application-main application-main-simple">
           <a className="application-back" href={mainSiteUrl}>&larr; Back to Universe City</a>
-          <p className="kick">Membership</p>
-          <h1>Apply for Universe City.</h1>
+          <p className="kick">Residency</p>
+          <h1>Apply for residency.</h1>
           <p className="lede application-lede">
-            Universe City is a life management agency. Your membership gives you a resident workspace,
-            an agent relationship, and practical systems that are built around your real life.
+            Universe City is a life management agency. Residency gives you an agent, the Resident
+            Portal, and your folders.
           </p>
 
           <div className="application-benefits">
@@ -33,14 +33,14 @@ export default async function Apply() {
             <div>
               <span>02</span>
               <div>
-                <strong>Your workspace</strong>
+                <strong>Your Resident Portal</strong>
                 <p>One place for plans, updates, decisions, and the history you build over time.</p>
               </div>
             </div>
             <div>
               <span>03</span>
               <div>
-                <strong>Your systems</strong>
+                <strong>Your folders</strong>
                 <p>Structure is introduced as you use Universe City. You do not need to learn the architecture before you begin.</p>
               </div>
             </div>
@@ -52,21 +52,21 @@ export default async function Apply() {
           <ol className="application-steps">
             <li><span>01</span><p>Create your Universe City account.</p></li>
             <li><span>02</span><p>Confirm your email.</p></li>
-            <li><span>03</span><p>Activate your membership.</p></li>
-            <li><span>04</span><p>Enter your resident workspace and begin Orientation.</p></li>
+            <li><span>03</span><p>Begin your residency.</p></li>
+            <li><span>04</span><p>Enter the Resident Portal and begin Orientation.</p></li>
           </ol>
 
           {profile ? (
             <>
               <p className="note application-note">
-                Your account is ready. Activate your membership to continue into Orientation.
+                Your account is ready. Begin your residency to open Orientation.
               </p>
               <Checkout />
             </>
           ) : (
             <>
               <Link className="btn application-primary" href="/signup">
-                Begin application
+                Start my application
               </Link>
               <p className="note">
                 Already have an account? <Link href="/login?next=/apply">Log in</Link>.

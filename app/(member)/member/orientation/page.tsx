@@ -6,7 +6,7 @@ export default function OrientationPage() {
       <p className="kick">Welcome to Universe City</p>
       <h1>Welcome. We start with Time.</h1>
       <p className="lede">
-        The walkthrough uses the real resident interface. Nothing here is a separate demo you have
+        The walkthrough uses the real Resident Portal. Nothing here is a separate demo you have
         to relearn later.
       </p>
 
@@ -16,7 +16,7 @@ export default function OrientationPage() {
           <strong>Time</strong>
         </div>
         <div>
-          <span className="lab">Next</span>
+          <span className="lab">Next step</span>
           <strong>Plan tomorrow</strong>
         </div>
       </div>

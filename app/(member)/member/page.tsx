@@ -42,7 +42,7 @@ export default async function MemberHome({
         </div>
       )}
 
-      <p className="kick">Dashboard</p>
+      <p className="kick">Resident Portal</p>
       <h1 style={{ fontSize: 34, marginTop: 8 }}>{profile?.name}</h1>
       <p style={{ color: 'var(--dim)' }}>
         Case {profile?.case_no}
@@ -72,7 +72,7 @@ export default async function MemberHome({
         </p>
       )}
 
-      <h2 style={{ marginTop: 44, fontSize: 20 }}>Your systems</h2>
+      <h2 style={{ marginTop: 44, fontSize: 20 }}>Your folders</h2>
       <div className="grid4" style={{ marginTop: 16 }}>
         {LIVE_FOLDERS.map(x => {
           const d = deptOf(x.dept);
@@ -88,7 +88,7 @@ export default async function MemberHome({
                   {x.name === 'Time' && has ? `${Math.round(f.free)} hours of this week are yours.` : null}
                   {x.name === 'Standards' ? `${standards ?? 0} active.` : null}
                   {x.name === 'Salary' ? 'Collecting. Needs Time behind it.' : null}
-                  {x.name === 'Inventory' ? 'Part of your systems. Not active yet.' : null}
+                  {x.name === 'Inventory' ? 'One of your folders. Not active yet.' : null}
                   {x.name === 'Time' && !has ? 'Your first Plan is ready.' : null}
                 </p>
                 {live && (

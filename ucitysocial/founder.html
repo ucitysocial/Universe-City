@@ -104,6 +104,12 @@ a{color:inherit}
 }
 
 
+
+/* phone header: the longer Apply for residency button */
+@media(max-width:520px){.sitebar{padding:0 14px}.sitebar-inner{gap:8px}.brand{font-size:15.5px}.signin-link{font-size:12.5px}.apply-link{font-size:12px;padding:8px 9px}.menu-button{width:36px;height:34px;font-size:18px}}
+@media(max-width:372px){.signin-link{display:none}.brand{font-size:14.5px}}
+.menu-groups a.menu-login{display:none}
+@media(max-width:372px){.menu-groups a.menu-login{display:block}}
 </style>
 </head>
 <body>
@@ -111,8 +117,8 @@ a{color:inherit}
  <div class="sitebar-inner">
   <a class="brand" href="/">universe<span>&#9733;</span>city<em>LIFE MANAGEMENT AGENCY</em></a>
   <div class="head-actions">
-   <a class="signin-link" href="/login">Sign in</a>
-   <a class="apply-link" href="/apply">Apply</a>
+   <a class="signin-link" href="/login">Log in</a>
+   <a class="apply-link" href="/apply">Apply for residency</a>
    <button class="menu-button" id="menuBtn" aria-label="Open menu" aria-expanded="false">&#9733;</button>
   </div>
  </div>
@@ -124,8 +130,9 @@ a{color:inherit}
    <div><div class="menu-label">UNIVERSE CITY</div>
     <a href="/">Home</a>
     <a href="/#what">How it works</a>
-    <a href="/#business">Membership</a>
-    <a href="/founder">Founder</a></div>
+    <a href="/#business">Residency</a>
+    <a href="/founder">Founder</a>
+    <a href="/login" class="menu-login">Log in</a></div>
    <div><div class="menu-label">DEPARTMENTS</div>
     <a href="/agency-assessment">I &middot; Agency Assessment</a>
     <a href="/housing-stability">II &middot; Housing Stability</a>

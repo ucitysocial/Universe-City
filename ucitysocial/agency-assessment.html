@@ -685,13 +685,19 @@ footer a:hover{opacity:1}
  .system-next{width:100%;text-align:center;padding:11px 14px;font-size:13px}
 }
 
+
+/* phone header: the longer Apply for residency button */
+@media(max-width:520px){nav .w{gap:8px;padding-left:14px;padding-right:14px}nav .links{gap:8px}nav .wm{font-size:15.5px}nav a.signin{font-size:12.5px}nav a.cta{font-size:12px;padding:8px 9px}nav .links button{width:36px;height:34px;font-size:18px}}
+@media(max-width:372px){nav a.signin{display:none}nav .wm{font-size:14.5px}}
+#menu a.menu-login{display:none}
+@media(max-width:372px){#menu a.menu-login{display:block}}
 </style></head>
 <body style="--c:var(--pa)">
 <nav><div class="w">
  <a href="/" class="wm" style="text-decoration:none;color:var(--paper)">universe<i>&#9733;</i>city<em>LIFE MANAGEMENT AGENCY</em></a>
  <span class="links">
-  <a href="/login" class="signin">Sign in</a>
-  <a href="/apply" class="cta">Apply</a>
+  <a href="/login" class="signin">Log in</a>
+  <a href="/apply" class="cta">Apply for residency</a>
   <button id="menuBtn" aria-label="Open menu" aria-expanded="false">&#9733;</button>
  </span>
 </div></nav>
@@ -703,8 +709,9 @@ footer a:hover{opacity:1}
    <div><div class="mlbl">UNIVERSE CITY</div>
     <a href="/">Home</a>
     <a href="/#what">How it works</a>
-    <a href="/#business">Membership</a>
-    <a href="/founder">Founder</a></div>
+    <a href="/#business">Residency</a>
+    <a href="/founder">Founder</a>
+    <a href="/login" class="menu-login">Log in</a></div>
    <div><div class="mlbl">DEPARTMENTS</div>
     <a href="/agency-assessment">I &middot; Agency Assessment</a>
     <a href="/housing-stability">II &middot; Housing Stability</a>
@@ -717,20 +724,20 @@ footer a:hover{opacity:1}
 <section class="dept-hero"><div class="w">
  <div class="dept-hero-line">
   <h1>Agency Assessment</h1>
-  <div class="dept-count">12 SYSTEMS</div>
+  <div class="dept-count">12 FOLDERS</div>
  </div>
- <p>Understand the person before trying to manage the life. These systems organize the information that shapes how everyday life actually works.</p>
+ <p>Understand the person before trying to manage the life. These folders organize the information that shapes how everyday life actually works.</p>
 </div></section>
 
 <section class="system-explorer"><div class="w">
  <div class="explorer-intro">
-  <h2>Choose a system.</h2>
-  <p>The definition names the part of life. Open a system to see what information belongs there, how that information is organized, what the system makes visible, and how it changes the way that part of life is managed.</p>
+  <h2>Choose a folder.</h2>
+  <p>The definition names the part of life. Open a folder to see what information belongs there, how that information is organized, what the folder makes visible, and how it changes the way that part of life is managed.</p>
  </div>
 
  <div class="system-workspace">
-  <aside class="system-index" aria-label="Agency Assessment systems">
-   <div class="system-index-head">AGENCY ASSESSMENT &middot; 12 SYSTEMS</div>
+  <aside class="system-index" aria-label="Agency Assessment folders">
+   <div class="system-index-head">AGENCY ASSESSMENT &middot; 12 FOLDERS</div>
    <button class="system-item" type="button" data-i="0" aria-selected="true"><span class="n">01</span><span>Time</span><span class="arr">&rarr;</span></button><button class="system-item" type="button" data-i="1" aria-selected="false"><span class="n">02</span><span>Health</span><span class="arr">&rarr;</span></button><button class="system-item" type="button" data-i="2" aria-selected="false"><span class="n">03</span><span>Language</span><span class="arr">&rarr;</span></button><button class="system-item" type="button" data-i="3" aria-selected="false"><span class="n">04</span><span>Background</span><span class="arr">&rarr;</span></button><button class="system-item" type="button" data-i="4" aria-selected="false"><span class="n">05</span><span>Identification</span><span class="arr">&rarr;</span></button><button class="system-item" type="button" data-i="5" aria-selected="false"><span class="n">06</span><span>Finance</span><span class="arr">&rarr;</span></button><button class="system-item" type="button" data-i="6" aria-selected="false"><span class="n">07</span><span>Legal</span><span class="arr">&rarr;</span></button><button class="system-item" type="button" data-i="7" aria-selected="false"><span class="n">08</span><span>Mediation</span><span class="arr">&rarr;</span></button><button class="system-item" type="button" data-i="8" aria-selected="false"><span class="n">09</span><span>Education</span><span class="arr">&rarr;</span></button><button class="system-item" type="button" data-i="9" aria-selected="false"><span class="n">10</span><span>Employment</span><span class="arr">&rarr;</span></button><button class="system-item" type="button" data-i="10" aria-selected="false"><span class="n">11</span><span>Regulation</span><span class="arr">&rarr;</span></button><button class="system-item" type="button" data-i="11" aria-selected="false"><span class="n">12</span><span>Community</span><span class="arr">&rarr;</span></button>
   </aside>
 
@@ -755,7 +762,7 @@ footer a:hover{opacity:1}
  <div><div class="lbl">UNIVERSE CITY</div>
   <a href="/">Home</a>
   <a href="/#what">How it works</a>
-  <a href="/#business">Membership</a>
+  <a href="/#business">Residency</a>
   <a href="/founder">Founder</a>
  </div>
  <div><div class="lbl">DEPARTMENTS</div>
@@ -805,7 +812,7 @@ if(mBtn){
   current=i;
   var s=systems[i];
   function apply(){
-   number.textContent='SYSTEM '+s.n;
+   number.textContent='FOLDER '+s.n;
    title.textContent=s.name;
    progress.textContent=s.n+' / 12';
    definition.textContent=s.definition;
@@ -813,7 +820,7 @@ if(mBtn){
    example.textContent=s.example;
    buttons.forEach(function(b,x){b.setAttribute('aria-selected',x===i?'true':'false')});
    if(i<systems.length-1){
-    next.textContent='Next: '+systems[i+1].name+' \u2192';
+    next.textContent='Open '+systems[i+1].name+' \u2192';
     next.href='#'+slug(systems[i+1].name);
    }else{
     next.textContent='Next department: '+nextDepartmentName+' \u2192';

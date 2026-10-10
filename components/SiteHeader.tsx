@@ -17,9 +17,9 @@ export default function SiteHeader({ signedIn }: { signedIn: boolean }) {
 
           <div className="public-actions">
             {signedIn
-              ? <Link className="public-signin" href="/member">Dashboard</Link>
-              : <Link className="public-signin" href="/login">Sign in</Link>}
-            {!signedIn && <a className="public-apply" href={mainSiteUrl + '/apply'}>Apply</a>}
+              ? <Link className="public-signin" href="/member">Resident Portal</Link>
+              : <Link className="public-signin" href="/login">Log in</Link>}
+            {!signedIn && <a className="public-apply" href={mainSiteUrl + '/apply'}>Apply for residency</a>}
 
             <button
               className="public-menu-button"
@@ -49,8 +49,11 @@ export default function SiteHeader({ signedIn }: { signedIn: boolean }) {
                 <div className="public-menu-label">UNIVERSE CITY</div>
                 <a href={mainSiteUrl}>Home</a>
                 <a href={mainSiteUrl + '/#what'}>How it works</a>
-                <a href={mainSiteUrl + '/#business'}>Membership</a>
+                <a href={mainSiteUrl + '/#business'}>Residency</a>
                 <a href={mainSiteUrl + '/founder'}>Founder</a>
+                {signedIn
+                  ? <Link className="public-menu-login" href="/member">Resident Portal</Link>
+                  : <Link className="public-menu-login" href="/login">Log in</Link>}
               </div>
 
               <div>

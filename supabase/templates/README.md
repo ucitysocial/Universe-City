@@ -30,7 +30,7 @@ Use short transactional subjects:
 
 - Confirm signup — `Welcome to Universe City`
 - Reset password — `Reset your Universe City password`
-- Magic link — `Your Universe City sign-in link`
+- Magic link — `Your Universe City log in link`
 - Invite user — `Your Universe City invitation`
 - Change email — `Confirm your new Universe City email`
 - Reauthentication — `{{ .Token }} is your Universe City verification code`

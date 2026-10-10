@@ -27,12 +27,12 @@ export default function ResidentFileNav({
     <aside className="resident-file" data-tour="file">
       <div>
         <Link href="/member" className="mark resident-mark">universe&#9733;city</Link>
-        <p className="file-label">Systems</p>
+        <p className="file-label">Folders</p>
       </div>
 
       <nav className="file-primary" aria-label="Resident navigation">
         <Link className={isCurrent('/member') ? 'file-home current' : 'file-home'} href="/member">
-          Dashboard
+          Resident Portal
         </Link>
 
         <div className="file-tree">
@@ -68,7 +68,7 @@ export default function ResidentFileNav({
                       <span
                         key={folder.name}
                         className="folder-row unavailable"
-                        title={timeStarted ? 'This system is not active yet.' : 'Time comes first.'}
+                        title={timeStarted ? 'This folder is not active yet.' : 'Time comes first.'}
                       >
                         <span className="folder-num">{String(folder.num).padStart(2, '0')}</span>
                         <span>{folder.name}</span>
