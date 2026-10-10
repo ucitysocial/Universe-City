@@ -1889,10 +1889,36 @@ if(dash){
   },420);
  }
 
+ /* Keep the newest reply and its buttons on screen. The page moves, so the reader does not scroll. */
+ var navEl=document.querySelector('nav');
+ var reduceMotion=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+ var firstNew=null, followQueued=false;
+ function follow(){
+  followQueued=false;
+  var topLimit=(navEl?navEl.getBoundingClientRect().bottom:0)+12;
+  var delta=demo.getBoundingClientRect().bottom+16-window.innerHeight;
+  if(firstNew&&firstNew.isConnected){
+   var room=firstNew.getBoundingClientRect().top-topLimit;
+   if(delta>room) delta=room;
+  }
+  if(delta>1) window.scrollBy({top:delta,behavior:reduceMotion?'auto':'smooth'});
+ }
+ if(window.MutationObserver){
+  new MutationObserver(function(records){
+   records.forEach(function(r){
+    for(var i=0;i<r.addedNodes.length;i++){
+     if(!firstNew&&r.addedNodes[i].nodeType===1) firstNew=r.addedNodes[i];
+    }
+   });
+   if(!followQueued){followQueued=true;requestAnimationFrame(follow);}
+  }).observe(body,{childList:true});
+ }
+
  body.addEventListener('click',function(e){
   var control=e.target.closest('[data-agent-choice]');
   if(!control) return;
   var choice=control.getAttribute('data-agent-choice');
+  firstNew=null;
 
   if(choice==='confirm-budget'){
    budget=85;
