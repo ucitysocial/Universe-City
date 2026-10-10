@@ -150,10 +150,9 @@ The current homepage logic is:
 1. Arrival
 2. Membership and the four departments
 3. Interactive agent example
-4. The agent job
-5. Application call to action
-6. Founder and trust
-7. Footer
+4. Start where you are, combined with the agent job
+5. Founder and trust
+6. Footer
 
 Copy can continue to evolve, but new work should preserve the reading logic unless the hierarchy is intentionally changed.
 
