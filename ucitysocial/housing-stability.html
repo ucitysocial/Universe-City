@@ -602,6 +602,62 @@ footer a:hover{opacity:1}
 .biz .lead,.pricing .lead,.mlist .lead,.pfoot .lead{color:var(--ink)}
 .mdef span{color:#3d2c28}
 .mrow .nm{color:var(--ink)}
+
+/* compact department explorer */
+.dept-hero{background:var(--c);color:var(--paper);border-bottom:2px solid var(--ink)}
+.dept-hero .w{padding-top:28px;padding-bottom:30px}
+.dept-hero-line{display:flex;align-items:flex-end;gap:24px;flex-wrap:wrap}
+.dept-hero h1{font-size:clamp(36px,4vw,54px);line-height:.98;letter-spacing:-.035em;color:#fff}
+.dept-count{margin-left:auto;font-family:var(--record);font-size:15px;letter-spacing:.14em;color:rgba(255,255,255,.72);padding-bottom:5px}
+.dept-hero p{font-size:15.5px;line-height:1.5;max-width:74ch;margin-top:12px;color:rgba(255,255,255,.84)}
+.system-explorer{padding:34px 0 52px;background:var(--paper)}
+.explorer-intro{margin-bottom:18px;max-width:820px}
+.explorer-intro h2{font-size:clamp(24px,2.3vw,30px);letter-spacing:-.025em;line-height:1.05;color:var(--ink)}
+.explorer-intro p{margin-top:8px;color:#594843;line-height:1.5;font-size:14.5px;max-width:76ch}
+.system-workspace{display:grid;grid-template-columns:310px minmax(0,1fr);border:2px solid var(--ink);min-height:570px;background:var(--paper)}
+.system-index{border-right:2px solid var(--ink);background:var(--paper2)}
+.system-index-head{padding:18px 20px;border-bottom:2px solid var(--ink);font-family:var(--record);font-size:13px;letter-spacing:.14em}
+.system-item{width:100%;border:0;border-bottom:1px solid var(--rule);background:transparent;text-align:left;padding:14px 18px;display:flex;gap:14px;align-items:center;font-family:var(--voice);font-size:14px;cursor:pointer;color:var(--ink)}
+.system-item .n{font-family:var(--record);font-size:14px;color:var(--c);width:26px}
+.system-item .arr{margin-left:auto;opacity:.35}
+.system-item[aria-selected="true"]{background:var(--c);color:#fff}
+.system-item[aria-selected="true"] .n{color:#fff}
+.system-item[aria-selected="true"] .arr{opacity:1}
+.system-item:focus-visible{outline:2px solid var(--ink);outline-offset:-3px}
+.system-panel{padding:36px 42px 34px;display:flex;flex-direction:column;transition:opacity .16s ease,transform .16s ease}
+.system-panel.switching{opacity:.18;transform:translateX(8px)}
+.system-panel-top{display:flex;justify-content:space-between;gap:20px;align-items:start;border-bottom:1px solid var(--rule);padding-bottom:22px}
+.system-no{font-family:var(--record);font-size:15px;letter-spacing:.13em;color:var(--c)}
+.system-title{font-size:clamp(36px,3.7vw,50px);line-height:1;letter-spacing:-.035em;margin-top:6px;font-weight:600}
+.system-progress{font-family:var(--record);font-size:13px;color:var(--dim);letter-spacing:.1em}
+.system-definition,.system-application,.system-example{display:grid;grid-template-columns:150px minmax(0,1fr);gap:24px}
+.system-definition{margin-top:24px}
+.system-label{font-family:var(--record);font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.system-definition p{font-size:16px;line-height:1.55;color:#4d3c37;font-style:italic;max-width:56ch}
+.system-application{margin-top:28px;padding-top:24px;border-top:2px solid var(--c)}
+.system-application .system-label{color:var(--c)}
+.system-application p{font-size:clamp(17px,1.55vw,20px);line-height:1.48;max-width:56ch;font-weight:600;letter-spacing:-.01em}
+.system-example{position:relative;margin-top:30px;color:var(--paper);padding:24px 0;z-index:0}
+.system-example::before{content:"";position:absolute;inset:0 -26px;background:var(--ink);z-index:-1}
+.system-example .system-label{color:rgba(255,255,255,.6)}
+.system-example p{font-size:15px;line-height:1.62;color:rgba(255,255,255,.88);max-width:56ch}
+.system-next-wrap{margin-top:auto;padding-top:28px;display:flex;justify-content:flex-end}
+.system-next{display:inline-block;background:var(--c);color:#fff;text-decoration:none;padding:13px 18px;font-weight:700;font-size:14px;border:0;box-shadow:5px 5px 0 var(--ink);cursor:pointer;font-family:var(--voice)}
+.system-next:active{transform:translate(3px,3px);box-shadow:2px 2px 0 var(--ink)}
+@media(max-width:800px){
+ .dept-hero .w{padding-top:22px;padding-bottom:24px}
+ .dept-hero-line{gap:8px 18px}
+ .dept-count{margin-left:0;width:100%}
+ .dept-hero p{font-size:14.5px}
+ .system-explorer{padding-top:26px}
+ .system-workspace{grid-template-columns:1fr}
+ .system-index{border-right:0;border-bottom:2px solid var(--ink)}
+ .system-item{padding:13px 15px}
+ .system-panel{padding:28px 20px}
+ .system-definition,.system-application,.system-example{grid-template-columns:1fr;gap:8px}
+ .system-example::before{inset:0 -10px}
+}
+
 </style></head>
 <body style="--c:var(--hs)">
 <nav><div class="w">
@@ -635,29 +691,37 @@ footer a:hover{opacity:1}
   <div class="mfoot"><span>&#9733;</span><span>management@ucitysocial.com</span><span>Denver, Colorado</span></div>
  </div>
 </div>
-<div class="phero" data-rn="II"><div class="w">
- <a href="/#business" class="back rv">&larr; All four departments</a>
- <span class="k rv">department II</span>
- <h1 class="rv d1">Housing Stability</h1>
- <p class="lead rv d2 mt3" style="max-width:44ch">Manage your living environment.</p>
- <p class="rv d2" style="max-width:56ch">These twelve folders cover the items, records, schedules, access, transportation, maintenance, and technology required to manage a household.</p>
-</div></div>
 
-<section class="mlist"><div class="w">
- <span class="k rv" style="color:var(--c)">twelve folders</span>
- <h2 class="rv d1" style="margin-bottom:8px">Each folder becomes a working system</h2>
- <p class="rv d2" style="max-width:60ch;margin-bottom:var(--s3)">The definition names the part of life. In Universe City, that idea is applied to your real information and turned into a structure you can use, update, and return to as life changes. The folders do not run in a required sequence.</p>
- <div class="mrow rv"><div class="num">01</div><div><div class="nm">Inventory</div><div class="mdef"><div><b>Definition</b><span>A record of items a household keeps available for use.</span></div><div><b>In Universe City</b><span>Inventory learns what your household regularly uses, how much you normally keep, and how quickly you go through it. That becomes a living baseline for what you have, what you need, and what is likely to run out next.</span></div></div></div></div><div class="mrow rv"><div class="num">02</div><div><div class="nm">Storage</div><div class="mdef"><div><b>Definition</b><span>Keeping items in a place until they are needed.</span></div><div><b>In Universe City</b><span>Storage maps what is stored, where it lives, and what it costs to keep. Hidden and paid storage become visible enough to decide what is worth holding onto.</span></div></div></div></div><div class="mrow rv"><div class="num">03</div><div><div class="nm">Sanitation</div><div class="mdef"><div><b>Definition</b><span>Conditions relating to cleanliness and the removal of waste.</span></div><div><b>In Universe City</b><span>Sanitation turns cleaning, laundry, waste, and recurring household care into a schedule sized to the time and people actually available. What is due, overdue, or assigned stays visible instead of becoming background stress.</span></div></div></div></div><div class="mrow rv"><div class="num">04</div><div><div class="nm">Organization</div><div class="mdef"><div><b>Definition</b><span>Arranging things into a working order.</span></div><div><b>In Universe City</b><span>Organization gives frequently used items a defined home based on where and how they are used. The result is a household map that makes finding, returning, and sharing things easier.</span></div></div></div></div><div class="mrow rv"><div class="num">05</div><div><div class="nm">Information</div><div class="mdef"><div><b>Definition</b><span>Facts recorded about something.</span></div><div><b>In Universe City</b><span>Information gathers the stable facts about your home—utilities, shutoffs, appliance details, service contacts, schedules, and ownership information—into one reference. When something breaks, the basics are already documented.</span></div></div></div></div><div class="mrow rv"><div class="num">06</div><div><div class="nm">Administration</div><div class="mdef"><div><b>Definition</b><span>The running of routine business affairs.</span></div><div><b>In Universe City</b><span>Administration brings rent, bills, renewals, filings, receipts, and household deadlines into one operating calendar. It creates a paper trail of what is due, what was sent, and what was paid.</span></div></div></div></div><div class="mrow rv"><div class="num">07</div><div><div class="nm">Law</div><div class="mdef"><div><b>Definition</b><span>Rules made by a government and enforced by it.</span></div><div><b>In Universe City</b><span>Law turns leases, notices, deposits, and housing rights into a reference tied to the home you actually live in. Important terms and deadlines stay readable and retrievable when you need them.</span></div></div></div></div><div class="mrow rv"><div class="num">08</div><div><div class="nm">Privacy</div><div class="mdef"><div><b>Definition</b><span>Being free from being observed, entered or disturbed.</span></div><div><b>In Universe City</b><span>Privacy maps who can physically access your home and who holds information about you or your address. It tracks what can be changed, secured, removed, or limited over time.</span></div></div></div></div><div class="mrow rv"><div class="num">09</div><div><div class="nm">Transportation</div><div class="mdef"><div><b>Definition</b><span>The means by which a person moves from one place to another.</span></div><div><b>In Universe City</b><span>Transportation brings vehicles, passes, routes, commute times, costs, maintenance needs, and backups into one mobility picture. The system shows not just how you move, but what it takes to keep that movement reliable.</span></div></div></div></div><div class="mrow rv"><div class="num">10</div><div><div class="nm">Maintenance</div><div class="mdef"><div><b>Definition</b><span>The work of keeping something in working condition.</span></div><div><b>In Universe City</b><span>Maintenance converts the things you own that need servicing into a schedule of what was done, what is due next, who is responsible, and what proof exists. Problems become trackable before they become emergencies.</span></div></div></div></div><div class="mrow rv"><div class="num">11</div><div><div class="nm">Technology</div><div class="mdef"><div><b>Definition</b><span>Equipment and systems used to do practical work.</span></div><div><b>In Universe City</b><span>Technology maps the devices, accounts, subscriptions, and dependencies a household runs on. If something is lost, replaced, or stops working, the system shows what else depends on it.</span></div></div></div></div><div class="mrow rv"><div class="num">12</div><div><div class="nm">Communal Space</div><div class="mdef"><div><b>Definition</b><span>Areas shared between more than one household.</span></div><div><b>In Universe City</b><span>Communal Space turns shared areas and shared expectations into a clear record of chores, money, guests, noise, and agreements. When something stops working, there is a documented baseline to return to.</span></div></div></div></div>
+<section class="dept-hero"><div class="w">
+ <div class="dept-hero-line">
+  <h1>Housing Stability</h1>
+  <div class="dept-count">12 SYSTEMS</div>
+ </div>
+ <p>Make the home easier to run. These systems organize what you use, maintain, pay for, protect, and depend on every day.</p>
 </div></section>
 
-<section class="pfoot"><div class="w">
- <span class="k rv" style="color:var(--c)">membership</span>
- <h2 class="rv d1">The systems develop as your life requires them</h2>
- <p class="rv d2 mt2" style="max-width:54ch">Universe City does not require you to finish one folder before another begins. Systems become useful as the information they manage becomes relevant, and they stay connected as your life changes.</p>
- <div class="btns rv d2"><a href="/membership" class="btn" style="background:var(--c);color:#fff;box-shadow:5px 5px 0 var(--ink)">See membership</a></div>
- <div style="margin-top:var(--s5)">
-  <span class="k rv" style="color:var(--dim)">the other three</span>
-  <div class="others rv d1"><a href="/agency-assessment" style="--o:var(--pa)"><div class="rn">DEPARTMENT I</div><div class="nm">Agency Assessment</div><div class="go">Folder 01 &middot; Time &rarr;</div></a><a href="/career-development" style="--o:var(--cd)"><div class="rn">DEPARTMENT III</div><div class="nm">Career Development</div><div class="go">Folder 01 &middot; Salary &rarr;</div></a><a href="/life-management" style="--o:var(--lm)"><div class="rn">DEPARTMENT IV</div><div class="nm">Life Management</div><div class="go">Folder 01 &middot; Standards &rarr;</div></a></div>
+<section class="system-explorer"><div class="w">
+ <div class="explorer-intro">
+  <h2>Choose a system.</h2>
+  <p>The definition names the part of life. Open a system to see what information belongs there, how that information is organized, what the system makes visible, and how it changes the way that part of life is managed.</p>
+ </div>
+
+ <div class="system-workspace">
+  <aside class="system-index" aria-label="Housing Stability systems">
+   <div class="system-index-head">HOUSING STABILITY &middot; 12 SYSTEMS</div>
+   <button class="system-item" type="button" data-i="0" aria-selected="true"><span class="n">01</span><span>Inventory</span><span class="arr">&rarr;</span></button><button class="system-item" type="button" data-i="1" aria-selected="false"><span class="n">02</span><span>Storage</span><span class="arr">&rarr;</span></button><button class="system-item" type="button" data-i="2" aria-selected="false"><span class="n">03</span><span>Sanitation</span><span class="arr">&rarr;</span></button><button class="system-item" type="button" data-i="3" aria-selected="false"><span class="n">04</span><span>Organization</span><span class="arr">&rarr;</span></button><button class="system-item" type="button" data-i="4" aria-selected="false"><span class="n">05</span><span>Information</span><span class="arr">&rarr;</span></button><button class="system-item" type="button" data-i="5" aria-selected="false"><span class="n">06</span><span>Administration</span><span class="arr">&rarr;</span></button><button class="system-item" type="button" data-i="6" aria-selected="false"><span class="n">07</span><span>Law</span><span class="arr">&rarr;</span></button><button class="system-item" type="button" data-i="7" aria-selected="false"><span class="n">08</span><span>Privacy</span><span class="arr">&rarr;</span></button><button class="system-item" type="button" data-i="8" aria-selected="false"><span class="n">09</span><span>Transportation</span><span class="arr">&rarr;</span></button><button class="system-item" type="button" data-i="9" aria-selected="false"><span class="n">10</span><span>Maintenance</span><span class="arr">&rarr;</span></button><button class="system-item" type="button" data-i="10" aria-selected="false"><span class="n">11</span><span>Technology</span><span class="arr">&rarr;</span></button><button class="system-item" type="button" data-i="11" aria-selected="false"><span class="n">12</span><span>Communal Space</span><span class="arr">&rarr;</span></button>
+  </aside>
+
+  <main class="system-panel" id="systemPanel">
+   <div class="system-panel-top">
+    <div><div class="system-no" id="systemNo"></div><div class="system-title" id="systemTitle"></div></div>
+    <div class="system-progress" id="systemProgress"></div>
+   </div>
+   <div class="system-definition"><div class="system-label">Definition</div><p id="systemDefinition"></p></div>
+   <div class="system-application"><div class="system-label">In Universe City</div><p id="systemApplication"></p></div>
+   <div class="system-example"><div class="system-label">What that looks like</div><p id="systemExample"></p></div>
+   <div class="system-next-wrap"><a class="system-next" id="systemNext" href="#"></a></div>
+  </main>
  </div>
 </div></section>
 <footer><div class="w cols">
@@ -691,4 +755,70 @@ if(mBtn){
  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!mPan.hidden)close()});
 }
 })();
-</script></body></html>
+</script>
+<script>
+(function(){
+ var systems=[{"n":"01","name":"Inventory","definition":"A record of items a household keeps available for use.","application":"Inventory learns what your household uses, how much you usually keep, and how quickly it runs out. It turns recurring purchases into a baseline that makes restocking more predictable.","example":"You normally use one pack of toilet paper every three weeks. Inventory can surface it before the last roll instead of after."},{"n":"02","name":"Storage","definition":"Keeping items in a place until they are needed.","application":"Storage maps what you keep, where it lives, and what it costs to hold. It makes hidden, boxed, and paid storage visible enough to find things and decide what is worth keeping.","example":"You need your winter coat. Storage tells you which bin it is in and also reminds you that two paid storage boxes have not been opened in a year."},{"n":"03","name":"Sanitation","definition":"Conditions relating to cleanliness and the removal of waste.","application":"Sanitation turns cleaning, laundry, waste, and recurring household care into a routine that fits the people and time actually available. It shows what needs attention before the home reaches crisis mode.","example":"Trash day, laundry, and the bathroom all land in the same busy week. Sanitation spreads the work across the available time instead of waiting until everything is urgent."},{"n":"04","name":"Organization","definition":"Arranging things into a working order.","application":"Organization gives belongings a defined place based on where and how they are used. It reduces the number of small decisions required to find, return, and share everyday things.","example":"Mail keeps piling up on the counter. Organization gives incoming mail a home and a next step so the pile stops becoming a second filing system."},{"n":"05","name":"Information","definition":"Facts recorded about something.","application":"Information keeps the stable facts about your home in one reference: utilities, service contacts, appliance details, schedules, access points, and other basics. When something goes wrong, you do not start by searching the house or old messages.","example":"The sink starts leaking. Information gives you the shutoff location, landlord or plumber contact, and fixture details in one place."},{"n":"06","name":"Administration","definition":"The running of routine business affairs.","application":"Administration turns rent, bills, renewals, receipts, filings, and household deadlines into a current operating calendar. It keeps proof of what was due, paid, sent, or renewed with the obligation itself.","example":"Your renter insurance renews next month. Administration surfaces the date, current cost, and payment record before it lapses."},{"n":"07","name":"Law","definition":"Rules made by a government and enforced by it.","application":"Law organizes the rules and documents that govern your housing situation. It makes lease terms, notices, deposits, responsibilities, and deadlines easier to retrieve when a question comes up.","example":"Your landlord sends a notice about entry. Law puts the notice next to the relevant lease terms and dates so you can understand what applies before responding."},{"n":"08","name":"Privacy","definition":"Being free from being observed, entered or disturbed.","application":"Privacy maps who can enter your home, who holds your address or household information, and what protections are in place. It makes physical and informational exposure visible so you can decide what needs to change.","example":"A former roommate still has a key and an old account still lists your address publicly. Privacy keeps both issues in the same view until they are resolved."},{"n":"09","name":"Transportation","definition":"The means by which a person moves from one place to another.","application":"Transportation turns the ways you move into a working mobility plan. It brings routes, travel time, cost, maintenance, insurance, parking, fares, and backups together so getting somewhere is not treated as just the minutes on the map.","example":"Your car goes into the shop before a work shift. Transportation already knows the bus route, travel time, fare, and when you need to leave."},{"n":"10","name":"Maintenance","definition":"The work of keeping something in working condition.","application":"Maintenance turns the things you own that need service into a schedule of what was done, what is due, who is responsible, and what proof exists. Small upkeep becomes visible before it becomes a larger repair.","example":"Your furnace filter is due and your car needs an oil change. Maintenance shows both before either turns into a problem you have to remember."},{"n":"11","name":"Technology","definition":"Equipment and systems used to do practical work.","application":"Technology maps the devices, accounts, subscriptions, and connections your household depends on. It shows what each thing does, what it costs, and what else is affected if it stops working.","example":"Your phone is lost. Technology shows which accounts depend on that number, which device backups exist, and what needs to be secured or replaced first."},{"n":"12","name":"Communal Space","definition":"Areas shared between more than one household.","application":"Communal Space turns shared areas and shared expectations into clear agreements about use, chores, money, guests, noise, and responsibility. It creates a baseline for what everyone thought they agreed to.","example":"Laundry keeps being left in the shared machines. Communal Space holds the agreed schedule and the change everyone decided on after the problem repeated."}];
+ var nextDepartment="/career-development";
+ var nextDepartmentName="Career Development";
+ var buttons=[].slice.call(document.querySelectorAll('.system-item'));
+ var panel=document.getElementById('systemPanel');
+ var title=document.getElementById('systemTitle');
+ var number=document.getElementById('systemNo');
+ var progress=document.getElementById('systemProgress');
+ var definition=document.getElementById('systemDefinition');
+ var application=document.getElementById('systemApplication');
+ var example=document.getElementById('systemExample');
+ var next=document.getElementById('systemNext');
+ var current=0;
+ var reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+ function slug(s){return s.toLowerCase().replace(/[^a-z0-9]+/g,'').trim()}
+
+ function paint(i,scroll){
+  current=i;
+  var s=systems[i];
+  function apply(){
+   number.textContent='SYSTEM '+s.n;
+   title.textContent=s.name;
+   progress.textContent=s.n+' / 12';
+   definition.textContent=s.definition;
+   application.textContent=s.application;
+   example.textContent=s.example;
+   buttons.forEach(function(b,x){b.setAttribute('aria-selected',x===i?'true':'false')});
+   if(i<systems.length-1){
+    next.textContent='Next: '+systems[i+1].name+' \u2192';
+    next.href='#'+slug(systems[i+1].name);
+   }else{
+    next.textContent='Next department: '+nextDepartmentName+' \u2192';
+    next.href=nextDepartment;
+   }
+   if(history.replaceState) history.replaceState(null,'','#'+slug(s.name));
+   panel.classList.remove('switching');
+   if(scroll && window.matchMedia('(max-width:800px)').matches){
+    panel.scrollIntoView({behavior:reduce?'auto':'smooth',block:'start'});
+   }
+  }
+  if(reduce){apply();return}
+  panel.classList.add('switching');
+  setTimeout(apply,110);
+ }
+
+ buttons.forEach(function(b){
+  b.addEventListener('click',function(){paint(+b.dataset.i,true)});
+ });
+
+ next.addEventListener('click',function(e){
+  if(current<systems.length-1){
+   e.preventDefault();
+   paint(current+1,true);
+  }
+ });
+
+ var hash=(location.hash||'').slice(1);
+ var initial=systems.findIndex(function(s){return slug(s.name)===hash});
+ paint(initial>-1?initial:0,false);
+})();
+</script>
+
+</body></html>
