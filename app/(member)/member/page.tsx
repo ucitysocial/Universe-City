@@ -1,11 +1,24 @@
+import { redirect } from 'next/navigation';
 import { currentProfile, supabaseServer } from '@/lib/supabase/server';
 import { LIVE_FOLDERS, deptOf } from '@/lib/domain/folders';
 import { figures, type Block } from '@/lib/domain/time';
 import { weekBounds } from '@/lib/domain/dates';
 
-export default async function MemberHome() {
+export default async function MemberHome({
+  searchParams
+}: {
+  searchParams?: { welcome?: string; plan?: string };
+}) {
+  if (searchParams?.welcome === '1') redirect('/member/orientation');
+
   const profile = await currentProfile();
   const sb = supabaseServer();
+
+  const { count: allTime } = await sb.from('blocks')
+    .select('id', { count: 'exact', head: true });
+
+  if ((allTime ?? 0) === 0) redirect('/member/orientation');
+
   const { start, end } = weekBounds(profile?.timezone ?? 'America/Denver');
 
   const { data: blocks } = await sb.from('blocks')
@@ -18,7 +31,18 @@ export default async function MemberHome() {
 
   return (
     <>
-      <p className="kick">Your file</p>
+      {searchParams?.plan === 'ready' && (
+        <div className="plan-ready-banner">
+          <div>
+            <p className="kick">Time is running</p>
+            <h2>Your first Plan is ready.</h2>
+            <p>Live the day. Universe City now has something real to compare with what actually happens.</p>
+          </div>
+          <a className="btn ghost compact" href="/member/time">Open Time</a>
+        </div>
+      )}
+
+      <p className="kick">Dashboard</p>
       <h1 style={{ fontSize: 34, marginTop: 8 }}>{profile?.name}</h1>
       <p style={{ color: 'var(--dim)' }}>
         Case {profile?.case_no}
@@ -30,8 +54,8 @@ export default async function MemberHome() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)',
                       background: 'var(--ink2)', border: '3px solid var(--ink)',
                       boxShadow: 'var(--shadow)', marginTop: 14, maxWidth: 620 }}>
-          {[['Observed', f.observed], ['Estimated', f.estimated],
-            ['Unaccounted', f.unaccounted], ['Yours', f.free]].map(([k, v], i) => (
+          {[[ 'Observed', f.observed ], [ 'Estimated', f.estimated ],
+            [ 'Unaccounted', f.unaccounted ], [ 'Yours', f.free ]].map(([k, v], i) => (
             <div key={k as string} style={{ padding: '14px 10px', textAlign: 'center',
                  borderRight: i < 3 ? '1px solid rgba(244,239,233,.22)' : undefined }}>
               <div className="vt" style={{ fontSize: 34, lineHeight: 1, color: '#fff' }}>
@@ -43,8 +67,8 @@ export default async function MemberHome() {
         </div>
       ) : (
         <p className="note" style={{ maxWidth: 'var(--text)' }}>
-          Nothing is on file yet. Your agent starts Time with you at the first review, and
-          anything you say before then is kept.
+          Your first Plan is ready for tomorrow. This view will become more useful as planned
+          time turns into observed time.
         </p>
       )}
 
@@ -63,9 +87,9 @@ export default async function MemberHome() {
                 <p className="q">
                   {x.name === 'Time' && has ? `${Math.round(f.free)} hours of this week are yours.` : null}
                   {x.name === 'Standards' ? `${standards ?? 0} active.` : null}
-                  {x.name === 'Salary' ? 'Collecting. Needs a month of Time behind it.' : null}
-                  {x.name === 'Inventory' ? 'Opens once Time is running.' : null}
-                  {x.name === 'Time' && !has ? 'Not established yet.' : null}
+                  {x.name === 'Salary' ? 'Collecting. Needs Time behind it.' : null}
+                  {x.name === 'Inventory' ? 'Part of your systems. Not active yet.' : null}
+                  {x.name === 'Time' && !has ? 'Your first Plan is ready.' : null}
                 </p>
                 {live && (
                   <p style={{ marginTop: 12 }}>

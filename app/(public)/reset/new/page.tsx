@@ -20,7 +20,7 @@ export default function NewPassword() {
   }
 
   return (
-    <div className="wrap"><div className="panel">
+    <div className="simple-auth-page"><div className="wrap"><div className="panel">
       <p className="kick">Universe City</p>
       <h2 style={{ marginTop: 8 }}>Set a new password</h2>
       {err && <p className="err" style={{ marginTop: 18 }}>{err}</p>}
@@ -31,9 +31,9 @@ export default function NewPassword() {
                  value={password} onChange={e => setPassword(e.target.value)} required />
         </div>
         <button className="btn" style={{ width: '100%' }} disabled={busy}>
-          {busy ? 'Saving' : 'Save it and open my file'}
+          {busy ? 'Saving' : 'Save password and continue'}
         </button>
       </form>
-    </div></div>
+    </div></div></div>
   );
 }

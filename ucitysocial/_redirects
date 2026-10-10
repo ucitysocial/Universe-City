@@ -1,8 +1,17 @@
 # Canonical public routes.
-/membership /membership.html 200
+/index.html / 301
+/membership.html /membership 301
+/agency-assessment.html /agency-assessment 301
+/housing-stability.html /housing-stability 301
+/career-development.html /career-development 301
+/life-management.html /life-management 301
+/founder.html /founder 301
 /join /apply 301
+/join.html /apply 301
 
-# Application routes stay on the ucitysocial.com domain.
+/membership /membership.html 200
+
+# Application routes are reverse-proxied so the browser stays on the public domain.
 /apply https://universecitystage.netlify.app/apply 200
 /login https://universecitystage.netlify.app/login 200
 /signup https://universecitystage.netlify.app/signup 200

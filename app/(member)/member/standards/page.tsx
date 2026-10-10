@@ -1,6 +1,10 @@
+import { redirect } from 'next/navigation';
 import { supabaseServer } from '@/lib/supabase/server';
 
 export default async function StandardsPage() {
+  const { count: timeCount } = await supabaseServer().from('blocks')
+    .select('id', { count: 'exact', head: true });
+  if ((timeCount ?? 0) === 0) redirect('/member/time/setup');
   const { data } = await supabaseServer().from('standards')
     .select('*').order('created_at', { ascending: false });
   const list = data ?? [];
@@ -16,7 +20,7 @@ export default async function StandardsPage() {
 
       {list.length === 0 ? (
         <p className="note" style={{ maxWidth: 'var(--text)' }}>
-          None on file yet. Your agent writes the first ones down with you, and a standard only
+          No Standards yet. Your agent writes the first ones down with you, and a standard only
           counts once it is in your own words with a date on it.
         </p>
       ) : (

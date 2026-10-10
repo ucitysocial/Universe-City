@@ -4,10 +4,10 @@ import { DEPARTMENTS } from '@/lib/domain/folders';
 export default function HowItWorks() {
   return (
     <>
-      <section>
+      <section className="hero-section">
         <div className="wrap">
           <p className="kick">How it works</p>
-          <h1 style={{ marginTop: 12, maxWidth: '18ch' }}>An agency keeps a file. So do we.</h1>
+          <h1 style={{ marginTop: 12, maxWidth: '18ch' }}>Your life changes. Your systems should too.</h1>
           <p className="lede">
             Most tools ask you to build the thing yourself and then blame you when the grid stays
             empty. Universe City works the other way round. You talk, it gets recorded, and the
@@ -16,7 +16,7 @@ export default function HowItWorks() {
         </div>
       </section>
 
-      <section>
+      <section className="systems-section">
         <div className="wrap">
           <p className="kick">What you get at launch</p>
           <h2 style={{ marginTop: 10 }}>Four systems, running.</h2>
@@ -43,13 +43,13 @@ export default function HowItWorks() {
         </div>
       </section>
 
-      <section>
+      <section className="membership-section">
         <div className="wrap prose">
           <p className="kick">What we will never do</p>
-          <h2 style={{ marginTop: 10 }}>Nothing goes on file that you did not say.</h2>
+          <h2 style={{ marginTop: 10 }}>We don’t turn guesses into facts.</h2>
           <p style={{ marginTop: 18 }}>
             No times are invented. An estimate stays an estimate until you say what actually
-            happened. Software can propose a change to your record. It cannot make one. Your agent
+            happened. Software can propose a change. It cannot quietly make one. Your agent
             approves anything consequential, and you can see every version of every correction.
           </p>
         </div>
