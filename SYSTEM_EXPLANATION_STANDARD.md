@@ -1,5 +1,14 @@
 # Universe City System Explanation Standard
 
+Governed by [LANGUAGE_STANDARD.md](LANGUAGE_STANDARD.md). Where this document and the Language Standard disagree, the Language Standard governs.
+
+This document was written before Language Standard Version 4 and has not been rewritten to it. Four known conflicts:
+
+1. This document calls the forty eight units systems. They are folders. A system is the working product of one folder.
+2. This document asks What that looks like to paint a picture. Clause 6.7 of the Language Standard prohibits a scene from one kind of life.
+3. This document calls agents personal assistants. Assistant is a prohibited substitute for Agent.
+4. The Time example in this document uses constructions that clauses 6.8, 6.11, and 6.13 of the Language Standard prohibit.
+
 This document defines how Universe City explains its systems on the public site, inside product education, in sales language, in training, and in future system documentation.
 
 The goal is not to make every system sound impressive. The goal is to make each system understandable.

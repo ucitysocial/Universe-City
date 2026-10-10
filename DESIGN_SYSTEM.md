@@ -2,6 +2,8 @@
 
 This document is the current source of truth for visual and interaction decisions across Universe City.
 
+Wording is governed by [LANGUAGE_STANDARD.md](LANGUAGE_STANDARD.md). Where this file and the Language Standard disagree on a word, the Language Standard governs.
+
 When an older component, page, mockup, or note conflicts with this file, this file wins.
 
 ## Product surfaces are related, not identical
@@ -99,8 +101,8 @@ Current public navigation:
 - 58px ink navigation bar
 - Montserrat `universe★city` wordmark
 - VT323 `LIFE MANAGEMENT AGENCY` descriptor
-- `Sign in` in the top right
-- ivory `Apply` action in the top right
+- `Log in` in the top right
+- ivory `Apply for residency` action in the top right
 - bordered star menu control beside those actions
 
 The star is reserved for opening the site menu. Do not reuse the same boxed star as a back button, previous section control, or chapter control.
@@ -112,7 +114,7 @@ The public menu is intentionally small.
 UNIVERSE CITY:
 - Home
 - How it works
-- Membership
+- Residency
 - Founder
 
 DEPARTMENTS:
@@ -121,7 +123,7 @@ DEPARTMENTS:
 - Career Development
 - Life Management
 
-Apply and Sign in do not need to be repeated inside the star menu because they already live in the header.
+Apply for residency and Log in are in the header. The star menu does not repeat them.
 
 Do not add placeholder navigation such as The show, For employers, Client rates, or Quarterly report unless a real destination exists and the product decision has been made to expose it publicly.
 
@@ -132,7 +134,7 @@ The footer should remain compact.
 UNIVERSE CITY:
 - Home
 - How it works
-- Membership
+- Residency
 - Founder
 
 DEPARTMENTS:
@@ -148,7 +150,7 @@ Account actions belong in the header rather than being duplicated in the footer.
 The current homepage logic is:
 
 1. Arrival
-2. Membership and the four departments
+2. Residency and the four departments
 3. Interactive agent example
 4. Start where you are, combined with the agent job
 5. Founder and trust
@@ -156,9 +158,9 @@ The current homepage logic is:
 
 Copy can continue to evolve, but new work should preserve the reading logic unless the hierarchy is intentionally changed.
 
-## System names
+## Folder names
 
-Use the canonical public names:
+The forty eight folder names are fixed in [LANGUAGE_STANDARD.md](LANGUAGE_STANDARD.md) clause 2.6. They are repeated here.
 
 ### Agency Assessment
 Time, Health, Language, Background, Identification, Finance, Legal, Mediation, Education, Employment, Regulation, Community
@@ -172,43 +174,33 @@ Salary, Schedule, Skill, Scope, Integrity, Professionalism, Resources, Key Perfo
 ### Life Management
 Standards, Survival, Perception, Instinct, Identity, Ethics, Equilibrium, Boundary, Discernment, Prioritization, Systems, Socializing
 
-Do not shorten Key Performance Indicators to KPIs or Information Technology to Info Technology in primary public system lists.
+Write Key Performance Indicators and Information Technology in full wherever a resident can read them.
 
 ## Language boundary
 
-Resident facing language:
-- account
-- membership
-- systems
-- Plan
-- dashboard or workspace
-- agent
-- history
-- follow up
-- commitment
+The defined terms are in [LANGUAGE_STANDARD.md](LANGUAGE_STANDARD.md) section 2. This section repeats the four that change the most text.
 
-Internal or agent language may use:
-- file
-- member file
-- case
-- record
-- Genesis
+- Resident is the word for the person in all text the person can read. Client is the word for the same person in agent documents and in the agent console.
+- The forty eight units are folders. A folder contains a record and a system. A system is the working product of one folder.
+- The arrangement is a residency.
+- The part of the website a resident logs in to is the Resident Portal. The action is Log in.
 
-Residents should benefit from the internal structure without being asked to understand it.
+Genesis is an internal name. A resident never reads it.
 
 ## Public copy punctuation
 
-Do not use hyphens, en dash punctuation, or em dash punctuation in public facing copy. Rewrite with commas, colons, semicolons, periods, or a different sentence structure.
+Resident facing text contains no hyphen, no en dash, and no em dash. [LANGUAGE_STANDARD.md](LANGUAGE_STANDARD.md) clause 5.13 states the rule.
 
 ## Source of truth order
 
 When decisions conflict, use this order:
 
-1. Current explicit product decisions documented in this file
-2. [SYSTEM_EXPLANATION_STANDARD.md](SYSTEM_EXPLANATION_STANDARD.md)
-3. Current production behavior and approved homepage patterns
-4. Existing component implementation
-5. Older briefs, mockups, or historical code
+1. [LANGUAGE_STANDARD.md](LANGUAGE_STANDARD.md), for every word
+2. Current explicit product decisions documented in this file
+3. [SYSTEM_EXPLANATION_STANDARD.md](SYSTEM_EXPLANATION_STANDARD.md)
+4. Current production behavior and approved homepage patterns
+5. Existing component implementation
+6. Older briefs, mockups, or historical code
 
 The repository should be updated when a product decision changes so old behavior does not silently return later.
 
@@ -217,7 +209,7 @@ The repository should be updated when a product decision changes so old behavior
 
 The department pages must do more than describe what a system could theoretically do.
 
-What That Looks Like should describe an actual resident interaction: what brings the resident into the system, what the agent does with existing context, what decision belongs to the resident, and what happens to unfinished work afterward.
+[LANGUAGE_STANDARD.md](LANGUAGE_STANDARD.md) clause 6.7 governs these sections. A section states what the folder contains and gives the question the folder answers. It does not supply a scene from one kind of life.
 
 Do not end the explanation at advice. If the resident still needs to confirm, review, answer, schedule, upload, call, attend, or decide something, that work must become a commitment or active follow up.
 

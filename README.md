@@ -49,9 +49,10 @@ The standard defines how to balance what a system is with how a resident actuall
 
 Use these before extending public or resident facing behavior:
 
-1. [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) for visual hierarchy, public shell, navigation, typography, mobile density, and the distinction between public and working surfaces.
-2. [SYSTEM_EXPLANATION_STANDARD.md](SYSTEM_EXPLANATION_STANDARD.md) for agent behavior, system explanations, commitments, follow ups, and interaction patterns.
-3. [ARCHITECTURE.md](ARCHITECTURE.md) for data ownership, provenance, history, and server side constraints.
+1. [LANGUAGE_STANDARD.md](LANGUAGE_STANDARD.md) for every word a resident, an agent, or a contributor reads. Read it before writing text. Run `python3 scripts/language-check.py` before a commit.
+2. [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) for visual hierarchy, public shell, navigation, typography, mobile density, and the distinction between public and working surfaces.
+3. [SYSTEM_EXPLANATION_STANDARD.md](SYSTEM_EXPLANATION_STANDARD.md) for agent behavior, system explanations, commitments, follow ups, and interaction patterns.
+4. [ARCHITECTURE.md](ARCHITECTURE.md) for data ownership, provenance, history, and server side constraints.
 
 Do not copy an older page or component merely because it already exists. If it conflicts with the current standards, update the component rather than reintroducing the old behavior.
 
