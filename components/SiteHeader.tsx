@@ -18,10 +18,10 @@ export default function SiteHeader({ signedIn }: { signedIn: boolean }) {
           <a href={mainSiteUrl + '#what'}>How it works</a>
           <a href={mainSiteUrl + '/membership'}>Membership</a>
           {signedIn
-            ? <Link href="/member">Your file</Link>
+            ? <Link href="/member">Dashboard</Link>
             : <Link href="/login">Log in</Link>}
           {signedIn
-            ? <Link className="header-cta" href="/member">Open your file</Link>
+            ? <Link className="header-cta" href="/member">Open dashboard</Link>
             : <a className="header-cta" href={mainSiteUrl + '/apply'}>Apply</a>}
         </nav>
 
@@ -42,7 +42,7 @@ export default function SiteHeader({ signedIn }: { signedIn: boolean }) {
               <a href={mainSiteUrl + '#what'}>How it works</a>
               <a href={mainSiteUrl + '/membership'}>Membership</a>
               {signedIn
-                ? <Link href="/member">Your file</Link>
+                ? <Link href="/member">Dashboard</Link>
                 : <>
                     <Link href="/login">Log in</Link>
                     <a className="compact-cta" href={mainSiteUrl + '/apply'}>Apply</a>
