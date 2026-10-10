@@ -30,7 +30,7 @@ Use short transactional subjects:
 
 - Confirm signup — `Welcome to Universe City`
 - Reset password — `Reset your Universe City password`
-- Magic link — `Open your Universe City File`
+- Magic link — `Your Universe City sign-in link`
 - Invite user — `Your Universe City invitation`
 - Change email — `Confirm your new Universe City email`
 - Reauthentication — `{{ .Token }} is your Universe City verification code`
@@ -73,9 +73,10 @@ Keep:
 - no promotional sections
 - restrained department-color stripe
 - black / white / ivory
-- File / resident language
+- account / membership / resident language
 
 Avoid:
+- resident-facing "File" language
 - multiple CTAs
 - marketing banners
 - heavy image assets
