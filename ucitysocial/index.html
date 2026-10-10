@@ -817,12 +817,34 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
 .experience{background:var(--ink);color:var(--paper);padding:clamp(54px,7vw,100px) 0;border-bottom:2px solid var(--ink)}
 .experience h2{color:#fff;max-width:18ch}.experience .k{color:rgba(244,239,233,.48)}
 .experience .lead{color:rgba(244,239,233,.74);max-width:48ch}
-.agent-moments{width:min(760px,100%);margin-top:clamp(30px,4vw,54px);display:flex;flex-direction:column;gap:12px}
-.moment{width:min(560px,88%);border:1px solid rgba(244,239,233,.22);padding:16px 18px}
-.moment span{font-family:var(--record);font-size:14px;letter-spacing:.16em;color:rgba(244,239,233,.46)}
-.moment p{font-size:clamp(17px,1.5vw,21px);line-height:1.4;margin-top:4px;color:var(--paper)}
-.moment.resident{align-self:flex-end;background:rgba(244,239,233,.08)}
-.moment.agent{align-self:flex-start;border-left:6px solid var(--pa);background:rgba(92,15,27,.18)}
+.agent-thread-demo{width:min(820px,100%);margin-top:clamp(30px,4vw,54px);border:2px solid rgba(244,239,233,.48);background:rgba(0,0,0,.28)}
+.agent-thread-head{min-height:48px;padding:11px 15px;border-bottom:1px solid rgba(244,239,233,.28);display:flex;align-items:center;gap:14px;font-family:var(--record);font-size:15px;letter-spacing:.15em;color:rgba(244,239,233,.72)}
+.agent-thread-head span:first-child{color:#fff}
+.agent-thread-head span:last-child{margin-left:auto;font-size:13px;color:rgba(244,239,233,.46)}
+.agent-thread-body{padding:20px 18px 22px;display:flex;flex-direction:column;gap:7px;min-height:390px;justify-content:flex-end}
+.thread-label{font-family:var(--record);font-size:13px;letter-spacing:.18em;color:rgba(244,239,233,.42);margin-top:8px;opacity:0;transform:translateY(6px)}
+.thread-label.resident{align-self:flex-end}
+.thread-bubble{max-width:82%;padding:12px 15px;border:2px solid rgba(244,239,233,.34);font-size:clamp(15px,1.3vw,18px);line-height:1.45;opacity:0;transform:translateY(10px)}
+.thread-bubble.agent{align-self:flex-start;border-left:5px solid var(--pa);background:rgba(92,15,27,.19);color:var(--paper)}
+.thread-bubble.resident{align-self:flex-end;background:var(--paper);border-color:var(--paper);color:var(--ink)}
+.agent-thread-status{border-top:1px solid rgba(244,239,233,.28);padding:10px 15px;display:flex;gap:14px;justify-content:space-between;flex-wrap:wrap;font-family:var(--record);font-size:12px;letter-spacing:.12em;color:rgba(244,239,233,.48)}
+.agent-thread-demo.in .thread-label,.agent-thread-demo.in .thread-bubble{animation:threadIn .38s cubic-bezier(.2,.8,.2,1) forwards}
+.agent-thread-demo.in .thread-label:nth-child(1){animation-delay:.05s}
+.agent-thread-demo.in .thread-bubble:nth-child(2){animation-delay:.12s}
+.agent-thread-demo.in .thread-label:nth-child(3){animation-delay:.42s}
+.agent-thread-demo.in .thread-bubble:nth-child(4){animation-delay:.49s}
+.agent-thread-demo.in .thread-label:nth-child(5){animation-delay:.79s}
+.agent-thread-demo.in .thread-bubble:nth-child(6){animation-delay:.86s}
+.agent-thread-demo.in .thread-label:nth-child(7){animation-delay:1.16s}
+.agent-thread-demo.in .thread-bubble:nth-child(8){animation-delay:1.23s}
+@keyframes threadIn{to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.thread-label,.thread-bubble{opacity:1;transform:none}.agent-thread-demo.in .thread-label,.agent-thread-demo.in .thread-bubble{animation:none}}
+@media(max-width:640px){
+ .agent-thread-head{align-items:flex-start;flex-direction:column;gap:3px}
+ .agent-thread-head span:last-child{margin-left:0}
+ .agent-thread-body{min-height:0;padding:16px 12px 18px}
+ .thread-bubble{max-width:92%}
+}
 
 .membership-promise{background:var(--paper);color:var(--ink)}
 .promise-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:clamp(30px,4vw,52px) 0}
@@ -1036,13 +1058,21 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
 <section class="experience" id="experience"><div class="w">
  <span class="k rv">your agent, with context</span>
  <h2 class="rv d1">Someone who can pick up where you left off.</h2>
- <p class="lead rv d2 mt3">You should not have to re-explain your entire life every time you need help with the next thing.</p>
+ <p class="lead rv d2 mt3">You should not have to explain your entire life again every time you need help with the next thing.</p>
 
- <div class="agent-moments rv d2">
-  <div class="moment resident"><span>YOU</span><p>I have a lot going on this week.</p></div>
-  <div class="moment agent"><span>YOUR AGENT</span><p>Okay. What is fixed?</p></div>
-  <div class="moment resident"><span>YOU</span><p>I forgot where we left off.</p></div>
-  <div class="moment agent"><span>YOUR AGENT</span><p>I have it. We can continue from there.</p></div>
+ <div class="agent-thread-demo rv d2">
+  <div class="agent-thread-head"><span>UNIVERSE CITY</span><span>EXAMPLE THREAD &middot; CONTEXT ACTIVE</span></div>
+  <div class="agent-thread-body">
+   <div class="thread-label resident">YOU</div>
+   <div class="thread-bubble resident">I need to figure out the rest of this week.</div>
+   <div class="thread-label agent">YOUR AGENT</div>
+   <div class="thread-bubble agent">We can pick up from the plan we already started. What changed?</div>
+   <div class="thread-label resident">YOU</div>
+   <div class="thread-bubble resident">Tuesday opened up. I also need time to finish the application.</div>
+   <div class="thread-label agent">YOUR AGENT</div>
+   <div class="thread-bubble agent">I have both. We can work them into the week without starting over.</div>
+  </div>
+  <div class="agent-thread-status"><span>CONTEXT CARRIED FORWARD</span><span>TIME &middot; CAREER DEVELOPMENT</span></div>
  </div>
 
  <a class="flow-link light rv d3" href="#business">See what membership gives you &rarr;</a>
