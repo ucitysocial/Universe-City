@@ -11,7 +11,7 @@ export default async function PublicLayout({ children }: { children: React.React
 
       <footer className="public-footer">
         <div className="wrap public-footer-grid">
-          <div>
+          <div className="public-footer-brand-block">
             <div className="public-footer-brand">universe<span>★</span>city</div>
             <div className="public-footer-sub">LIFE MANAGEMENT AGENCY</div>
             <div className="public-footer-meta">
@@ -21,26 +21,19 @@ export default async function PublicLayout({ children }: { children: React.React
           </div>
 
           <div>
-            <div className="public-footer-label">HOW IT WORKS</div>
-            <a href="/#what">Why an agent</a>
-            <a href="/#system">Starting folders</a>
-            <a href="/#departments">Four departments</a>
-            <a href="/agency-assessment">Agency Assessment folders</a>
+            <div className="public-footer-label">UNIVERSE CITY</div>
+            <a href="/">Home</a>
+            <a href="/#what">How it works</a>
+            <a href="/#business">Membership</a>
+            <a href="/founder">Founder</a>
           </div>
 
           <div>
-            <div className="public-footer-label">OPEN BOOKS</div>
-            <a href="#">Quarterly report</a>
-            <Link href="/membership">Membership</Link>
-            <Link href="/login">Member sign in</Link>
-          </div>
-
-          <div>
-            <div className="public-footer-label">MORE</div>
-            <a href="/founder">About the founder</a>
-            <a href="#">The show</a>
-            <a href="#">For employers</a>
-            <Link href="/login">Sign in</Link>
+            <div className="public-footer-label">DEPARTMENTS</div>
+            <a href="/agency-assessment">Agency Assessment</a>
+            <a href="/housing-stability">Housing Stability</a>
+            <a href="/career-development">Career Development</a>
+            <a href="/life-management">Life Management</a>
           </div>
         </div>
       </footer>
