@@ -250,17 +250,21 @@ a.btn.dark{background:var(--pa);color:#fff;box-shadow:5px 5px 0 var(--ink)}
 .scene.on{opacity:1}
 
 /* ===== 2 WHAT YOUR AGENT DOES ===== */
-.problem{color:var(--ink);background:var(--paper);padding:clamp(42px,5vw,76px) 0;border-bottom:2px solid var(--ink)}
-.agent-job-grid{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(330px,.92fr);gap:clamp(30px,5vw,72px);align-items:start}
-.agent-job-copy h2{font-size:clamp(40px,5.2vw,72px);line-height:1;max-width:13ch}
-.agent-job-lead{font-size:clamp(20px,1.9vw,27px);line-height:1.4;font-weight:600;max-width:41ch;margin-top:24px}
-.agent-job-support{font-size:15.5px;line-height:1.58;color:#58453f;max-width:52ch;margin-top:16px}
-.agent-job-list{border-top:5px solid var(--pa)}
-.agent-job-list>div{display:grid;grid-template-columns:34px minmax(0,1fr);gap:4px 12px;padding:16px 0;border-bottom:1px solid var(--rule)}
-.agent-job-list span{grid-row:1/3;font-family:var(--record);font-size:14px;color:var(--pa);padding-top:2px}
-.agent-job-list strong{font-size:16px;line-height:1.3}
-.agent-job-list p{font-size:13.5px;line-height:1.48;color:#5b4943;margin:0}
-@media(max-width:900px){.agent-job-grid{grid-template-columns:1fr;gap:26px}.agent-job-copy h2{max-width:15ch}.agent-job-list{max-width:680px}}
+.problem{color:var(--ink);background:var(--paper2);padding:clamp(44px,5vw,76px) 0;border-bottom:2px solid var(--ink)}
+.agent-job-single{max-width:980px}
+.agent-job-single h2{font-size:clamp(40px,5.2vw,72px);line-height:1;max-width:12ch}
+.agent-job-lead{font-size:clamp(21px,2vw,28px);line-height:1.38;font-weight:600;max-width:39ch;margin-top:24px}
+.agent-job-note{max-width:720px;margin-top:26px;padding-top:18px;border-top:3px solid var(--pa)}
+.agent-job-note strong{display:block;font-size:16px;line-height:1.4}
+.agent-job-note p{font-size:14.5px;line-height:1.55;color:#57443f;max-width:60ch;margin-top:8px}
+@media(max-width:640px){
+ .problem{padding:34px 0 38px}
+ .agent-job-single h2{font-size:33px;line-height:1.02;max-width:none}
+ .agent-job-lead{font-size:17px;line-height:1.42;margin-top:16px}
+ .agent-job-note{margin-top:18px;padding-top:14px}
+ .agent-job-note strong{font-size:14px}
+ .agent-job-note p{font-size:13px;line-height:1.5}
+}
 
 /* ===== 3 SYSTEM (dark) ===== */
 .system{background:var(--ink);color:var(--paper);padding:clamp(38px,4.4vw,70px) 0 var(--s5);overflow:hidden}
@@ -865,7 +869,7 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
  .thread-composer{align-items:flex-start;flex-direction:column;gap:2px}
 }
 
-.membership-promise{background:var(--paper);color:var(--ink);padding-top:clamp(44px,5.5vw,76px);padding-bottom:clamp(44px,5.5vw,76px)}
+.membership-promise{background:var(--paper);color:var(--ink);padding-top:clamp(44px,5.5vw,76px);padding-bottom:clamp(44px,5.5vw,76px);border-bottom:2px solid var(--ink)}
 .promise-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:clamp(30px,4vw,52px) 0}
 .promise{border-top:6px solid var(--c);border-left:1px solid var(--ink);border-right:1px solid var(--ink);
  border-bottom:1px solid var(--ink);padding:24px;min-height:220px}
@@ -881,12 +885,13 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
 .trust-rules strong{font-size:14.5px}.trust-actions{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-top:28px}
 .text-link{font-size:14px;font-weight:600;text-underline-offset:4px}
 
-.final-cta{background:var(--pa);color:var(--paper);padding:clamp(70px,10vw,150px) 0;border-bottom:0}
-.final-cta .k{color:rgba(244,239,233,.55)}.final-cta h2{color:#fff;max-width:22ch;font-size:clamp(40px,6vw,86px);line-height:.98}
-.final-actions{display:flex;align-items:center;gap:24px;flex-wrap:wrap;margin-top:38px}
+.final-cta{background:var(--pa);color:var(--paper);padding:clamp(58px,7vw,96px) 0;border-bottom:2px solid var(--ink)}
+.final-cta .k{color:rgba(244,239,233,.58)}
+.final-cta h2{color:#fff;max-width:17ch;font-size:clamp(40px,5.6vw,76px);line-height:.99}
+.final-copy{max-width:54ch;margin-top:22px;font-size:clamp(16px,1.35vw,20px);line-height:1.5;color:rgba(244,239,233,.82)}
+.final-actions{display:flex;align-items:center;gap:24px;flex-wrap:wrap;margin-top:30px}
 .final-apply{display:inline-block;background:var(--paper);color:var(--ink);border:2px solid var(--ink);box-shadow:7px 7px 0 var(--ink);
- padding:15px 34px;text-decoration:none;font-weight:700;letter-spacing:.04em}
-.final-actions>span{font-size:13px;color:rgba(244,239,233,.75)}.final-actions>span a{color:#fff}
+ padding:14px 24px;text-decoration:none;font-weight:700;letter-spacing:.035em}
 
 @media(max-width:800px){
  .promise-grid{grid-template-columns:1fr}
@@ -995,14 +1000,7 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
  .stage .m1{font-size:12px;margin-top:9px;padding-top:8px}
  #stagePause{bottom:7px}
 
- .problem{padding:34px 0 38px}
- .agent-job-grid{gap:20px}
- .agent-job-copy h2{font-size:33px;line-height:1.02;max-width:none}
- .agent-job-lead{font-size:17px;line-height:1.4;margin-top:16px}
- .agent-job-support{font-size:13.5px;line-height:1.5;margin-top:11px}
- .agent-job-list>div{padding:12px 0;grid-template-columns:28px 1fr;gap:3px 9px}
- .agent-job-list strong{font-size:14px}
- .agent-job-list p{font-size:12.5px}
+
 
  .experience{padding-top:36px!important;padding-bottom:38px!important}
  .experience h2{font-size:31px;line-height:1.02}
@@ -1037,10 +1035,11 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
  .trust-rules>div{padding:10px 0}
  .trust-actions{margin-top:20px}
 
- .final-cta{padding:46px 0!important}
- .final-cta h2{font-size:34px;line-height:1.01}
- .final-actions{margin-top:24px;gap:14px}
- .final-apply{padding:12px 20px}
+ .final-cta{padding:42px 0!important}
+ .final-cta h2{font-size:33px;line-height:1.02}
+ .final-copy{font-size:14px;line-height:1.48;margin-top:16px}
+ .final-actions{margin-top:20px}
+ .final-apply{width:100%;text-align:center;padding:12px 16px}
 }
 </style>
 </head>
@@ -1059,11 +1058,11 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
   <button id="menuX" aria-label="Close menu">&times;</button>
   <div class="mcols">
    <div>
-    <div class="mlbl">EXPLORE</div>
-    <a href="#what">What your agent does</a>
-    <a href="#business">Four departments</a>
-    <a href="#experience">Your agent working</a>
-    <a href="/founder">About Brittnay</a>
+    <div class="mlbl">UNIVERSE CITY</div>
+    <a href="/">Home</a>
+    <a href="#what">How it works</a>
+    <a href="#business">Membership</a>
+    <a href="/founder">Founder</a>
    </div>
    <div>
     <div class="mlbl">DEPARTMENTS</div>
@@ -1113,17 +1112,13 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
 
 <!-- 2 WHAT YOUR AGENT DOES -->
 <section class="problem" id="what"><div class="w">
- <span class="k rv" style="color:var(--pa)">what your agent does</span>
- <div class="agent-job-grid">
-  <div class="agent-job-copy">
-   <h2 class="rv d1">Your agent is responsible for helping your life work.</h2>
-   <p class="agent-job-lead rv d2">A Universe City agent protects you from making plans you cannot realistically keep, helps turn what you want into commitments you can actually follow through on, and keeps the systems around those commitments current as life changes.</p>
-   <p class="rv d2 agent-job-support">You should not have to remember every dependency or manually update every part of your life. When one change touches several systems, your agent handles what can be handled, protects what you already committed to, and brings you the decision that actually needs you.</p>
-  </div>
-  <div class="agent-job-list rv d3">
-   <div><span>01</span><strong>Protect what already matters.</strong><p>A new plan should not quietly break a commitment, standard, or limit you already chose to keep.</p></div>
-   <div><span>02</span><strong>Keep the systems current.</strong><p>When life changes, the parts affected should change with it so the next decision starts from reality.</p></div>
-   <div><span>03</span><strong>Carry the work forward.</strong><p>Unfinished work does not disappear because the conversation ended. Your agent keeps responsibility for what still needs attention.</p></div>
+ <span class="k rv" style="color:var(--pa)">the job</span>
+ <div class="agent-job-single">
+  <h2 class="rv d1">Your agent helps you follow through.</h2>
+  <p class="agent-job-lead rv d2">A Universe City agent protects you from making plans you cannot realistically keep, helps turn what you want into commitments you can actually follow through on, and keeps the systems around those commitments current as life changes.</p>
+  <div class="agent-job-note rv d3">
+   <strong>You make the decisions. Your agent carries the management work around them.</strong>
+   <p>That means keeping track of what is already committed, noticing when something changes, protecting the parts of the plan that still matter, and making sure unfinished work does not disappear just because the conversation ended.</p>
   </div>
  </div>
 </div></section>
@@ -1198,11 +1193,11 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
 
 <!-- 5 FINAL CTA -->
 <section class="final-cta" id="apply-final"><div class="w">
- <span class="k rv">universe city</span>
- <h2 class="rv d1">You already manage a life.<br>You do not have to manage every part of it alone.</h2>
+ <span class="k rv">start where you are</span>
+ <h2 class="rv d1">Your life does not have to be organized before you start.</h2>
+ <p class="final-copy rv d2">Universe City starts with what is actually happening now and helps you build systems that make the next decision, commitment, and week easier to manage.</p>
  <div class="final-actions rv d2">
-  <a href="/apply" class="final-apply">APPLY</a>
-  <span>Already a resident? <a href="/login">Sign in.</a></span>
+  <a href="/apply" class="final-apply">APPLY FOR UNIVERSE CITY</a>
  </div>
 </div></section>
 
@@ -1240,11 +1235,11 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
   <div class="footer-tag">LIFE MANAGEMENT AGENCY</div>
   <div class="footer-meta">Denver, Colorado<br>management@ucitysocial.com</div>
  </div>
- <div><div class="lbl">EXPLORE</div>
-  <a href="#what">What your agent does</a>
-  <a href="#business">Four departments</a>
-  <a href="#experience">Your agent working</a>
-  <a href="/founder">About Brittnay</a>
+ <div><div class="lbl">UNIVERSE CITY</div>
+  <a href="/">Home</a>
+  <a href="#what">How it works</a>
+  <a href="#business">Membership</a>
+  <a href="/founder">Founder</a>
  </div>
  <div><div class="lbl">DEPARTMENTS</div>
   <a href="/agency-assessment">Agency Assessment</a>
