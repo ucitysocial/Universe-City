@@ -17,9 +17,9 @@ A responsive website. Public site, member area, private agent console.
    `STRIPE_PRICE_MEMBERSHIP`. Point a webhook at `/api/stripe/webhook` for
    `checkout.session.completed`, `customer.subscription.updated` and
    `customer.subscription.deleted`.
-4. Vercel. Add every variable from `.env.example`. `SUPABASE_SERVICE_ROLE_KEY`
-   and `ANTHROPIC_API_KEY` are server only and must never be prefixed
-   `NEXT_PUBLIC_`.
+4. Netlify. Production public traffic is served at `https://ucitysocial.com`.
+   Add every required variable from `.env.example`. Server only secrets must
+   never be prefixed `NEXT_PUBLIC_`.
 
 ## The rules this codebase exists to keep
 
@@ -43,3 +43,14 @@ all the client gets.
 Public explanations of Universe City systems follow [SYSTEM_EXPLANATION_STANDARD.md](SYSTEM_EXPLANATION_STANDARD.md).
 
 The standard defines how to balance what a system is with how a resident actually uses it, how an agent participates, and how the system develops through continued use.
+
+
+## Current product sources of truth
+
+Use these before extending public or resident facing behavior:
+
+1. [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) for visual hierarchy, public shell, navigation, typography, mobile density, and the distinction between public and working surfaces.
+2. [SYSTEM_EXPLANATION_STANDARD.md](SYSTEM_EXPLANATION_STANDARD.md) for agent behavior, system explanations, commitments, follow ups, and interaction patterns.
+3. [ARCHITECTURE.md](ARCHITECTURE.md) for data ownership, provenance, history, and server side constraints.
+
+Do not copy an older page or component merely because it already exists. If it conflicts with the current standards, update the component rather than reintroducing the old behavior.
