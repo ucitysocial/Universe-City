@@ -1,25 +1,180 @@
 <!doctype html>
 <html lang="en">
   <body style="margin:0;background:#f4f1eb;color:#111111;font-family:Arial,Helvetica,sans-serif;">
-    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f4f1eb;padding:32px 14px;">
-      <tr><td align="center">
-        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:620px;background:#ffffff;border:3px solid #111111;">
-          <tr><td style="background:#111111;color:#ffffff;padding:18px 24px;font-family:monospace;font-size:22px;letter-spacing:2px;">universe★city</td></tr>
-          <tr><td><table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr>
-            <td style="height:6px;background:#5C0F1B;"></td><td style="height:6px;background:#A07818;"></td><td style="height:6px;background:#4A2A78;"></td><td style="height:6px;background:#2A4B3C;"></td>
-          </tr></table></td></tr>
-          <tr><td style="padding:36px 30px 32px;">
-            <p style="margin:0 0 8px;font-size:11px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;color:#5C0F1B;">Universe City // Invitation</p>
-            <h1 style="margin:0 0 18px;font-size:31px;line-height:1.1;font-weight:600;">You've been invited.</h1>
-            <p style="margin:0 0 24px;font-size:16px;line-height:1.65;color:#4f4d49;">Use this invitation to create your Universe City account and continue enrollment.</p>
-            <p style="margin:0 0 30px;">
-              <a href="{{ .ConfirmationURL }}" style="display:inline-block;background:#5C0F1B;color:#ffffff;border:3px solid #111111;box-shadow:4px 4px 0 #111111;padding:14px 20px;text-decoration:none;font-weight:bold;">ACCEPT INVITATION</a>
-            </p>
-            <p style="margin:0;font-size:12px;line-height:1.55;color:#77736e;">If you were not expecting this invitation, you can ignore this email.</p>
-          </td></tr>
-          <tr><td style="padding:16px 30px;background:#f7f7f4;border-top:1px solid #d9d7d0;font-size:11px;color:#77736e;">Universe City · Life Management Agency</td></tr>
-        </table>
-      </td></tr>
+    <table
+      role="presentation"
+      width="100%"
+      cellspacing="0"
+      cellpadding="0"
+      style="background:#f4f1eb;padding:32px 14px;"
+    >
+      <tr>
+        <td align="center">
+
+          <table
+            role="presentation"
+            width="100%"
+            cellspacing="0"
+            cellpadding="0"
+            style="max-width:620px;background:#ffffff;border:3px solid #111111;"
+          >
+
+            <tr>
+              <td
+                style="
+                  background:#111111;
+                  color:#ffffff;
+                  padding:18px 24px;
+                  font-family:monospace;
+                  font-size:22px;
+                  letter-spacing:2px;
+                "
+              >
+                universe★city
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <table
+                  role="presentation"
+                  width="100%"
+                  cellspacing="0"
+                  cellpadding="0"
+                >
+                  <tr>
+                    <td style="height:6px;background:#5C0F1B;"></td>
+                    <td style="height:6px;background:#A07818;"></td>
+                    <td style="height:6px;background:#4A2A78;"></td>
+                    <td style="height:6px;background:#2A4B3C;"></td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr>
+              <td style="padding:36px 30px 32px;">
+
+                <p
+                  style="
+                    margin:0 0 8px;
+                    font-size:11px;
+                    font-weight:bold;
+                    letter-spacing:2px;
+                    text-transform:uppercase;
+                    color:#5C0F1B;
+                  "
+                >
+                  YOU’RE INVITED TO UNIVERSE CITY
+                </p>
+
+                <h1
+                  style="
+                    margin:0 0 18px;
+                    font-size:31px;
+                    line-height:1.1;
+                    font-weight:600;
+                  "
+                >
+                  There’s a place for you here.
+                </h1>
+
+                <p
+                  style="
+                    margin:0 0 24px;
+                    font-size:16px;
+                    line-height:1.65;
+                    color:#4f4d49;
+                  "
+                >
+                  You’ve been invited to create a Universe City account.
+                </p>
+
+                <p
+                  style="
+                    margin:0 0 26px;
+                    font-size:16px;
+                    line-height:1.65;
+                    color:#4f4d49;
+                  "
+                >
+                  Accept your invitation to activate your account and continue setting up your membership.
+                </p>
+
+                <p style="margin:0 0 34px;">
+                  <a
+                    href="{{ .ConfirmationURL }}"
+                    style="
+                      display:inline-block;
+                      background:#5C0F1B;
+                      color:#ffffff;
+                      border:3px solid #111111;
+                      box-shadow:4px 4px 0 #111111;
+                      padding:14px 20px;
+                      text-decoration:none;
+                      font-weight:bold;
+                    "
+                  >
+                    ACCEPT INVITATION
+                  </a>
+                </p>
+
+                <div
+                  style="
+                    border-top:1px solid #d9d7d0;
+                    padding-top:22px;
+                  "
+                >
+                  <p
+                    style="
+                      margin:0;
+                      font-size:12px;
+                      line-height:1.6;
+                      color:#77736e;
+                    "
+                  >
+                    Already have a Universe City account?
+                    <a
+                      href="{{ .SiteURL }}/login"
+                      style="color:#111111;font-weight:bold;"
+                    >
+                      Log in to Universe City.
+                    </a>
+                  </p>
+
+                  <p
+                    style="
+                      margin:10px 0 0;
+                      font-size:12px;
+                      line-height:1.55;
+                      color:#77736e;
+                    "
+                  >
+                    If you were not expecting an invitation to Universe City, you can ignore this email.
+                  </p>
+                </div>
+
+              </td>
+            </tr>
+
+            <tr>
+              <td
+                style="
+                  padding:16px 30px;
+                  background:#f7f7f4;
+                  border-top:1px solid #d9d7d0;
+                  font-size:11px;
+                  color:#77736e;
+                "
+              >
+                Universe City · Life Management Agency
+              </td>
+            </tr>
+
+          </table>
+
+        </td>
+      </tr>
     </table>
   </body>
 </html>
