@@ -26,7 +26,7 @@ export default async function ClientFile({ params }: { params: { id: string } })
   return (
     <div style={{ maxWidth: 820 }}>
       {/* 1 */}
-      <p className="kick">Member file</p>
+      <p className="kick">Member</p>
       <h1 style={{ fontSize: 32, marginTop: 8 }}>{profile.name}</h1>
       <p style={{ color: 'var(--dim)' }}>
         {profile.case_no} &middot; {profile.membership}
@@ -128,7 +128,7 @@ export default async function ClientFile({ params }: { params: { id: string } })
         <div className="lab" style={{ color: 'var(--II)' }}>Private to you</div>
         <p className="note" style={{ marginTop: 8 }}>
           Generated before the meeting from the record above. Not built in this pass, and it is
-          guidance rather than anything that reaches the file.
+          guidance rather than anything shown to the resident.
         </p>
       </div>
 
