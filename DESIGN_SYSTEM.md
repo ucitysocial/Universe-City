@@ -55,6 +55,8 @@ Internal / agent language may use:
 
 Residents should benefit from the internal file structure without being asked to understand it.
 
+System explanations, department copy, product education, and future public descriptions follow [SYSTEM_EXPLANATION_STANDARD.md](SYSTEM_EXPLANATION_STANDARD.md). This is the source of truth for the blend of what a system is and how residents actually use it.
+
 ## Source of truth
 
 `app/globals.css` and the palette above must stay aligned with the production marketing site. New pages should reuse existing page and surface classes before adding new one-off styles.
