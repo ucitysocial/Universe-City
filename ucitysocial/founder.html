@@ -77,15 +77,14 @@ a{color:inherit}
 .zone:focus-visible{outline:2px solid var(--burgundy);outline-offset:-4px}
 
 /* type inside the book */
-.flow p{margin:0;orphans:2;widows:2}
-.flow p+p{text-indent:1.4em}
+.flow p{margin:0;orphans:2;widows:2;break-inside:avoid;-webkit-column-break-inside:avoid}
+.flow p+p{margin-top:.6em}
 .flow h2{margin:0 0 20px;font:500 31px/1.1 var(--reading);letter-spacing:-.012em;break-after:avoid;-webkit-column-break-after:avoid}
 .kick{margin:0 0 13px;font:14px/1.2 var(--record);letter-spacing:.2em;text-transform:uppercase;color:var(--burgundy)}
 .ch{break-before:column;-webkit-column-break-before:always}
 .ch>h2+p::first-letter{float:left;margin:.07em .09em 0 0;font:600 3.2em/.8 var(--reading);color:var(--burgundy)}
 .pull{margin:20px 0 0;padding:13px 0 14px;border-top:1px solid rgba(20,10,12,.3);border-bottom:1px solid rgba(20,10,12,.3);font-style:italic;font-size:1.13em;line-height:1.36;break-inside:avoid;-webkit-column-break-inside:avoid}
 .pull+p{margin-top:18px}
-.flow .pull+p,.flow .q{text-indent:0}
 
 .tp{display:flex;flex-direction:column;justify-content:center;height:100%;break-after:column;-webkit-column-break-after:always}
 .tp .t-mark{font:600 15px var(--ui);color:var(--burgundy)}
@@ -191,7 +190,7 @@ a{color:inherit}
     <span class="c-title">Founder Story</span>
     <span class="c-author">Brittnay Folkes</span>
    </span>
-   <span class="c-foot">Denver, Colorado &middot; 2016 to 2026</span>
+   <span class="c-foot">Denver, Colorado &middot; 2016 to <span data-year>2026</span></span>
   </button>
 
   <div class="board">
@@ -205,7 +204,7 @@ a{color:inherit}
        <p class="t-mark">universe&#9733;city</p>
        <h2>Founder Story</h2>
        <p class="t-author">Brittnay Folkes</p>
-       <p class="t-place">Denver, Colorado<br>2016 to 2026</p>
+       <p class="t-place">Denver, Colorado<br>2016 to <span data-year>2026</span></p>
       </section>
 
       <section id="contents" data-title="Contents">
@@ -214,7 +213,7 @@ a{color:inherit}
       </section>
 
       <section class="ch" id="timeline" data-title="Timeline" data-toc="Timeline">
-       <p class="kick">2015 to 2026</p>
+       <p class="kick">2015 to <span data-year>2026</span></p>
        <h2>Timeline</h2>
        <dl class="tl">
         <div class="row"><dt>2015 to 2020</dt><dd>I work in multifamily interior design. I see how much money goes into building housing. I cannot work out why living in it keeps costing more.</dd></div>
@@ -223,7 +222,7 @@ a{color:inherit}
         <div class="row"><dt>2021</dt><dd>I move to Denver. I look into community development corporations. I build a project for the Denver Housing Authority.</dd></div>
         <div class="row"><dt>2022 to 2025</dt><dd>I work in community management, at a nonprofit for homeless youth, and at a community radio station. I attend hospitality school. Each job changes how I define the folders.</dd></div>
         <div class="row"><dt>January 2026</dt><dd>I expand the first model of twelve folders into four departments with twelve folders each.</dd></div>
-        <div class="row"><dt>2026</dt><dd>I am 30. I am the first resident of Universe City.</dd></div>
+        <div class="row"><dt>Now</dt><dd>I am <span data-age>30</span>. I am the first resident of Universe City. I run all forty eight folders on my own life first, in public. I publish the numbers as I go.</dd></div>
        </dl>
       </section>
 
@@ -261,7 +260,8 @@ a{color:inherit}
       <section class="ch" id="ch4" data-title="Working with kids changed the question." data-toc="Working with kids changed the question.">
        <p class="kick">Chapter 04</p>
        <h2>Working with kids changed the question.</h2>
-       <p>I worked with kids. I started asking what a child should understand before adulthood begins.</p>
+       <p>I worked with homeless youth at a nonprofit. I worked with kids at a Boys and Girls Club.</p>
+       <p>I started asking what a child should understand before adulthood begins.</p>
        <p>I started thinking in terms of preparedness.</p>
        <blockquote class="pull">What do these kids need to understand to be prepared for adulthood?</blockquote>
       </section>
@@ -288,7 +288,7 @@ a{color:inherit}
        <p class="kick">Chapter 07</p>
        <h2>Where I come from</h2>
        <p>Both of my parents were Libras. They were born on the same day.</p>
-       <p>Law and order were present in my upbringing. Dysfunction and inconsistency were present too.</p>
+       <p>Law and order were present in my upbringing. So were dysfunction, inconsistency, and the outlaw side of life.</p>
        <p>I can see my upbringing in Universe City. It has folders named Standards, Mediation, Boundary, and Law.</p>
        <p>I know what life is like when rules and records are inconsistent or missing.</p>
       </section>
@@ -303,8 +303,8 @@ a{color:inherit}
       </section>
 
       <section class="ch" id="ch9" data-title="I am 30 now." data-toc="I am 30 now.">
-       <p class="kick">Chapter 09 &middot; 2026</p>
-       <h2>I am 30 now.</h2>
+       <p class="kick">Chapter 09 &middot; <span data-year>2026</span></p>
+       <h2>I am <span data-age>30</span> now.</h2>
        <p>I have spent most of my twenties building a way to make everyday life easier to manage.</p>
        <p>I started Universe City in 2018. I am still its first resident.</p>
        <p>Universe City provides life management. It does not provide therapy. It does not provide case management.</p>
@@ -445,6 +445,21 @@ a{color:inherit}
     if(document.fonts.ready)document.fonts.ready.then(relayout);
     if(document.fonts.addEventListener)document.fonts.addEventListener('loadingdone',relayout);
   }
+
+  /* Her age and the current year fill in on their own. Born December 10, 1995.
+     The date is read in Denver time, so the age changes on her birthday there. */
+  try{
+    const now={};
+    new Intl.DateTimeFormat('en-US',{timeZone:'America/Denver',year:'numeric',month:'numeric',day:'numeric'})
+      .formatToParts(new Date()).forEach(x=>{now[x.type]=Number(x.value)});
+    const age=now.year-1995-((now.month<12||(now.month===12&&now.day<10))?1:0);
+    if(age>=30){
+      document.querySelectorAll('[data-age]').forEach(e=>{e.textContent=age});
+      document.querySelectorAll('[data-year]').forEach(e=>{e.textContent=now.year});
+      const last=$('ch9'),title='I am '+age+' now.';
+      last.dataset.title=title;last.dataset.toc=title;
+    }
+  }catch(e){}
 
   buildContents();paint();
 })();
