@@ -602,6 +602,62 @@ footer a:hover{opacity:1}
 .biz .lead,.pricing .lead,.mlist .lead,.pfoot .lead{color:var(--ink)}
 .mdef span{color:#3d2c28}
 .mrow .nm{color:var(--ink)}
+
+/* compact department explorer */
+.dept-hero{background:var(--c);color:var(--paper);border-bottom:2px solid var(--ink)}
+.dept-hero .w{padding-top:28px;padding-bottom:30px}
+.dept-hero-line{display:flex;align-items:flex-end;gap:24px;flex-wrap:wrap}
+.dept-hero h1{font-size:clamp(36px,4vw,54px);line-height:.98;letter-spacing:-.035em;color:#fff}
+.dept-count{margin-left:auto;font-family:var(--record);font-size:15px;letter-spacing:.14em;color:rgba(255,255,255,.72);padding-bottom:5px}
+.dept-hero p{font-size:15.5px;line-height:1.5;max-width:74ch;margin-top:12px;color:rgba(255,255,255,.84)}
+.system-explorer{padding:34px 0 52px;background:var(--paper)}
+.explorer-intro{margin-bottom:18px;max-width:820px}
+.explorer-intro h2{font-size:clamp(24px,2.3vw,30px);letter-spacing:-.025em;line-height:1.05;color:var(--ink)}
+.explorer-intro p{margin-top:8px;color:#594843;line-height:1.5;font-size:14.5px;max-width:76ch}
+.system-workspace{display:grid;grid-template-columns:310px minmax(0,1fr);border:2px solid var(--ink);min-height:570px;background:var(--paper)}
+.system-index{border-right:2px solid var(--ink);background:var(--paper2)}
+.system-index-head{padding:18px 20px;border-bottom:2px solid var(--ink);font-family:var(--record);font-size:13px;letter-spacing:.14em}
+.system-item{width:100%;border:0;border-bottom:1px solid var(--rule);background:transparent;text-align:left;padding:14px 18px;display:flex;gap:14px;align-items:center;font-family:var(--voice);font-size:14px;cursor:pointer;color:var(--ink)}
+.system-item .n{font-family:var(--record);font-size:14px;color:var(--c);width:26px}
+.system-item .arr{margin-left:auto;opacity:.35}
+.system-item[aria-selected="true"]{background:var(--c);color:#fff}
+.system-item[aria-selected="true"] .n{color:#fff}
+.system-item[aria-selected="true"] .arr{opacity:1}
+.system-item:focus-visible{outline:2px solid var(--ink);outline-offset:-3px}
+.system-panel{padding:36px 42px 34px;display:flex;flex-direction:column;transition:opacity .16s ease,transform .16s ease}
+.system-panel.switching{opacity:.18;transform:translateX(8px)}
+.system-panel-top{display:flex;justify-content:space-between;gap:20px;align-items:start;border-bottom:1px solid var(--rule);padding-bottom:22px}
+.system-no{font-family:var(--record);font-size:15px;letter-spacing:.13em;color:var(--c)}
+.system-title{font-size:clamp(36px,3.7vw,50px);line-height:1;letter-spacing:-.035em;margin-top:6px;font-weight:600}
+.system-progress{font-family:var(--record);font-size:13px;color:var(--dim);letter-spacing:.1em}
+.system-definition,.system-application,.system-example{display:grid;grid-template-columns:150px minmax(0,1fr);gap:24px}
+.system-definition{margin-top:24px}
+.system-label{font-family:var(--record);font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.system-definition p{font-size:16px;line-height:1.55;color:#4d3c37;font-style:italic;max-width:56ch}
+.system-application{margin-top:28px;padding-top:24px;border-top:2px solid var(--c)}
+.system-application .system-label{color:var(--c)}
+.system-application p{font-size:clamp(17px,1.55vw,20px);line-height:1.48;max-width:56ch;font-weight:600;letter-spacing:-.01em}
+.system-example{position:relative;margin-top:30px;color:var(--paper);padding:24px 0;z-index:0}
+.system-example::before{content:"";position:absolute;inset:0 -26px;background:var(--ink);z-index:-1}
+.system-example .system-label{color:rgba(255,255,255,.6)}
+.system-example p{font-size:15px;line-height:1.62;color:rgba(255,255,255,.88);max-width:56ch}
+.system-next-wrap{margin-top:auto;padding-top:28px;display:flex;justify-content:flex-end}
+.system-next{display:inline-block;background:var(--c);color:#fff;text-decoration:none;padding:13px 18px;font-weight:700;font-size:14px;border:0;box-shadow:5px 5px 0 var(--ink);cursor:pointer;font-family:var(--voice)}
+.system-next:active{transform:translate(3px,3px);box-shadow:2px 2px 0 var(--ink)}
+@media(max-width:800px){
+ .dept-hero .w{padding-top:22px;padding-bottom:24px}
+ .dept-hero-line{gap:8px 18px}
+ .dept-count{margin-left:0;width:100%}
+ .dept-hero p{font-size:14.5px}
+ .system-explorer{padding-top:26px}
+ .system-workspace{grid-template-columns:1fr}
+ .system-index{border-right:0;border-bottom:2px solid var(--ink)}
+ .system-item{padding:13px 15px}
+ .system-panel{padding:28px 20px}
+ .system-definition,.system-application,.system-example{grid-template-columns:1fr;gap:8px}
+ .system-example::before{inset:0 -10px}
+}
+
 </style></head>
 <body style="--c:var(--lm)">
 <nav><div class="w">
@@ -635,29 +691,37 @@ footer a:hover{opacity:1}
   <div class="mfoot"><span>&#9733;</span><span>management@ucitysocial.com</span><span>Denver, Colorado</span></div>
  </div>
 </div>
-<div class="phero" data-rn="IV"><div class="w">
- <a href="/#business" class="back rv">&larr; All four departments</a>
- <span class="k rv">department IV</span>
- <h1 class="rv d1">Life Management</h1>
- <p class="lead rv d2 mt3" style="max-width:44ch">Set your priorities.</p>
- <p class="rv d2" style="max-width:56ch">These twelve folders cover the rules, emergency plans, self-description, ethics, boundaries, decision practices, priorities, and social records you use to manage your life.</p>
-</div></div>
 
-<section class="mlist"><div class="w">
- <span class="k rv" style="color:var(--c)">twelve folders</span>
- <h2 class="rv d1" style="margin-bottom:8px">Each folder becomes a working system</h2>
- <p class="rv d2" style="max-width:60ch;margin-bottom:var(--s3)">The definition names the part of life. In Universe City, that idea is applied to your real information and turned into a structure you can use, update, and return to as life changes. The folders do not run in a required sequence.</p>
- <div class="mrow rv"><div class="num">01</div><div><div class="nm">Standards</div><div class="mdef"><div><b>Definition</b><span>Rules or minimum conditions a person chooses to maintain.</span></div><div><b>In Universe City</b><span>Standards turns the rules you want to live by into something explicit enough to use when decisions come up. As you confirm, change, or outgrow those rules, the system changes with you.</span></div></div></div></div><div class="mrow rv"><div class="num">02</div><div><div class="nm">Survival</div><div class="mdef"><div><b>Definition</b><span>Staying safe and functional through danger, breakdown or emergency.</span></div><div><b>In Universe City</b><span>Survival brings emergency money, documents, contacts, locations, and contingency plans into one readiness system. It shows what you have, what is missing, and how long you could keep functioning if something went wrong.</span></div></div></div></div><div class="mrow rv"><div class="num">03</div><div><div class="nm">Perception</div><div class="mdef"><div><b>Definition</b><span>The meaning a person assigns to what happens to them.</span></div><div><b>In Universe City</b><span>Perception records the meanings you tend to assign to events and where those interpretations come from. As patterns repeat across your life, the system helps separate what happened from what you assumed it meant.</span></div></div></div></div><div class="mrow rv"><div class="num">04</div><div><div class="nm">Instinct</div><div class="mdef"><div><b>Definition</b><span>A response that occurs without conscious reasoning.</span></div><div><b>In Universe City</b><span>Instinct identifies the reactions and patterns that show up before deliberate thought. Repeated behavior becomes visible enough to confirm, question, or account for in future decisions.</span></div></div></div></div><div class="mrow rv"><div class="num">05</div><div><div class="nm">Identity</div><div class="mdef"><div><b>Definition</b><span>The qualities, values and beliefs that make a person who they are.</span></div><div><b>In Universe City</b><span>Identity turns the way you describe yourself into a living self-description that can be compared with how you actually spend time, money, and attention. The record changes when the old description stops fitting.</span></div></div></div></div><div class="mrow rv"><div class="num">06</div><div><div class="nm">Ethics</div><div class="mdef"><div><b>Definition</b><span>What a person believes is right and wrong.</span></div><div><b>In Universe City</b><span>Ethics collects the beliefs you use to decide what is right, wrong, acceptable, or unacceptable—and where those beliefs came from. Difficult choices have a visible moral reference instead of an improvised answer every time.</span></div></div></div></div><div class="mrow rv"><div class="num">07</div><div><div class="nm">Equilibrium</div><div class="mdef"><div><b>Definition</b><span>A state of balance between competing forces.</span></div><div><b>In Universe City</b><span>Equilibrium compares what you say matters with where your time, money, and attention are actually going across the other systems. It makes imbalance visible so neglected areas are easier to identify.</span></div></div></div></div><div class="mrow rv"><div class="num">08</div><div><div class="nm">Boundary</div><div class="mdef"><div><b>Definition</b><span>A line that marks a limit.</span></div><div><b>In Universe City</b><span>Boundary turns a limit into a documented rule: what the limit is, who it applies to, how it was communicated, and what happened afterward. Over time, the system shows which boundaries are clear, repeated, or not holding.</span></div></div></div></div><div class="mrow rv"><div class="num">09</div><div><div class="nm">Discernment</div><div class="mdef"><div><b>Definition</b><span>Deciding well.</span></div><div><b>In Universe City</b><span>Discernment creates pause rules for decisions you know are easy to make too quickly. It records the choice, the reasoning, and the outcome so future decisions can use what past decisions taught you.</span></div></div></div></div><div class="mrow rv"><div class="num">10</div><div><div class="nm">Prioritization</div><div class="mdef"><div><b>Definition</b><span>Deciding the order in which things get done.</span></div><div><b>In Universe City</b><span>Prioritization turns everything competing for attention into an explicit order of importance with reasons attached. When everything feels urgent, the system gives decisions a hierarchy to return to.</span></div></div></div></div><div class="mrow rv"><div class="num">11</div><div><div class="nm">Systems</div><div class="mdef"><div><b>Definition</b><span>A set of parts working together as a method.</span></div><div><b>In Universe City</b><span>Systems keeps a registry of the routines, tools, protocols, and structures built across the rest of Universe City. It shows what is still working, what has drifted, and what needs to be rebuilt.</span></div></div></div></div><div class="mrow rv"><div class="num">12</div><div><div class="nm">Socializing</div><div class="mdef"><div><b>Definition</b><span>Spending time in the company of other people.</span></div><div><b>In Universe City</b><span>Socializing maps who is actually in your life, where you spend social time, who you owe a response to, and what kind of social life you want. It makes the gap between current connection and desired connection visible.</span></div></div></div></div>
+<section class="dept-hero"><div class="w">
+ <div class="dept-hero-line">
+  <h1>Life Management</h1>
+  <div class="dept-count">12 SYSTEMS</div>
+ </div>
+ <p>Turn values and priorities into decisions you can actually use. These systems organize the rules, patterns, boundaries, choices, and relationships that shape how you run your life.</p>
 </div></section>
 
-<section class="pfoot"><div class="w">
- <span class="k rv" style="color:var(--c)">membership</span>
- <h2 class="rv d1">The systems develop as your life requires them</h2>
- <p class="rv d2 mt2" style="max-width:54ch">Universe City does not require you to finish one folder before another begins. Systems become useful as the information they manage becomes relevant, and they stay connected as your life changes.</p>
- <div class="btns rv d2"><a href="/membership" class="btn" style="background:var(--c);color:#fff;box-shadow:5px 5px 0 var(--ink)">See membership</a></div>
- <div style="margin-top:var(--s5)">
-  <span class="k rv" style="color:var(--dim)">the other three</span>
-  <div class="others rv d1"><a href="/agency-assessment" style="--o:var(--pa)"><div class="rn">DEPARTMENT I</div><div class="nm">Agency Assessment</div><div class="go">Folder 01 &middot; Time &rarr;</div></a><a href="/housing-stability" style="--o:var(--hs)"><div class="rn">DEPARTMENT II</div><div class="nm">Housing Stability</div><div class="go">Folder 01 &middot; Inventory &rarr;</div></a><a href="/career-development" style="--o:var(--cd)"><div class="rn">DEPARTMENT III</div><div class="nm">Career Development</div><div class="go">Folder 01 &middot; Salary &rarr;</div></a></div>
+<section class="system-explorer"><div class="w">
+ <div class="explorer-intro">
+  <h2>Choose a system.</h2>
+  <p>The definition names the part of life. Open a system to see what information belongs there, how that information is organized, what the system makes visible, and how it changes the way that part of life is managed.</p>
+ </div>
+
+ <div class="system-workspace">
+  <aside class="system-index" aria-label="Life Management systems">
+   <div class="system-index-head">LIFE MANAGEMENT &middot; 12 SYSTEMS</div>
+   <button class="system-item" type="button" data-i="0" aria-selected="true"><span class="n">01</span><span>Standards</span><span class="arr">&rarr;</span></button><button class="system-item" type="button" data-i="1" aria-selected="false"><span class="n">02</span><span>Survival</span><span class="arr">&rarr;</span></button><button class="system-item" type="button" data-i="2" aria-selected="false"><span class="n">03</span><span>Perception</span><span class="arr">&rarr;</span></button><button class="system-item" type="button" data-i="3" aria-selected="false"><span class="n">04</span><span>Instinct</span><span class="arr">&rarr;</span></button><button class="system-item" type="button" data-i="4" aria-selected="false"><span class="n">05</span><span>Identity</span><span class="arr">&rarr;</span></button><button class="system-item" type="button" data-i="5" aria-selected="false"><span class="n">06</span><span>Ethics</span><span class="arr">&rarr;</span></button><button class="system-item" type="button" data-i="6" aria-selected="false"><span class="n">07</span><span>Equilibrium</span><span class="arr">&rarr;</span></button><button class="system-item" type="button" data-i="7" aria-selected="false"><span class="n">08</span><span>Boundary</span><span class="arr">&rarr;</span></button><button class="system-item" type="button" data-i="8" aria-selected="false"><span class="n">09</span><span>Discernment</span><span class="arr">&rarr;</span></button><button class="system-item" type="button" data-i="9" aria-selected="false"><span class="n">10</span><span>Prioritization</span><span class="arr">&rarr;</span></button><button class="system-item" type="button" data-i="10" aria-selected="false"><span class="n">11</span><span>Systems</span><span class="arr">&rarr;</span></button><button class="system-item" type="button" data-i="11" aria-selected="false"><span class="n">12</span><span>Socializing</span><span class="arr">&rarr;</span></button>
+  </aside>
+
+  <main class="system-panel" id="systemPanel">
+   <div class="system-panel-top">
+    <div><div class="system-no" id="systemNo"></div><div class="system-title" id="systemTitle"></div></div>
+    <div class="system-progress" id="systemProgress"></div>
+   </div>
+   <div class="system-definition"><div class="system-label">Definition</div><p id="systemDefinition"></p></div>
+   <div class="system-application"><div class="system-label">In Universe City</div><p id="systemApplication"></p></div>
+   <div class="system-example"><div class="system-label">What that looks like</div><p id="systemExample"></p></div>
+   <div class="system-next-wrap"><a class="system-next" id="systemNext" href="#"></a></div>
+  </main>
  </div>
 </div></section>
 <footer><div class="w cols">
@@ -691,4 +755,70 @@ if(mBtn){
  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!mPan.hidden)close()});
 }
 })();
-</script></body></html>
+</script>
+<script>
+(function(){
+ var systems=[{"n":"01","name":"Standards","definition":"Rules or minimum conditions a person chooses to maintain.","application":"Standards turns the rules you want to live by into clear conditions you can use when choices come up. A standard is not just a preference. It becomes a reference for what you will maintain, accept, or change.","example":"You decide that work cannot regularly take over your only day off. Standards gives that rule somewhere to live so future schedule decisions are measured against it."},{"n":"02","name":"Survival","definition":"Staying safe and functional through danger, breakdown or emergency.","application":"Survival organizes what you need to stay safe and functional when normal life breaks down. It brings emergency money, documents, contacts, places, supplies, and fallback plans into one readiness picture.","example":"Your income stops unexpectedly. Survival shows what cash is available, which bills become urgent first, who you can call, and how long the current plan can carry you."},{"n":"03","name":"Perception","definition":"The meaning a person assigns to what happens to them.","application":"Perception records the meaning you tend to assign to what happens and compares that meaning with the facts available. It helps repeated interpretations become visible before they quietly shape every decision.","example":"A friend takes hours to reply and you read it as rejection. Perception can separate the delayed reply from the meaning you attached to it and show whether that interpretation repeats elsewhere."},{"n":"04","name":"Instinct","definition":"A response that occurs without conscious reasoning.","application":"Instinct captures the reactions that happen before deliberate thought and looks for patterns across situations. Once the pattern is visible, you can account for it instead of only noticing after the outcome.","example":"You agree to requests before checking your schedule, then feel trapped later. Instinct makes the automatic yes visible early enough to build a pause around it."},{"n":"05","name":"Identity","definition":"The qualities, values and beliefs that make a person who they are.","application":"Identity turns how you describe yourself into a living picture that can be compared with your actual choices, time, money, relationships, and goals. It gives you somewhere to notice when the old description no longer fits.","example":"You still describe yourself as someone who loves nightlife, but you have stopped enjoying it and keep choosing quiet weekends. Identity can show that shift without forcing the old label to stay."},{"n":"06","name":"Ethics","definition":"What a person believes is right and wrong.","application":"Ethics organizes the beliefs you use to decide what is right, wrong, acceptable, or unacceptable and where those beliefs came from. It creates a reference for hard choices instead of inventing a moral rule in the moment.","example":"A friend asks you to keep a secret that could hurt someone else. Ethics gives you your own stated principles to weigh before deciding what loyalty requires."},{"n":"07","name":"Equilibrium","definition":"A state of balance between competing forces.","application":"Equilibrium compares what you say matters with where your time, money, and attention are actually going. It reads across the rest of your systems to make imbalance visible before one area quietly consumes the others.","example":"You say health and family are priorities, but work has taken every evening for three weeks. Equilibrium makes the mismatch visible so the next plan can respond to it."},{"n":"08","name":"Boundary","definition":"A line that marks a limit.","application":"Boundary turns a limit into something specific enough to communicate and maintain. It tracks what the limit is, who it applies to, how it was expressed, and what happened when it was tested.","example":"You tell a family member you cannot lend money again. Boundary records the limit and helps you recognize when the same request returns in a different form."},{"n":"09","name":"Discernment","definition":"Deciding well.","application":"Discernment creates rules for decisions that deserve more time than your first reaction. It gives important choices a pause, a set of questions, and a record of what the decision eventually cost or created.","example":"You are offered a purchase plan that sounds affordable in the moment. Discernment can trigger a pause, compare the total cost with current obligations, and keep the final decision for future reference."},{"n":"10","name":"Prioritization","definition":"Deciding the order in which things get done.","application":"Prioritization turns competing needs into an explicit order for what comes first when everything feels important. It gives plans a hierarchy so urgency does not automatically win.","example":"Work, a family request, errands, and rest all want the same Saturday. Prioritization gives you an order based on what you already said matters, not whoever asked last."},{"n":"11","name":"Systems","definition":"A set of parts working together as a method.","application":"Systems keeps a registry of the routines, tools, checklists, plans, and structures built across Universe City. It shows what still works, what stopped being used, and what needs to be changed when life no longer fits the original setup.","example":"Your meal planning routine worked when you had weekends free, but your schedule changed. Systems flags that the routine is failing because the conditions changed, not because you forgot how to plan."},{"n":"12","name":"Socializing","definition":"Spending time in the company of other people.","application":"Socializing maps the people actually in your life, the relationships you want to maintain, the places you enjoy, and the kind of social life you want to build. It makes connection something you can shape instead of only noticing when it feels absent.","example":"You keep saying you want to see friends more, but weeks pass without plans. Socializing shows who you want to stay close to and gives those relationships a place in the calendar."}];
+ var nextDepartment="/apply";
+ var nextDepartmentName="Apply for Universe City";
+ var buttons=[].slice.call(document.querySelectorAll('.system-item'));
+ var panel=document.getElementById('systemPanel');
+ var title=document.getElementById('systemTitle');
+ var number=document.getElementById('systemNo');
+ var progress=document.getElementById('systemProgress');
+ var definition=document.getElementById('systemDefinition');
+ var application=document.getElementById('systemApplication');
+ var example=document.getElementById('systemExample');
+ var next=document.getElementById('systemNext');
+ var current=0;
+ var reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+ function slug(s){return s.toLowerCase().replace(/[^a-z0-9]+/g,'').trim()}
+
+ function paint(i,scroll){
+  current=i;
+  var s=systems[i];
+  function apply(){
+   number.textContent='SYSTEM '+s.n;
+   title.textContent=s.name;
+   progress.textContent=s.n+' / 12';
+   definition.textContent=s.definition;
+   application.textContent=s.application;
+   example.textContent=s.example;
+   buttons.forEach(function(b,x){b.setAttribute('aria-selected',x===i?'true':'false')});
+   if(i<systems.length-1){
+    next.textContent='Next: '+systems[i+1].name+' \u2192';
+    next.href='#'+slug(systems[i+1].name);
+   }else{
+    next.textContent='Apply for Universe City \u2192';
+    next.href=nextDepartment;
+   }
+   if(history.replaceState) history.replaceState(null,'','#'+slug(s.name));
+   panel.classList.remove('switching');
+   if(scroll && window.matchMedia('(max-width:800px)').matches){
+    panel.scrollIntoView({behavior:reduce?'auto':'smooth',block:'start'});
+   }
+  }
+  if(reduce){apply();return}
+  panel.classList.add('switching');
+  setTimeout(apply,110);
+ }
+
+ buttons.forEach(function(b){
+  b.addEventListener('click',function(){paint(+b.dataset.i,true)});
+ });
+
+ next.addEventListener('click',function(e){
+  if(current<systems.length-1){
+   e.preventDefault();
+   paint(current+1,true);
+  }
+ });
+
+ var hash=(location.hash||'').slice(1);
+ var initial=systems.findIndex(function(s){return slug(s.name)===hash});
+ paint(initial>-1?initial:0,false);
+})();
+</script>
+
+</body></html>
