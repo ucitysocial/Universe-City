@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 export default function SiteHeader({ signedIn }: { signedIn: boolean }) {
   const [open, setOpen] = useState(false);
-  const mainSiteUrl = process.env.NEXT_PUBLIC_MARKETING_SITE_URL ?? 'https://ucitysocial.com';
+  const mainSiteUrl = process.env.NEXT_PUBLIC_MARKETING_SITE_URL ?? 'https://www.ucitysocial.com';
 
   return (
     <header className="site-head">
