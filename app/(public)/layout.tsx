@@ -7,15 +7,41 @@ export default async function PublicLayout({ children }: { children: React.React
   return (
     <>
       <SiteHeader signedIn={!!user} />
-      <main>{children}</main>
-      <footer className="site-foot">
-        <div className="wrap" style={{ display: 'flex', gap: 22, flexWrap: 'wrap' }}>
-          <span>universe&#9733;city &middot; Life Management Agency</span>
-          <span style={{ marginLeft: 'auto', display: 'flex', gap: 18 }}>
-            <Link href="/how-it-works">How it works</Link>
+      <main className="public-site">{children}</main>
+
+      <footer className="public-footer">
+        <div className="wrap public-footer-grid">
+          <div>
+            <div className="public-footer-brand">universe<span>★</span>city</div>
+            <div className="public-footer-sub">LIFE MANAGEMENT AGENCY</div>
+            <div className="public-footer-meta">
+              Denver, Colorado<br />
+              management@ucitysocial.com
+            </div>
+          </div>
+
+          <div>
+            <div className="public-footer-label">HOW IT WORKS</div>
+            <a href="/#what">Why an agent</a>
+            <a href="/#system">Starting folders</a>
+            <a href="/#departments">Four departments</a>
+            <a href="/agency-assessment">Agency Assessment folders</a>
+          </div>
+
+          <div>
+            <div className="public-footer-label">OPEN BOOKS</div>
+            <a href="#">Quarterly report</a>
             <Link href="/membership">Membership</Link>
-            <Link href="/login">Log in</Link>
-          </span>
+            <Link href="/login">Member sign in</Link>
+          </div>
+
+          <div>
+            <div className="public-footer-label">MORE</div>
+            <a href="/founder">About the founder</a>
+            <a href="#">The show</a>
+            <a href="#">For employers</a>
+            <Link href="/login">Sign in</Link>
+          </div>
         </div>
       </footer>
     </>
