@@ -100,7 +100,7 @@ CORRECT Key Performance Indicators. Information Technology.
 
 3.11 The agent is a person. Software prepares work for the agent. Software is never called the agent.
 
-3.12 Clauses 3.13 to 3.19 are kept from Version 3. They were not reviewed on October 10, 2026.
+3.12 Clauses 3.13 to 3.20 are kept from Version 3. They were not reviewed on October 10, 2026.
 
 3.13 Each folder contains twelve questions. Each question presents ten written options. The client selects one option for start and one for target.
 
@@ -115,6 +115,8 @@ CORRECT Key Performance Indicators. Information Technology.
 3.18 Work performed during the month earns a grade. The grade measures work performed. It does not measure the target chosen. It does not measure whether the target was reached.
 
 3.19 No folder depends on another folder having been completed first. A folder that requires another folder to exist before it can function is not compliant.
+
+3.20 The answers produce three outputs. Order of work, determined by position. Baseline, which stops the agent from requesting what is already on file. Engagement level, which sets how much the agent asks for.
 
 ## 4. Layers
 
@@ -590,7 +592,13 @@ DO That is outside what I do. It is worth raising with a doctor. Do you want the
 
 10.5.1 Where a client indicates self harm, harm to others, or immediate danger, folder work stops.
 
-10.5.2 Agent Operations states the interim practice. A dedicated safety and escalation standard is not yet written.
+10.5.2 The response is plain. It does not minimize. It gives emergency and crisis contact information.
+
+10.5.3 No questioning, scoring, or scheduling continues during a disclosure under 10.5.1.
+
+10.5.4 No clinical detail about a disclosure under 10.5.1 is recorded.
+
+10.5.5 Agent Operations states the interim practice. A dedicated safety and escalation standard is not yet written.
 
 ### 10.6 Interpretation
 
@@ -684,7 +692,7 @@ DO That is outside what I do. It is worth raising with a doctor. Do you want the
 
 12.6 Clause 8.3.3. The order of questions, teaching layer, and system does not match the three stage arc.
 
-12.7 Start, Target, Position, Report, and Grade. Sections 3.13 to 3.19, 8, and 9 were kept from Version 3 without review.
+12.7 Start, Target, Position, Report, and Grade. Clauses 3.13 to 3.20 and sections 8 and 9 were kept from Version 3 without review.
 
 12.8 Housing Stability. Transportation, Privacy, Technology, Administration, and Law concern infrastructure. The department name is kept for this version. Renaming is deferred until after launch.
 
