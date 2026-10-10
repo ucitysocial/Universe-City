@@ -822,29 +822,35 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
 .agent-thread-head{min-height:48px;padding:11px 15px;border-bottom:1px solid rgba(244,239,233,.28);display:flex;align-items:center;gap:14px;font-family:var(--record);font-size:15px;letter-spacing:.15em;color:rgba(244,239,233,.72)}
 .agent-thread-head span:first-child{color:#fff}
 .agent-thread-head span:last-child{margin-left:auto;font-size:13px;color:rgba(244,239,233,.46)}
-.agent-thread-body{padding:20px 18px 22px;display:flex;flex-direction:column;gap:12px;min-height:500px;justify-content:flex-end}
-.thread-turn{display:flex;flex-direction:column;gap:5px;opacity:0;transform:translateY(12px)}
+.agent-thread-body{padding:20px 18px 22px;display:flex;flex-direction:column;gap:14px;min-height:280px;justify-content:flex-end}
+.thread-turn{display:flex;flex-direction:column;gap:5px}
 .thread-turn.resident{align-items:flex-end}
 .thread-turn.agent{align-items:flex-start}
 .thread-label{font-family:var(--record);font-size:13px;letter-spacing:.18em;color:rgba(244,239,233,.42)}
 .thread-bubble{max-width:82%;padding:12px 15px;border:2px solid rgba(244,239,233,.34);font-size:clamp(15px,1.3vw,18px);line-height:1.48}
 .thread-turn.agent .thread-bubble{border-left:5px solid var(--pa);background:rgba(92,15,27,.19);color:var(--paper)}
 .thread-turn.resident .thread-bubble{background:var(--paper);border-color:var(--paper);color:var(--ink)}
+.thread-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:3px}
+.thread-actions button,.thread-actions a{min-height:42px;display:inline-flex;align-items:center;justify-content:center;font-family:var(--record);font-size:13px;letter-spacing:.08em;text-decoration:none;padding:10px 12px;border:1px solid var(--paper);background:var(--paper);color:var(--ink);cursor:pointer}
+.thread-actions button.secondary,.thread-actions a.secondary{background:transparent;color:var(--paper);border-color:rgba(244,239,233,.55)}
+.thread-actions button:hover,.thread-actions a:hover{filter:brightness(.96)}
+.thread-actions button:focus-visible,.thread-actions a:focus-visible{outline:2px solid #fff;outline-offset:3px}
+.thread-system{border:1px solid rgba(244,239,233,.28);background:rgba(244,239,233,.06);padding:13px 14px;display:grid;grid-template-columns:auto 1fr;gap:5px 15px;max-width:520px}
+.thread-system .sys-k{font-family:var(--record);font-size:12px;letter-spacing:.15em;color:rgba(244,239,233,.46)}
+.thread-system .sys-v{font-size:14px;line-height:1.4;color:var(--paper)}
 .agent-thread-status{border-top:1px solid rgba(244,239,233,.28);padding:10px 15px;display:flex;gap:14px;justify-content:space-between;flex-wrap:wrap;font-family:var(--record);font-size:12px;letter-spacing:.12em;color:rgba(244,239,233,.48)}
-.thread-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;opacity:0;transform:translateY(10px)}
-.thread-actions button,.thread-actions a{font-family:var(--record);font-size:13px;letter-spacing:.08em;text-decoration:none;padding:10px 12px;border:1px solid rgba(244,239,233,.55);background:transparent;color:var(--paper);cursor:pointer}
-.thread-actions button{background:var(--paper);color:var(--ink);border-color:var(--paper)}
-.agent-thread-demo.in .thread-turn{animation:threadIn .48s cubic-bezier(.2,.8,.2,1) forwards}
-.agent-thread-demo.in .thread-turn:nth-child(1){animation-delay:.45s}
-.agent-thread-demo.in .thread-turn:nth-child(2){animation-delay:2.5s}
-.agent-thread-demo.in .thread-actions{animation:threadIn .48s cubic-bezier(.2,.8,.2,1) 4.6s forwards}
-@keyframes threadIn{to{opacity:1;transform:none}}
-@media(prefers-reduced-motion:reduce){.thread-turn,.thread-actions{opacity:1;transform:none}.agent-thread-demo.in .thread-turn,.agent-thread-demo.in .thread-actions{animation:none}}
+.thread-turn.is-new,.thread-actions.is-new,.thread-system.is-new{animation:threadIn .28s cubic-bezier(.2,.8,.2,1) both}
+@keyframes threadIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.thread-turn.is-new,.thread-actions.is-new,.thread-system.is-new{animation:none}}
 @media(max-width:640px){
  .agent-thread-head{align-items:flex-start;flex-direction:column;gap:3px}
  .agent-thread-head span:last-child{margin-left:0}
  .agent-thread-body{min-height:0;padding:16px 12px 18px}
- .thread-bubble{max-width:92%}
+ .thread-bubble{max-width:94%}
+ .thread-actions{display:grid;grid-template-columns:1fr;width:100%}
+ .thread-actions button,.thread-actions a{width:100%}
+ .thread-system{grid-template-columns:1fr;gap:2px}
+ .thread-system .sys-v{margin-bottom:7px}
 }
 
 .membership-promise{background:var(--paper);color:var(--ink)}
@@ -1062,23 +1068,23 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
  <p class="lead rv d2 mt3">Each folder gives your agent a responsibility: keep that part of your life organized, current, and useful.</p>
  <p class="agent-principle rv d2">A Universe City agent protects the resident from making plans they cannot realistically keep, helps turn what they want into commitments they can actually follow through on, and keeps the systems around those commitments current as life changes.</p>
 
- <div class="agent-thread-demo rv d2">
+ <div class="agent-thread-demo rv d2" id="agentDemo">
   <div class="agent-thread-head"><span>UNIVERSE CITY</span><span>RESIDENT THREAD &middot; CONTEXT ACTIVE</span></div>
-  <div class="agent-thread-body">
+  <div class="agent-thread-body" id="agentDemoBody">
    <div class="thread-turn resident">
     <div class="thread-label">YOU</div>
     <div class="thread-bubble">I need to get groceries before the weekend.</div>
    </div>
    <div class="thread-turn agent">
     <div class="thread-label">YOUR AGENT</div>
-    <div class="thread-bubble">Thursday after work is the best fit. I updated your shopping list from Inventory too.</div>
+    <div class="thread-bubble">Thursday at 6:15 PM is your best opening. I can give you 45 minutes for it.</div>
    </div>
    <div class="thread-actions">
-    <button type="button">CONFIRM GROCERY COMMITMENT</button>
-    <a href="/housing-stability#inventory">VIEW INVENTORY</a>
+    <button type="button" data-agent-choice="confirm-thursday">CONFIRM THURSDAY, 6:15 PM</button>
+    <button type="button" class="secondary" data-agent-choice="another-time">CHOOSE ANOTHER TIME</button>
    </div>
   </div>
-  <div class="agent-thread-status"><span>TIME &middot; INVENTORY</span><span>ONE NEED, TWO SYSTEMS UPDATED</span></div>
+  <div class="agent-thread-status" id="agentDemoStatus"><span>TIME &middot; INVENTORY</span><span>READY FOR YOUR DECISION</span></div>
  </div>
 
  <a class="flow-link light rv d3" href="#business">See what membership gives you &rarr;</a>
@@ -1743,6 +1749,83 @@ if(dash){
   p.addEventListener('touchstart',on,{passive:true});
  });
  w.querySelector('#zsvg').addEventListener('mouseleave',reset);
+})();
+</script>
+
+<script>
+(function(){
+ var demo=document.getElementById('agentDemo');
+ var body=document.getElementById('agentDemoBody');
+ var status=document.getElementById('agentDemoStatus');
+ if(!demo||!body||!status) return;
+
+ function agent(text){
+  return '<div class="thread-turn agent is-new"><div class="thread-label">YOUR AGENT</div><div class="thread-bubble">'+text+'</div></div>';
+ }
+ function resident(text){
+  return '<div class="thread-turn resident is-new"><div class="thread-label">YOU</div><div class="thread-bubble">'+text+'</div></div>';
+ }
+ function actions(items){
+  return '<div class="thread-actions is-new">'+items.map(function(item){
+   if(item.href) return '<a href="'+item.href+'"'+(item.secondary?' class="secondary"':'')+'>'+item.label+'</a>';
+   return '<button type="button" data-agent-choice="'+item.choice+'"'+(item.secondary?' class="secondary"':'')+'>'+item.label+'</button>';
+  }).join('')+'</div>';
+ }
+ function systemBlock(day,time){
+  return '<div class="thread-system is-new"><span class="sys-k">TIME</span><span class="sys-v">'+day+', '+time+' &middot; Groceries &middot; Confirmed</span><span class="sys-k">INVENTORY</span><span class="sys-v">Grocery list updated and ready to review</span></div>';
+ }
+ function setStatus(right){
+  status.innerHTML='<span>TIME &middot; INVENTORY</span><span>'+right+'</span>';
+ }
+ function append(html){
+  body.insertAdjacentHTML('beforeend',html);
+ }
+ function clearActions(){
+  var old=body.querySelectorAll('.thread-actions');
+  old.forEach(function(el){el.remove();});
+ }
+ function finish(day,time,endTime){
+  clearActions();
+  append(agent('Done. Groceries are on your schedule '+day+' from '+time+' to '+endTime+'. I updated your grocery list too.'));
+  append(systemBlock(day,time+' to '+endTime));
+  append(actions([{label:'VIEW INVENTORY',href:'/housing-stability#inventory'},{label:'START OVER',choice:'reset',secondary:true}]));
+  setStatus('COMMITMENT CONFIRMED');
+ }
+
+ body.addEventListener('click',function(e){
+  var control=e.target.closest('[data-agent-choice]');
+  if(!control) return;
+  var choice=control.getAttribute('data-agent-choice');
+
+  if(choice==='confirm-thursday'){
+   finish('Thursday','6:15 PM','7:00 PM');
+   return;
+  }
+
+  if(choice==='another-time'){
+   clearActions();
+   append(resident('What about Friday around 7?'));
+   append(agent('You already protected Friday night for yourself. I would keep that commitment. Saturday at 10:30 AM is open if Thursday does not work.'));
+   append(actions([
+    {label:'CONFIRM SATURDAY, 10:30 AM',choice:'confirm-saturday'},
+    {label:'KEEP THURSDAY, 6:15 PM',choice:'confirm-thursday',secondary:true}
+   ]));
+   setStatus('PROTECTING AN EXISTING COMMITMENT');
+   return;
+  }
+
+  if(choice==='confirm-saturday'){
+   finish('Saturday','10:30 AM','11:15 AM');
+   return;
+  }
+
+  if(choice==='reset'){
+   body.innerHTML='<div class="thread-turn resident"><div class="thread-label">YOU</div><div class="thread-bubble">I need to get groceries before the weekend.</div></div>'+
+    '<div class="thread-turn agent"><div class="thread-label">YOUR AGENT</div><div class="thread-bubble">Thursday at 6:15 PM is your best opening. I can give you 45 minutes for it.</div></div>'+
+    '<div class="thread-actions"><button type="button" data-agent-choice="confirm-thursday">CONFIRM THURSDAY, 6:15 PM</button><button type="button" class="secondary" data-agent-choice="another-time">CHOOSE ANOTHER TIME</button></div>';
+   setStatus('READY FOR YOUR DECISION');
+  }
+ });
 })();
 </script>
 </body>
