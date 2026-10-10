@@ -35,6 +35,12 @@ Use short transactional subjects:
 - Change email — `Confirm your new Universe City email`
 - Reauthentication — `{{ .Token }} is your Universe City verification code`
 - Password changed — `Your Universe City password was changed`
+- Email address changed — `Your Universe City email was changed`
+- Phone number changed — `Your Universe City phone number was changed`
+- Sign-in method linked — `A sign-in method was linked to your Universe City account`
+- Sign-in method removed — `A sign-in method was removed from your Universe City account`
+- MFA method added — `A verification method was added to your Universe City account`
+- MFA method removed — `A verification method was removed from your Universe City account`
 
 ## Template mapping
 
@@ -45,6 +51,12 @@ Use short transactional subjects:
 - Change email → `email_change.html`
 - Reauthentication → `reauthentication.html`
 - Password changed notification → `password_changed.html`
+- Email address changed notification → `email_changed.html`
+- Phone number changed notification → `phone_changed.html`
+- Sign-in method linked notification → `identity_linked.html`
+- Sign-in method removed notification → `identity_unlinked.html`
+- MFA method added notification → `mfa_factor_enrolled.html`
+- MFA method removed notification → `mfa_factor_unenrolled.html`
 
 ## Hosted Supabase setup
 
