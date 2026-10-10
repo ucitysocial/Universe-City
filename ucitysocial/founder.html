@@ -25,6 +25,8 @@ a{color:inherit}
 .brand span{margin:0 1px;font-size:.92em;vertical-align:1px}
 .brand em{font-style:normal;font-family:var(--record);font-size:14px;font-weight:400;letter-spacing:.2em;color:rgba(244,239,233,.5);white-space:nowrap;margin-left:13px}
 .head-actions{margin-left:auto;display:flex;align-items:center;gap:clamp(11px,1.5vw,23px)}
+.signin-link{color:var(--paper);font-size:13.5px;font-weight:600;text-decoration:none;white-space:nowrap;opacity:.78}
+.signin-link:hover{opacity:1}
 .apply-link{background:var(--paper);color:var(--ink);padding:9px 16px;font-size:13.5px;font-weight:600;text-decoration:none;white-space:nowrap}
 .menu-button{font-family:var(--ui);font-size:20px;line-height:1;background:none;border:2px solid rgba(244,239,233,.5);color:var(--paper);width:42px;height:38px;cursor:pointer}
 .menu-overlay{position:fixed;inset:0;z-index:100;background:rgba(10,6,7,.34);backdrop-filter:blur(2px)}
@@ -105,40 +107,34 @@ a{color:inherit}
 </head>
 <body>
 <header class="sitebar">
-  <div class="sitebar-inner">
-    <a class="brand" href="/">universe<span>&#9733;</span>city<em>LIFE MANAGEMENT AGENCY</em></a>
-    <div class="head-actions">
-      <a class="apply-link" href="/apply">Apply</a>
-      <button class="menu-button" id="menuBtn" aria-label="Open menu" aria-expanded="false">&#9733;</button>
-    </div>
+ <div class="sitebar-inner">
+  <a class="brand" href="/">universe<span>&#9733;</span>city<em>LIFE MANAGEMENT AGENCY</em></a>
+  <div class="head-actions">
+   <a class="signin-link" href="/login">Sign in</a>
+   <a class="apply-link" href="/apply">Apply</a>
+   <button class="menu-button" id="menuBtn" aria-label="Open menu" aria-expanded="false">&#9733;</button>
   </div>
+ </div>
 </header>
 <div class="menu-overlay" id="menu" hidden>
-  <div class="menu-panel">
-    <button class="menu-close" id="menuX" aria-label="Close menu">&times;</button>
-    <div class="menu-groups">
-      <div><div class="menu-label">HOW IT WORKS</div>
-        <a href="/#what">Why an agent</a>
-        <a href="/#departments">Four departments</a>
-        <a href="/#system">Starting folders</a>
-        <a href="/#time">Time example</a>
-      </div>
-      <div><div class="menu-label">DEPARTMENTS</div>
-        <a href="/agency-assessment">I · Agency Assessment</a>
-        <a href="/housing-stability">II · Housing Stability</a>
-        <a href="/career-development">III · Career Development</a>
-        <a href="/life-management">IV · Life Management</a>
-      </div>
-      <div><div class="menu-label">UNIVERSE CITY</div>
-        <a href="/founder">About the founder</a>
-        <a href="/#business">How it operates</a>
-        <a href="/membership">Membership</a>
-        <a href="/login">Member sign in</a>
-      </div>
-    </div>
-    <div class="menu-foot"><span>&#9733;</span><span>management@ucitysocial.com</span><span>Denver, Colorado</span></div>
+ <div class="menu-panel">
+  <button class="menu-close" id="menuX" aria-label="Close menu">&times;</button>
+  <div class="menu-groups">
+   <div><div class="menu-label">EXPLORE</div>
+    <a href="/#what">What your agent does</a>
+    <a href="/#business">Four departments</a>
+    <a href="/#experience">Your agent working</a>
+    <a href="/founder">About Brittnay</a></div>
+   <div><div class="menu-label">DEPARTMENTS</div>
+    <a href="/agency-assessment">I &middot; Agency Assessment</a>
+    <a href="/housing-stability">II &middot; Housing Stability</a>
+    <a href="/career-development">III &middot; Career Development</a>
+    <a href="/life-management">IV &middot; Life Management</a></div>
   </div>
+  <div class="menu-foot"><span>&#9733;</span><span>management@ucitysocial.com</span><span>Denver, Colorado</span></div>
+ </div>
 </div>
+
 <main class="shell">
   <div class="book-head"><div><p class="book-kicker">Founder archive · 2016—present</p><h1>Founder Story</h1></div></div>
   <div class="book-wrap"><button class="edge prev" id="edgePrev" type="button" aria-label="Previous spread">‹</button><section class="book" id="book" aria-live="polite"><article class="page left" id="leftPage"></article><article class="page right" id="rightPage"></article></section><button class="edge next" id="edgeNext" type="button" aria-label="Next spread">›</button></div>
