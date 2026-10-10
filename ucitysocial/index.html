@@ -807,6 +807,52 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
 
 .portrait img,.slide img{position:absolute;inset:0;width:100%;height:100%;
  object-fit:cover;object-position:50% 32%;display:block}
+
+/* ===== COMPOUNDING SCROLL FLOW ===== */
+.flow-link{display:inline-block;margin-top:26px;font-family:var(--record);font-size:17px;letter-spacing:.08em;
+ text-transform:uppercase;color:var(--pa);text-decoration:none;border-bottom:1px solid currentColor;padding-bottom:3px}
+.flow-link:hover{opacity:.72}.flow-link.light{color:var(--paper)}
+.hero-flow{color:rgba(244,239,233,.9);margin-top:24px}
+
+.experience{background:var(--ink);color:var(--paper);padding:clamp(54px,7vw,100px) 0;border-bottom:2px solid var(--ink)}
+.experience h2{color:#fff;max-width:18ch}.experience .k{color:rgba(244,239,233,.48)}
+.experience .lead{color:rgba(244,239,233,.74);max-width:48ch}
+.agent-moments{width:min(760px,100%);margin-top:clamp(30px,4vw,54px);display:flex;flex-direction:column;gap:12px}
+.moment{width:min(560px,88%);border:1px solid rgba(244,239,233,.22);padding:16px 18px}
+.moment span{font-family:var(--record);font-size:14px;letter-spacing:.16em;color:rgba(244,239,233,.46)}
+.moment p{font-size:clamp(17px,1.5vw,21px);line-height:1.4;margin-top:4px;color:var(--paper)}
+.moment.resident{align-self:flex-end;background:rgba(244,239,233,.08)}
+.moment.agent{align-self:flex-start;border-left:6px solid var(--pa);background:rgba(92,15,27,.18)}
+
+.membership-promise{background:var(--paper);color:var(--ink)}
+.promise-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:clamp(30px,4vw,52px) 0}
+.promise{border-top:6px solid var(--c);border-left:1px solid var(--ink);border-right:1px solid var(--ink);
+ border-bottom:1px solid var(--ink);padding:24px;min-height:220px}
+.promise>span{font-family:var(--record);font-size:20px;color:var(--c)}
+.promise h3{margin-top:20px}.promise p{margin-top:8px;color:var(--dim);font-size:14.5px;line-height:1.55}
+
+.trust-founder{background:var(--paper2);color:var(--ink);padding:clamp(54px,7vw,100px) 0;border-bottom:2px solid var(--ink)}
+.trust-founder-grid{display:grid;grid-template-columns:minmax(280px,.78fr) minmax(0,1.22fr);gap:clamp(34px,6vw,88px);align-items:center}
+.trust-copy h2{max-width:17ch}.trust-copy .lead{max-width:48ch}.trust-copy>p{max-width:58ch}
+.trust-rules{margin-top:30px;border-top:1px solid var(--ink)}
+.trust-rules>div{display:grid;grid-template-columns:38px 1fr;gap:10px;padding:14px 0;border-bottom:1px solid var(--rule)}
+.trust-rules span{font-family:var(--record);font-size:18px;color:var(--pa)}
+.trust-rules strong{font-size:14.5px}.trust-actions{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-top:28px}
+.text-link{font-size:14px;font-weight:600;text-underline-offset:4px}
+
+.final-cta{background:var(--pa);color:var(--paper);padding:clamp(70px,10vw,150px) 0;border-bottom:0}
+.final-cta .k{color:rgba(244,239,233,.55)}.final-cta h2{color:#fff;max-width:22ch;font-size:clamp(40px,6vw,86px);line-height:.98}
+.final-actions{display:flex;align-items:center;gap:24px;flex-wrap:wrap;margin-top:38px}
+.final-apply{display:inline-block;background:var(--paper);color:var(--ink);border:2px solid var(--ink);box-shadow:7px 7px 0 var(--ink);
+ padding:15px 34px;text-decoration:none;font-weight:700;letter-spacing:.04em}
+.final-actions>span{font-size:13px;color:rgba(244,239,233,.75)}.final-actions>span a{color:#fff}
+
+@media(max-width:800px){
+ .promise-grid{grid-template-columns:1fr}
+ .promise{min-height:0}
+ .trust-founder-grid{grid-template-columns:1fr}
+ .trust-founder .portrait{max-width:460px}
+}
 </style>
 </head>
 <body>
@@ -825,8 +871,9 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
    <div>
     <div class="mlbl">HOW IT WORKS</div>
     <a href="#what">Why an agent</a>
-    <a href="#what-you-get">What membership provides</a>
+    <a href="#experience">Your agent</a>
     <a href="#business">Membership</a>
+    <a href="#about">Why trust us</a>
     <a href="/agency-assessment">Agency Assessment folders</a>
    </div>
    <div>
@@ -867,6 +914,7 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
  <div>
   <h1 class="rv d1">A life management agency for everyday people.</h1>
   <p class="lead px rv d2 mt3">Professional athletes and entertainers often have agents. Most people manage their own schedules, household needs, income, records, and decisions. Universe City is built to help with that work.</p>
+  <a class="flow-link hero-flow rv d3" href="#what">See why an agent &darr;</a>
  </div>
 
  <div class="stage rv d2" id="stage">
@@ -910,79 +958,85 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
    <p class="px mt3">Universe City gives you an agent and a place to organize that work, keep it current, and continue from where you left off.</p>
   </div>
  </div>
+ <a class="flow-link rv d3" href="#experience">See what having an agent feels like &rarr;</a>
 </div></section>
 
-<!-- WHAT YOU GET -->
-<section class="system" id="what-you-get"><div class="w">
- <span class="k rv">what membership provides</span>
- <h2 class="rv d1">A place to manage life with help.</h2>
- <p class="lead rv d2 mt3" style="max-width:52ch">Universe City gives you an ongoing place to plan, organize, follow up, and make decisions with an agent who can keep context as your life changes.</p>
- <div class="assembly rv d2">
-  <div class="part"><div class="n">01</div><h3>Your agent</h3>
-   <p>Someone who helps keep the work moving instead of leaving every task, reminder, and decision for you to carry alone.</p></div>
-  <div class="part"><div class="n">02</div><h3>Your workspace</h3>
-   <p>One place to continue conversations, plans, updates, and the history you build with Universe City.</p></div>
-  <div class="part"><div class="n">03</div><h3>Your systems</h3>
-   <p>Practical structure is introduced as you use the service and built around the life you actually live.</p></div>
-  <div class="part"><div class="n">04</div><h3>Ongoing review</h3>
-   <p>Your work stays current through regular review, updates, and follow-through as circumstances change.</p></div>
+<!-- 3 AGENT EXPERIENCE -->
+<section class="experience" id="experience"><div class="w">
+ <span class="k rv">your agent, with context</span>
+ <h2 class="rv d1">Someone who can pick up where you left off.</h2>
+ <p class="lead rv d2 mt3">You should not have to re-explain your entire life every time you need help with the next thing.</p>
+
+ <div class="agent-moments rv d2">
+  <div class="moment resident"><span>YOU</span><p>I have a lot going on this week.</p></div>
+  <div class="moment agent"><span>YOUR AGENT</span><p>Okay. What is fixed?</p></div>
+  <div class="moment resident"><span>YOU</span><p>I forgot where we left off.</p></div>
+  <div class="moment agent"><span>YOUR AGENT</span><p>I have it. We can continue from there.</p></div>
  </div>
- <div class="joined rv d3">YOU DO NOT NEED TO LEARN THE ARCHITECTURE BEFORE YOU BEGIN</div>
+
+ <a class="flow-link light rv d3" href="#business">See what membership gives you &rarr;</a>
 </div></section>
 
-<!-- MEMBERSHIP -->
-<section class="biz" id="business"><div class="w">
+<!-- 4 MEMBERSHIP PROMISE -->
+<section class="biz membership-promise" id="business"><div class="w">
  <span class="k rv">membership</span>
- <h2 class="head rv d1">One membership. Ongoing life management.</h2>
- <p class="lead rv d2 mt3 px" style="max-width:48ch">A resident workspace and a Universe City agent helping you organize, plan, follow up, and keep the work current as life changes.</p>
- <div class="bgrid rv d2">
-  <div class="c"><div class="n">AGENT</div><h3>A person who stays with the work</h3>
-   <p>Your agent helps you organize what is happening, decide what needs attention, and keep important work from disappearing between conversations.</p></div>
-  <div class="c"><div class="n">WORKSPACE</div><h3>One place to continue</h3>
-   <p>Your resident workspace keeps your plans, updates, conversations, and ongoing work together so you can return without starting over.</p></div>
+ <h2 class="head rv d1">Your agent. Your workspace. Your systems.</h2>
+ <p class="lead rv d2 mt3 px" style="max-width:50ch">Universe City gives you an ongoing place to manage the work of everyday life without asking you to learn our internal architecture first.</p>
+
+ <div class="promise-grid rv d2">
+  <div class="promise" style="--c:var(--pa)">
+   <span>01</span><h3>Your agent</h3>
+   <p>Someone who helps organize what is happening, follow up, and keep important work moving.</p>
+  </div>
+  <div class="promise" style="--c:var(--hs)">
+   <span>02</span><h3>Your workspace</h3>
+   <p>One place for plans, updates, conversations, decisions, and the history you build over time.</p>
+  </div>
+  <div class="promise" style="--c:var(--cd)">
+   <span>03</span><h3>Your systems</h3>
+   <p>Practical structure for the parts of life you are actively managing, introduced as you need it.</p>
+  </div>
  </div>
- <div class="btns rv d3" style="margin-bottom:var(--s4)">
-  <a href="/apply" class="btn dark">Apply</a>
-  <a href="/membership" class="btn">Membership details</a>
- </div>
- <div class="never rv d3">
-  <div class="t">TWO RULES THAT DO NOT MOVE</div>
-  <ul style="grid-template-columns:1fr">
-   <li><b>01</b><span><b style="font-family:var(--voice);font-size:14.5px;color:var(--ink)">Nobody we refer you to pays us.</b> Universe City keeps a network of local businesses, clinics, attorneys, mechanics, landlords, and services that clients need. None of them pay to be in it. They are listed on what clients reported after being sent there. No fee, no commission, ever.</span></li>
-  </ul>
- </div>
- <div class="never rv d3" style="margin-top:var(--s2)">
-  <div class="t">WHAT WE WILL NEVER DO</div>
-  <ul>
-   <li><b>&times;</b>Sell your data, to anyone, ever</li>
-   <li><b>&times;</b>Run ads against your record</li>
-   <li><b>&times;</b>Take a commission for a referral</li>
-   <li><b>&times;</b>Show an employer anything about an individual</li>
-   <li><b>&times;</b>Charge you to leave with what you built</li>
-   <li><b>&times;</b>Hide what any of this costs to run</li>
-  </ul>
- </div>
+
+ <a class="btn dark rv d3" href="/apply">Start your application &rarr;</a>
 </div></section>
 
-
-<!-- FOUNDER -->
-<!-- ABOUT TEASER -->
-<section class="about" id="about"><div class="w">
- <div class="abgrid">
+<!-- 5 TRUST + FOUNDER -->
+<section class="trust-founder" id="about"><div class="w">
+ <div class="trust-founder-grid">
   <div class="portrait rv">
    <div class="slides"><div class="slide on">
     <img src="brittnay.jpg" alt="Brittnay Folkes" width="1000" height="1333"></div></div>
    <div class="cap"><span>BRITTNAY FOLKES</span><span>FOUNDER &middot; DENVER</span></div>
   </div>
-  <div class="story">
-   <span class="k rv">why this exists</span>
-   <h2 class="rv d1">Why I built<br>Universe City</h2>
-   <p class="lead rv d2 mt3">I lost my mom suddenly in 2016. I was 20, heading into 21, and I lost my guiding light.</p>
-   <p class="rv d2">She was the person I could call, fall back on, move back in with, love and hug. She had known me from the beginning of time. Losing her meant realizing I would now be responsible for understanding myself as fully as she had.</p>
-   <p class="rv d2">I had to learn how to manage my time, money, goals, priorities and standards while creating a direction of my own. I knew I could not be the only person who felt overwhelmed by the ordinary work of adulthood.</p>
-   <p class="rv d2 px">Universe City grew from years of asking what makes life easier to manage, what people should understand before adulthood, and how those responsibilities can be organized into something usable.</p>
-   <div class="btns rv d3"><a href="/founder" class="btn" style="background:var(--paper);color:var(--ink);box-shadow:5px 5px 0 var(--pa)">Read the full story</a></div>
+
+  <div class="trust-copy">
+   <span class="k rv">why trust Universe City</span>
+   <h2 class="rv d1">Built around the resident, not the transaction.</h2>
+   <p class="lead rv d2 mt3">I started building Universe City after losing my mom and realizing how much invisible administrative work adulthood asks one person to carry.</p>
+   <p class="rv d2">Years of asking what makes everyday life easier to manage became a life management agency built to stay with the work, not just answer one question and disappear.</p>
+
+   <div class="trust-rules rv d2">
+    <div><span>01</span><strong>Your information stays yours.</strong></div>
+    <div><span>02</span><strong>Referrals do not pay us.</strong></div>
+    <div><span>03</span><strong>No ads are run against your information.</strong></div>
+   </div>
+
+   <div class="trust-actions rv d3">
+    <a href="/founder" class="text-link">Read the founder story</a>
+    <a href="/apply" class="btn">Apply for Universe City &rarr;</a>
+   </div>
   </div>
+ </div>
+</div></section>
+
+<!-- 6 FINAL CTA -->
+<section class="final-cta" id="apply-final"><div class="w">
+ <span class="k rv">universe city</span>
+ <h2 class="rv d1">You already manage a life.<br>You do not have to manage every part of it alone.</h2>
+ <div class="final-actions rv d2">
+  <a href="/apply" class="final-apply">APPLY</a>
+  <span>Already a resident? <a href="/login">Sign in.</a></span>
  </div>
 </div></section>
 
@@ -993,7 +1047,7 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
   <div style="font-size:13.5px;opacity:.5;margin-top:18px">Denver, Colorado<br>management@ucitysocial.com</div>
  </div>
  <div><div class="lbl">HOW IT WORKS</div>
-  <a href="#what">Why an agent</a><a href="#what-you-get">What membership provides</a><a href="#business">Membership</a></div>
+  <a href="#what">Why an agent</a><a href="#experience">Your agent</a><a href="#business">Membership</a><a href="#about">Why trust us</a></div>
  <div><div class="lbl">OPEN BOOKS</div>
   <a href="#">Quarterly report</a><a href="/membership">Membership</a>
     <a href="/login">Member sign in</a></div>
@@ -1116,8 +1170,8 @@ if(stage){
 /* ---------- chapter rail + star dividers ---------- */
 (function(){
  var MAP=[
-  ['#what','Why an agent'],['#what-you-get','What you get'],
-  ['#business','Membership'],['#about','Why it exists']
+  ['#what','Why an agent'],['#experience','Your agent'],
+  ['#business','Membership'],['#about','Why trust us'],['#apply-final','Apply']
  ];
  var rail=document.getElementById('rail');
  if(!rail) return;
