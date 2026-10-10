@@ -173,7 +173,8 @@ section.dark .rows li{border-color:rgba(244,239,233,.22)}
 }
 .application-folder-heading h2{
   margin-top:2px;
-  font-size:clamp(30px,3.2vw,44px);
+  font-size:clamp(24px,2.4vw,34px);
+  line-height:1.08;
 }
 .application-folder-slide{
   margin-top:14px;
@@ -181,20 +182,22 @@ section.dark .rows li{border-color:rgba(244,239,233,.22)}
 }
 .application-folder-step{
   font-family:'VT323',monospace;
-  font-size:18px;
+  font-size:16px;
   letter-spacing:.08em;
   text-transform:uppercase;
   color:var(--folder-color);
   margin-bottom:6px;
 }
 .application-folder-slide h3{
-  font-size:18px;
-  line-height:1.35;
+  font-size:17px;
+  line-height:1.32;
 }
 .application-folder-slide>p:last-child{
   margin-top:5px;
   color:var(--dim);
   max-width:60ch;
+  font-size:15px;
+  line-height:1.5;
 }
 .application-folder-controls{
   margin-top:auto;
