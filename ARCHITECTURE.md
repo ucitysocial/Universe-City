@@ -158,6 +158,18 @@ Membership is set from the webhook only. A browser returning from checkout is
 not proof of payment.
 
 
+## Interaction ownership
+
+Conversation is not the durable home for unfinished work.
+
+When a resident still needs to confirm, review, answer, choose, upload, call, attend, or complete something, the product should create or maintain an explicit commitment or follow up state rather than relying on chat history.
+
+The agent may complete administrative work that falls inside an established responsibility without requiring repetitive permission. Meaningful commitments, material tradeoffs, changes to stated priorities, and decisions that belong to the resident require confirmation.
+
+Cross system reasoning should happen behind the interaction. The resident should normally receive one manageable decision at a time.
+
+Confirmed items should remain represented in the relevant system. Unresolved items should remain active until completed, changed, or intentionally dismissed.
+
 ## Public explanation layer
 
 Architecture describes how Universe City works internally. Public language should translate that structure into something a resident can picture themselves using.
