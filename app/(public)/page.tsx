@@ -4,8 +4,8 @@ import DeskCards from '@/components/DeskCards';
 export default function Home() {
   return (
     <>
-      <section>
-        <div className="wrap">
+      <section className="hero-section">
+        <div className="wrap hero-copy">
           <p className="kick">Universe City &middot; Life Management Agency</p>
           <h1 style={{ marginTop: 14, maxWidth: '16ch' }}>
             Artists have teams. Athletes have teams.
@@ -14,25 +14,26 @@ export default function Home() {
             You are running a whole life by yourself. Universe City is an agency for everyday
             people. You get four working systems and a real person who helps keep them current.
           </p>
-          <div style={{ display: 'flex', gap: 14, marginTop: 34, flexWrap: 'wrap' }}>
+          <div className="hero-actions">
             <Link className="btn" href="/apply">Apply for membership</Link>
             <Link className="btn ghost" href="/how-it-works">See how it works</Link>
           </div>
         </div>
       </section>
 
-      <section>
+      <section className="systems-section">
         <div className="wrap">
           <p className="kick">Four systems</p>
-          <h2 style={{ marginTop: 10, maxWidth: '22ch' }}>
+          <h2 className="systems-heading">
             Nothing here is advice. Every one of them leaves you something.
           </h2>
           <DeskCards />
         </div>
       </section>
 
-      <section className="dark">
+      <section className="agent-section">
         <div className="wrap">
+          <div className="agent-copy">
           <p className="kick">The part that is not software</p>
           <h2 style={{ marginTop: 10, maxWidth: '20ch' }}>
             Fifteen minutes a week with your agent.
@@ -47,10 +48,11 @@ export default function Home() {
             <li><span className="rn">03</span><span>Once a week we sit down for fifteen minutes and work out what it means.</span></li>
             <li><span className="rn">04</span><span>Nothing is ever recorded that you did not say.</span></li>
           </ul>
+          </div>
         </div>
       </section>
 
-      <section>
+      <section className="membership-section">
         <div className="wrap" style={{ display: 'flex', gap: 40, flexWrap: 'wrap', alignItems: 'flex-start' }}>
           <div className="prose">
             <p className="kick">Membership</p>
