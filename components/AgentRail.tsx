@@ -6,7 +6,7 @@ function contextFromPath(path: string) {
   if (path.includes('/time')) return 'Time';
   if (path.includes('/standards')) return 'Standards';
   if (path.includes('/orientation')) return 'Orientation';
-  if (path.includes('/file')) return 'Account';
+  if (path.includes('/account')) return 'Account';
   return 'Dashboard';
 }
 
