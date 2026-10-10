@@ -248,19 +248,25 @@ a.btn.dark{background:var(--pa);color:#fff;box-shadow:5px 5px 0 var(--ink)}
 
 .scene.on{opacity:1}
 
-/* ===== 2 PROBLEM ===== */
-.problem{color:var(--ink);background:var(--paper);padding:clamp(38px,4.4vw,70px) 0 var(--s5);border-bottom:2px solid var(--ink)}
-.problem .big{font-size:clamp(40px,7.4vw,116px);line-height:.96;font-weight:600;letter-spacing:-.035em;max-width:16ch}
-.problem .big em{font-style:normal;color:var(--pa)}
-.problem .cols{display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,4vw,80px);margin-top:var(--s4)}
-@media(max-width:900px){.problem .cols{grid-template-columns:1fr}}
-.problem .scat{display:flex;flex-wrap:wrap;gap:8px;margin-top:var(--s2)}
-.problem .scat{display:flex;flex-wrap:wrap;gap:9px;margin-top:12px}
-.problem .scat span{display:inline-block;font-family:var(--record);font-size:18px;
- letter-spacing:.04em;line-height:1.1;border:1px solid var(--rule);padding:7px 13px;
- color:#5a4a44;background:var(--paper2);white-space:nowrap}
-.problem .whereat{font-family:var(--record);font-size:17px;letter-spacing:.2em;
- color:var(--pa);padding-bottom:9px;border-bottom:2px solid var(--rule)}
+/* ===== 2 WHY AN AGENT ===== */
+.problem{color:var(--ink);background:var(--paper);padding:clamp(42px,5vw,78px) 0 clamp(46px,6vw,90px);border-bottom:2px solid var(--ink)}
+.problem-grid{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(360px,.92fr);gap:clamp(34px,5vw,82px);align-items:start;margin-top:10px}
+.problem .big{font-size:clamp(42px,5.8vw,82px);line-height:.98;font-weight:600;letter-spacing:-.035em;max-width:13ch}
+.problem-copy .lead{max-width:28ch;margin-top:clamp(22px,3vw,34px)}
+.problem-copy>p:last-child{max-width:49ch;margin-top:18px;color:#54413b}
+.connection-panel{border-top:5px solid var(--pa);border-bottom:1px solid var(--rule);padding:18px 0 22px}
+.problem .whereat{font-family:var(--record);font-size:15px;letter-spacing:.2em;color:var(--pa);padding-bottom:10px;border-bottom:1px solid var(--rule)}
+.connection-lead{font-size:clamp(20px,1.8vw,27px);line-height:1.35;font-weight:600;max-width:31ch;margin-top:22px}
+.connection-flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:22px 0 18px}
+.connection-flow span{font-family:var(--record);font-size:15px;letter-spacing:.08em;border:1px solid var(--rule);background:var(--paper2);padding:7px 10px}
+.connection-flow i{font-style:normal;color:var(--pa);font-weight:700}
+.connection-panel>p:last-child{font-size:15px;line-height:1.58;max-width:50ch;color:#54413b}
+.problem .flow-link{margin-top:clamp(26px,3vw,38px)}
+@media(max-width:900px){
+ .problem-grid{grid-template-columns:1fr;gap:28px}
+ .problem .big{max-width:15ch}
+ .connection-panel{max-width:680px}
+}
 
 /* ===== 3 SYSTEM (dark) ===== */
 .system{background:var(--ink);color:var(--paper);padding:clamp(38px,4.4vw,70px) 0 var(--s5);overflow:hidden}
@@ -953,6 +959,88 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
 
 @media(max-width:1000px){.department-promise-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:580px){.department-promise-grid{grid-template-columns:1fr}.department-promise{min-height:260px}}
+
+/* ===== MOBILE DENSITY ===== */
+@media(max-width:640px){
+ :root{--gut:18px;--s1:8px;--s2:14px;--s3:22px;--s4:32px;--s5:46px}
+ body{line-height:1.5}
+ .k{font-size:14px;letter-spacing:.18em;margin-bottom:12px}
+ .lead{font-size:18px;line-height:1.32}
+ nav .w{padding-top:10px;padding-bottom:10px}
+ nav .wm{font-size:15px}
+ nav .links button{width:38px;height:34px}
+
+ .arrival{padding:22px 0 30px}
+ .arrival .w{gap:18px}
+ .arrival h1{font-size:38px;line-height:.98;max-width:12ch}
+ .arrival .lead.px{font-size:19px;line-height:1.25}
+ .idbar{margin-bottom:14px}
+ .stage{min-height:0}
+ .stage .sel button{font-size:11px;letter-spacing:.08em;padding:8px 2px}
+ .stage .body{padding:13px 14px 12px}
+ .stage .rn{font-size:12px}
+ .stage .pn{font-size:20px;margin-top:2px}
+ .stage .pp{font-size:13px;line-height:1.4;margin-top:5px}
+ .stage .canvas{min-height:178px;margin-top:8px}
+ .mgrid{grid-template-columns:1fr 1fr;grid-template-rows:repeat(6,1fr);column-gap:12px}
+ .mcell{gap:5px}
+ .mcell i{font-size:11px;width:17px}
+ .mcell span{font-size:11.5px}
+ .stage .m1{font-size:12px;margin-top:9px;padding-top:8px}
+ #stagePause{bottom:7px}
+
+ .problem{padding:38px 0 42px}
+ .problem-grid{gap:22px;margin-top:0}
+ .problem .big{font-size:34px;line-height:1.01;max-width:none}
+ .problem-copy .lead{margin-top:18px;max-width:none}
+ .problem-copy>p:last-child{margin-top:12px}
+ .connection-panel{padding:14px 0 16px}
+ .problem .whereat{font-size:13px;padding-bottom:7px}
+ .connection-lead{font-size:18px;margin-top:14px}
+ .connection-flow{gap:5px;margin:14px 0 12px}
+ .connection-flow span{font-size:12px;padding:6px 7px}
+ .connection-panel>p:last-child{font-size:14px;line-height:1.5}
+ .problem .flow-link{margin-top:22px}
+
+ .experience{padding-top:42px!important;padding-bottom:42px!important}
+ .experience h2{font-size:32px;line-height:1.02}
+ .experience .lead{margin-top:14px}
+ .agent-principle{font-size:16px;line-height:1.45;margin-top:12px}
+ .agent-thread-demo{margin-top:22px}
+ .agent-thread-head{min-height:0;padding:9px 11px;font-size:12px}
+ .agent-thread-body{padding:14px 11px 15px;gap:11px}
+ .thread-label{font-size:11px}
+ .thread-bubble{font-size:14px;line-height:1.42;padding:10px 11px}
+ .thread-actions{gap:7px}
+ .thread-actions button,.thread-actions a{min-height:40px;font-size:11.5px;padding:9px 10px}
+ .agent-thread-status{padding:8px 11px;font-size:10px}
+
+ .membership-promise{padding-top:42px!important;padding-bottom:42px!important}
+ .membership-promise .head{font-size:32px;line-height:1.03}
+ .membership-promise .lead{margin-top:14px!important}
+ .system-explainer{font-size:14px;line-height:1.48;margin-top:14px}
+ .system-tip{font-size:12px;margin-top:7px}
+ .department-promise-grid{display:flex;overflow-x:auto;gap:12px;margin:18px calc(var(--gut) * -1) 22px;padding:0 var(--gut) 8px;scroll-snap-type:x mandatory;scrollbar-width:none}
+ .department-promise-grid::-webkit-scrollbar{display:none}
+ .department-promise{flex:0 0 min(82vw,310px);min-height:238px;padding:15px;scroll-snap-align:start}
+ .dp-top{padding-bottom:8px}
+ .dp-system-head{margin-top:11px}
+ .dp-copy{margin-top:7px}
+ .dp-application{margin-top:7px;padding-top:7px}
+ .dp-controls{padding-top:12px}
+ .dp-link{margin-top:8px}
+
+ .trust-founder{padding-top:42px!important;padding-bottom:42px!important}
+ .trust-founder-grid{gap:26px}
+ .trust-rules{margin-top:20px}
+ .trust-rules>div{padding:10px 0}
+ .trust-actions{margin-top:20px}
+
+ .final-cta{padding:46px 0!important}
+ .final-cta h2{font-size:34px;line-height:1.01}
+ .final-actions{margin-top:24px;gap:14px}
+ .final-apply{padding:12px 20px}
+}
 </style>
 </head>
 <body>
@@ -1037,28 +1125,25 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
  </div>
 </div></div>
 
-<!-- 2 PROBLEM -->
+<!-- 2 WHY AN AGENT -->
 <section class="problem" id="what"><div class="w">
- <span class="k rv" style="color:var(--pa)">the problem</span>
- <div class="big rv d1">Managing everyday life takes ongoing administrative work.</div>
- <div class="cols">
-  <div class="rv d2">
-   <p class="lead">The information already exists.</p>
-   <p>The information is scattered across websites, offices, apps, family, workplaces, and your own records.</p>
-   <p>The work is organizing it, applying it, keeping it current, and connecting one part of life to another. Most people do that work themselves.</p>
+ <span class="k rv" style="color:var(--pa)">why an agent</span>
+ <div class="problem-grid">
+  <div class="problem-copy">
+   <div class="big rv d1">Your life is connected. The places managing it are not.</div>
+   <p class="lead rv d2">A change at work can affect your time, transportation, money, home, and commitments you already made.</p>
+   <p class="rv d2">Most services see one piece. You are expected to remember the rest, resolve the conflicts, and keep every part of the plan current.</p>
   </div>
-  <div class="rv d3">
-   <div class="whereat">WHERE IT CURRENTLY LIVES</div>
-   <div class="scat">
-    <span>a browser tab</span><span>your mother</span><span>a form you lost</span>
-    <span>three apps</span><span>a coworker</span><span>an office that closes at 4</span>
-    <span>a group chat</span><span>your own memory</span><span>a pdf</span>
-    <span>whatever you can afford</span>
+  <div class="connection-panel rv d3">
+   <div class="whereat">WHAT AN AGENT CHANGES</div>
+   <p class="connection-lead">Your systems hold the details. Your agent is responsible for the connections between them.</p>
+   <div class="connection-flow" aria-label="Example of connected life systems">
+    <span>WORK</span><i>&rarr;</i><span>TIME</span><i>&rarr;</i><span>TRANSPORTATION</span><i>&rarr;</i><span>HOME</span>
    </div>
-   <p class="px mt3">Universe City gives you an agent and a place to organize that work, keep it current, and continue from where you left off.</p>
+   <p>Your agent sees what a change touches, protects what you already committed to, updates what can be handled, and brings you the decisions that actually require you.</p>
   </div>
  </div>
- <a class="flow-link rv d3" href="#experience">See what having an agent feels like &rarr;</a>
+ <a class="flow-link rv d3" href="#experience">See an agent manage a real request &rarr;</a>
 </div></section>
 
 <!-- 3 AGENT EXPERIENCE -->
@@ -1097,7 +1182,7 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
  <p class="lead rv d2 mt3 px" style="max-width:54ch">Universe City organizes everyday life across four departments. Each department contains a different set of systems for turning real-life information into something usable.</p>
 
  <p class="system-explainer rv d2">Each department contains 12 folders. A folder names the part of life. <strong>In Universe City, that folder becomes a working system: information is organized into a structure you can use, update, and return to as life changes.</strong></p>
- <p class="system-tip rv d2">Click through each card to see all 12.</p>
+ <p class="system-tip rv d2">Use the arrows to explore all 12 systems.</p>
 
  <div class="department-promise-grid rv d2">
   <article class="department-promise" data-dept="pa" style="--c:var(--pa)">
