@@ -879,13 +879,15 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
   <div class="body">
    <div class="rn" id="sRn">DEPARTMENT I</div>
    <div class="pn" id="sPn">Agency Assessment</div>
-   <div class="pp" id="sPp">Understand your current situation and establish the information your agent needs to work with you.</div>
-   <a class="stage-link" id="sLink" href="/agency-assessment">Explore the department &rarr;</a>
+   <div class="pp" id="sPp">A person’s life in one place. Who you are, what you can do, what you can prove, and what you are currently carrying.</div>
+   <div class="canvas" id="sCanvas"><div class="scene on" data-s="0"><div class="mgrid"><div class="mcell one"><i>01</i><span>Time</span></div><div class="mcell"><i>02</i><span>Health</span></div><div class="mcell"><i>03</i><span>Language</span></div><div class="mcell"><i>04</i><span>Background</span></div><div class="mcell"><i>05</i><span>Identification</span></div><div class="mcell"><i>06</i><span>Finance</span></div><div class="mcell"><i>07</i><span>Legal</span></div><div class="mcell"><i>08</i><span>Mediation</span></div><div class="mcell"><i>09</i><span>Education</span></div><div class="mcell"><i>10</i><span>Employment</span></div><div class="mcell"><i>11</i><span>Regulation</span></div><div class="mcell"><i>12</i><span>Community</span></div></div></div><div class="scene" data-s="1"><div class="mgrid"><div class="mcell one"><i>01</i><span>Inventory</span></div><div class="mcell"><i>02</i><span>Storage</span></div><div class="mcell"><i>03</i><span>Sanitation</span></div><div class="mcell"><i>04</i><span>Organization</span></div><div class="mcell"><i>05</i><span>Information</span></div><div class="mcell"><i>06</i><span>Administration</span></div><div class="mcell"><i>07</i><span>Law</span></div><div class="mcell"><i>08</i><span>Privacy</span></div><div class="mcell"><i>09</i><span>Transportation</span></div><div class="mcell"><i>10</i><span>Maintenance</span></div><div class="mcell"><i>11</i><span>Technology</span></div><div class="mcell"><i>12</i><span>Communal Space</span></div></div></div><div class="scene" data-s="2"><div class="mgrid"><div class="mcell one"><i>01</i><span>Salary</span></div><div class="mcell"><i>02</i><span>Schedule</span></div><div class="mcell"><i>03</i><span>Skill</span></div><div class="mcell"><i>04</i><span>Scope</span></div><div class="mcell"><i>05</i><span>Integrity</span></div><div class="mcell"><i>06</i><span>Professionalism</span></div><div class="mcell"><i>07</i><span>Resources</span></div><div class="mcell"><i>08</i><span>KPIs</span></div><div class="mcell"><i>09</i><span>Advancement</span></div><div class="mcell"><i>10</i><span>Leadership</span></div><div class="mcell"><i>11</i><span>Info Technology</span></div><div class="mcell"><i>12</i><span>Networking</span></div></div></div><div class="scene" data-s="3"><div class="mgrid"><div class="mcell one"><i>01</i><span>Standards</span></div><div class="mcell"><i>02</i><span>Survival</span></div><div class="mcell"><i>03</i><span>Perception</span></div><div class="mcell"><i>04</i><span>Instinct</span></div><div class="mcell"><i>05</i><span>Identity</span></div><div class="mcell"><i>06</i><span>Ethics</span></div><div class="mcell"><i>07</i><span>Equilibrium</span></div><div class="mcell"><i>08</i><span>Boundary</span></div><div class="mcell"><i>09</i><span>Discernment</span></div><div class="mcell"><i>10</i><span>Prioritization</span></div><div class="mcell"><i>11</i><span>Systems</span></div><div class="mcell"><i>12</i><span>Socializing</span></div></div></div></div>
+   <div class="m1" id="sM1">FOLDER 01 &middot; TIME</div>
   </div>
   <div class="prog"><i></i>
    <button id="stagePause" aria-label="Pause the rotation" aria-pressed="false">&#10073;&#10073;</button>
   </div>
- </div></div></div>
+ </div>
+</div></div>
 
 <!-- 2 PROBLEM -->
 <section class="problem" id="what"><div class="w">
@@ -1048,14 +1050,19 @@ if(mBtn){
 
 /* ---------- 1. department stage ---------- */
 var P=[
- {rn:'DEPARTMENT I',  nm:'Agency Assessment', pp:'Understand your current situation and establish the information your agent needs to work with you.', href:'/agency-assessment', c:'#5C0F1B'},
- {rn:'DEPARTMENT II', nm:'Housing Stability', pp:'Create more stability around your home, household needs, and the practical work of maintaining where you live.', href:'/housing-stability', c:'#A07818'},
- {rn:'DEPARTMENT III',nm:'Career Development', pp:'Work through employment, income, capability, and the choices that shape how you make a living.', href:'/career-development', c:'#4A2A78'},
- {rn:'DEPARTMENT IV', nm:'Life Management', pp:'Build clearer priorities, standards, and ways of managing the decisions that affect everyday life.', href:'/life-management', c:'#2A4B3C'}
+ {rn:'DEPARTMENT I',  nm:'Agency Assessment', pp:'Understand your current situation.',
+  m1:'FOLDER 01 &middot; TIME', c:'#5C0F1B'},
+ {rn:'DEPARTMENT II', nm:'Housing Stability',   pp:'Manage your living environment.',
+  m1:'FOLDER 01 &middot; INVENTORY', c:'#A07818'},
+ {rn:'DEPARTMENT III',nm:'Career Development',  pp:'Expand your work options.',
+  m1:'FOLDER 01 &middot; SALARY', c:'#4A2A78'},
+ {rn:'DEPARTMENT IV', nm:'Life Management',     pp:'Set your priorities.',
+  m1:'FOLDER 01 &middot; STANDARDS', c:'#2A4B3C'}
 ];
 var i=0, timer=null, paused=false;
 var arrival=document.getElementById('arrival'),
     stage=document.getElementById('stage'),
+    canvas=document.getElementById('sCanvas'),
     tabs=stage?stage.querySelectorAll('.sel button'):[];
 
 function show(n,manual){
@@ -1065,9 +1072,12 @@ function show(n,manual){
   document.getElementById('sRn').innerHTML=p.rn;
   document.getElementById('sPn').textContent=p.nm;
   document.getElementById('sPp').textContent=p.pp;
-  document.getElementById('sLink').href=p.href;
+  document.getElementById('sM1').innerHTML=p.m1;
   arrival.style.background=p.c;
   tabs.forEach(function(t,x){ t.setAttribute('aria-selected', x===n?'true':'false') });
+  canvas.querySelectorAll('.scene').forEach(function(s,x){
+    s.classList.toggle('on', x===n);
+  });
   if(!reduce && !paused){
     stage.classList.remove('play'); void stage.offsetWidth; stage.classList.add('play');
   }
