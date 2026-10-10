@@ -17,8 +17,9 @@ export default function SiteHeader({ signedIn }: { signedIn: boolean }) {
 
           <div className="public-actions">
             {signedIn
-              ? <Link className="public-apply" href="/member">Dashboard</Link>
-              : <a className="public-apply" href={mainSiteUrl + '/apply'}>Apply</a>}
+              ? <Link className="public-signin" href="/member">Dashboard</Link>
+              : <Link className="public-signin" href="/login">Sign in</Link>}
+            {!signedIn && <a className="public-apply" href={mainSiteUrl + '/apply'}>Apply</a>}
 
             <button
               className="public-menu-button"
@@ -45,12 +46,11 @@ export default function SiteHeader({ signedIn }: { signedIn: boolean }) {
 
             <div className="public-menu-groups">
               <div>
-                <div className="public-menu-label">HOW IT WORKS</div>
-                <a href={mainSiteUrl + '/#what'}>Why an agent</a>
-                <a href={mainSiteUrl + '/#departments'}>Four departments</a>
-                <a href={mainSiteUrl + '/#system'}>Starting folders</a>
-                <a href={mainSiteUrl + '/#time'}>Time example</a>
-                <a href={mainSiteUrl + '/agency-assessment'}>Agency Assessment folders</a>
+                <div className="public-menu-label">UNIVERSE CITY</div>
+                <a href={mainSiteUrl}>Home</a>
+                <a href={mainSiteUrl + '/#what'}>How it works</a>
+                <a href={mainSiteUrl + '/#business'}>Membership</a>
+                <a href={mainSiteUrl + '/founder'}>Founder</a>
               </div>
 
               <div>
@@ -59,25 +59,6 @@ export default function SiteHeader({ signedIn }: { signedIn: boolean }) {
                 <a href={mainSiteUrl + '/housing-stability'}>II · Housing Stability</a>
                 <a href={mainSiteUrl + '/career-development'}>III · Career Development</a>
                 <a href={mainSiteUrl + '/life-management'}>IV · Life Management</a>
-              </div>
-
-              <div>
-                <div className="public-menu-label">UNIVERSE CITY</div>
-                <a href={mainSiteUrl + '/founder'}>About the founder</a>
-                <a href={mainSiteUrl + '/#business'}>How it operates</a>
-                <a href={mainSiteUrl + '/membership'}>Membership</a>
-                {signedIn
-                  ? <Link href="/member">Dashboard</Link>
-                  : <Link href="/login">Member sign in</Link>}
-              </div>
-
-              <div>
-                <div className="public-menu-label">OPEN BOOKS</div>
-                <a href={mainSiteUrl + '/#'}>Quarterly report</a>
-                <a href={mainSiteUrl + '/membership'}>Membership</a>
-                {signedIn
-                  ? <Link href="/member">Open dashboard</Link>
-                  : <Link href="/login">Sign in</Link>}
               </div>
             </div>
 
