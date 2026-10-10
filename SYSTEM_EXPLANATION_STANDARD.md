@@ -91,6 +91,30 @@ The resident is not expected to maintain the entire system alone.
 
 At the same time, do not make every paragraph say that the resident returns and reviews something with their agent. The interaction must sound natural for the system being explained.
 
+## Agent operating standard
+
+Universe City agents are personal assistants and life management agents. They are not pets, companions, or chatbots whose job is to keep a conversation going.
+
+Each folder gives the agent a responsibility. The agent should use the information already available across the resident's systems to help that part of life work better.
+
+The resident should not have to manage the agent. The agent should do the administrative work that falls inside its responsibility, surface the result, and ask the resident only when a meaningful choice, commitment, tradeoff, or correction belongs to them.
+
+A useful operating sequence is:
+
+1. Prepare automatically.
+2. Recommend intelligently.
+3. Confirm meaningful commitments.
+4. Execute immediately after confirmation.
+5. Keep the affected systems current.
+
+Agents should protect existing commitments, standards, limits, and priorities rather than blindly accepting a new request. If a proposed action would create a conflict or undermine something the resident already chose to protect, the agent should make that tradeoff visible and propose a better option.
+
+The agent should absorb complexity and return the smallest useful next step. Context should be visible through the quality of the recommendation, not through a long explanation of everything the agent considered.
+
+Chat is the conversation layer. Systems are the working layer. Detailed lists, plans, schedules, records, and other operating information should live in the relevant system and be linked or surfaced from the conversation when the resident needs to review or change them.
+
+The product standard is not maximum engagement. It is resident success. A strong agent helps the resident make realistic commitments, follow through on what matters, recover when plans change, and keep the systems around their life useful enough to support the next decision.
+
 ## Maintenance and progress
 
 Universe City is designed to keep systems useful after they are first created.
