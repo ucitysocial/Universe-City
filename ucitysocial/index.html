@@ -854,25 +854,59 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
  .trust-founder .portrait{max-width:460px}
 }
 
-/* department promise cards */
-.department-promise-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:clamp(28px,3.5vw,46px) 0}
-.department-promise{--c:var(--pa);display:flex;flex-direction:column;min-height:248px;border:1px solid var(--ink);
- border-top:6px solid var(--c);background:var(--paper);color:var(--ink);padding:18px;text-decoration:none;
- transition:transform .18s,box-shadow .18s,background .18s}
-.department-promise:hover{transform:translate(-2px,-2px);box-shadow:5px 5px 0 var(--ink);background:#fffaf5}
+/* department promise cards + system explorer */
+.system-explainer{max-width:62ch;margin-top:18px;color:#4d3b36;font-size:15px;line-height:1.55}
+.system-explainer strong{font-weight:600;color:var(--ink)}
+
+.department-promise-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:clamp(26px,3.3vw,42px) 0 18px}
+.department-promise{--c:var(--pa);display:flex;flex-direction:column;min-height:196px;border:1px solid var(--ink);
+ border-top:6px solid var(--c);background:var(--paper);color:var(--ink);padding:18px;text-align:left;font:inherit;
+ cursor:pointer;transition:transform .18s,box-shadow .18s,background .18s}
+.department-promise:hover,.department-promise.active{transform:translate(-2px,-2px);box-shadow:5px 5px 0 var(--ink);background:#fffaf5}
+.department-promise:focus-visible{outline:3px solid var(--c);outline-offset:4px}
 .dp-top{display:flex;align-items:baseline;gap:9px}
 .dp-top span{font-family:var(--record);font-size:23px;line-height:1;color:var(--c)}
 .dp-top b{font-size:16px;font-weight:600;line-height:1.2}
 .department-promise>p{margin-top:10px;color:#3d2c28;line-height:1.45;font-size:13.5px}
-.dp-systems{display:flex;flex-wrap:wrap;gap:5px;margin-top:16px}
-.dp-systems small,.dp-how small{width:100%;font-family:var(--record);font-size:12px;letter-spacing:.14em;color:var(--dim)}
-.dp-systems span{font-size:11.5px;border:1px solid var(--rule);padding:4px 6px;background:var(--paper2)}
-.dp-how{margin-top:14px;padding-top:11px;border-top:1px solid var(--rule)}
-.dp-how p{font-size:12.5px;line-height:1.4;color:var(--dim);margin-top:3px}
 .dp-link{margin-top:auto;padding-top:14px;font-family:var(--record);font-size:13px;letter-spacing:.05em;color:var(--c)}
-@media(max-width:1000px){.department-promise-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:580px){.department-promise-grid{grid-template-columns:1fr}.department-promise{min-height:0}}
-</style>
+
+.system-explorer{border:2px solid var(--ink);border-top:8px solid var(--c);background:var(--paper2);padding:clamp(20px,2.7vw,32px);margin-bottom:clamp(28px,3.5vw,44px)}
+.system-explorer-head{display:flex;justify-content:space-between;gap:20px;align-items:flex-start}
+.se-label{font-family:var(--record);font-size:14px;letter-spacing:.16em;color:var(--c)}
+.system-explorer h3{font-size:clamp(28px,3vw,42px);margin-top:4px}
+.se-count{font-family:var(--record);font-size:18px;letter-spacing:.08em;color:var(--dim);white-space:nowrap}
+.se-count span{font-size:32px;color:var(--c)}
+
+.system-numbers{display:grid;grid-template-columns:repeat(12,1fr);gap:4px;margin-top:22px}
+.system-numbers button{border:1px solid var(--rule);background:var(--paper);font-family:var(--record);font-size:14px;padding:8px 4px;cursor:pointer;color:var(--dim)}
+.system-numbers button:hover,.system-numbers button.active{background:var(--c);color:#fff;border-color:var(--c)}
+.system-numbers button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+
+.system-detail{display:grid;grid-template-columns:.8fr 1.35fr 1fr;border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);margin-top:20px}
+.system-detail>div{padding:20px;border-right:1px solid var(--rule)}
+.system-detail>div:last-child{border-right:0}
+.system-detail span{font-family:var(--record);font-size:13px;letter-spacing:.15em;color:var(--c)}
+.system-detail p{font-size:14px;line-height:1.55;color:#4d3b36;margin-top:7px}
+
+.system-explorer-foot{display:flex;justify-content:space-between;align-items:center;gap:18px;margin-top:18px}
+.se-nav{display:flex;gap:8px}
+.se-nav button{border:1px solid var(--ink);background:var(--paper);color:var(--ink);padding:8px 12px;font:600 12px var(--voice);cursor:pointer}
+.se-nav button:hover{background:var(--ink);color:var(--paper)}
+.system-explorer-foot>a{font-family:var(--record);font-size:14px;letter-spacing:.05em;color:var(--c);text-decoration:none;border-bottom:1px solid currentColor}
+
+@media(max-width:1000px){
+ .department-promise-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .system-detail{grid-template-columns:1fr}
+ .system-detail>div{border-right:0;border-bottom:1px solid var(--rule)}
+ .system-detail>div:last-child{border-bottom:0}
+ .system-numbers{grid-template-columns:repeat(6,1fr)}
+}
+@media(max-width:580px){
+ .department-promise-grid{grid-template-columns:1fr}
+ .department-promise{min-height:0}
+ .system-numbers{grid-template-columns:repeat(4,1fr)}
+ .system-explorer-head,.system-explorer-foot{flex-direction:column;align-items:flex-start}
+}</style>
 </head>
 <body>
 <nav><div class="w">
@@ -1002,38 +1036,67 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
  <h2 class="head rv d1">Four departments. Systems built around your life.</h2>
  <p class="lead rv d2 mt3 px" style="max-width:54ch">Your agent works across all four departments inside one resident workspace. Each department builds a different kind of practical system with you.</p>
 
- <div class="department-promise-grid rv d2">
-  <a class="department-promise" href="/agency-assessment" style="--c:var(--pa)">
+ <p class="system-explainer rv d2">Each department contains 12 folders. A folder names a part of life. <strong>A system is the working structure you and your agent build inside it</strong> — something you can use, update, and return to.</p>
+
+ <div class="department-promise-grid rv d2" role="tablist" aria-label="Universe City departments">
+  <button class="department-promise active" type="button" role="tab" aria-selected="true" data-dept="pa" style="--c:var(--pa)">
    <div class="dp-top"><span>I</span><b>Agency Assessment</b></div>
-   <p>Systems that establish and maintain a clear picture of your current situation.</p>
-   <div class="dp-systems"><small>EXAMPLES</small><span>Time</span><span>Health</span><span>Finance</span></div>
-   <div class="dp-how"><small>HOW</small><p>Establish what is true, then keep it current.</p></div>
+   <p>Understand your current situation and keep the working picture current.</p>
    <div class="dp-link">Explore 12 systems &rarr;</div>
-  </a>
+  </button>
 
-  <a class="department-promise" href="/housing-stability" style="--c:var(--hs)">
+  <button class="department-promise" type="button" role="tab" aria-selected="false" data-dept="hs" style="--c:var(--hs)">
    <div class="dp-top"><span>II</span><b>Housing Stability</b></div>
-   <p>Systems for keeping your home, household needs, and living environment working.</p>
-   <div class="dp-systems"><small>EXAMPLES</small><span>Inventory</span><span>Storage</span><span>Transportation</span></div>
-   <div class="dp-how"><small>HOW</small><p>Build useful baselines and maintain them.</p></div>
+   <p>Keep your home, household needs, and living environment working.</p>
    <div class="dp-link">Explore 12 systems &rarr;</div>
-  </a>
+  </button>
 
-  <a class="department-promise" href="/career-development" style="--c:var(--cd)">
+  <button class="department-promise" type="button" role="tab" aria-selected="false" data-dept="cd" style="--c:var(--cd)">
    <div class="dp-top"><span>III</span><b>Career Development</b></div>
-   <p>Systems for understanding your work, income, capabilities, and next moves.</p>
-   <div class="dp-systems"><small>EXAMPLES</small><span>Salary</span><span>Schedule</span><span>Skill</span></div>
-   <div class="dp-how"><small>HOW</small><p>Turn work information into usable options.</p></div>
+   <p>Understand your work, income, capabilities, and next moves.</p>
    <div class="dp-link">Explore 12 systems &rarr;</div>
-  </a>
+  </button>
 
-  <a class="department-promise" href="/life-management" style="--c:var(--lm)">
+  <button class="department-promise" type="button" role="tab" aria-selected="false" data-dept="lm" style="--c:var(--lm)">
    <div class="dp-top"><span>IV</span><b>Life Management</b></div>
-   <p>Systems for the standards, priorities, and decisions that shape everyday life.</p>
-   <div class="dp-systems"><small>EXAMPLES</small><span>Standards</span><span>Priorities</span><span>Socializing</span></div>
-   <div class="dp-how"><small>HOW</small><p>Define what matters and use it as context.</p></div>
+   <p>Build structure around standards, priorities, and everyday decisions.</p>
    <div class="dp-link">Explore 12 systems &rarr;</div>
-  </a>
+  </button>
+ </div>
+
+ <div class="system-explorer rv d3" id="system-explorer" style="--c:var(--pa)">
+  <div class="system-explorer-head">
+   <div>
+    <span class="se-label" id="seDept">DEPARTMENT I · AGENCY ASSESSMENT</span>
+    <h3 id="seName">Time</h3>
+   </div>
+   <div class="se-count"><span id="seNumber">01</span> / 12</div>
+  </div>
+
+  <div class="system-numbers" id="systemNumbers" aria-label="Systems 01 through 12"></div>
+
+  <div class="system-detail">
+   <div>
+    <span>WHAT IT MANAGES</span>
+    <p id="seDefinition"></p>
+   </div>
+   <div>
+    <span>HOW YOUR AGENT WORKS WITH IT</span>
+    <p id="seAgent"></p>
+   </div>
+   <div>
+    <span>WHAT YOU BUILD</span>
+    <p id="seBuild"></p>
+   </div>
+  </div>
+
+  <div class="system-explorer-foot">
+   <div class="se-nav">
+    <button type="button" id="sePrev">&larr; Previous</button>
+    <button type="button" id="seNext">Next &rarr;</button>
+   </div>
+   <a id="seDepartmentLink" href="/agency-assessment">Open full department page &rarr;</a>
+  </div>
  </div>
 
  <a class="btn dark rv d3" href="/apply">Start your application &rarr;</a>
@@ -1204,6 +1267,58 @@ if(stage){
   if(!reduce) timer=setInterval(cycle,11000);
 }
 
+
+/* ---------- department system explorer ---------- */
+var DEPARTMENT_SYSTEMS={"pa":{"name":"Agency Assessment","url":"/agency-assessment","color":"var(--pa)","systems":[{"n":"01","name":"Time","definition":"The measured period in which something takes place.","agent":"Your agent establishes the commitments that already use your time and the time you want to protect. Work, commuting, sleep, meals, preparation, appointments, responsibilities, and rest can all be placed on the calendar as you confirm them.","build":"A calendar your agent maintains as your schedule changes."},{"n":"02","name":"Health","definition":"The condition of a person's body and mind, and the care taken to maintain it.","agent":"Appointments, medications, symptoms and mood, recorded as they happen. What you are due for, what you have let go, and who you last saw about it.","build":"A health record holding your appointments, your medications, what you have reported, and what is currently due."},{"n":"03","name":"Language","definition":"The system of words a person uses to understand others and to be understood.","agent":"Reading, writing, speaking, grammar and punctuation, placed at a level and tracked. Where your comprehension currently limits what you can do.","build":"A placement across reading, writing and speaking, and a route to raising it."},{"n":"04","name":"Background","definition":"A person's origins, family and history.","agent":"Where you come from. Parents, grandparents, the people you are related to, close friends, and the timeline of your own life. Not jobs and not addresses.","build":"A family tree and a personal history timeline, and a record of who you can actually call."},{"n":"05","name":"Identification","definition":"Proof that a person is who they say they are.","agent":"Which documents you hold, what each one is for, when it expires, and how it is replaced. Universe City records that a document exists and its status. It never records the number on it.","build":"A document registry listing what you hold, what has expired, what is missing, and how to obtain it."},{"n":"06","name":"Finance","definition":"The management of money.","agent":"What comes in, what goes out, what you owe, and what is left. Budgeting, saving, credit and financial literacy. This is education, not advice.","build":"A money picture showing income, obligations, and what remains after both."},{"n":"07","name":"Legal","definition":"Relating to the law and to matters the law decides.","agent":"Open legal matters, court dates, charges and deadlines. Where to go for help and how the process works. Universe City is not a law firm and does not advise on the merits of a matter.","build":"A legal matters log holding every open issue, its deadline, and who handles it."},{"n":"08","name":"Mediation","definition":"Settling a difference between two sides.","agent":"Conflicts with a landlord, an employer, a coworker, a family member. What happened, what was said, what was asked for, and what was agreed. Universe City is not a therapist and does not provide counseling.","build":"A conflict record holding what happened, what was said, and what was agreed."},{"n":"09","name":"Education","definition":"Gaining knowledge or skill through study or instruction.","agent":"What you have already learned and can prove, and a running list of what you want to learn next. Your agent sources the actual next step rather than leaving the interest to fade.","build":"A credentials log, and a list of what you want to learn with a costed route to each."},{"n":"10","name":"Employment","definition":"Work done for payment.","agent":"Every job you have held, when, for whom, and who can confirm it. The record you need when a form asks for five years of history.","build":"A verified work history you can evidence."},{"n":"11","name":"Regulation","definition":"Keeping something running the way you want it to run.","agent":"What you do for your own sake, with no obligation attached. Hobbies, going out, rest, personal interests you want to explore, and the small comforts that make a day bearable.","build":"A record of what actually restores you and what only fills the hours."},{"n":"12","name":"Community","definition":"The people in a place and the relationships between them.","agent":"Where you live, who you know there, what you show up for, and what you contribute. Volunteering, civic participation, and making a connection on purpose.","build":"A community log holding your area, the people in it, and what you turn up for."}]},"hs":{"name":"Housing Stability","url":"/housing-stability","color":"var(--hs)","systems":[{"n":"01","name":"Inventory","definition":"A record of items a household keeps available for use.","agent":"Your agent establishes the groceries, household supplies, hygiene products, and other items you replace regularly. For each item, record the quantity you normally keep and how long that amount usually lasts.","build":"A household baseline showing what you normally keep and when recurring items are expected to need replenishment."},{"n":"02","name":"Storage","definition":"Keeping items in a place until they are needed.","agent":"What is boxed away, where it is, and whether it is worth what it costs to keep. Paid storage, the loft, the back of the wardrobe.","build":"A map of what is stored, where, and what it costs you to hold."},{"n":"03","name":"Sanitation","definition":"Conditions relating to cleanliness and the removal of waste.","agent":"Cleaning, laundry, bins and waste. What has to be done, how often, by whom, and what is currently overdue.","build":"A cleaning system sized to the hours you actually have."},{"n":"04","name":"Organization","definition":"Arranging things into a working order.","agent":"Where everything lives, so that you and anyone else in the house can find it without asking.","build":"A household map putting what you use most where you use it."},{"n":"05","name":"Information","definition":"Facts recorded about something.","agent":"The facts about your home that do not change. Where the water shutoff is, which breaker runs which room, the wifi, who owns the building, the plumber you call, which day the bins go out, the make and model of the appliances.","build":"A home reference showing how your home works and who to call when it stops."},{"n":"06","name":"Administration","definition":"The running of routine business affairs.","agent":"The things with dates on them. Rent, bills, renewals, filings, and the paper trail proving you paid.","build":"A household calendar of what is due and what it costs, with a record of what you sent and when."},{"n":"07","name":"Law","definition":"Rules made by a government and enforced by it.","agent":"Your rights where you live. What a lease actually says, what a notice actually means, and what a landlord can and cannot do.","build":"A tenancy and rights reference covering your lease, your deposit, and every notice you have received."},{"n":"08","name":"Privacy","definition":"Being free from being observed, entered or disturbed.","agent":"Who can get into your home and how. Locks, keys, entry notice, lighting, and whether the place is actually secure. Then who holds your information. Who has your address, what is public that you did not choose, and what you can get removed.","build":"A record of who can get in and who holds your information, and what you have changed or had taken down."},{"n":"09","name":"Transportation","definition":"The means by which a person moves from one place to another.","agent":"Everything you move around on and everything it takes to keep it running. A car, a bike, a scooter, a bus pass, or rides from other people. Registration, insurance, mileage, gas, fares, tires, parking and tolls. Then the routes themselves, how long each actually takes, and what happens the day it fails.","build":"A record of what you move around on, what it costs you a month, how long your real routes take, and a backup for each one."},{"n":"10","name":"Maintenance","definition":"The work of keeping something in working condition.","agent":"Items you own that need servicing. Home, vehicle, appliances. When each was last done, when the next is due, who is responsible, and proof that you asked. The vehicle itself and what it costs to run are recorded in Transportation.","build":"A maintenance schedule with dates requested and dates completed."},{"n":"11","name":"Technology","definition":"Equipment and systems used to do practical work.","agent":"The devices and accounts a household runs on, what each is tied to, what it costs monthly, and what happens if one is lost.","build":"A device and account registry showing what you have and what depends on it."},{"n":"12","name":"Communal Space","definition":"Areas shared between more than one household.","agent":"Space you use but do not control alone. Hallways, laundry, yards, and the people you share them with. Chores, money, guests and noise.","build":"A shared space agreement recording what was agreed and what is not working."}]},"cd":{"name":"Career Development","url":"/career-development","color":"var(--cd)","systems":[{"n":"01","name":"Salary","definition":"Income received from work.","agent":"Your agent compares income with the regular expenses your current life requires. The starting exercise reviews the last full month so the first budget uses amounts that already happened.","build":"A working income-and-expenses view showing what came in, what is due, and what remains."},{"n":"02","name":"Schedule","definition":"A plan setting out when things will happen.","agent":"When you work, how far ahead you are told, and what you can move. Shifts, availability, and the requests you make.","build":"A work schedule recording your actual hours against your posted ones."},{"n":"03","name":"Skill","definition":"The ability to do something well, gained through practice.","agent":"What you can do, what you can prove, and what each is paid elsewhere.","build":"A verified skills ledger with the current rate for each."},{"n":"04","name":"Scope","definition":"The extent of what something covers.","agent":"What your job includes and what it does not, written down. What you are doing that nobody agreed to.","build":"A written description of your role and a log of what falls outside it."},{"n":"05","name":"Integrity","definition":"Doing what you said you would do.","agent":"The commitments you make to yourself when nobody is checking. You state the thing and the deadline arrives whether or not you mention it again.","build":"A record of what you said you would do and what happened to each one, ending in a rate rather than a feeling."},{"n":"06","name":"Professionalism","definition":"The conduct and standards a person holds at work.","agent":"Your own rules for the workplace. What you share and with whom, how you handle conflict, what you do and do not do socially with coworkers, how you speak to people above and below you.","build":"A written set of your work rules, and an answer to whether to say something and to who."},{"n":"07","name":"Resources","definition":"Supplies or support available for use.","agent":"What your employer and the public system make available that you are not using. Tools, budget, training, benefits and programs.","build":"A resource map of what you can request and what you qualify for right now."},{"n":"08","name":"Key Performance Indicators","definition":"The measures used to judge whether work is succeeding.","agent":"What you are judged on, whether you were told, and whether you can prove your side of it.","build":"A performance record holding your own numbers, kept independently of your employer."},{"n":"09","name":"Advancement","definition":"Moving forward to a higher position.","agent":"The next role, what it requires, and what is missing between you and it. How you ask rather than waiting to be noticed.","build":"An advancement plan naming the next role, its requirements, and your gaps against them."},{"n":"10","name":"Leadership","definition":"The structure of authority above a person at work.","agent":"Who your manager is, who theirs is, what each of them controls, and who actually decides what. Most people cannot name three levels up or say who signs off on anything.","build":"An org chart showing who is above you, what they control, and who to go to for what."},{"n":"11","name":"Information Technology","definition":"The use of computers and systems to store and handle information.","agent":"The systems you have to work inside and nobody teaches. Logins and credentials, the sites and tools you use, standard operating procedures, and email and phone etiquette.","build":"A record of the systems you work in, how each is used, and who to ask when one breaks."},{"n":"12","name":"Networking","definition":"Building relationships that lead to opportunity.","agent":"The rooms you want to be in, not the room you are currently in. Who is already there, and what you have done about getting in.","build":"A record of the rooms you are trying to enter, who is in them, and every approach you have made."}]},"lm":{"name":"Life Management","url":"/life-management","color":"var(--lm)","systems":[{"n":"01","name":"Standards","definition":"Rules or minimum conditions a person chooses to maintain.","agent":"Your agent helps identify rules you return to when you want to function consistently. A possible standard is added only after you confirm it.","build":"A dated set of confirmed standards. Each standard records its intention, the value behind it, and the impact you expect when you maintain it."},{"n":"02","name":"Survival","definition":"Staying safe and functional through danger, breakdown or emergency.","agent":"What you do when something goes wrong. Money, documents, who to call, and where to go. Plus the practical skills nobody teaches until the moment you need them.","build":"An emergency plan holding what you have, who to call, and how long you last if your income stops."},{"n":"03","name":"Perception","definition":"The meaning a person assigns to what happens to them.","agent":"Not the thing itself but what you take it to mean. One person reads being interrupted as disrespect and another reads it as enthusiasm. This folder fills from the work you do everywhere else, and your agent proposes what it noticed for you to confirm.","build":"A record of how you see yourself and the world, and where each reading came from."},{"n":"04","name":"Instinct","definition":"A response that occurs without conscious reasoning.","agent":"What you reliably do before you have thought about it. Your agent spots the repeat across your systems, names it, and asks whether that is what you do.","build":"A record of your patterns, noticed across the record and confirmed by you."},{"n":"05","name":"Identity","definition":"The qualities, values and beliefs that make a person who they are.","agent":"How you describe yourself, on paper and to yourself, and whether the description still fits.","build":"A written self description, checked against where your hours and money actually go."},{"n":"06","name":"Ethics","definition":"What a person believes is right and wrong.","agent":"Your own code and where each part of it came from. People state their morals constantly as opinions about other people, so your agent catches the judgement and asks where it came from.","build":"A record of what you believe is right and wrong, and who gave you each belief."},{"n":"07","name":"Equilibrium","definition":"A state of balance between competing forces.","agent":"Whether your attention matches what you said matters. You named an order in Prioritization. This folder reads across every other folder and shows where your time and money actually went.","build":"A read across all your folders showing where your life is out of balance and what you have been neglecting."},{"n":"08","name":"Boundary","definition":"A line that marks a limit.","agent":"Stating a limit, to whom, and what happens after somebody crosses it.","build":"A boundary protocol recording what you said, who you said it to, and whether it held."},{"n":"09","name":"Discernment","definition":"Deciding well.","agent":"The decisions you make too fast. You set a rule for what you will not decide on the spot, money over an amount, anything that adds hours, anyone asking to borrow. Your agent runs the check with you early and teaches you to run it yourself.","build":"Your rule for what needs a pause, and a record of what you decided and what it cost."},{"n":"10","name":"Prioritization","definition":"Deciding the order in which things get done.","agent":"What actually matters to you, in order, when everything is urgent and most of it is somebody else's urgency.","build":"An ordered list of what comes first, and the reason for the order."},{"n":"11","name":"Systems","definition":"A set of parts working together as a method.","agent":"Every system the other folders left behind, and whether each one is still running.","build":"A register of what you have built, what is running, and what has fallen over."},{"n":"12","name":"Socializing","definition":"Spending time in the company of other people.","agent":"Your social life as it is and as you want it. Who is in your inner circle, where you like to go, who you owe a reply to, and what you want that you do not have yet.","build":"A record of who is actually in your life, and what you are doing about the life you want."}]}};
+var deptOrder=['pa','hs','cd','lm'];
+var deptRoman={pa:'I',hs:'II',cd:'III',lm:'IV'};
+var activeDept='pa', activeSystem=0;
+var explorer=document.getElementById('system-explorer');
+var numberWrap=document.getElementById('systemNumbers');
+
+function renderSystemNumbers(){
+  if(!numberWrap) return;
+  numberWrap.innerHTML='';
+  DEPARTMENT_SYSTEMS[activeDept].systems.forEach(function(sys,i){
+    var b=document.createElement('button');
+    b.type='button';
+    b.textContent=sys.n;
+    b.setAttribute('aria-label',sys.n+' '+sys.name);
+    b.classList.toggle('active',i===activeSystem);
+    b.addEventListener('click',function(){activeSystem=i;renderSystem();});
+    numberWrap.appendChild(b);
+  });
+}
+function renderSystem(){
+  if(!explorer) return;
+  var dept=DEPARTMENT_SYSTEMS[activeDept], sys=dept.systems[activeSystem];
+  explorer.style.setProperty('--c',dept.color);
+  document.getElementById('seDept').textContent='DEPARTMENT '+deptRoman[activeDept]+' · '+dept.name.toUpperCase();
+  document.getElementById('seName').textContent=sys.name;
+  document.getElementById('seNumber').textContent=sys.n;
+  document.getElementById('seDefinition').textContent=sys.definition;
+  document.getElementById('seAgent').textContent=sys.agent;
+  document.getElementById('seBuild').textContent=sys.build;
+  document.getElementById('seDepartmentLink').href=dept.url;
+  renderSystemNumbers();
+}
+document.querySelectorAll('.department-promise[data-dept]').forEach(function(card){
+  card.addEventListener('click',function(){
+    activeDept=card.dataset.dept;
+    activeSystem=0;
+    document.querySelectorAll('.department-promise[data-dept]').forEach(function(c2){
+      var on=c2===card;
+      c2.classList.toggle('active',on);
+      c2.setAttribute('aria-selected',on?'true':'false');
+    });
+    renderSystem();
+    explorer.scrollIntoView({behavior:reduce?'auto':'smooth',block:'center'});
+  });
+});
+var sePrev=document.getElementById('sePrev'), seNext=document.getElementById('seNext');
+if(sePrev) sePrev.addEventListener('click',function(){activeSystem=(activeSystem+11)%12;renderSystem();});
+if(seNext) seNext.addEventListener('click',function(){activeSystem=(activeSystem+1)%12;renderSystem();});
+renderSystem();
 
 /* ---------- chapter rail + star dividers ---------- */
 (function(){
