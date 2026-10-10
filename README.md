@@ -54,3 +54,39 @@ Use these before extending public or resident facing behavior:
 3. [ARCHITECTURE.md](ARCHITECTURE.md) for data ownership, provenance, history, and server side constraints.
 
 Do not copy an older page or component merely because it already exists. If it conflicts with the current standards, update the component rather than reintroducing the old behavior.
+
+
+## Route ownership
+
+The repository contains two delivery layers.
+
+### Canonical public marketing pages
+
+The public marketing source lives in `ucitysocial/` and is served on `https://ucitysocial.com`.
+
+Canonical static public routes include:
+
+- `/`
+- `/membership`
+- `/agency-assessment`
+- `/housing-stability`
+- `/career-development`
+- `/life-management`
+- `/founder`
+
+### Application and workspace routes
+
+The Next application owns account, authentication, resident, agent, and API routes. Production reverse proxies those routes through the public domain.
+
+These include:
+
+- `/apply`
+- `/login`
+- `/signup`
+- `/reset`
+- `/auth/*`
+- `/api/*`
+- `/member/*`
+- `/agent/*`
+
+The public shell used by the Next application must stay aligned with the current static marketing shell. Do not treat the stage application's old homepage or older public components as the marketing source of truth.
