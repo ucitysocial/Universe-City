@@ -25,7 +25,7 @@ export default async function Apply() {
         <p className="kick">Application</p>
         <ol className="application-steps">
           <li><span>01</span><p>Create your Universe City account.</p></li>
-          <li><span>02</span><p>Confirm your email and activate your $48 membership.</p></li>
+          <li><span>02</span><p>Confirm your email and activate your membership.</p></li>
           <li><span>03</span><p>Walk through the real resident interface.</p></li>
           <li><span>04</span><p>Start with Time by making a believable Plan for tomorrow.</p></li>
         </ol>
