@@ -251,21 +251,6 @@ a.btn.dark{background:var(--pa);color:#fff;box-shadow:5px 5px 0 var(--ink)}
 
 /* ===== 2 WHAT YOUR AGENT DOES ===== */
 .problem{color:var(--ink);background:var(--paper2);padding:clamp(44px,5vw,76px) 0;border-bottom:2px solid var(--ink)}
-.agent-job-single{max-width:980px}
-.agent-job-single h2{font-size:clamp(40px,5.2vw,72px);line-height:1;max-width:12ch}
-.agent-job-lead{font-size:clamp(21px,2vw,28px);line-height:1.38;font-weight:600;max-width:39ch;margin-top:24px}
-.agent-job-note{max-width:720px;margin-top:26px;padding-top:18px;border-top:3px solid var(--pa)}
-.agent-job-note strong{display:block;font-size:16px;line-height:1.4}
-.agent-job-note p{font-size:14.5px;line-height:1.55;color:#57443f;max-width:60ch;margin-top:8px}
-@media(max-width:640px){
- .problem{padding:34px 0 38px}
- .agent-job-single h2{font-size:33px;line-height:1.02;max-width:none}
- .agent-job-lead{font-size:17px;line-height:1.42;margin-top:16px}
- .agent-job-note{margin-top:18px;padding-top:14px}
- .agent-job-note strong{font-size:14px}
- .agent-job-note p{font-size:13px;line-height:1.5}
-}
-
 /* ===== 3 SYSTEM (dark) ===== */
 .system{background:var(--ink);color:var(--paper);padding:clamp(38px,4.4vw,70px) 0 var(--s5);overflow:hidden}
 .system h2{color:#fff}
@@ -895,10 +880,27 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
 .final-cta{background:var(--pa);color:var(--paper);padding:clamp(58px,7vw,96px) 0;border-bottom:2px solid var(--ink)}
 .final-cta .k{color:rgba(244,239,233,.58)}
 .final-cta h2{color:#fff;max-width:17ch;font-size:clamp(40px,5.6vw,76px);line-height:.99}
-.final-copy{max-width:54ch;margin-top:22px;font-size:clamp(16px,1.35vw,20px);line-height:1.5;color:rgba(244,239,233,.82)}
+.final-copy{max-width:58ch;margin-top:22px;font-size:clamp(17px,1.45vw,21px);line-height:1.5;color:rgba(244,239,233,.86)}
+.job-strip{display:grid;grid-template-columns:repeat(3,1fr);margin-top:30px;border-top:1px solid rgba(244,239,233,.34);border-bottom:1px solid rgba(244,239,233,.34)}
+.job-strip>div{padding:18px 20px 18px 0}
+.job-strip>div+div{border-left:1px solid rgba(244,239,233,.26);padding-left:20px}
+.job-strip span{display:block;font-family:var(--record);font-size:15px;letter-spacing:.12em;color:rgba(244,239,233,.5);margin-bottom:5px}
+.job-strip strong{display:block;font-size:14px;line-height:1.35;color:#fff}
+.job-strip p{font-size:14px;line-height:1.4;color:rgba(244,239,233,.76);margin-top:2px}
 .final-actions{display:flex;align-items:center;gap:24px;flex-wrap:wrap;margin-top:30px}
-.final-apply{display:inline-block;background:var(--paper);color:var(--ink);border:2px solid var(--ink);box-shadow:7px 7px 0 var(--ink);
- padding:14px 24px;text-decoration:none;font-weight:700;letter-spacing:.035em}
+.final-apply{display:inline-block;background:var(--paper);color:var(--ink);border:2px solid var(--ink);box-shadow:7px 7px 0 var(--ink);padding:14px 24px;text-decoration:none;font-weight:700;letter-spacing:.035em}
+@media(max-width:640px){
+ .final-cta{padding:44px 0 50px}
+ .final-cta h2{font-size:34px;line-height:1.01;max-width:none}
+ .final-copy{font-size:16px;line-height:1.48;margin-top:17px}
+ .job-strip{grid-template-columns:1fr;margin-top:22px}
+ .job-strip>div{padding:12px 0}
+ .job-strip>div+div{border-left:0;border-top:1px solid rgba(244,239,233,.22);padding-left:0}
+ .job-strip span{font-size:13px;margin-bottom:3px}
+ .job-strip strong,.job-strip p{font-size:13px}
+ .final-actions{margin-top:22px}
+ .final-apply{width:100%;text-align:center;padding:12px 16px}
+}
 
 @media(max-width:800px){
  .promise-grid{grid-template-columns:1fr}
@@ -1200,24 +1202,18 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
  </div>
 </div></section>
 
-<!-- 4B THE JOB -->
-<section class="problem" id="what"><div class="w">
- <span class="k rv" style="color:var(--pa)">the job</span>
- <div class="agent-job-single">
-  <h2 class="rv d1">Your agent manages the work around your life.</h2>
-  <p class="agent-job-lead rv d2">You decide what matters. Your agent turns those decisions into plans, keeps track of what is still open, prepares the next step, and makes sure unfinished work stays active until it is handled.</p>
-  <div class="agent-job-note rv d3">
-   <strong>You should not have to remember everything you asked for help with.</strong>
-   <p>If something needs your confirmation, it stays open. If it needs time, it is scheduled. If the agent can handle it, it gets handled. When life changes, the affected systems are updated so you are not starting over.</p>
-  </div>
- </div>
-</div></section>
-
-<!-- 5 FINAL CTA -->
-<section class="final-cta" id="apply-final"><div class="w">
+<!-- 5 START + THE JOB -->
+<section class="final-cta" id="what"><div class="w">
  <span class="k rv">start where you are</span>
  <h2 class="rv d1">Your life does not have to be organized before you start.</h2>
- <p class="final-copy rv d2">Universe City starts with what is actually happening now and helps you build systems that make the next decision, commitment, and week easier to manage.</p>
+ <p class="final-copy rv d2">Universe City starts with what is actually happening now. You decide what matters. Your agent turns those decisions into plans and keeps unfinished work active until it is handled.</p>
+
+ <div class="job-strip rv d2" aria-label="What your agent does">
+  <div><span>01</span><strong>Needs your answer?</strong><p>It stays open.</p></div>
+  <div><span>02</span><strong>Needs time?</strong><p>It gets scheduled.</p></div>
+  <div><span>03</span><strong>Your agent can handle it?</strong><p>It gets handled.</p></div>
+ </div>
+
  <div class="final-actions rv d2">
   <a href="/apply" class="final-apply">APPLY FOR UNIVERSE CITY</a>
  </div>
