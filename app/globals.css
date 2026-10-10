@@ -266,6 +266,11 @@ h3{font-size:19px;font-weight:600}
 
 .public-site h1,.public-site h2,.public-site h3{font-weight:600;letter-spacing:-.022em}
 .public-site h1{font-size:clamp(38px,5.6vw,82px);line-height:1.02}
+.public-site .application-main h1{
+  font-size:clamp(34px,3vw,48px);
+  line-height:1.05;
+  max-width:17ch;
+}
 .public-site h2{font-size:clamp(28px,3.4vw,50px);line-height:1.08}
 .public-site h3{font-size:clamp(18px,1.5vw,23px);line-height:1.24}
 .public-site .kick{font-family:'VT323',monospace;font-size:clamp(16px,1.3vw,22px);font-weight:400;letter-spacing:.24em;text-transform:uppercase}
