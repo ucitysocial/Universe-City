@@ -658,3 +658,46 @@ h3{font-size:19px;font-weight:600}
   .public-menu-button{width:38px;height:36px}
   .public-footer-grid{grid-template-columns:1fr}
 }
+
+
+/* public simplification pass */
+.application-main-simple{
+  box-shadow:none;
+  border:1px solid var(--rule);
+  padding:30px;
+}
+.application-main-simple .application-lede{
+  max-width:52ch;
+  font-size:18px;
+  line-height:1.55;
+  margin-top:16px;
+}
+.application-benefits{
+  margin-top:30px;
+  border-top:1px solid var(--rule);
+}
+.application-benefits>div{
+  display:grid;
+  grid-template-columns:34px 1fr;
+  gap:14px;
+  padding:16px 0;
+  border-bottom:1px solid var(--rule);
+}
+.application-benefits>div>span{
+  font-family:'VT323',monospace;
+  font-size:18px;
+  color:var(--I);
+}
+.application-benefits strong{
+  display:block;
+  font-size:15px;
+}
+.application-benefits p{
+  margin-top:3px;
+  color:var(--dim);
+  font-size:14px;
+  line-height:1.5;
+}
+.application-card{
+  box-shadow:4px 4px 0 var(--I);
+}
