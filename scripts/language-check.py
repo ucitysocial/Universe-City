@@ -26,7 +26,7 @@ RULES = [
     ("6.11 contrast", re.compile(
         r"(,\s*not\b|\bnot\b[^.,;]{1,60},?\s+but\b|\bnot (?:just|only|merely|simply)\b|\binstead of\b|\brather than\b)", re.I)),
     ("6.13 sample list", re.compile(
-        r"(\bor (?:an)?other\b|\band (?:an)?other\b|\band so on\b|\betc\b|\band more\b|\bsuch as\b|\bfor example\b|\blike [a-z]+, [a-z]+)", re.I)),
+        r"(\bor (?:an)?other\b|\band (?:an)?other\b|\band so on\b|\betc\b|\band more\b(?=[.,;!?]|$)|\bsuch as\b|\bfor example\b|\blike [a-z]+, [a-z]+)", re.I)),
     ("5.13 hyphen or dash", re.compile(r"[—–]|\b[A-Za-z]{2,}-[A-Za-z]{2,}\b")),
     ("5.6 prohibited phrase", re.compile(
         r"\b(journey|empower\w*|unlock your potential|mindset|best self|level up|crush it|you(?:'ve| have) got this)\b", re.I)),

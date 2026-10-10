@@ -4,20 +4,20 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Founder Story · Universe City</title>
-<meta name="description" content="Brittnay Folkes on why Universe City exists.">
+<meta name="description" content="The founder story of Universe City, written by Brittnay Folkes. It includes a timeline from 2015 to 2026.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=VT323&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=VT323&display=swap" rel="stylesheet">
 <style>
 :root{
   --ink:#140a0c;--paper:#f4efe9;--paper2:#e9ded6;--burgundy:#5C0F1B;
   --gold:#A07818;--purple:#4A2A78;--green:#2A4B3C;--muted:#786a65;
-  --ui:'Montserrat',system-ui,-apple-system,sans-serif;--reading:Georgia,"Times New Roman",serif;
+  --ui:'Montserrat',system-ui,-apple-system,sans-serif;--reading:'Newsreader',Georgia,'Times New Roman',serif;
   --record:'VT323',monospace;
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
-body{background:var(--burgundy);color:var(--ink);font-family:var(--ui);-webkit-font-smoothing:antialiased}
+body{background:var(--ink);color:var(--ink);font-family:var(--ui);-webkit-font-smoothing:antialiased}
 a{color:inherit}
 .sitebar{height:58px;background:var(--ink);color:var(--paper);display:flex;align-items:center;padding:0 clamp(20px,4.2vw,52px);border-bottom:1px solid rgba(255,255,255,.1);position:sticky;top:0;z-index:90}
 .sitebar-inner{width:min(1300px,100%);margin:0 auto;display:flex;align-items:center;gap:clamp(12px,1.8vw,26px)}
@@ -40,70 +40,107 @@ a{color:inherit}
 .menu-foot{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-top:16px;padding-top:12px;border-top:1px solid rgba(244,239,233,.18);font-family:var(--record);font-size:13px;letter-spacing:.12em;color:rgba(244,239,233,.5)}
 .menu-foot span:first-child{font-size:18px}
 @media(max-width:700px){.brand em{display:none}}
-.shell{width:min(1280px,calc(100% - 40px));margin:26px auto 48px}
-@media(max-width:640px){.shell{width:calc(100% - 40px);margin-top:20px}}
-.book-head{display:flex;justify-content:space-between;align-items:end;gap:24px;color:var(--paper);margin-bottom:14px}
-.book-kicker{font:12px/1.2 var(--record);letter-spacing:.16em;text-transform:uppercase;opacity:.7;margin:0 0 8px}
-.book-head h1{font-size:clamp(30px,4vw,52px);line-height:1;margin:0;letter-spacing:-.03em}
-.book-head>p{max-width:42ch;margin:0;font-size:13px;line-height:1.5;opacity:.76}
-.book-wrap{position:relative}
-.book{position:relative;display:grid;grid-template-columns:1fr 1fr;min-height:650px;background:var(--paper);border:2px solid var(--ink);box-shadow:0 24px 44px rgba(20,10,12,.28);overflow:hidden;isolation:isolate}
-.book::before{content:"";position:absolute;z-index:4;top:0;bottom:0;left:50%;width:1px;background:rgba(20,10,12,.17);box-shadow:0 0 18px rgba(20,10,12,.12);pointer-events:none}
-.page{position:relative;min-width:0;background:var(--paper);padding:52px 62px 60px;overflow:hidden}
-.page.left{border-right:1px solid rgba(20,10,12,.07)}
-.page.right{border-left:1px solid rgba(255,255,255,.55)}
-.page::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,transparent 78%,rgba(20,10,12,.035))}
-.page.left::after{background:linear-gradient(270deg,transparent 78%,rgba(20,10,12,.032))}
-.page-content{position:relative;z-index:1;max-width:35rem}
-.chapter{font:10px/1.2 var(--record);letter-spacing:.18em;text-transform:uppercase;color:var(--muted);padding-bottom:9px;margin-bottom:25px;border-bottom:1px solid rgba(20,10,12,.16)}
-.tint-burgundy{border-top:7px solid var(--burgundy)}.tint-gold{border-top:7px solid var(--gold)}.tint-purple{border-top:7px solid var(--purple)}.tint-green{border-top:7px solid var(--green)}
-.tint-burgundy .chapter{color:var(--burgundy)}.tint-gold .chapter{color:#77590f}.tint-purple .chapter{color:var(--purple)}.tint-green .chapter{color:var(--green)}
-.page h2{font-family:var(--ui);font-size:clamp(28px,2.2vw,36px);line-height:1.12;letter-spacing:-.025em;margin:0 0 25px;max-width:none;width:100%;text-wrap:pretty}
-.page p{font-family:var(--reading);font-size:17px;line-height:1.56;margin:0 0 1em;max-width:60ch}
-.page .lead{font-size:19px;line-height:1.5;font-style:italic;margin-bottom:1.15em;max-width:56ch}
-.pull{font-family:var(--reading);font-size:20px;line-height:1.38;font-weight:600;margin:27px 0 0;padding-top:16px;border-top:1px solid rgba(20,10,12,.38);max-width:55ch}
-.page-no{position:absolute;z-index:2;bottom:18px;font:10px/1 var(--record);letter-spacing:.13em;color:var(--muted)}
-.left .page-no{left:24px}.right .page-no{right:24px}
-.cover{background:var(--burgundy);color:var(--paper);display:flex;flex-direction:column;justify-content:space-between}
-.cover::after{display:none}.cover .page-content{height:100%;max-width:none;display:flex;flex-direction:column;justify-content:space-between}
-.cover .chapter{border:0;color:rgba(244,239,233,.62)}
-.cover h2{color:#fff;font-size:clamp(46px,4.8vw,70px);line-height:.98;max-width:8ch;margin:0}
-.cover .coverline{font-family:var(--ui);font-size:clamp(22px,2.2vw,32px);line-height:1.15;font-weight:700;max-width:12ch;margin:0}
-.cover small{font:11px/1.4 var(--record);letter-spacing:.14em;text-transform:uppercase;opacity:.68}
-.cover .page-no{color:rgba(244,239,233,.6)}
-.back-main{display:inline-block;margin-top:20px;padding:11px 15px;border:1px solid var(--ink);background:transparent;text-decoration:none;font:700 13px/1 var(--ui)}
-.edge{position:absolute;top:50%;transform:translateY(-50%);z-index:12;width:44px;height:86px;border:0;background:rgba(20,10,12,.88);color:var(--paper);font-size:24px;cursor:pointer;display:grid;place-items:center}
-.edge.prev{left:-10px}.edge.next{right:-10px}.edge[disabled]{opacity:.2;cursor:default}
-.controls{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px;color:var(--paper)}
-.controls button{border:1px solid rgba(244,239,233,.48);background:transparent;color:var(--paper);padding:10px 15px;font:600 12px var(--ui);cursor:pointer}.controls button:disabled{opacity:.3;cursor:default}
-.status{font:12px/1 var(--record);letter-spacing:.1em;opacity:.7}
-.book::after{content:"";position:absolute;z-index:30;top:0;bottom:0;left:50%;width:50%;background:linear-gradient(90deg,var(--paper),var(--paper2));opacity:0;pointer-events:none;transform-style:preserve-3d;backface-visibility:hidden}
-.book.turn-next::after{transform-origin:left center;animation:turnNext .38s cubic-bezier(.45,.02,.18,1)}
-.book.turn-prev::after{left:0;transform-origin:right center;animation:turnPrev .38s cubic-bezier(.45,.02,.18,1)}
-@keyframes turnNext{0%{opacity:0;transform:perspective(1500px) rotateY(0)}8%{opacity:1}100%{opacity:1;transform:perspective(1500px) rotateY(-179deg)}}
-@keyframes turnPrev{0%{opacity:0;transform:perspective(1500px) rotateY(0)}8%{opacity:1}100%{opacity:1;transform:perspective(1500px) rotateY(179deg)}}
-@media(prefers-reduced-motion:reduce){.book::after{display:none}.book.turn-next::after,.book.turn-prev::after{animation:none}}
+
+/* ===== the book ===== */
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.stage{width:min(1120px,calc(100% - 40px));margin:30px auto 44px}
+.book{--h:clamp(480px,calc(100svh - 228px),640px);--outer:56px;--gap:96px;position:relative;margin:0 auto;width:min(100%,calc(var(--h) * 1.52))}
+.book[data-state="closed"] .board{display:none}
+.book[data-state="open"] .cover{display:none}
+
+/* closed: the cover */
+.cover{display:flex;flex-direction:column;justify-content:space-between;position:relative;margin:0 auto;height:var(--h);width:min(100%,calc(var(--h) * .72));padding:46px 42px 40px 58px;background:var(--burgundy);color:var(--paper);border:2px solid #000;box-shadow:10px 10px 0 rgba(0,0,0,.5);font-family:var(--ui);text-align:left;cursor:pointer}
+.cover::before{content:"";position:absolute;top:16px;right:16px;bottom:16px;left:34px;border:1px solid rgba(244,239,233,.5);pointer-events:none}
+.cover::after{content:"";position:absolute;top:0;bottom:0;left:20px;width:2px;background:rgba(0,0,0,.34)}
+.cover:focus-visible{outline:3px solid var(--paper);outline-offset:4px}
+.c-mark{font-size:15px;font-weight:600}
+.c-mark span{margin:0 1px;font-size:.92em}
+.c-title{display:block;font:500 clamp(42px,7vw,60px)/1 var(--reading);letter-spacing:-.012em}
+.c-author{display:block;margin-top:18px;font:italic 400 22px/1.2 var(--reading)}
+.c-foot{font:14px/1.3 var(--record);letter-spacing:.2em;text-transform:uppercase;opacity:.75}
+
+/* open: the page block inside the cover boards */
+.board{background:var(--burgundy);border:2px solid #000;padding:10px 12px;box-shadow:10px 10px 0 rgba(0,0,0,.5)}
+.block{position:relative;height:var(--h);background:var(--paper);overflow:hidden}
+.block::before,.block::after{content:"";position:absolute;top:0;bottom:0;width:7px;z-index:3;pointer-events:none;background:repeating-linear-gradient(90deg,rgba(20,10,12,.2) 0 1px,transparent 1px 3px)}
+.block::before{left:0}.block::after{right:0}
+.spine{position:absolute;top:0;bottom:0;left:50%;width:64px;transform:translateX(-50%);z-index:2;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(20,10,12,.06) 36%,rgba(20,10,12,.2) 50%,rgba(20,10,12,.06) 64%,transparent)}
+.runhead,.folio{position:absolute;z-index:1;font-family:var(--record);color:var(--muted);text-transform:uppercase}
+.runhead{top:26px;font-size:13px;letter-spacing:.2em;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:calc(50% - var(--outer) - 30px)}
+.folio{bottom:22px;font-size:16px;letter-spacing:.1em;line-height:1}
+.runhead.l,.folio.l{left:var(--outer)}.runhead.r,.folio.r{right:var(--outer)}
+.viewport{position:absolute;top:60px;bottom:56px;left:var(--outer);right:var(--outer);overflow:hidden}
+.flow{position:relative;height:100%;column-count:2;column-gap:var(--gap);column-fill:auto;font:400 19px/1.56 var(--reading);color:#1c1113;transition:opacity .15s ease}
+.flow.turning{opacity:0}
+.zone{position:absolute;top:0;bottom:0;width:20%;z-index:4;background:none;border:0;padding:0;cursor:pointer}
+.zone.l{left:0}.zone.r{right:0}
+.zone:focus-visible{outline:2px solid var(--burgundy);outline-offset:-4px}
+
+/* type inside the book */
+.flow p{margin:0;orphans:2;widows:2}
+.flow p+p{text-indent:1.4em}
+.flow h2{margin:0 0 20px;font:500 31px/1.1 var(--reading);letter-spacing:-.012em;break-after:avoid;-webkit-column-break-after:avoid}
+.kick{margin:0 0 13px;font:14px/1.2 var(--record);letter-spacing:.2em;text-transform:uppercase;color:var(--burgundy)}
+.ch{break-before:column;-webkit-column-break-before:always}
+.ch>h2+p::first-letter{float:left;margin:.07em .09em 0 0;font:600 3.2em/.8 var(--reading);color:var(--burgundy)}
+.pull{margin:20px 0 0;padding:13px 0 14px;border-top:1px solid rgba(20,10,12,.3);border-bottom:1px solid rgba(20,10,12,.3);font-style:italic;font-size:1.13em;line-height:1.36;break-inside:avoid;-webkit-column-break-inside:avoid}
+.pull+p{margin-top:18px}
+.flow .pull+p,.flow .q{text-indent:0}
+
+.tp{display:flex;flex-direction:column;justify-content:center;height:100%;break-after:column;-webkit-column-break-after:always}
+.tp .t-mark{font:600 15px var(--ui);color:var(--burgundy)}
+.tp h2{margin:26px 0 0;font-size:46px;line-height:1}
+.tp .t-author{margin-top:14px;font-style:italic;font-size:22px;text-indent:0}
+.tp .t-place{margin-top:40px;font:14px/1.6 var(--record);letter-spacing:.2em;text-transform:uppercase;color:var(--muted);text-indent:0}
+
+.toc{list-style:none;margin:6px 0 0;padding:0}
+.toc li{break-inside:avoid;-webkit-column-break-inside:avoid}
+.toc a{display:flex;align-items:baseline;gap:10px;padding:5px 0;color:inherit;text-decoration:none;font-size:.95em;line-height:1.3}
+.toc a:hover .tt{text-decoration:underline}
+.toc .dots{flex:1;min-width:16px;border-bottom:1px dotted rgba(20,10,12,.45);transform:translateY(-4px)}
+.toc .pn{font:17px/1 var(--record);color:var(--burgundy);min-width:1.6em;text-align:right}
+
+.tl{margin:4px 0 0}
+.tl .row{display:grid;grid-template-columns:5.7em 1fr;gap:0 16px;padding:10px 0;border-top:1px solid rgba(20,10,12,.22);break-inside:avoid;-webkit-column-break-inside:avoid}
+.tl .row:last-child{border-bottom:1px solid rgba(20,10,12,.22)}
+.tl dt{font:19px/1.3 var(--record);letter-spacing:.04em;color:var(--burgundy)}
+.tl dd{margin:0;font-size:.9em;line-height:1.42}
+
+.fin{break-inside:avoid;-webkit-column-break-inside:avoid}
+#endMark{display:block;height:1px}
+.end{margin:26px 0 0;text-align:center;color:var(--burgundy);font:22px/1 var(--ui);text-indent:0}
+.flow .back{display:block;margin:22px auto 0;width:max-content;max-width:100%;padding:11px 18px;border:2px solid var(--ink);background:var(--paper);color:var(--ink);font:600 14px/1.2 var(--ui);text-decoration:none;box-shadow:4px 4px 0 var(--ink)}
+
+/* controls */
+.controls{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:26px auto 0;width:min(100%,calc(var(--h,640px) * 1.52))}
+.book+.controls{--h:clamp(480px,calc(100svh - 228px),640px)}
+.controls button{min-height:44px;padding:10px 16px;background:transparent;color:var(--paper);border:2px solid rgba(244,239,233,.6);font:600 14px/1.2 var(--ui);cursor:pointer}
+.controls button:hover{background:var(--paper);color:var(--ink);border-color:var(--paper)}
+.controls button:focus-visible{outline:2px solid var(--paper);outline-offset:3px}
+.controls button[hidden]{display:none}
+.controls.closed{justify-content:center}
+.controls.closed .status{display:none}
+.status{font:15px/1.2 var(--record);letter-spacing:.16em;text-transform:uppercase;color:rgba(244,239,233,.7);text-align:center}
+
 @media(max-width:760px){
-  html,body{height:100%;overflow:hidden}
-  .sitebar{height:54px;padding:0 16px}.sitebar-inner{width:100%}.brand{font-size:16px}.apply-link{font-size:12px;padding:8px 10px}.menu-button{width:38px;height:36px}.menu-panel{top:54px;right:12px}
-  .shell{height:calc(100svh - 54px);width:calc(100% - 12px);margin:0 auto;padding:7px 0 5px;display:flex;flex-direction:column;overflow:hidden}
-  .book-head{height:35px;flex:0 0 35px;margin:0;align-items:center}.book-kicker,.book-head>p{display:none}.book-head h1{font-size:17px}
-  .book-wrap{flex:1 1 auto;min-height:0;overflow:hidden}
-  .book{height:100%;display:block;min-height:0;border-width:1px}.book::before{display:none}.book::after{left:0;width:100%}
-  .page{height:100%;display:block;padding:17px 20px 34px;overflow:hidden;border:0!important}.page.left{display:none}.page.right{display:block}
-  .page-content{max-width:none;transform-origin:top left}
-  .chapter{font-size:8.5px;margin-bottom:11px;padding-bottom:7px;letter-spacing:.16em}
-  .page h2{font-size:clamp(22px,5.8vw,28px);line-height:1.1;margin-bottom:13px;max-width:none;width:100%}
-  .page p{font-size:clamp(12.5px,3.35vw,14.5px);line-height:1.48;margin-bottom:.78em;max-width:none}
-  .page .lead{font-size:clamp(14px,3.75vw,16.5px);line-height:1.42;margin-bottom:.86em}
-  .pull{font-size:clamp(15px,4vw,18px);line-height:1.32;margin-top:13px;padding-top:9px;max-width:none}
-  .cover{padding:20px 19px 34px}.cover h2{font-size:clamp(36px,10vw,48px)}.cover .coverline{font-size:clamp(19px,5.4vw,25px)}
-  .page-no{bottom:9px}.left .page-no{left:12px}.right .page-no{right:12px}
-  .edge{width:34px;height:58px;font-size:20px}.edge.prev{left:-2px}.edge.next{right:-2px}
-  .controls{height:36px;flex:0 0 36px;margin:0;padding-top:4px}.controls button{padding:7px 10px;font-size:11px}.status{font-size:10px}
+  .stage{width:calc(100% - 24px);margin:14px auto 18px}
+  .book{--h:max(440px,calc(100svh - 184px));--outer:26px;--gap:52px;width:100%}
+  .book+.controls{--h:max(440px,calc(100svh - 184px));width:100%;margin-top:16px;gap:8px}
+  .cover{width:100%;padding:38px 30px 32px 46px}
+  .board{padding:7px 8px;box-shadow:6px 6px 0 rgba(0,0,0,.5)}
+  .cover{box-shadow:6px 6px 0 rgba(0,0,0,.5)}
+  .spine,.runhead.l,.folio.l{display:none}
+  .runhead.r{left:var(--outer);right:auto;max-width:calc(100% - 2 * var(--outer))}
+  .viewport{top:52px;bottom:48px}
+  .flow{column-count:1;font-size:17.5px;line-height:1.55}
+  .flow h2{font-size:28px}
+  .tp h2{font-size:40px}
+  .zone{width:16%}
+  .controls button{padding:10px 10px;font-size:12.5px;white-space:nowrap}
+  .status{font-size:12.5px;letter-spacing:.06em;white-space:nowrap}
+  .tl .row{grid-template-columns:1fr;gap:2px 0}
 }
-
-
+@media(prefers-reduced-motion:reduce){.flow{transition:none}}
 
 /* phone header: the longer Apply for residency button */
 @media(max-width:520px){.sitebar{padding:0 14px}.sitebar-inner{gap:8px}.brand{font-size:15.5px}.signin-link{font-size:12.5px}.apply-link{font-size:12px;padding:8px 9px}.menu-button{width:36px;height:34px;font-size:18px}}
@@ -143,11 +180,161 @@ a{color:inherit}
  </div>
 </div>
 
-<main class="shell">
-  <div class="book-head"><div><p class="book-kicker">Founder archive · 2016 to present</p><h1>Founder Story</h1></div></div>
-  <div class="book-wrap"><button class="edge prev" id="edgePrev" type="button" aria-label="Previous spread">‹</button><section class="book" id="book" aria-live="polite"><article class="page left" id="leftPage"></article><article class="page right" id="rightPage"></article></section><button class="edge next" id="edgeNext" type="button" aria-label="Next spread">›</button></div>
-  <div class="controls"><button id="prevBtn" type="button">Previous</button><div class="status" id="status">Spread 1 of 5</div><button id="nextBtn" type="button">Turn page</button></div>
+
+<main class="stage">
+ <h1 class="vh">Founder Story, by Brittnay Folkes</h1>
+ <div class="book" id="book" data-state="closed">
+
+  <button class="cover" id="cover" type="button" aria-label="Open the book">
+   <span class="c-mark">universe<span>&#9733;</span>city</span>
+   <span>
+    <span class="c-title">Founder Story</span>
+    <span class="c-author">Brittnay Folkes</span>
+   </span>
+   <span class="c-foot">Denver, Colorado &middot; 2016 to 2026</span>
+  </button>
+
+  <div class="board">
+   <div class="block" id="block">
+    <div class="runhead l">Founder Story</div>
+    <div class="runhead r" id="runChapter"></div>
+    <div class="viewport" id="viewport">
+     <div class="flow" id="flow">
+
+      <section class="tp" data-title="Founder Story">
+       <p class="t-mark">universe&#9733;city</p>
+       <h2>Founder Story</h2>
+       <p class="t-author">Brittnay Folkes</p>
+       <p class="t-place">Denver, Colorado<br>2016 to 2026</p>
+      </section>
+
+      <section id="contents" data-title="Contents">
+       <h2>Contents</h2>
+       <ol class="toc" id="toc"></ol>
+      </section>
+
+      <section class="ch" id="timeline" data-title="Timeline" data-toc="Timeline">
+       <p class="kick">2015 to 2026</p>
+       <h2>Timeline</h2>
+       <dl class="tl">
+        <div class="row"><dt>2015 to 2020</dt><dd>I work in multifamily interior design. I see how much money goes into building housing. I cannot work out why living in it keeps costing more.</dd></div>
+        <div class="row"><dt>2016</dt><dd>My mom dies. I am 20.</dd></div>
+        <div class="row"><dt>2018</dt><dd>I start a podcast named Blank Univercity. I design its first logo myself. Then I pay an artist to redraw it.</dd></div>
+        <div class="row"><dt>2021</dt><dd>I move to Denver. I look into community development corporations. I build a project for the Denver Housing Authority.</dd></div>
+        <div class="row"><dt>2022 to 2025</dt><dd>I work in community management, at a nonprofit for homeless youth, and at a community radio station. I attend hospitality school. Each job changes how I define the folders.</dd></div>
+        <div class="row"><dt>January 2026</dt><dd>I expand the first model of twelve folders into four departments with twelve folders each.</dd></div>
+        <div class="row"><dt>2026</dt><dd>I am 30. I am the first resident of Universe City.</dd></div>
+       </dl>
+      </section>
+
+      <section class="ch" id="ch1" data-title="I was 20." data-toc="I was 20.">
+       <p class="kick">Chapter 01 &middot; 2016</p>
+       <h2>I was 20.</h2>
+       <p>My mom died in 2016. I was 20, heading into 21.</p>
+       <p>She was the person I could call. She was the person I could move back in with. She had known me since the day I was born.</p>
+       <p>She taught me how to handle parts of everyday life before I knew how to manage them myself.</p>
+       <p>After she died, I understood how much administrative work she had been doing with me. She helped me keep information in order. She helped me make decisions. She helped me handle responsibilities I had not learned to manage yet.</p>
+       <blockquote class="pull">I was now the person responsible for understanding myself as fully as she did.</blockquote>
+      </section>
+
+      <section class="ch" id="ch2" data-title="Adulthood felt enormous." data-toc="Adulthood felt enormous.">
+       <p class="kick">Chapter 02</p>
+       <h2>Adulthood felt enormous.</h2>
+       <p>I was now responsible for every part of my own life.</p>
+       <p>I did not have clear standards for myself. I made decisions without a plan. No person could tell me what deserved my attention first.</p>
+       <p>Parents often do part of this work for their children. Some people lose that support. Some people never have it.</p>
+       <blockquote class="pull">I knew I was not the only person who felt that way.</blockquote>
+      </section>
+
+      <section class="ch" id="ch3" data-title="Blank Univercity" data-toc="Blank Univercity">
+       <p class="kick">Chapter 03 &middot; 2018</p>
+       <h2>Blank Univercity</h2>
+       <p>In 2018 I started a podcast. I named it Blank Univercity.</p>
+       <p>I was creating from grief. I was processing in public what had happened to me.</p>
+       <p>On the podcast I joked that grief had sent me to Street University. The joke was about becoming emotionally hardened. I felt tougher and more guarded than I had been before my mom died.</p>
+       <p>I designed the first logo myself. Then I paid an artist to redraw it.</p>
+       <p>Blank Univercity was tied to a social media identity I no longer use. One question from the podcast stayed with me.</p>
+       <blockquote class="pull">What are people expected to know about adulthood, even though nobody formally teaches it?</blockquote>
+       <p>The name Universe City came from Blank Univercity.</p>
+      </section>
+
+      <section class="ch" id="ch4" data-title="Working with kids changed the question." data-toc="Working with kids changed the question.">
+       <p class="kick">Chapter 04</p>
+       <h2>Working with kids changed the question.</h2>
+       <p>I worked with kids. I started asking what a child should understand before adulthood begins.</p>
+       <p>I started thinking in terms of preparedness.</p>
+       <blockquote class="pull">What do these kids need to understand to be prepared for adulthood?</blockquote>
+      </section>
+
+      <section class="ch" id="ch5" data-title="What makes a life easier to manage?" data-toc="What makes a life easier to manage?">
+       <p class="kick">Chapter 05</p>
+       <h2>What makes a life easier to manage?</h2>
+       <p>For years I asked versions of that one question.</p>
+       <p>What does a person need to write down? What needs a schedule? What needs a rule? What needs a plan?</p>
+       <p>My mom was an engineer. She thought in systems. I recognize the same instinct in myself.</p>
+       <blockquote class="pull">I inherited her instinct to look for structure.</blockquote>
+      </section>
+
+      <section class="ch" id="ch6" data-title="The constellations" data-toc="The constellations">
+       <p class="kick">Chapter 06</p>
+       <h2>The constellations</h2>
+       <p>My mom loved the moon and the constellations.</p>
+       <p>As Blank Univercity became Universe City, I used the constellations as structure. Each department has 12 folders. Each folder position matches one of the 12 zodiac constellations. Aries is Folder 01.</p>
+       <p>The constellations exist whether or not a person believes in astrology.</p>
+       <blockquote class="pull">I built this structure myself. I used the constellations to build it.</blockquote>
+      </section>
+
+      <section class="ch" id="ch7" data-title="Where I come from" data-toc="Where I come from">
+       <p class="kick">Chapter 07</p>
+       <h2>Where I come from</h2>
+       <p>Both of my parents were Libras. They were born on the same day.</p>
+       <p>Law and order were present in my upbringing. Dysfunction and inconsistency were present too.</p>
+       <p>I can see my upbringing in Universe City. It has folders named Standards, Mediation, Boundary, and Law.</p>
+       <p>I know what life is like when rules and records are inconsistent or missing.</p>
+      </section>
+
+      <section class="ch" id="ch8" data-title="Universe big. City small." data-toc="Universe big. City small.">
+       <p class="kick">Chapter 08 &middot; The name</p>
+       <h2>Universe big. City small.</h2>
+       <p>I kept thinking about problems that are too large for one person to solve. Hunger is one. Homelessness is one.</p>
+       <p>I asked myself a question. What is it going to take to create a better world?</p>
+       <blockquote class="pull">It is going to take U in your CITY.</blockquote>
+       <p>The universe is big. A city is small enough for one person to act in.</p>
+      </section>
+
+      <section class="ch" id="ch9" data-title="I am 30 now." data-toc="I am 30 now.">
+       <p class="kick">Chapter 09 &middot; 2026</p>
+       <h2>I am 30 now.</h2>
+       <p>I have spent most of my twenties building a way to make everyday life easier to manage.</p>
+       <p>I started Universe City in 2018. I am still its first resident.</p>
+       <p>Universe City provides life management. It does not provide therapy. It does not provide case management.</p>
+       <p>It provides the structure of the help a parent gives. It does not replace the relationship.</p>
+       <p>In the long term, I want practical life management education to be available in schools and communities.</p>
+       <div class="fin">
+        <p class="end" aria-hidden="true">&#9733;</p>
+        <a class="back" href="/">Return to the homepage</a>
+        <span id="endMark"></span>
+       </div>
+      </section>
+
+     </div>
+    </div>
+    <div class="folio l" id="folioL"></div>
+    <div class="folio r" id="folioR"></div>
+    <div class="spine" aria-hidden="true"></div>
+    <button class="zone l" id="zoneL" type="button" aria-label="Turn back a page" tabindex="-1"></button>
+    <button class="zone r" id="zoneR" type="button" aria-label="Turn the page" tabindex="-1"></button>
+   </div>
+  </div>
+ </div>
+
+ <div class="controls closed">
+  <button id="prevBtn" type="button" hidden>Close the book</button>
+  <div class="status" id="status" aria-live="polite"></div>
+  <button id="nextBtn" type="button">Open the book</button>
+ </div>
 </main>
+
 <script>
 (() => {
   const menuBtn=document.getElementById('menuBtn');
@@ -158,34 +345,108 @@ a{color:inherit}
   menuBtn.addEventListener('click',openMenu);
   menuX.addEventListener('click',closeMenu);
   menu.addEventListener('click',e=>{if(e.target===menu)closeMenu()});
-  menu.querySelectorAll('a').forEach(a=>a.addEventListener('click',closeMenu));
-  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!menu.hidden)closeMenu()});
+  addEventListener('keydown',e=>{if(e.key==='Escape'&&!menu.hidden)closeMenu()});
+})();
 
-  const pages=[
-    {cls:"cover",chapter:"Founder Story",title:"Brittnay Folkes",html:`<div><p class="coverline">Universe big.<br>City small.</p></div><small>Universe City · A life management agency</small>`},
-    {cls:"tint-burgundy",chapter:"01 · Losing my guiding light",title:"I was 20, heading into 21.",html:`<p class="lead">When my mom died, I did not just lose someone I loved. I lost the person who made the world feel easier to navigate.</p><p>She was the person I could call, fall back on, move back in with, love on and hug. She knew my history without needing an explanation.</p><p>After losing her, I understood adulthood differently. I was now responsible for knowing myself, managing myself, and making sense of a life that suddenly felt much bigger.</p><div class="pull">I lost my guiding light, and I became responsible for building one inside my own life.</div>`},
-    {cls:"tint-burgundy",chapter:"02 · Adulthood felt enormous",title:"The problem was not one thing. It was all the things.",html:`<p>Time. Money. Work. Health. Housing. Goals. Priorities. Relationships. Paperwork. Decisions.</p><p>None of those things exist alone. A work change affects time. Money changes housing choices. A health issue changes the week. A decision in one area can create problems somewhere else.</p><p>I did not need one more tip. I needed a way to understand the whole picture and know what deserved attention next.</p><div class="pull">I knew I could not be the only person trying to manage an entire life without enough structure around it.</div>`},
-    {cls:"tint-gold",chapter:"03 · Blank University",title:"At first, I thought the answer might be education.",html:`<p>I was creating from grief and processing what had happened to me in public. I joked that grief had sent me to Street University.</p><p>Blank University grew out of that period. Underneath the joke was a serious question: what are people expected to know about adulthood even though nobody formally teaches it?</p><p>The more I thought about it, the longer the list became.</p><div class="pull">What are people supposed to understand before they are responsible for running a life?</div>`},
-    {cls:"tint-gold",chapter:"04 · Preparedness",title:"Working with kids changed the question.",html:`<p class="lead">I stopped asking only what adults were missing and started asking what a young person should understand before adulthood begins.</p><p>What should they know about time? Money? Health? Home? Work? Standards? Responsibility? Decision making?</p><p>That was when I started thinking in terms of preparedness, not just information.</p><div class="pull">Knowing something is different from having a system that helps you use it when life is actually happening.</div>`},
-    {cls:"tint-purple",chapter:"05 · From lessons to systems",title:"Education was not enough.",html:`<p>A person can understand budgeting and still have money they cannot keep track of. They can understand time management and still have a schedule that no longer matches their life.</p><p>I started studying the structure underneath everyday life. What needs to be written down? What needs to stay current? What needs a schedule? What needs a rule? What needs a history? What needs to be connected to something else?</p><p>That changed the idea completely.</p><div class="pull">Universe City stopped being about teaching people life skills and became about helping people maintain the systems their lives depend on.</div>`},
-    {cls:"tint-purple",chapter:"06 · Why an agency",title:"I did not want to build another tool people had to manage by themselves.",html:`<p>Most life management tools still leave the management work with the person using them. You have to remember to open the app, update the list, rebuild the plan, notice what changed, and figure out what deserves attention.</p><p>That never felt like enough to me.</p><p>I wanted responsibility to live somewhere. The systems could hold the working detail, but someone still needed to help keep them current, connect the moving parts, and carry unfinished work forward.</p><div class="pull">The resident should not have to manage the system that is supposed to help manage their life.</div>`},
-    {cls:"tint-green",chapter:"07 · The architecture",title:"The structure became four departments and forty eight systems.",html:`<p>Agency Assessment looks at the person and the conditions shaping their life. Housing Stability organizes the household. Career Development organizes work and professional growth. Life Management holds the rules, priorities, boundaries, decisions, and systems that help a person govern their life.</p><p>Each department has 12 folders. Each folder gives Universe City a defined responsibility instead of leaving everything inside one giant conversation.</p><p>My mom loved the moon and the constellations, and the 12 constellations became part of the architecture.</p><div class="pull">The structure gave the big idea somewhere practical to live.</div>`},
-    {cls:"tint-green",chapter:"08 · Where I come from",title:"I recognize pieces of my upbringing inside the system.",html:`<p>Both of my parents were Libras. They were born on the same day.</p><p>Law and order were present in my upbringing. So were dysfunction, inconsistency, resilience, improvisation, and the outlaw side of life.</p><p>I know what structure can protect. I also know what life feels like when rules, boundaries, records, plans, and responsibilities are inconsistent or missing.</p><p>My mom was an engineer. She had a systems brain. I did not inherit a finished system from her, but I recognize the instinct to look for structure.</p>`},
-    {cls:"tint-burgundy",chapter:"09 · Why Universe City",title:"Universe big. City small.",html:`<p>I kept thinking about problems so large they become abstract: hunger, homelessness, instability, access, education, work, and the basic difficulty of keeping a life together.</p><p>Universe City became a way of shrinking the question until there was something a person, a household, or a city could actually work on.</p><div class="pull">What is it going to take to create a better world?<br><br>It is going to take U in your CITY.</div><p>The universe is big. A city is small enough to act inside. A life is smaller still.</p>`},
-    {cls:"tint-burgundy",chapter:"10 · Present day",title:"I am 30 now, and the question is still the same.",html:`<p class="lead">I have spent most of my twenties trying to build something that makes everyday life easier to understand and easier to manage.</p><p>Universe City began with grief, grew through questions about preparedness, and became a life management agency because information alone was never the whole problem.</p><p>People need systems that stay useful. They need unfinished work to stay visible. They need help carrying the administrative weight around the decisions that belong to them.</p><div class="pull">The better world is still the question. Universe City is my attempt to make the answer small enough to work on, one resident, one system, one commitment, and one city at a time.</div><a class="back-main" href="/">Back to main page</a>`}
-  ];
-  const left=document.getElementById('leftPage'),right=document.getElementById('rightPage'),book=document.getElementById('book'),prev=document.getElementById('prevBtn'),next=document.getElementById('nextBtn'),edgePrev=document.getElementById('edgePrev'),edgeNext=document.getElementById('edgeNext'),status=document.getElementById('status');
-  let spread=0,mobilePage=0,animating=false;
-  const mobile=()=>matchMedia('(max-width:760px)').matches;
-  function markup(p,n){return `<div class="page-content"><div class="chapter">${p.chapter}</div><h2>${p.title}</h2>${p.html}</div><div class="page-no">${String(n).padStart(2,'0')} / ${pages.length}</div>`}
-  function apply(el,p,n,side){el.className=`page ${side} ${p.cls||''}`;el.innerHTML=markup(p,n)}
-  function fitMobile(el){if(!mobile())return;const c=el.querySelector('.page-content');if(!c)return;c.style.transform='';c.style.width='100%';const available=Math.max(1,el.clientHeight-44),needed=c.scrollHeight;if(needed>available){const scale=Math.max(.78,available/needed);c.style.transform=`scale(${scale})`;c.style.width=`${100/scale}%`}}
-  function render(){if(mobile()){left.style.display='none';apply(right,pages[mobilePage],mobilePage+1,'right');status.textContent=`Page ${mobilePage+1} of ${pages.length}`;prev.disabled=edgePrev.disabled=mobilePage===0;next.disabled=edgeNext.disabled=mobilePage===pages.length-1;next.textContent=next.disabled?'End':'Turn page';requestAnimationFrame(()=>fitMobile(right));return}left.style.display='block';const li=spread*2,ri=li+1;apply(left,pages[li],li+1,'left');apply(right,pages[ri],ri+1,'right');status.textContent=`Spread ${spread+1} of ${Math.ceil(pages.length/2)}`;prev.disabled=edgePrev.disabled=spread===0;next.disabled=edgeNext.disabled=spread===Math.ceil(pages.length/2)-1;next.textContent=next.disabled?'End':'Turn page'}
-  function go(dir){if(animating)return;const max=mobile()?pages.length-1:Math.ceil(pages.length/2)-1,current=mobile()?mobilePage:spread,target=current+dir;if(target<0||target>max)return;animating=true;book.classList.remove('turn-next','turn-prev');void book.offsetWidth;book.classList.add(dir>0?'turn-next':'turn-prev');setTimeout(()=>{if(mobile())mobilePage=target;else spread=target;render()},180);setTimeout(()=>{book.classList.remove('turn-next','turn-prev');animating=false},410)}
-  [next,edgeNext].forEach(x=>x.addEventListener('click',()=>go(1)));[prev,edgePrev].forEach(x=>x.addEventListener('click',()=>go(-1)));
-  book.addEventListener('click',e=>{if(e.target.closest('a,button'))return;const r=book.getBoundingClientRect(),x=e.clientX-r.left;if(x>r.width*.68)go(1);else if(x<r.width*.32)go(-1)});
-  let sx=null;book.addEventListener('touchstart',e=>sx=e.changedTouches[0].clientX,{passive:true});book.addEventListener('touchend',e=>{if(sx==null)return;const dx=e.changedTouches[0].clientX-sx;sx=null;if(Math.abs(dx)>45)go(dx<0?1:-1)},{passive:true});
-  addEventListener('keydown',e=>{if(e.key==='ArrowRight')go(1);if(e.key==='ArrowLeft')go(-1)});addEventListener('resize',render);render();
+/* The book. The text is one continuous flow laid out in columns, and each
+   column is a page. That keeps every page full at every screen size. */
+(() => {
+  const $=id=>document.getElementById(id);
+  const book=$('book'),cover=$('cover'),flow=$('flow'),viewport=$('viewport'),toc=$('toc');
+  const prev=$('prevBtn'),next=$('nextBtn'),status=$('status'),controls=prev.parentElement;
+  const folioL=$('folioL'),folioR=$('folioR'),runChapter=$('runChapter'),endMark=$('endMark');
+  const phone=matchMedia('(max-width:760px)');
+  const calm=matchMedia('(prefers-reduced-motion:reduce)');
+  let page=0,total=1,step=0,per=2,marks=[];
+
+  /* Every measured element is a block that starts at the left edge of its column. */
+  const pageOf=el=>Math.max(0,Math.round(el.offsetLeft/step));
+
+  function buildContents(){
+    toc.innerHTML='';
+    flow.querySelectorAll('[data-toc]').forEach(sec=>{
+      const li=document.createElement('li'),a=document.createElement('a');
+      a.href='#'+sec.id;a.dataset.target=sec.id;
+      a.innerHTML='<span class="tt"></span><span class="dots"></span><span class="pn"></span>';
+      a.firstChild.textContent=sec.dataset.toc;
+      a.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();go(pageOf(sec),true)});
+      li.appendChild(a);toc.appendChild(li);
+    });
+  }
+
+  function measure(){
+    per=phone.matches?1:2;
+    const gap=parseFloat(getComputedStyle(flow).columnGap)||0;
+    step=(viewport.getBoundingClientRect().width+gap)/per;
+    total=pageOf(endMark)+1;
+    marks=[...flow.querySelectorAll('[data-title]')].map(s=>({title:s.dataset.title,page:pageOf(s)}));
+    toc.querySelectorAll('a').forEach(a=>{a.lastChild.textContent=String(pageOf($(a.dataset.target))+1)});
+  }
+
+  function chapterAt(p){let t='';for(const m of marks){if(m.page<=p)t=m.title}return t}
+
+  function paint(){
+    const open=book.dataset.state==='open';
+    if(!open){
+      controls.classList.add('closed');prev.hidden=true;next.textContent='Open the book';status.textContent='';return;
+    }
+    controls.classList.remove('closed');
+    flow.style.transform='translateX('+(-page*step)+'px)';
+    const last=Math.min(page+per-1,total-1);
+    folioL.textContent=per===2?String(page+1):'';
+    folioR.textContent=per===2?(page+2<=total?String(page+2):''):String(page+1);
+    runChapter.textContent=chapterAt(last);
+    status.textContent=per===2&&last>page?'Pages '+(page+1)+' and '+(last+1)+' of '+total:'Page '+(page+1)+' of '+total;
+    prev.hidden=false;
+    prev.textContent=page===0?'Close the book':'Turn back a page';
+    next.textContent=page+per>=total?'Close the book':'Turn the page';
+  }
+
+  function snap(p){p=Math.max(0,Math.min(p,total-1));return p-(p%per)}
+
+  function go(p,exact){
+    const target=snap(p);
+    if(target===page&&!exact)return;
+    if(calm.matches){page=target;paint();return}
+    flow.classList.add('turning');
+    setTimeout(()=>{page=target;paint();flow.classList.remove('turning')},150);
+  }
+
+  function openBook(){
+    book.dataset.state='open';page=0;measure();paint();next.focus({preventScroll:true});
+    /* The page fonts load when the pages first show, and that changes where pages break. */
+    if(document.fonts&&document.fonts.ready)document.fonts.ready.then(relayout);
+  }
+  function closeBook(){book.dataset.state='closed';page=0;paint()}
+  function forward(){if(book.dataset.state!=='open')return openBook();if(page+per>=total)return closeBook();go(page+per)}
+  function back(){if(book.dataset.state!=='open')return;if(page===0)return closeBook();go(page-per)}
+
+  cover.addEventListener('click',openBook);
+  next.addEventListener('click',forward);
+  prev.addEventListener('click',back);
+  $('zoneR').addEventListener('click',forward);
+  $('zoneL').addEventListener('click',back);
+  addEventListener('keydown',e=>{
+    if(!document.getElementById('menu').hidden)return;
+    if(e.key==='ArrowRight'||e.key==='PageDown')forward();
+    if(e.key==='ArrowLeft'||e.key==='PageUp')back();
+  });
+  let sx=null;
+  book.addEventListener('touchstart',e=>{sx=e.changedTouches[0].clientX},{passive:true});
+  book.addEventListener('touchend',e=>{if(sx==null)return;const dx=e.changedTouches[0].clientX-sx;sx=null;if(Math.abs(dx)>45)(dx<0?forward:back)()},{passive:true});
+
+  function relayout(){
+    if(book.dataset.state!=='open')return;
+    const ratio=total>1?page/(total-1):0;
+    measure();page=snap(Math.round(ratio*(total-1)));paint();
+  }
+  let t;addEventListener('resize',()=>{clearTimeout(t);t=setTimeout(relayout,120)});
+  if(document.fonts){
+    if(document.fonts.ready)document.fonts.ready.then(relayout);
+    if(document.fonts.addEventListener)document.fonts.addEventListener('loadingdone',relayout);
+  }
+
+  buildContents();paint();
 })();
 </script>
 </body>
