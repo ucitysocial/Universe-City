@@ -4,7 +4,7 @@ import DeskCards from '@/components/DeskCards';
 export default function Membership() {
   return (
     <>
-      <section>
+      <section className="membership-section">
         <div className="wrap">
           <p className="kick">Membership</p>
           <h1 style={{ marginTop: 12, maxWidth: '16ch' }}>What your membership includes.</h1>
@@ -19,7 +19,7 @@ export default function Membership() {
           <p className="note">Cancel any time. Your information stays yours either way.</p>
         </div>
       </section>
-      <section>
+      <section className="systems-section">
         <div className="wrap">
           <p className="kick">What is running today</p>
           <DeskCards />
