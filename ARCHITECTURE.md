@@ -156,3 +156,10 @@ stays and the systems close.
 
 Membership is set from the webhook only. A browser returning from checkout is
 not proof of payment.
+
+
+## Public explanation layer
+
+Architecture describes how Universe City works internally. Public language should translate that structure into something a resident can picture themselves using.
+
+The source of truth for that translation is [SYSTEM_EXPLANATION_STANDARD.md](SYSTEM_EXPLANATION_STANDARD.md). Product and engineering decisions should preserve enough clarity about each system's purpose, resident interaction, agent contribution, and ongoing maintenance that the public explanation remains true.
