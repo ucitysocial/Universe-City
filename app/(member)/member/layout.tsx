@@ -6,7 +6,7 @@ import { currentProfile, supabaseServer } from '@/lib/supabase/server';
 export default async function MemberLayout({ children }: { children: React.ReactNode }) {
   const profile = await currentProfile();
   if (!profile) redirect('/login?next=/member');
-  if (profile.membership !== 'active') redirect('/join');
+  if (profile.membership !== 'active') redirect('/apply');
 
   const { count } = await supabaseServer().from('blocks')
     .select('id', { count: 'exact', head: true });
