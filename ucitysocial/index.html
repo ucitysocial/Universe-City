@@ -868,10 +868,7 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
 .dp-system-head{display:flex;align-items:baseline;gap:8px;margin-top:15px}
 .dp-index{font-family:var(--record);font-size:14px;color:rgba(255,255,255,.72)}
 .dp-name{font-size:20px;line-height:1.1;color:#fff}
-.dp-definition{font-size:12.5px;line-height:1.42;color:rgba(255,255,255,.82);margin-top:7px}
-.dp-build{margin-top:14px;padding-top:11px;border-top:1px solid rgba(255,255,255,.24)}
-.dp-build small{display:block;font-family:var(--record);font-size:11px;letter-spacing:.14em;color:rgba(255,255,255,.72)}
-.dp-build p{font-size:12.5px;line-height:1.42;color:#fff;margin-top:4px}
+.dp-explain{font-size:12.8px;line-height:1.5;color:#fff;margin-top:10px}
 .dp-controls{display:grid;grid-template-columns:34px 1fr 34px;align-items:center;gap:6px;margin-top:auto;padding-top:16px}
 .dp-controls button{height:30px;border:1px solid rgba(255,255,255,.55);background:rgba(0,0,0,.12);color:#fff;cursor:pointer;font:600 13px var(--voice)}
 .dp-controls button:hover{background:rgba(255,255,255,.16);border-color:#fff}
@@ -879,18 +876,15 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
 .dp-link{margin-top:10px;text-align:center;font-family:var(--record);font-size:12px;letter-spacing:.05em;color:#fff;text-decoration:none;opacity:.82}
 .dp-link:hover{opacity:1;text-decoration:underline;text-underline-offset:3px}
 .department-promise .dp-system-head,
-.department-promise .dp-definition,
-.department-promise .dp-build,
+.department-promise .dp-explain,
 .department-promise .dp-count{will-change:transform,opacity}
 .department-promise.dp-changing-next .dp-system-head,
-.department-promise.dp-changing-next .dp-definition,
-.department-promise.dp-changing-next .dp-build,
+.department-promise.dp-changing-next .dp-explain,
 .department-promise.dp-changing-next .dp-count{
  animation:dpNext .28s cubic-bezier(.2,.75,.2,1)
 }
 .department-promise.dp-changing-prev .dp-system-head,
-.department-promise.dp-changing-prev .dp-definition,
-.department-promise.dp-changing-prev .dp-build,
+.department-promise.dp-changing-prev .dp-explain,
 .department-promise.dp-changing-prev .dp-count{
  animation:dpPrev .28s cubic-bezier(.2,.75,.2,1)
 }
@@ -908,12 +902,10 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
 }
 @media(prefers-reduced-motion:reduce){
  .department-promise.dp-changing-next .dp-system-head,
- .department-promise.dp-changing-next .dp-definition,
- .department-promise.dp-changing-next .dp-build,
+ .department-promise.dp-changing-next .dp-explain,
  .department-promise.dp-changing-next .dp-count,
  .department-promise.dp-changing-prev .dp-system-head,
- .department-promise.dp-changing-prev .dp-definition,
- .department-promise.dp-changing-prev .dp-build,
+ .department-promise.dp-changing-prev .dp-explain,
  .department-promise.dp-changing-prev .dp-count{animation:none}
 }
 .department-promise,
@@ -921,9 +913,7 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
 .department-promise .dp-top b,
 .department-promise .dp-index,
 .department-promise .dp-name,
-.department-promise .dp-definition,
-.department-promise .dp-build small,
-.department-promise .dp-build p,
+.department-promise .dp-explain,
 .department-promise .dp-count,
 .department-promise .dp-link{color:#fff}
 .membership-promise>.w>a.btn.dark{display:block;width:max-content;margin:0 auto}
@@ -1067,8 +1057,7 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
   <article class="department-promise" data-dept="pa" style="--c:var(--pa)">
    <div class="dp-top"><span>I</span><b>Agency Assessment</b></div>
    <div class="dp-system-head"><span class="dp-index">01</span><h3 class="dp-name">Time</h3></div>
-   <p class="dp-definition"></p>
-   <div class="dp-build"><small>WHAT YOU BUILD</small><p></p></div>
+   <p class="dp-explain"></p>
    <div class="dp-controls">
     <button type="button" class="dp-prev" aria-label="Previous Agency Assessment system">&larr;</button>
     <span class="dp-count">01 / 12</span>
@@ -1080,8 +1069,7 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
   <article class="department-promise" data-dept="hs" style="--c:var(--hs)">
    <div class="dp-top"><span>II</span><b>Housing Stability</b></div>
    <div class="dp-system-head"><span class="dp-index">01</span><h3 class="dp-name">Inventory</h3></div>
-   <p class="dp-definition"></p>
-   <div class="dp-build"><small>WHAT YOU BUILD</small><p></p></div>
+   <p class="dp-explain"></p>
    <div class="dp-controls">
     <button type="button" class="dp-prev" aria-label="Previous Housing Stability system">&larr;</button>
     <span class="dp-count">01 / 12</span>
@@ -1093,8 +1081,7 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
   <article class="department-promise" data-dept="cd" style="--c:var(--cd)">
    <div class="dp-top"><span>III</span><b>Career Development</b></div>
    <div class="dp-system-head"><span class="dp-index">01</span><h3 class="dp-name">Salary</h3></div>
-   <p class="dp-definition"></p>
-   <div class="dp-build"><small>WHAT YOU BUILD</small><p></p></div>
+   <p class="dp-explain"></p>
    <div class="dp-controls">
     <button type="button" class="dp-prev" aria-label="Previous Career Development system">&larr;</button>
     <span class="dp-count">01 / 12</span>
@@ -1106,8 +1093,7 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
   <article class="department-promise" data-dept="lm" style="--c:var(--lm)">
    <div class="dp-top"><span>IV</span><b>Life Management</b></div>
    <div class="dp-system-head"><span class="dp-index">01</span><h3 class="dp-name">Standards</h3></div>
-   <p class="dp-definition"></p>
-   <div class="dp-build"><small>WHAT YOU BUILD</small><p></p></div>
+   <p class="dp-explain"></p>
    <div class="dp-controls">
     <button type="button" class="dp-prev" aria-label="Previous Life Management system">&larr;</button>
     <span class="dp-count">01 / 12</span>
@@ -1300,8 +1286,7 @@ document.querySelectorAll('.department-promise[data-dept]').forEach(function(car
     idx:0,
     name:card.querySelector('.dp-name'),
     num:card.querySelector('.dp-index'),
-    def:card.querySelector('.dp-definition'),
-    build:card.querySelector('.dp-build p'),
+    explain:card.querySelector('.dp-explain'),
     count:card.querySelector('.dp-count')
   };
 
@@ -1309,8 +1294,9 @@ document.querySelectorAll('.department-promise[data-dept]').forEach(function(car
     var sys=ctrl.dept.systems[ctrl.idx];
     ctrl.name.textContent=sys.name;
     ctrl.num.textContent=sys.n;
-    ctrl.def.textContent=sys.definition;
-    ctrl.build.textContent=sys.build;
+    var interaction=sys.agent.replace(/^Your agent /,'Your agent ');
+    var output=sys.build.replace(/^A /,'a ').replace(/^An /,'an ').replace(/^Your /,'your ');
+    ctrl.explain.textContent=interaction+' Together, you build '+output.replace(/.$/,'')+'.';
     ctrl.count.textContent=sys.n+' / 12';
   };
 
