@@ -32,7 +32,12 @@ export async function GET(req: Request) {
     try {
       const d = await getDriver();
       out.database = 'connected';
-      void d.describe();
+      const tls = d.tls?.();
+      if (tls) {
+        out.database_tls_verified = tls.verified;
+        // A certificate is public. The authority's certificate is listed so it can be set as the one to trust.
+        out.database_certificates = tls.chain.map(c => ({ subject: c.subject, issuer: c.issuer, fingerprint256: c.fingerprint256, ...(url.searchParams.get('pem') === '1' ? { pem_base64: Buffer.from(c.pem).toString('base64') } : {}) }));
+      }
       const facts = await d.tx(async q => (await q<any>(
         `select session_user::text as login, current_user::text as acting_as,
                 has_schema_privilege(session_user, 'uc_pilot', 'usage') as login_can_use_schema,
