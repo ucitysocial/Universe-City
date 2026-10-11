@@ -227,3 +227,11 @@ The Agent is successful when the resident feels:
 Not:
 
 > I have another inbox I need to manage.
+
+## What the agent establishes about a commitment
+
+**LOCKED product direction, October 10, 2026.**
+
+Every meaningful commitment has four internal conditions to establish as needed: Timing, Completion, Consequences, and Standards. The agent must recognize stated conditions in ordinary conversation and avoid asking for facts already on file. Missing conditions remain unknown; they do not justify prolonged questioning when that information is unnecessary to the immediate decision.
+
+These are internal requirements, not a four question script shown to the resident. Completion is recorded separately from timing compliance and consequences. An anticipated consequence must not be recorded as one that happened. A resident may complete a commitment at a different time without violating any established condition. The agent judges an outcome against that resident's stated conditions and confirmed record, not a universal punctuality rule.
