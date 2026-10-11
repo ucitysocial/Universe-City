@@ -289,7 +289,7 @@ Need an operational definition that is better than "resident completed setup."
 
 ### OQ-025 — What takes place during Enrollment?
 
-Application precedes Enrollment. Residency begins at Enrollment. Resolve the order and roles of Agency Assessment, Orientation, the first seven day schedule, and initial commitments. Agency Assessment is Department I; the phrase does not automatically name the whole Enrollment process.
+**Sequencing resolved October 10, 2026.** Application precedes Enrollment. The initial Agency Assessment constitutes Enrollment. Orientation follows Enrollment, then initial Time work. Residency begins at Enrollment. Remaining question: which general information and Start and Target questions does an agent need to begin representing the resident?
 
 ### OQ-026 — When does payment take place?
 
@@ -297,4 +297,4 @@ Payment at Application or Enrollment remains unresolved under `LANGUAGE_STANDARD
 
 ### OQ-027 — What is the first Time requirement?
 
-Resolve whether the resident establishes a seven day schedule, a daily Plan, or both during Enrollment, and when the normal Resident Portal home becomes available.
+Initial Time work follows Orientation. Resolve whether the resident establishes a seven day schedule, a daily Plan, or both before the normal Resident Portal home becomes available.
