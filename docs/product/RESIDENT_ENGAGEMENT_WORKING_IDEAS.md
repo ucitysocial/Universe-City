@@ -628,7 +628,237 @@ Later prototypes can evaluate interactive voice with interruption, optional call
 **Further questions:** Where do reusable procedures belong without duplicating Folder-owned data? Which existing entities need immutable revisions beyond Time blocks? How are transient task observations separated from durable File facts? How do agents review/revise proposed procedures? What are acceptable voice/recording policies and workplace protections? How should curriculum sources and professional advice be checked? Which technical approach satisfies Apple/Android call restrictions without misleading residents?
 
 
-## 19. Open design questions
+## 19. Adaptive Communication, Personality, and Language Standards (founder direction, October 11, 2026)
+
+**Status:** Founder-directed product thinking. The principle and the limits in this section are founder directions. The mechanics, the controls, the storage and the example wording are **proposals** until they are incorporated into governing documents. This section changes no governing specification, no part of `LANGUAGE_STANDARD.md`, no Curriculum text and no code. Where this section and a governing document disagree, the governing document applies until it is revised. Read with Sections 14 and 16 to 18.
+
+### 19.1 Core principle
+
+> **The personality adapts. The standards don't.**
+
+Universe City must distinguish **what is communicated** from **how it is communicated**.
+
+- **What** is the content: the facts on File and their evidentiary status, what was authorized, what was decided and by whom, what is still open, what an assessment option or a lesson says.
+- **How** is the delivery: tone, length, pace, vocabulary, humor, directness, warmth, the amount of explanation, the amount of silence.
+
+The "what" has one correct version. The "how" may differ from one resident to the next, and for the same resident from one activity to the next.
+
+### 19.2 Three communication layers
+
+| Layer | What it covers | Who is speaking | How much it adapts |
+| :-- | :-- | :-- | :-- |
+| **1. Official communication** | Website copy, assessments, Curriculum, policies, formal notices, File entries, governing documentation | Universe City as an institution | Does not adapt. Follows the Language Standard's professional, accurate, consistent, educational register |
+| **2. Human-agent communication** | The agent's conversations, messages and calls with a resident | A real person with professional responsibilities | Adapts to the resident's natural communication style, personality, pacing, vocabulary, humor, directness and desired warmth |
+| **3. Guided Life communication** | The automated guide's voice and text | Software, clearly identified as software and separate from the human agent | Adapts its style to the resident while keeping one familiar, consistent conversational presence |
+
+Notes on the layers:
+
+- An assessment question, its options, a lesson, a policy and a File entry read the same for every resident. A resident who jokes with their agent still selects from the same ten written options as everyone else.
+- The agent remains a person who answers for the work. Adapting to a resident is part of representing them well. It does not loosen the agent's professional responsibilities.
+- The guide may become familiar. It never becomes the agent, and it never borrows the agent's identity to seem more personal.
+- A message can cross layers. When the guide or the agent tells a resident about a change in a relaxed style, the **File entry for that change is still written in official language**. The conversation is one rendering. The File is the record.
+
+### 19.3 What can adapt
+
+These are the dimensions of "how". They are illustrations of range, not resident categories or personality types.
+
+| Dimension | Range |
+| :-- | :-- |
+| Tone | Playful, neutral, direct, quiet |
+| Length | One line, a short exchange, a fuller explanation |
+| Pace | Quick, ordinary, slow, with pauses |
+| Vocabulary | Plain everyday words, more technical words where the resident uses them |
+| Explanation | The result alone, the result with the reason, a step by step account |
+| Humor | None, light, more frequent where the resident enjoys it |
+| Warmth | Reserved, friendly, gentle |
+| Narration and silence | Continuous guidance, occasional cues, silence until asked |
+| Check-ins | Frequent, occasional, only when something needs the resident |
+
+Founder illustrations:
+
+- A resident who is **playful** may receive playful communication.
+- A resident who **prefers direct answers** may receive concise, practical messages.
+- A resident who prefers a **quiet, meditative experience** may receive slower, gentler guidance with more silence.
+
+The same resident may want different things in different moments. Someone playful at lunch may want two words when they are running late.
+
+### 19.4 How preferences are learned
+
+**Founder direction:** Preferences can evolve naturally through conversation, explicit resident feedback and corrections. The system should **not require an extensive personality questionnaire**. It should offer **simple controls** and allow preferences to emerge through use.
+
+Proposed approach, not approved:
+
+1. **Start plain.** A new resident receives plain, calm, brief communication until they show or say they want something else.
+2. **Listen for explicit requests.** "Shorter." "Just tell me the next thing." "You can explain more." "Slow down." A request takes effect at once and is not questioned.
+3. **Treat corrections as preferences.** If a resident says a message was too much, too cold, too chatty or too fast, that is a preference to keep, not a complaint to log and ignore.
+4. **Offer a small set of controls** the resident can reach at any time by voice or on screen: more or less conversation, more or less explanation, slower or faster, a different tone, silence.
+5. **Allow activity-level differences.** A resident can want quiet during one activity and conversation during another.
+6. **Keep it visible and correctable.** The resident can see what the system currently understands about how they like to be spoken to, and change it.
+7. **Carry it across the agent and the guide.** A resident should not have to teach the same preference twice. Each still speaks as itself.
+
+A stated preference is the resident's own statement and can be kept in their words. An adjustment the system made on its own is a **working setting**, not a fact about the resident, and must never be written into the File as a trait.
+
+### 19.5 Limits on adaptation
+
+**Founder direction. Do not:**
+
+- **Automatically copy slang or profanity.** Matching a resident's register is not repeating their words back.
+- **Mimic the resident's identity.** No imitation of a dialect, an accent, a cultural speech pattern, an age group or a community the speaker does not belong to.
+- **Infer psychological diagnoses or sensitive personality traits** from writing or speech. Style adapts to what the resident asks for and responds well to. It is never built from a guess about their mental health, intelligence, background or character.
+
+**The resident must always be able to request** a different tone, less conversation, more explanation, different pacing, or silence.
+
+Proposed additions, not approved:
+
+- Style follows the individual resident's requests and responses, never an assumption drawn from their age, gender, race, income, job, housing or any other demographic fact.
+- A style preference is not a label. "Prefers short messages" is acceptable. "Impatient" is not.
+- In an urgent matter, or where a resident indicates danger, style drops to plain and direct, and the existing safety rules apply.
+- Adapting never means agreeing. A playful tone does not soften a fact, and a gentle tone does not withhold one.
+
+### 19.6 Nonnegotiable standards
+
+**Personalization never changes:**
+
+| Standard | What it means in practice |
+| :-- | :-- |
+| **Facts established in the File, and their evidentiary status** | Planned stays planned. Estimated stays estimated. Reported stays reported. A warmer sentence cannot turn "you said it happened" into "it happened" |
+| **Permission and authorization requirements** | The same change needs the same permission, whatever the tone of the conversation around it |
+| **Resident authority over decisions** | A friendly recommendation is still a recommendation. The resident decides |
+| **Assessment standards and Curriculum accuracy** | Questions, options, scoring and lesson content are identical for every resident. Delivery may vary. Content may not |
+| **The distinction between human agents and software** | The guide is always identified as software. Software never speaks as the agent |
+| **Professional boundaries, privacy and safety** | No medical, legal or financial advice in a casual voice. No private information spoken or shown beyond what the resident allowed |
+| **The agent's responsibility to maintain the File and carry out authorized work** | Rapport is not a substitute for the work. The agent still files, follows up and answers for it |
+
+**A resident's communication style never determines whether a commitment was executed or how their assessment is scored.** A talkative resident and a silent resident with the same reported outcomes have the same outcomes on File.
+
+### 19.7 Encouragement and acknowledgment
+
+**Founder direction:** Natural encouragement and acknowledgment should be permitted, **without invented praise, judgment, pressure, or claims about outcomes that have not occurred.**
+
+Proposed distinction, not approved:
+
+| Permitted | Not permitted |
+| :-- | :-- |
+| Acknowledging what the resident said or did | Praise for an outcome that is not established |
+| Stating something true that happened, in a natural voice | Rating the resident as a person |
+| An invitation to begin or continue | Guilt, urgency, streaks or comparison with other residents |
+| Recognizing that something was hard when the resident said it was | Telling the resident how they feel |
+| Marking a real completion the resident reported | Claiming or implying an outcome that has not occurred |
+
+Illustrations, fictional:
+
+- Acceptable: "Okay. Shower's done. Getting dressed is next."
+- Acceptable: "That was the one you were putting off. It's done."
+- Not acceptable: "Amazing job today!" when the day's outcomes are unknown.
+- Not acceptable: "You always pull it together in the end."
+
+The phrases the Language Standard prohibits in all output stay prohibited in every layer.
+
+### 19.8 Application to Guided Life
+
+**Founder direction:** Guided Life should feel **increasingly familiar without becoming repetitive or intrusive.**
+
+The same guide speaks differently in different activities:
+
+| Situation | How the guide communicates |
+| :-- | :-- |
+| A guided shower | Quiet and minimally interactive |
+| Work training | Instructional and precise |
+| Grocery shopping | Conversational and responsive |
+| The resident is behind schedule | Calm, clear and practical |
+
+**One guide across settings.** The same guide should support planned routines, spontaneous calls, workplace sessions, screen-assisted activities and cross-folder learning. What stays constant is who the guide is: its identity as software, its name once chosen, and its voice. What varies is its register.
+
+**What the guide adjusts.** Conversation length, speech pace, detail, humor, narration, silence and how often the guide checks in should reflect three inputs: the activity, the resident's preferences, and the relevant timing.
+
+Proposed order when those inputs disagree, not approved:
+
+1. Safety and a time-critical fact come first, stated plainly.
+2. What the resident asks for in the moment.
+3. The resident's standing preferences.
+4. The usual style for that kind of activity.
+
+**Familiar without repetitive.** Familiarity comes from continuity: the guide remembers what is on File about how the resident likes to be guided and what they have already heard. It does not come from repeating the same lines, and it does not come from pretending to a relationship. The guide claims no feelings and no life of its own.
+
+**Familiar without intrusive.** More familiarity never means more talking. A resident who has used Guided Life for months may hear less from it than a resident in their first week.
+
+On the agent side this experience is Guide Mode. On the resident side it is Guided Life (Section 17.1). The agent can see how the guide has been communicating with a resident and can correct it.
+
+### 19.9 Proposed safeguard: one verified message, several renderings
+
+Proposal, not approved. To keep the principle enforceable rather than aspirational:
+
+1. **Fix the content first.** Before anything is said, the message is established from the File as a short set of verified points: what changed, its status, who authorized it, what is still open.
+2. **Apply the style second.** The agent or the guide renders those points in the resident's preferred style.
+3. **A rendering may not add, remove, soften or upgrade a point.** It may reorder, shorten, and change the words.
+4. **The File entry is written in official language** no matter how the message was delivered.
+5. **The rendering is reviewable.** The agent can see the verified points beside what was said.
+
+### 19.10 Examples: one verified Schedule update, three styles
+
+Fictional. The verified points are the same in all three.
+
+| Verified point | Value |
+| :-- | :-- |
+| Commitment | Grocery shopping |
+| Change | Moved from Tuesday, October 13, 2026, 5:00 PM to Wednesday, October 14, 2026, 10:00 AM |
+| Reason | Reported by the resident: work ends at 6:00 PM on October 13 |
+| Authorization | The resident's decision, October 13, 2026, 3:42 PM |
+| Execution status | Planned. Not executed |
+| Other commitments | None changed |
+
+**1. Official File language**
+
+> Changed. Grocery shopping moved from Tuesday, October 13, 2026, 5:00 PM to Wednesday, October 14, 2026, 10:00 AM. Reason reported by the resident: work ends at 6:00 PM on October 13. Authorized by the resident's decision on October 13, 2026, at 3:42 PM. Execution: planned. No other commitment changed.
+
+**2. A concise conversational style the resident prefers, from the agent**
+
+> You said work runs to 6:00 PM today, so groceries moved to tomorrow at 10:00 AM, like you asked. Still planned. Nothing else changed.
+
+**3. A warmer Guided Life style, from the guide, identified as software**
+
+> Okay, that's taken care of. You said work runs until 6:00 PM today, so I moved your grocery shopping to tomorrow at 10:00 AM, like you asked. It's still on your plan, and the rest of today stays the same.
+
+What is identical in all three:
+
+- The same commitment moved, from the same time to the same time.
+- The reason is the resident's own report. No version treats it as verified.
+- The change rests on the resident's decision. No version suggests the software or the agent decided.
+- The shopping is still planned. No version says or implies it happened.
+- Nothing else changed.
+
+What differs: length, warmth, word choice, and who is speaking.
+
+### 19.11 Reconciliation notes: governing text this direction touches
+
+Nothing below was changed. These are the places where the governing documents and this direction need to be reconciled before any of it is treated as policy.
+
+- **`LANGUAGE_STANDARD.md` section 4, Layers.** The standard already defines four layers: vocabulary, curriculum, agent and founder. Layer 1 here corresponds to its vocabulary and curriculum layers. Layer 2 corresponds to its agent layer, which already says the agent matches the client's register and does not match the client's conduct. **There is no layer for an automated guide speaking in its own identified voice.**
+- **Clause 4.5** says the client does not choose a tone, a personality or a profanity setting for the agent. This direction says a resident must be able to request a different tone, pacing, amount of conversation, or silence. These need one ruling.
+- **Clause 4.7** already states the core of the nonnegotiable list: no layer changes the vocabulary layer, the prohibitions in section 10, or a stated fact.
+- **Section 5, Register.** The standard sets a clinical and educational register for resident-facing text and prohibits decorative language. Which layers that binds needs to be stated.
+- **Clause 5.6** lists phrases that shall not appear in any output. This direction does not reopen that list.
+- **Section 6, Composition.** The rules against figures of speech, contrast constructions and placeholder words are written for resident-facing text. Playful or humorous conversation will often break them. Whether they bind layers 2 and 3 needs a ruling.
+- **Clause 10.6.2** says output shall not praise, console or apologize for a result. Section 19.7 would need that clause reworded to permit natural encouragement and acknowledgment. Clause 10.6.3, on guilt, urgency and streak language, is unaffected.
+- **Clauses 3.11 and 10.8.1**, on software never presenting as a person or as the agent, are unaffected and reinforced.
+- **Clause 10.4.2**, on not interpreting a psychological condition, is consistent with the limit on inferring diagnoses.
+- **`docs/systems/TIME.md` section 6** gives the wording the agent uses for its questions. Whether that wording is fixed, or whether the rules in 6.14 are fixed and the wording may adapt, needs a ruling.
+- **`docs/systems/TIME.md` 5.4.9 and `docs/systems/TIME_OPERATIONS.md` 7.6** cover how much contact a resident receives and when. Style preferences are a further kind of preference with no defined home yet.
+
+### 19.12 Questions to resolve before governing text is written
+
+1. Does the Language Standard gain a layer for the guide, and does clause 4.5 change?
+2. Which rules in sections 5 and 6 of the Language Standard bind all three layers, and which bind official communication only?
+3. What is the exact wording for permitted encouragement and acknowledgment?
+4. May a resident ask for profanity or slang from their agent or the guide, or is it never used regardless of request?
+5. Where are style preferences kept, who can see them, and how does a resident review and correct them?
+6. Which signals may shape a working setting? Explicit requests and corrections are clear. Automated analysis of a resident's voice or mood is not, and may conflict with the limit on inference.
+7. How is one consistent guide identity kept while its register varies?
+8. When a different agent covers for a resident's agent, how do style preferences carry over without the covering agent imitating the usual one?
+9. How is it checked that every rendering of a message carries the same verified points?
+10. How does adaptation serve accessibility, including plain language needs, translation and screen readers, without reducing clarity?
+
+## 20. Open design questions
 
 - How should a passing conversation statement be retained, structured, confirmed and made correctable?
 - What actions can software take on standing permission, and which need resident or agent approval?
@@ -641,7 +871,7 @@ Later prototypes can evaluate interactive voice with interruption, optional call
 - What does human-agent oversight cost at different scales?
 - What is the appropriate relationship between substantive engagement, Grade and future programs?
 
-## 20. Application to the Time Curriculum — advisory only
+## 21. Application to the Time Curriculum — advisory only
 
 When designing Time's assessment and lessons:
 - Measure planning, execution, review and follow-through under the resident's established conditions.
@@ -653,10 +883,10 @@ When designing Time's assessment and lessons:
 - Preserve ordinary conversational pacing; Curriculum questions do not authorize an interrogation.
 - These considerations **inform drafting** but do not override current authoritative Time, Curriculum or Language Standard text.
 
-## 21. Editorial handoff
+## 22. Editorial handoff
 
-**Founder directions expressed:** natural conversation, low-friction access, focused Portal experience, pattern recognition central to representation, human agent responsibility, brief text-like messages, acknowledging the resident before a nonurgent observation, meaningful continuity rather than login farming; schedule-first exploration, large expandable time blocks, optional smaller steps, optional non-daunting progress support, and no presumption that all residents have daily routines or paid work; optional narrated Guided Mode for any relevant time block, spoken Plan briefing, activity-aware prompting, time-until-next-commitment reminders, curriculum-based education with evolving scripts, optional opt-in distraction controls, and practical re-planning when the resident falls behind or becomes overwhelmed; agent-side **Guide Mode**, resident-side **Guided Life**, conversational voice or text Time-building, agent transcript access, resident-visible outcomes and durable change summaries available to weekly review; optional call-style native invitations, a hybrid voice model, work-session discovery and career development, deliberate screen sharing, resident-reviewed reusable SOPs, everyday guided activities across relevant Folders, and spontaneous calls that help reconcile reported life with Time without inventing execution.
+**Founder directions expressed:** natural conversation, low-friction access, focused Portal experience, pattern recognition central to representation, human agent responsibility, brief text-like messages, acknowledging the resident before a nonurgent observation, meaningful continuity rather than login farming; schedule-first exploration, large expandable time blocks, optional smaller steps, optional non-daunting progress support, and no presumption that all residents have daily routines or paid work; optional narrated Guided Mode for any relevant time block, spoken Plan briefing, activity-aware prompting, time-until-next-commitment reminders, curriculum-based education with evolving scripts, optional opt-in distraction controls, and practical re-planning when the resident falls behind or becomes overwhelmed; agent-side **Guide Mode**, resident-side **Guided Life**, conversational voice or text Time-building, agent transcript access, resident-visible outcomes and durable change summaries available to weekly review; optional call-style native invitations, a hybrid voice model, work-session discovery and career development, deliberate screen sharing, resident-reviewed reusable SOPs, everyday guided activities across relevant Folders, and spontaneous calls that help reconcile reported life with Time without inventing execution; adaptive communication in three layers (official, human-agent, Guided Life) under the principle that the personality adapts and the standards do not, preferences that emerge through use with simple controls and no personality questionnaire, no automatic copying of slang or profanity, no mimicry of identity, no inferred diagnoses or sensitive traits, seven nonnegotiable standards, natural encouragement and acknowledgment without invented praise, judgment, pressure or claims about outcomes that have not occurred, and communication style never determining execution or scoring.
 
-**Unapproved proposals:** exact expanded-block layout, optional Guided Mode implementation, lesson/script framework, cross-folder audio privacy and timing rules, voice/alarm and phone distraction controls, specific automation/approval mechanics, retention and privacy decisions, alert thresholds, proposed tests and measurement criteria, escalations and new operative rules.
+**Unapproved proposals:** exact expanded-block layout, optional Guided Mode implementation, lesson/script framework, cross-folder audio privacy and timing rules, voice/alarm and phone distraction controls, specific automation/approval mechanics, retention and privacy decisions, alert thresholds, proposed tests and measurement criteria, escalations and new operative rules; the adaptive style dimensions and resident controls, how style preferences are stored and reviewed, the order of precedence between activity, preference and timing, the one verified message with several renderings safeguard, the wording of permitted encouragement, and any change to sections 4, 5, 6 or 10 of the Language Standard.
 
 When another working chat updates this file, append/revise clearly labeled ideas and dates; do not silently reclassify proposals as approved policy. Reconcile suggested changes against `LANGUAGE_STANDARD.md`, `docs/systems/TIME.md` and relevant product/Operations documents **before** moving them to authoritative specifications.
