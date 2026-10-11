@@ -37,7 +37,9 @@ Department I, Agency Assessment. Systems operations. Version 1, October 11, 2026
 
 2.1.2 The eleven kinds in the code: sleep, getting ready, travel, paid work, unpaid work time, household time, caring for people, appointments, time with people, rest and leisure, and time on what you are building.
 
-2.1.3 The five statuses in the code: observed, required, planned, suggested, and estimated. `TIME.md` section 3.2 holds two pairs of values. `TIME.md` item 15.3 is open on which set holds. This document changes neither set until that item is decided.
+2.1.3 The five statuses in the code: observed, required, planned, suggested, and estimated. `TIME.md` section 3.2 holds two pairs of values: observed or estimated, and planned or done.
+
+2.1.4 To define: one set of block statuses for the specification and the code. `TIME.md` 3.6.1 files every future period as estimated. The code holds required, planned, and suggested for a future block. The reconciliation was assigned to this document on October 11, 2026. Neither set changes until it is decided.
 
 ### 2.2 The commitment. Defined and not built.
 
@@ -151,6 +153,10 @@ Department I, Agency Assessment. Systems operations. Version 1, October 11, 2026
 8.2 To define: the criteria by which a commitment is treated as established.
 
 8.3 To define: what returns an established commitment to regular questions.
+
+8.4 Defined in `TIME.md` 5.9. The agent selects the next question by four factors: the information still missing, the importance of the commitment to the client, the consequences on file, and the client's preferences. The Version 3 rule of lowest position first is retired.
+
+8.5 To define: how the four factors are weighed when two questions are both ready.
 
 ## 9. Further items to define
 

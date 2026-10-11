@@ -265,3 +265,13 @@ Contact has three origins: resident requested, permitted automatic, and agent in
 **Status:** LOCKED, October 11, 2026
 
 A purchase amount is filed in Finance. The Resident Portal home opens when the first seven day schedule is on file and the first Plan is confirmed. Time is operational on three conditions. The free first day is retired. `docs/systems/TIME_DEVELOPMENTS.md` 2.9 lists every resolution and where it sits in the specification.
+
+### D-024: Order of questions, and two results for execution
+
+**Status:** LOCKED, October 11, 2026
+
+The fixed rule of lowest Position first is retired for Time. The agent selects the next question by the information still missing, the importance of the commitment, the consequences on file, and the resident's preferences. Contact frequency follows the resident's contact preferences.
+
+Executed and confirmed successful are two results. A commitment is executed when its Completion condition is met. It is confirmed successful only when the resident has confirmed that no commitment or condition was affected. Consequences that are not established are never counted as no harm.
+
+`LANGUAGE_STANDARD.md` 3.20 still states order of work by Position. That clause is unreviewed under clause 12.7 and needs the matching change.

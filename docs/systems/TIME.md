@@ -292,9 +292,13 @@ Department I, Agency Assessment. Internal specification. Version 4, October 11, 
 
 ### 5.9 Order and frequency
 
-5.9.1 Version 3 set the order of work by the client's twelve answers, lowest position first. Version 3 set how often the agent asks by the same answers.
+5.9.1 The Version 3 rule that set the order of work by lowest position first is retired.
 
-5.9.2 Both rules depend on the twelve questions. The twelve questions are under revision. Both rules are held for review until the Curriculum is rewritten. See 15.1.
+5.9.2 The agent selects the next question by four factors: the information still missing, the importance of the commitment to the client, the consequences on file, and the client's preferences.
+
+5.9.3 The Version 3 rule that set how often the agent asks by the twelve answers is retired. How often the client is contacted is governed by 5.4.
+
+5.9.4 Start, Target, and Position for Time still come from the twelve questions. Position does not set the order of work in Time.
 
 ## 6. The agent's questions
 
@@ -533,29 +537,35 @@ Department I, Agency Assessment. Internal specification. Version 4, October 11, 
 
 ### 11.6 Successful execution
 
-11.6.1 Execution is successful when the Completion condition the client stated is met and no harm to a condition the client stated is on file.
+11.6.1 Two results are kept apart: executed, and confirmed successful.
 
-11.6.2 A changed time is filed whenever the actual time differs from the Plan. A changed time with no harm on file is successful execution.
+11.6.2 A commitment is executed when the Completion condition the client stated is met.
 
-11.6.3 A partly executed commitment stays on file as partly executed. It is never filed as executed.
+11.6.3 Execution is confirmed successful when the commitment is executed and Consequences is none confirmed. Confirmed successful is read from those two fields. It is not a fifth outcome field.
 
-11.6.4 An alternative agreed in advance is successful execution when it meets the Completion condition and no harm is on file.
+11.6.4 Where Consequences is not established, the commitment is executed and success is not confirmed. Not established is never counted as no harm.
 
-11.6.5 One case. A client plans to buy groceries at 5:00 PM.
+11.6.5 A changed time is filed whenever the actual time differs from the Plan. A changed time alone is never a failure.
 
-| What happened | Execution | Timing | Consequences |
-| :-- | :-- | :-- | :-- |
-| Shopping happened at 5:00 PM | Executed | As planned | Not established |
-| Shopping happened at 7:00 PM. The client said no other commitment was affected | Executed | Changed | None confirmed |
-| Shopping happened at 7:00 PM. The client missed an appointment | Executed | Changed | Reported |
-| Shopping was started and was not finished | Partly executed | Not established | Not established |
-| Shopping did not happen | Did not happen | Does not apply | Not established |
+11.6.6 A partly executed commitment stays on file as partly executed. It is never filed as executed.
 
-11.6.6 Rows one and two are successful execution. In row three the commitment is executed and one consequence is on file. The agent raises the consequence at the next Review.
+11.6.7 An alternative agreed in advance is executed when it meets the Completion condition. It is confirmed successful on the same terms as every other commitment.
 
-11.6.7 In rows four and five the agent asks whether the remaining shopping is still required, then keeps or revises the Plan as the client decides.
+11.6.8 One case. A client plans to buy groceries at 5:00 PM.
 
-11.6.8 In row one no question about consequences is needed. The agent asks about consequences where the client stated one in advance, or where the timing changed and the new time overlaps a second commitment.
+| What happened | Execution | Timing | Consequences | Result |
+| :-- | :-- | :-- | :-- | :-- |
+| Shopping happened at 5:00 PM | Executed | As planned | Not established | Executed. Success not confirmed |
+| Shopping happened at 7:00 PM. The client said no other commitment was affected | Executed | Changed | None confirmed | Confirmed successful |
+| Shopping happened at 7:00 PM. The client missed an appointment | Executed | Changed | Reported | Executed, with one consequence on file |
+| Shopping was started and was not finished | Partly executed | Not established | Not established | Partly executed |
+| Shopping did not happen | Did not happen | Does not apply | Not established | Did not happen |
+
+11.6.9 In row three the agent raises the consequence at the next Review.
+
+11.6.10 In rows four and five the agent asks whether the remaining shopping is still required, then keeps or revises the Plan as the client decides.
+
+11.6.11 The agent does not ask about consequences only to confirm success. The agent asks where the client stated a consequence in advance, or where the timing changed and the new time overlaps a second commitment. In every other case the commitment stays executed with Consequences not established.
 
 11.7 How the system runs is specified in Folder 01 Time Operations.
 
@@ -659,18 +669,14 @@ Department I, Agency Assessment. Internal specification. Version 4, October 11, 
 
 ### 14.5 Out of step
 
-14.5.1 The code holds five block statuses: observed, required, planned, suggested, and estimated. Section 3.2 defines observed or estimated, and planned or done. See 15.3.
+14.5.1 The code holds five block statuses: observed, required, planned, suggested, and estimated. Section 3.2 defines observed or estimated, and planned or done. The reconciliation is assigned to Folder 01 Time Operations, part 2.1.
 
 ## 15. Open items
 
 15.1 Curriculum. The twelve questions in Folder 01 Time Curriculum measure how well each kind of time is accounted for. Version 4 measures planning, execution, and review. What are the twelve new questions and their ten options? Which of the twelve older categories move into schedule intake?
 
-15.2 Research. Folder 01 Time Research holds the evidence behind Version 3. Which evidence supports the Version 4 definition, and what dated entry does Research need?
+15.2 Research. Folder 01 Time Research holds the evidence behind Version 3. Which evidence supports planning, execution, and follow through, and what dated entry does Research need? Research is revised after the Curriculum.
 
-15.3 Block statuses. The code holds five statuses: observed, required, planned, suggested, and estimated. Section 3.2 holds observed or estimated, and planned or done. Which set does this document adopt?
-
-15.4 Order and frequency. Do the two Version 3 rules in 5.9 return once the Curriculum is rewritten?
-
-15.5 Every other item that Version 4 first listed as open is resolved in this document or assigned to Folder 01 Time Operations. Folder 01 Time Developments holds the list, dated October 11, 2026.
+15.3 Every other item that Version 4 first listed as open is resolved in this document or assigned to Folder 01 Time Operations. Folder 01 Time Developments holds the list, dated October 11, 2026.
 
 Governed by `LANGUAGE_STANDARD.md`, section 8, for folder composition.

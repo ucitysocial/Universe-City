@@ -55,7 +55,7 @@ Department I, Agency Assessment. Log. Version 1, October 11, 2026. The dated log
 | 15.2 | The question for Time | Closed. Both questions are kept. One belongs to Daily Close and one to the schedule | 2.8 |
 | 15.3 | Time and Integrity | Closed. Integrity covers every commitment and reads Time. It holds no second copy | 4.4.7, 4.4.8, 13.10 |
 | 15.4 | A purchase amount | Closed. Filed in Finance | 4.4.6, 13.9 |
-| 15.5 | Partial execution, alternatives, timing | Closed. Execution is measured against the Completion condition. A changed time with no harm on file is successful | 3.3.7, 11.6.1 to 11.6.4 |
+| 15.5 | Partial execution, alternatives, timing | Closed. Execution is measured against the Completion condition. A changed time with no harm on file is successful. Corrected the same day. See 2.16 | 3.3.7, 11.6 |
 | 15.6 | Fields before a Plan | Closed. The action, the client's authorization, and a date or time | 3.3.4 |
 | 15.7 | What opens the Resident Portal home | Closed. The first seven day schedule and the first confirmed Plan | 9.3 |
 | 15.8 | Action with no further approval | Closed in principle. The full list of permissions is assigned to Operations | 5.6 |
@@ -82,6 +82,12 @@ Department I, Agency Assessment. Log. Version 1, October 11, 2026. The dated log
 
 2.14 `TIME_OPERATIONS.md` Version 1 and this document Version 1 were created.
 
+2.15 The four items left open in `TIME.md` section 15 were reviewed. The Curriculum stays open and is the next step. The Research stays open and follows the Curriculum. The block statuses moved to `TIME_OPERATIONS.md` 2.1.4. The Version 3 rule of lowest position first was retired, with the rule that set frequency by the twelve answers. `TIME.md` 5.9 now states four factors for the next question.
+
+2.16 Successful execution was split in two. Executed means the Completion condition is met. Confirmed successful means executed with Consequences none confirmed. Reason: the earlier wording counted a commitment with no information about consequences as successful. `TIME.md` 11.6.
+
+2.17 The sender rule in `TIME.md` 5.4.12 was reviewed and kept. A message from the agent and an automated Universe City message stay distinct.
+
 ## 3. Errors found
 
 3.1 October 11, 2026. Version 3 listed five features as live that the repository does not hold: plain language collection, the day view by whole hours, the month view, direct editing by hand, and reminders. Corrected in `TIME.md` 14.3.
@@ -94,15 +100,19 @@ Department I, Agency Assessment. Log. Version 1, October 11, 2026. The dated log
 
 3.5 October 11, 2026. A comment in `lib/domain/time.ts` states twelve kinds of time. The code holds eleven. Open.
 
+3.6 October 11, 2026. `TIME.md` 11.6 counted an executed commitment as successful while its consequences were not established. Corrected. See 2.16.
+
 ## 4. Open issues
 
-4.1 `TIME.md` section 15 holds four open items: the Curriculum, the Research, the block statuses, and the Version 3 rules for order and frequency.
+4.1 `TIME.md` section 15 holds four open items: the Curriculum, the Research, the block statuses, and the Version 3 rules for order and frequency. Closed in part on October 11, 2026. See 2.15. Two items remain open: the Curriculum and the Research.
 
 4.2 `TIME_OPERATIONS.md` marks each undecided mechanic as To define.
 
 4.3 The Curriculum and the Research are not in the repository. Both still describe Version 3. Neither has been revised.
 
 4.4 Decisions D-010 to D-017 call the person a resident. `TIME.md` calls the person a client, as `LANGUAGE_STANDARD.md` requires for an agent document. The two words name one person.
+
+4.5 `LANGUAGE_STANDARD.md` 3.20 states that order of work is determined by position. `TIME.md` 5.9 retires that rule for Time. `LANGUAGE_STANDARD.md` 12.7 lists clause 3.20 as kept from Version 3 without review. The standard governs until its clause is changed.
 
 ## 5. Ideas held for later
 
