@@ -2,7 +2,7 @@
 // in memory and a stand in for the language model, so the screens can be opened with no hosted service.
 // A production build never reaches this file's code path: NODE_ENV is production there.
 
-import { useDriver, type Driver, type Q } from './db';
+import { useDriver } from './db';
 import { useModel, type Model } from './model';
 
 export const LOCAL_USER = '00000000-0000-4000-8000-000000000001';
@@ -16,20 +16,13 @@ export function localMode(): boolean {
 export function ensureLocal(): Promise<void> {
   if (!localMode()) return Promise.resolve();
   return (G.__ucPilotLocal ||= (async () => {
-    const pg = '@electric-sql/pglite';
-    const { PGlite } = await import(/* webpackIgnore: true */ pg);
-    const { readFileSync } = await import('node:fs');
-    const { join } = await import('node:path');
-    const db = new PGlite();
-    await db.exec(readFileSync(join(process.cwd(), 'supabase/pilot/0001_founder_test.sql'), 'utf8'));
-    await db.query(
-      `insert into uc_pilot.access (user_id, label, synthetic, decides_proposals, display_name) values ($1, 'local', true, true, 'Local resident')`, [LOCAL_USER]);
-    await db.exec('set role uc_pilot_server');
-    const driver: Driver = {
-      describe: () => 'a database in memory',
-      tx: (fn: (q: Q) => Promise<any>) => db.transaction(async (tx: any) => fn(async (text, params) => (await tx.query(text, params as any[])).rows))
-    };
-    useDriver(driver);
+    const { memDb } = await import('./memdb');
+    const mem = await memDb();
+    await mem.db.exec('reset role');
+    await mem.db.query(
+      `insert into uc_pilot.access (user_id, label, synthetic, decides_proposals, display_name) values ($1, 'local', true, true, 'Local resident') on conflict do nothing`, [LOCAL_USER]);
+    await mem.db.exec('set role uc_pilot_server');
+    useDriver(mem.driver);
     if (!process.env.ANTHROPIC_API_KEY) useModel(standIn);
   })());
 }

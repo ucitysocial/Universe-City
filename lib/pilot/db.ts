@@ -32,6 +32,16 @@ export const isUuid = (s: unknown): s is string => typeof s === 'string' && UUID
 const G = globalThis as unknown as { __ucPilotDb?: { driver: Driver | null; promise: Promise<Driver> | null } };
 const state = (G.__ucPilotDb ||= { driver: null, promise: null });
 
+// One request can be pointed at a different database for its own duration. The check route uses this to run a
+// made up conversation against a database in memory. It changes nothing for any other request.
+import { AsyncLocalStorage } from 'node:async_hooks';
+const scoped = (G as unknown as { __ucPilotScope?: AsyncLocalStorage<Driver> }).__ucPilotScope ||= new AsyncLocalStorage<Driver>();
+(G as unknown as { __ucPilotScope?: AsyncLocalStorage<Driver> }).__ucPilotScope = scoped;
+
+export function withDriver<T>(d: Driver, fn: () => Promise<T>): Promise<T> {
+  return scoped.run(d, fn);
+}
+
 /** Tests and local work supply their own database. */
 export function useDriver(d: Driver | null) {
   state.driver = d;
@@ -116,6 +126,8 @@ async function pgDriver(): Promise<Driver> {
 }
 
 export async function getDriver(): Promise<Driver> {
+  const own = scoped.getStore();
+  if (own) return own;
   if (state.driver) return state.driver;
   if (!state.promise) {
     state.promise = pgDriver().then(d => { state.driver = d; return d; }).catch(e => { state.promise = null; throw e; });

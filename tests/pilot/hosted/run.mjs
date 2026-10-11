@@ -1,5 +1,9 @@
 // Runs steps against the founder test preview from a GitHub Actions run, and posts the results on the pull request.
 // Each step is one request. A step that is an object sends one message as a made up resident.
+//
+// STEPS is a JSON list of steps, or an object { mem: true, steps: [...] }.
+// With mem, the conversation runs against a database in memory on the preview. That database lives as long as the
+// server process. When a step lands on a different process, the whole list is run again from its first step.
 
 const base = process.env.PREVIEW;
 const pr = process.env.PULL_REQUEST;
@@ -26,8 +30,10 @@ async function get(path) {
   }
 }
 
-let steps;
-try { steps = JSON.parse(process.env.STEPS || 'null') || ['health?db=0&models=claude-sonnet-5-5,claude-haiku-4-5']; } catch { steps = ['health?db=0']; }
+let input;
+try { input = JSON.parse(process.env.STEPS || 'null'); } catch { input = null; }
+const mem = !!(input && !Array.isArray(input) && input.mem);
+const steps = (Array.isArray(input) ? input : input?.steps) || ['health?db=0'];
 
 // After a push, wait until the preview serves this commit.
 const sha = process.env.GITHUB_SHA;
@@ -35,33 +41,49 @@ let live = null;
 for (let i = 0; i < 48; i++) {
   const h = await get('health?db=0');
   live = h.body?.commit ?? null;
-  if (h.status === 200 && (live === sha || process.env.GITHUB_EVENT_NAME === 'workflow_dispatch' || i >= 47)) break;
+  if (h.status === 200 && (live === sha || process.env.GITHUB_EVENT_NAME === 'workflow_dispatch')) break;
   await new Promise(r => setTimeout(r, 10_000));
 }
 
-const out = [];
-for (const step of steps) {
-  let path;
-  if (typeof step === 'string') path = step;
-  else {
-    const q = new URLSearchParams();
-    q.set('who', step.who === 'b' ? 'b' : 'a');
-    if (step.fresh) q.set('fresh', '1');
-    if (step.say) q.set('say', step.say);
-    if (step.rk) q.set('rk', step.rk);
-    path = `selftest?${q.toString()}`;
+function pathOf(step) {
+  if (typeof step === 'string') return step;
+  const q = new URLSearchParams();
+  q.set('who', step.who === 'b' ? 'b' : 'a');
+  if (mem) q.set('mem', '1');
+  if (step.fresh) q.set('fresh', '1');
+  if (step.say) q.set('say', step.say);
+  if (step.rk) q.set('rk', step.rk);
+  if (step.file) q.set('file', '1');
+  return `selftest?${q.toString()}`;
+}
+
+let out = [];
+let restarts = 0;
+for (let attempt = 0; attempt < 4; attempt++) {
+  out = [];
+  let instance = null;
+  let moved = false;
+  for (const step of steps) {
+    const r = await get(pathOf(step));
+    const here = r.body?.mem_instance ?? null;
+    if (mem && here) {
+      if (instance && here !== instance) { moved = true; break; }
+      instance = here;
+    }
+    out.push({ step, status: r.status, ms: r.ms, body: r.body });
+    console.log(JSON.stringify({ step: typeof step === 'string' ? step : step.say || step, status: r.status, ms: r.ms }));
   }
-  const r = await get(path);
-  out.push({ step, ...r });
-  console.log(JSON.stringify({ step, status: r.status, ms: r.ms }));
+  if (!moved) break;
+  restarts += 1;
+  console.log('the server process changed. Running the list again from its first step.');
 }
 
 const body = [
   `<!-- founder-test-run -->`,
-  `**Founder test checks: ${label}**. Commit on the preview: \`${live}\`. Made up resident only.`,
+  `**Founder test checks: ${label}**. Commit on the preview: \`${live}\`. Made up resident only.${mem ? ` Database in memory. Restarts: ${restarts}.` : ''}`,
   '',
   '```json',
-  JSON.stringify(out, null, 1).slice(0, 60000),
+  JSON.stringify(out, null, 1).slice(0, 62000),
   '```'
 ].join('\n');
 

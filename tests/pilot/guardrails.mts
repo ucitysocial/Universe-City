@@ -534,6 +534,15 @@ const shift = (await asResident(A, q => q(`select id from uc_pilot.commitments w
   check('R-18', 'The four kinds of number are removed in their common written forms, and ordinary sentences are left whole', badGone.length === 0 && badKept.length === 0, { badGone, badKept });
 }
 
+// ================================================================= 22. the schema the app carries is the schema file
+{
+  const { SCHEMA_SQL } = await import('../../lib/pilot/schema-sql');
+  const { readFileSync } = await import('node:fs');
+  const { fileURLToPath } = await import('node:url');
+  const file = readFileSync(fileURLToPath(new URL('../../supabase/pilot/0001_founder_test.sql', import.meta.url)), 'utf8');
+  check('S-01', 'The schema text in the app equals supabase/pilot/0001_founder_test.sql. Run npm run pilot:schema after a change', SCHEMA_SQL === file);
+}
+
 const failed = results.filter(r => !r.pass);
 console.log(`\n${results.length - failed.length} of ${results.length} passed`);
 if (failed.length) process.exit(1);
