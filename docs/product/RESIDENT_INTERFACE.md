@@ -259,17 +259,18 @@ See open questions.
 
 **LOCKED direction**
 
-The confirmed entry order is Application followed by Enrollment. Residency starts at Enrollment. The details within Enrollment remain under review.
+Application comes first. Enrollment is the initial Agency Assessment. Residency starts at Enrollment. Orientation follows Enrollment. Initial Time work follows Orientation.
 
 ```
 Application
 → Email confirmation
-→ Enrollment (internal order under review)
-→ First seven day schedule and commitments (placement under review)
+→ Enrollment: Agency Assessment, initial information, Start and Target
+→ Orientation in the Resident Portal
+→ Time: initial seven day schedule and commitments
 → Resident Portal home
 ```
 
-Agency Assessment is Department I. The relationship between its initial work and Enrollment must be decided before the entry sequence is implemented. Orientation belongs in the Resident Portal; its position within Enrollment remains open. Payment timing also remains open. Do not interpret legacy membership activation as a required entry step.
+Agency Assessment is Department I and provides the work of Enrollment. Enrollment establishes general information, Start and Target. The assessment gathers only the information the agent needs to begin representing the resident; individual folder intake continues during residency. The resident does not build the Time system during Enrollment. Orientation follows Enrollment, and initial Time work follows Orientation. Payment timing remains open.
 
 Orientation should highlight the actual resident shell rather than use a disconnected slideshow.
 
@@ -281,4 +282,4 @@ Required concepts:
 - Time is explicitly identified as the first focus
 - a new resident sees entry work before the normal Resident Portal home
 
-The original decision to delay the normal Resident Portal home until initial Time information exists remains a working direction. Whether the resident completes a seven day schedule, a daily Plan, or both during Enrollment requires a product decision.
+The original decision to delay the normal Resident Portal home until initial Time information exists remains a working direction. Whether the resident establishes a seven day schedule, a daily Plan, or both immediately after Orientation still requires detailed design.
