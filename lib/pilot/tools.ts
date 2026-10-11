@@ -200,7 +200,7 @@ async function commitmentsOn(env: Env, date: string): Promise<CommitmentRow[]> {
 }
 
 /** Puts the day's recurring items on the day. A commitment the resident took off is left off. */
-async function placeSchedule(env: Env, date: string): Promise<number> {
+export async function placeSchedule(env: Pick<Env, 'q'>, date: string): Promise<number> {
   const made = await env.q<{ id: string }>(
     `insert into uc_pilot.commitments (label, on_date, start_min, end_min, schedule_item_id, basis, said, source_message_id)
      select s.label, $1::date, s.start_min, s.end_min, s.id, 'schedule', s.said, s.source_message_id
@@ -599,7 +599,7 @@ export const TOOLS: Tool[] = [
   {
     name: 'add_commitment',
     group: 'file',
-    description: 'Files one commitment on one day because the resident stated it or asked for it: an activity the resident intends to do or has to do that day. Use it also for an activity that already happened today or earlier and was not on file, before reporting its outcome. Leave out a time the resident did not give. Never choose a time for the resident.',
+    description: 'Files one commitment on one day because the resident stated it or asked for it: an activity the resident intends to do or has to do that day. Use it also for an activity that already happened today or earlier and was not on file, before reporting its outcome. When the resident gives different hours for an entry the day already holds, a work shift from the weekly schedule is the usual case, use change_commitment on that entry and add no second one. Leave out a time the resident did not give. Never choose a time for the resident.',
     input_schema: obj({
       date: DATE('The day'),
       label: { type: 'string', description: 'What it is, in a few plain words.' },
@@ -614,6 +614,7 @@ export const TOOLS: Tool[] = [
       const { start, end } = span(clockArg(a, 'start'), clockArg(a, 'end'));
       const completion = text(a, 'done_means', 300, false);
       const rough = !!said && isRough(said) && (start !== null || end !== null);
+      await placeSchedule(env, date);
       const same = await env.q<CommitmentRow>(
         `select ${COMMITMENT_COLS} from uc_pilot.commitments where on_date = $1::date and lower(label) = lower($2) and withdrawn_at is null limit 1`, [date, label]);
       if (same.length) {
@@ -629,12 +630,14 @@ export const TOOLS: Tool[] = [
          values ($1, $2::date, $3, $4, $5, $6, $7, $8) returning id`, [label, date, start, end, completion, rough, said, env.basis]))[0];
       await refreshPlanCard(env, date);
       const plan = (await env.q<any>(`select state from uc_pilot.plans where plan_date = $1::date`, [date]))[0];
+      const others = (await commitmentsOn(env, date)).filter(c => c.id !== row.id && !c.withdrawn_at);
       return {
         outcome: 'filed',
         detail: `Filed for ${sayDate(date)}: ${label}, ${saySpan(start, end)}${rough ? ', as a rough time' : ''}.${inWords(said)}`,
         target: 'commitments', targetId: row.id,
         data: {
           ref: shortId(row.id),
+          also_on_that_day: others.map(c => ({ ref: shortId(c.id), entry: sayCommitment(c), from: c.schedule_item_id ? 'the weekly schedule' : 'what the resident said' })),
           not_established: [start === null && end === null ? 'the time' : null, completion ? null : 'what counts as done'].filter(Boolean),
           plan_for_that_day: plan ? plan.state : 'no Plan yet'
         }

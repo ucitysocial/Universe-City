@@ -16,8 +16,8 @@ import { fileForModel, loadAccess, loadFile, type Access } from './file';
 import { cleanReply, clip, removeNumbers } from './guard';
 import { getModel, modelAvailable, type Block, type Turn } from './model';
 import { PROMPT_VERSION, SYSTEM } from './prompt';
-import { localNow, sayWhen } from './time';
-import { Refusal, TOOL_BY_NAME, TOOLS, type Env, type Result } from './tools';
+import { addDays, localNow, sayWhen } from './time';
+import { placeSchedule, Refusal, TOOL_BY_NAME, TOOLS, type Env, type Result } from './tools';
 
 export type Effect = { tool: string; outcome: string; detail: string; target: string | null; target_id: string | null };
 
@@ -97,7 +97,7 @@ function historyFor(rows: MessageView[], zone: string): Turn[] {
   const out: Turn[] = [];
   for (const m of rows) {
     const role: Turn['role'] = m.speaker === 'software' ? 'assistant' : 'user';
-    const body = clip(m.body, 1800);
+    const body = clip(m.body, LIMITS.messageClip);
     const textOf = m.speaker === 'software' ? body
       : m.speaker === 'agent' ? `(a message from the agent, a person, sent ${sayWhen(m.created_at, zone)})\n${body}`
         : `(sent ${sayWhen(m.created_at, zone)})\n${body}`;
@@ -196,6 +196,10 @@ export async function receive(userId: string, rawText: string, requestKey: strin
 
   try {
     const before = await withResident(run, async q => {
+      // The weekly schedule is placed on the days in view, so each day shows what it holds and a change to one day
+      // changes that day's entry. A commitment the resident took off stays off.
+      const today = localNow(access.timezone).date;
+      for (let i = 0; i <= LIMITS.placeDaysAhead; i++) await placeSchedule({ q }, addDays(today, i));
       const view = await loadFile(q, access.timezone);
       const recent = await q<MessageView>(
         `select * from (select ${MESSAGE_COLS}, seq from uc_pilot.messages where id <> $1 and seq < (select seq from uc_pilot.messages where id = $1)
@@ -213,6 +217,10 @@ export async function receive(userId: string, rawText: string, requestKey: strin
     const lastTurn = messages[messages.length - 1];
     if (lastTurn && lastTurn.role === 'user') lastTurn.content = `${lastTurn.content as string}\n\n${mine}`;
     else messages.push({ role: 'user', content: mine });
+    // Everything up to the resident's message is the same for each call of this reply. It is marked so the later
+    // calls read it at the lower price.
+    const lastMessage = messages[messages.length - 1];
+    lastMessage.content = [{ type: 'text', text: lastMessage.content as string, cache_control: { type: 'ephemeral' } } as any];
 
     // What the model already asked for in this reply, and what the server answered. Empty on a first attempt.
     const transcript: Turn[] = start.transcript;
@@ -240,7 +248,7 @@ export async function receive(userId: string, rawText: string, requestKey: strin
     while (steps < LIMITS.steps) {
       const late = Date.now() - t0 > LIMITS.softDeadlineMs;
       const allow = !late && steps < LIMITS.steps - 1 && actions < LIMITS.actionsPerReply;
-      const res = await getModel().create({ system, tools, messages: [...messages, ...transcript], maxTokens: 900, allowActions: allow });
+      const res = await getModel().create({ system, tools, messages: [...messages, ...transcript], maxTokens: LIMITS.replyTokens, allowActions: allow });
       steps += 1;
       modelUsed = res.model || modelUsed;
       // What the call cost is written as soon as it is known, so a reply that is cut off still counts toward the day's limit.
@@ -258,6 +266,19 @@ export async function receive(userId: string, rawText: string, requestKey: strin
       await answer(calls);
     }
 
+    // The model can stop with no words: it ran out of room, or it asked for an action after the last allowed one.
+    // It is asked once more for words alone.
+    if (!cleanReply(finalText)) {
+      const res = await getModel().create({
+        system, tools, maxTokens: LIMITS.replyTokens, allowActions: false,
+        messages: [...messages, ...transcript, { role: 'user', content: 'Write your reply to the resident now, in plain sentences, from the results above. Take no further action.' }]
+      });
+      await withResident(run, q => q(
+        `update uc_pilot.turns set steps = steps + 1, input_tokens = input_tokens + $2, output_tokens = output_tokens + $3,
+                cache_read_tokens = cache_read_tokens + $4, cache_write_tokens = cache_write_tokens + $5, cost_micro = cost_micro + $6 where id = $1`,
+        [turnId, res.usage.input, res.usage.output, res.usage.cacheRead, res.usage.cacheWrite, costMicro(res.model || modelUsed, res.usage)]));
+      finalText = res.content.filter((b): b is Extract<Block, { type: 'text' }> => b.type === 'text').map(b => b.text).join('\n').trim();
+    }
     const body = cleanReply(finalText);
     if (!body) {
       return finish('No reply was written. Your message is kept. The list under this note shows each action that was carried out before the reply stopped.', 'failed', 'the model returned no text');

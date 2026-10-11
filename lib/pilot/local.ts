@@ -33,12 +33,13 @@ const standIn: Model = {
   async create(req) {
     const last = req.messages[req.messages.length - 1];
     const usage = { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 };
-    if (Array.isArray(last.content)) {
+    if (Array.isArray(last.content) && last.content.some(b => b.type === 'tool_result')) {
       const first = last.content.find(b => b.type === 'tool_result') as any;
       const ok = first && !first.is_error;
       return { content: [{ type: 'text', text: ok ? 'That is on file now. The list under this reply shows the entry.' : 'That was not filed. The list under this reply shows the reason.' }], stop: 'end_turn', usage, model: 'stand in' };
     }
-    const said = String(last.content).split('\n').slice(-1)[0];
+    const whole = Array.isArray(last.content) ? last.content.map(b => (b.type === 'text' ? b.text : '')).join('\n') : String(last.content);
+    const said = whole.split('\n').slice(-1)[0];
     const m = /tomorrow i (work|have) (.+)/i.exec(said);
     if (m && req.allowActions) {
       const system = req.system[1]?.text || '';

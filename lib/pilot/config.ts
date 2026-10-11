@@ -45,7 +45,10 @@ export const LIMITS = {
   messageChars: 4000,       // one resident message
   steps: 6,                 // model calls in one reply
   actionsPerReply: 12,      // actions in one reply
-  recentMessages: 30,       // messages sent to the model as the conversation in view
+  recentMessages: 20,       // messages sent to the model as the conversation in view. Older ones are found by search
+  messageClip: 1200,        // characters of one earlier message sent to the model
+  placeDaysAhead: 7,        // the weekly schedule is placed on today and this many days ahead
+  replyTokens: 1400,        // the most the model writes in one call
   softDeadlineMs: 38_000,   // after this, the reply is finished with no further action
   runningStaleMs: 75_000    // a reply still marked running after this is treated as interrupted
 };
