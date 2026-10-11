@@ -282,3 +282,19 @@ Current model treats these as foundations, but exact sequencing and overlap need
 ### OQ-024 — When is a system "configured/current"?
 
 Need an operational definition that is better than "resident completed setup."
+
+---
+
+## Application and Enrollment
+
+### OQ-025 — What takes place during Enrollment?
+
+Application precedes Enrollment. Residency begins at Enrollment. Resolve the order and roles of Agency Assessment, Orientation, the first seven day schedule, and initial commitments. Agency Assessment is Department I; the phrase does not automatically name the whole Enrollment process.
+
+### OQ-026 — When does payment take place?
+
+Payment at Application or Enrollment remains unresolved under `LANGUAGE_STANDARD.md` clause 12.3. Do not require payment at a specific point in resident facing instructions until this is decided.
+
+### OQ-027 — What is the first Time requirement?
+
+Resolve whether the resident establishes a seven day schedule, a daily Plan, or both during Enrollment, and when the normal Resident Portal home becomes available.
