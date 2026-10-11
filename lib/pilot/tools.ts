@@ -371,7 +371,12 @@ export const TOOLS: Tool[] = [
         detail: `Read ${sayDate(date)}.`,
         data: {
           day: sayDate(date),
-          plan: plan ? { state: plan.state, confirmed_list: plan.confirmed_items ?? undefined, realism: plan.realism ?? 'not asked' } : 'No Plan is on file for this day.',
+          // The list kept at confirmation stays in the File and in the export. The model is shown the day as it stands,
+          // so a commitment changed after confirmation is said once, as it is now.
+          plan: plan
+            ? { state: plan.state, confirmed_at: plan.confirmed_at ?? undefined, realism: plan.realism ?? 'not asked',
+                note: plan.state === 'confirmed' ? 'The commitments listed here are what the day holds now. A commitment changed after the Plan was confirmed is a change on file, and the Plan stays confirmed.' : undefined }
+            : 'No Plan is on file for this day.',
           commitments: rows.map(c => ({ ref: shortId(c.id), entry: sayCommitment(c) })),
           weekly_schedule_for_this_weekday: items.map((s: any) => ({ ref: shortId(s.id), entry: `${s.label}, ${saySpan(s.start_min, s.end_min)}` }))
         }

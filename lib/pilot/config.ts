@@ -37,8 +37,8 @@ export function costMicro(model: string, u: Usage): number {
 
 /** The most the test spends on the language model in one day for one resident. */
 export function dailyCapMicro(): number {
-  const usd = parseFloat(process.env.PILOT_DAILY_CAP_USD || '1.00');
-  return Math.round((Number.isFinite(usd) && usd > 0 ? usd : 1) * 1_000_000);
+  const usd = parseFloat(process.env.PILOT_DAILY_CAP_USD || '3.00');
+  return Math.round((Number.isFinite(usd) && usd > 0 ? usd : 3) * 1_000_000);
 }
 
 export const LIMITS = {

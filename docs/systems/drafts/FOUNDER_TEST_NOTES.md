@@ -26,7 +26,7 @@ Written October 11, 2026. Branch `pilot/founder-test`. Pull request 19. The pull
 
 2.6 The preview reads four Netlify variables, each set for deploy previews alone and each marked secret: `PILOT_DATABASE_URL`, `PILOT_DATABASE_CA`, `PILOT_SELFTEST_KEY`, and `PILOT_SELFTEST_USERS`.
 
-2.7 One resident's replies stop for the day when their model cost reaches 1 dollar. `PILOT_DAILY_CAP_USD` changes that amount.
+2.7 One resident's replies stop for the day when their model cost reaches 3 dollars. `PILOT_DAILY_CAP_USD` changes that amount.
 
 ## 3. Choices made for this test
 
@@ -69,7 +69,7 @@ Each row is a choice for the test. None is a ruling.
 | Each screen and each route, asked with no login | Each screen sends the visitor to Log in. Each route answers 401 or 404 |
 | A write that names a different site as its origin | Refused with 403 |
 
-4.5 The cost of those 9 hosted messages was 14 cents. The first message of a conversation costs 3 cents and each later message costs 1 to 2 cents.
+4.5 The cost of those 9 hosted messages was 14 cents. A message sent within five minutes of the one before it costs 1 to 2 cents. The first message after a longer pause costs 3 to 6 cents.
 
 ## 5. What it does not do
 
