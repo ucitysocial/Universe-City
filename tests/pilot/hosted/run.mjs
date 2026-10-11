@@ -48,6 +48,22 @@ async function open(step) {
   }
 }
 
+// A step { link: '<address to return to>' } asks the login service where it sends a visitor whose emailed link
+// is no longer good. It uses a made up token, so it confirms no account, sends no email, and changes no row.
+const LOGIN_SERVICE = 'https://vcenqjsinidahrrvbklw.supabase.co/auth/v1';
+async function link(step) {
+  const t0 = Date.now();
+  try {
+    const q = new URLSearchParams({ token: 'pkce_0000000000000000000000000000000000000000000000000000000a', type: step.type || 'signup' });
+    if (step.link && step.link !== 'none') q.set('redirect_to', step.link);
+    const res = await fetch(`${LOGIN_SERVICE}/verify?${q.toString()}`, { redirect: 'manual' });
+    const text = await res.text();
+    return { status: res.status, ms: Date.now() - t0, body: { goes_to: res.headers.get('location'), body: text.slice(0, 300) } };
+  } catch (e) {
+    return { status: 0, ms: Date.now() - t0, body: String(e?.message || e) };
+  }
+}
+
 let input;
 try { input = JSON.parse(process.env.STEPS || 'null'); } catch { input = null; }
 const mem = !!(input && !Array.isArray(input) && input.mem);
@@ -81,7 +97,7 @@ for (let attempt = 0; attempt < 4; attempt++) {
   let instance = null;
   let moved = false;
   for (const step of steps) {
-    const r = step && typeof step === 'object' && step.open ? await open(step) : await get(pathOf(step));
+    const r = step && typeof step === 'object' && step.link ? await link(step) : step && typeof step === 'object' && step.open ? await open(step) : await get(pathOf(step));
     const here = r.body?.mem_instance ?? null;
     if (mem && here) {
       if (instance && here !== instance) { moved = true; break; }
