@@ -297,12 +297,16 @@ The agent must establish enough initial information to represent the resident, i
 
 Any interpretation of a resident's words is proposed for confirmation before it is placed on file. Software never presents itself as a human agent. Unanswered subjects remain open for future work.
 
-### Natural resident conversation, private assessment work
+### Purposeful conversation, private assessment work
 
-**WORKING direction, October 10, 2026. Supersedes the prior visible extraction demonstration.**
+**WORKING direction, October 10, 2026. Supersedes earlier confirmation and conversational examples.**
 
-Enrollment should feel like texting a person. The resident begins with one open question and receives a natural response that attends to what they actually said. The agent asks one relevant follow up at a time. Do not display extracted facts, folder classification, proposed record statements, or assessment mechanics as a routine part of conversation.
+Enrollment opens with one broad question: "So, tell me what's going on in your life right now. What's been on your mind lately?" The response determines which subject the assessment addresses first. The resident experiences brief, natural follow ups, with only one question at a time.
 
-Behind the resident conversation, software may prepare folder routing, proposed record updates, unresolved questions, and Start/Target assessment work for the human agent. Those internal details belong in the agent console. No interpreted information enters the File without required resident confirmation. Confirmation occurs naturally and selectively within conversation, using brief language or options when appropriate. Do not repeatedly interrupt the conversation with verification panels.
+Every follow up must have an internal purpose before it is asked: the specific missing fact, Start or Target selection, relevant obligation or constraint, priority, or permission it seeks to establish. Software routes the question to that purpose and recognizes when the needed information has been supplied. It does not keep asking about a subject simply to prolong conversation. Once sufficient information is established for Enrollment, remaining detail moves to the relevant folder intake during residency.
 
-Software must not impersonate a human agent. If software is replying before a human agent participates, identify its role plainly and design a distinct handoff. The exact live staffing and handoff behavior remains to be determined.
+Treat explicit resident statements as statements. Do not routinely paraphrase and ask whether the resident meant what they said. Ask for clarification when an answer is genuinely ambiguous or when it is needed to make a consequential record change. Preserve original statements. Interpreted or derived record entries still follow the record approval and provenance requirements.
+
+The agent console can track coverage, missing information, confidence of extraction, candidate questions, and unresolved follow ups. The Resident Portal does not display internal classification, a running checklist of extracted facts, or repeated confirmation cards. Structured response choices and scales are used when they produce information required for the assessment. Conversation is bounded by enrollment coverage and purposeful follow up, not by an open ended conversational objective.
+
+Software never pretends to be a human agent. Define plainly how automated replies are identified and how a human agent receives the case before implementation.
