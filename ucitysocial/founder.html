@@ -72,6 +72,10 @@ a{color:inherit}
 .viewport{position:absolute;top:60px;bottom:56px;left:var(--outer);right:var(--outer);overflow:hidden}
 .flow{position:relative;height:100%;column-count:2;column-gap:var(--gap);column-fill:auto;font:400 19px/1.56 var(--reading);color:#1c1113;transition:opacity .15s ease}
 .flow.turning{opacity:0}
+/* If a browser fails to make pages, the reader scrolls the text. */
+.book.scrolls .viewport{overflow-y:auto;-webkit-overflow-scrolling:touch}
+.book.scrolls .flow{height:auto}
+.book.scrolls .zone{display:none}
 .zone{position:absolute;top:0;bottom:0;width:20%;z-index:4;background:none;border:0;padding:0;cursor:pointer}
 .zone.l{left:0}.zone.r{right:0}
 .zone:focus-visible{outline:2px solid var(--burgundy);outline-offset:-4px}
@@ -139,7 +143,9 @@ a{color:inherit}
   .spine,.runhead.l,.folio.l{display:none}
   .runhead.r{left:var(--outer);right:auto;max-width:calc(100% - 2 * var(--outer))}
   .viewport{top:52px;bottom:48px}
-  .flow{column-count:1;font-size:17.5px;line-height:1.55}
+  /* Safari does not make pages from column-count:1. A column width does, on every browser.
+     The width is wider than the page, so the result is still one column per screen. */
+  .flow{column-count:auto;column-width:100vw;font-size:17.5px;line-height:1.55}
   .flow h2{font-size:28px}
   .tp h2{font-size:40px}
   .zone{width:16%}
@@ -435,6 +441,7 @@ a{color:inherit}
     const gap=parseFloat(getComputedStyle(flow).columnGap)||0;
     step=(viewport.getBoundingClientRect().width+gap)/per;
     total=Math.max(pageOf(endMark)+1,Math.round((flow.scrollWidth+gap)/step)||1);
+    book.classList.toggle('scrolls',total<=per&&flow.scrollHeight>viewport.clientHeight+8);
     marks=[...flow.querySelectorAll('[data-title]')].map(s=>({title:s.dataset.run!==undefined?s.dataset.run:s.dataset.title,page:pageOf(s)}));
     toc.querySelectorAll('a').forEach(a=>{a.lastChild.textContent=String(pageOf($(a.dataset.target))+1)});
   }
