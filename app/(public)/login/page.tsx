@@ -8,7 +8,7 @@ import { supabaseBrowser } from '@/lib/supabase/client';
 const LINK_NOTE: Record<string, string> = {
   expired: 'That link has expired. Enter your email and press Send a new confirmation email. For a new password, use Reset my password.',
   failed: 'That link did not work. Enter your email and press Send a new confirmation email. For a new password, use Reset my password.',
-  confirmed: 'Your email is confirmed. Log in with your email and password. For a new password, press Reset my password and open the new link in this browser.'
+  opened: 'The link opened, and this browser started no login from it. Log in with your email and password. For a new password, press Reset my password and open the new link in this browser.'
 };
 
 export default function Login() {
@@ -82,7 +82,7 @@ export default function Login() {
           </p>
         )}
         {!err && !sentTo && !unconfirmed && LINK_NOTE[arrived] && (
-          <p className="err" style={{ marginTop: 18, ...(arrived === 'confirmed' ? { borderLeftColor: 'var(--IV)' } : {}) }}>{LINK_NOTE[arrived]}</p>
+          <p className="err" style={{ marginTop: 18, ...(arrived === 'opened' ? { borderLeftColor: 'var(--IV)' } : {}) }}>{LINK_NOTE[arrived]}</p>
         )}
         <form onSubmit={submit} style={{ marginTop: 22 }}>
           <div className="field">
