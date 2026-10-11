@@ -297,10 +297,12 @@ The agent must establish enough initial information to represent the resident, i
 
 Any interpretation of a resident's words is proposed for confirmation before it is placed on file. Software never presents itself as a human agent. Unanswered subjects remain open for future work.
 
-### Confirm understanding before the next question
+### Natural resident conversation, private assessment work
 
-**WORKING direction, October 10, 2026**
+**WORKING direction, October 10, 2026. Supersedes the prior visible extraction demonstration.**
 
-After a resident's opening response, show a concise account of the information identified, linked to the appropriate folders. Identify each proposed statement as awaiting confirmation. Offer explicit choices to confirm or correct the statements before writing interpreted information to the File. Preserve the resident's original words separately from any proposed interpretation. Do not derive Start, Target, or Position from a general narrative when the required assessment selections have not been made.
+Enrollment should feel like texting a person. The resident begins with one open question and receives a natural response that attends to what they actually said. The agent asks one relevant follow up at a time. Do not display extracted facts, folder classification, proposed record statements, or assessment mechanics as a routine part of conversation.
 
-The assessment must establish four distinct outputs: who the resident says they are, their reported present condition, their intended condition, and the questions and work needed to determine their position. The exact fields and minimum coverage for Enrollment remain under review. Interaction should be useful even when a resident provides only a short opening response.
+Behind the resident conversation, software may prepare folder routing, proposed record updates, unresolved questions, and Start/Target assessment work for the human agent. Those internal details belong in the agent console. No interpreted information enters the File without required resident confirmation. Confirmation occurs naturally and selectively within conversation, using brief language or options when appropriate. Do not repeatedly interrupt the conversation with verification panels.
+
+Software must not impersonate a human agent. If software is replying before a human agent participates, identify its role plainly and design a distinct handoff. The exact live staffing and handoff behavior remains to be determined.
