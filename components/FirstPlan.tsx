@@ -236,7 +236,7 @@ export default function FirstPlan({
         <div className="plan-section-head">
           <span className="plan-step">02</span>
           <div>
-            <h2>What do you want tomorrow to be different from usual?</h2>
+            <h2>What do you want to do differently tomorrow?</h2>
             <p>One small move is enough. “Nothing” is a valid answer.</p>
           </div>
         </div>
