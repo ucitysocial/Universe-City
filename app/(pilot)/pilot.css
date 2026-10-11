@@ -33,6 +33,7 @@
 .pt-chip.unknown{background:var(--paper2);color:var(--ink2);border-color:var(--rule)}
 .pt-btn{background:var(--ink);color:var(--paper);border:2px solid var(--ink);padding:8px 13px;font-size:14px;font-weight:600;cursor:pointer}
 .pt-btn:hover{background:var(--ink2)}
+a.pt-btn{text-decoration:none;display:inline-block}
 .pt-btn.ghost{background:transparent;color:var(--ink)}
 .pt-btn:disabled{opacity:.5;cursor:default}
 .pt-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}

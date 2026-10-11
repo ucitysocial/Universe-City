@@ -17,7 +17,11 @@ export async function POST(req: Request) {
   try {
     const rows = await withResident({ userId: a.userId, actor: 'resident' }, q => q<any>(`select uc_pilot.clear_my_test_data() as removed`));
     return Response.json({ ok: true, removed: rows[0]?.removed ?? {} });
-  } catch {
+  } catch (e: any) {
+    // 42883: the database holds no clearing function. It is installed only after the founder confirms it.
+    if (e?.code === '42883') {
+      return Response.json({ error: 'Nothing was cleared. The clearing function is not installed in this test database.' }, { status: 501 });
+    }
     return Response.json({ error: 'Nothing was cleared, because the database did not answer.' }, { status: 503 });
   }
 }

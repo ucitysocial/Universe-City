@@ -11,7 +11,7 @@ type Msg = {
   unsent?: boolean;
 };
 type Waiting = { id: string; kind: string; summary: string };
-type Thread = { messages: Msg[]; more: boolean; waiting: Waiting[]; noticeSeen: boolean };
+type Thread = { messages: Msg[]; more: boolean; waiting: Waiting[]; noticeSeen: boolean; ownAccount?: boolean };
 
 const CHIP: Record<string, { word: string; tone: string }> = {
   filed: { word: 'Filed', tone: 'filed' },
@@ -146,13 +146,14 @@ export default function PilotConversation({ initial }: { initial: Thread }) {
               Your login reads it. Each person who can log in to the database account can read it. No second resident login can read it.
             </p>
             <p>
-              To write a reply, your messages and your File entries are sent to a language model from Anthropic, through Netlify.
-              Netlify states that it stores no message and no reply. The terms Anthropic applies to that service were left unchecked for this test.
+              {thread.ownAccount
+                ? 'To write a reply, your messages and your File entries are sent to a language model from Anthropic, under your own Anthropic account. The terms of that account apply to them.'
+                : 'To write a reply, your messages and your File entries are sent to a language model from Anthropic, through Netlify. Netlify states that it stores no message and no reply. The terms Anthropic applies to that service were left unchecked for this test.'}
             </p>
             <p>
               A payment card number, a government identification number, a bank account number, and a password are taken out of a message before it is kept, in the common ways each is written. A number written in an unusual way can get through, so leave those four out of your messages.
             </p>
-            <p>It stays until you clear it. The Activity page holds the control that clears your test data.</p>
+            <p>It stays until you clear it. The Activity page holds the control that clears your test data, and two buttons that download all of it as a file.</p>
             <p>You talk with the guide. The guide is Universe City software. Your agent is a person. No person reads this conversation unless you ask for one.</p>
             <div className="pt-btns" style={{ marginTop: 14 }}>
               <button type="button" className="pt-btn" onClick={start}>Start the conversation</button>

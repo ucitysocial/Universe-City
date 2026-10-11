@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { deployContext, modelName, pilotEnabled } from '@/lib/pilot/config';
 import { getDriver, withResident } from '@/lib/pilot/db';
-import { getModel } from '@/lib/pilot/model';
+import { getModel, modelRoute } from '@/lib/pilot/model';
 import { PROMPT_VERSION } from '@/lib/pilot/prompt';
 import { operatorOk } from '@/lib/pilot/operator';
 
@@ -23,6 +23,7 @@ export async function GET(req: Request) {
     model: modelName(),
     commit: process.env.PILOT_COMMIT || null,
     context: deployContext() || null,
+    model_route: modelRoute(),
     model_key_present: !!process.env.ANTHROPIC_API_KEY,
     model_address_present: !!process.env.ANTHROPIC_BASE_URL,
     database_address_present: !!process.env.PILOT_DATABASE_URL

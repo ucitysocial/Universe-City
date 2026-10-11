@@ -1,6 +1,7 @@
 import { admit } from '@/lib/pilot/auth';
 import { withResident } from '@/lib/pilot/db';
 import { loadFile } from '@/lib/pilot/file';
+import { modelRoute } from '@/lib/pilot/model';
 import { thread } from '@/lib/pilot/turn';
 
 export const dynamic = 'force-dynamic';
@@ -16,7 +17,8 @@ export async function GET(req: Request) {
     return Response.json({
       messages: t.messages, more: t.more,
       waiting: view.waitingResident.map(p => ({ id: p.id, kind: p.kind, summary: p.summary })),
-      noticeSeen: !!a.access.notice_seen_at
+      noticeSeen: !!a.access.notice_seen_at,
+      ownAccount: modelRoute() === 'own account'
     }, { headers: { 'cache-control': 'no-store' } });
   } catch {
     return Response.json({ error: 'The conversation was not loaded, because the database did not answer.' }, { status: 503 });

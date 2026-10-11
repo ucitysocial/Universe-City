@@ -53,6 +53,19 @@ export default async function ActivityPage() {
         );
       })}
 
+      <h2>Take the test out to study it</h2>
+      <div className="pt-card">
+        <p className="pt-said">
+          Each file holds the whole conversation in order, what each reply filed or left off, and each entry with its earlier versions.
+          The data file also holds what the language model asked for at each step of each reply.
+        </p>
+        <div className="pt-btns">
+          <a className="pt-btn" href="/api/pilot/export?format=text">Download the conversation as a text file</a>
+          <a className="pt-btn ghost" href="/api/pilot/export">Download every entry as a data file</a>
+        </div>
+        <p className="pt-meta">A file you download leaves the database. Keep it where you keep private papers.</p>
+      </div>
+
       <h2>Clear the test</h2>
       <PilotClear />
     </div>

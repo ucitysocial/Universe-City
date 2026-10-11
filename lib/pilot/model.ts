@@ -33,8 +33,13 @@ const anthropic: Model = {
   async create(req) {
     if (!state.client) {
       const { default: Anthropic } = await import('@anthropic-ai/sdk');
-      // The key and the address come from the server's environment. Neither reaches the browser.
-      state.client = new Anthropic({ maxRetries: 1, timeout: 45_000 });
+      // The key comes from the server's environment. It never reaches the browser.
+      // With PILOT_ANTHROPIC_KEY set, requests go straight to Anthropic under that account.
+      // With it unset, they go through the Netlify gateway, which supplies its own key and address.
+      const own = (process.env.PILOT_ANTHROPIC_KEY || '').trim();
+      state.client = own
+        ? new Anthropic({ apiKey: own, baseURL: 'https://api.anthropic.com', maxRetries: 1, timeout: 45_000 })
+        : new Anthropic({ maxRetries: 1, timeout: 45_000 });
     }
     const tools = req.tools.map((t, i) =>
       i === req.tools.length - 1 ? { ...t, cache_control: { type: 'ephemeral' as const } } : t);
@@ -66,5 +71,11 @@ export function getModel(): Model {
 }
 
 export function modelAvailable(): boolean {
-  return !!state.override || !!process.env.ANTHROPIC_API_KEY;
+  return !!state.override || !!process.env.PILOT_ANTHROPIC_KEY || !!process.env.ANTHROPIC_API_KEY;
+}
+
+/** Where a request to the model goes: the founder's own Anthropic account, or the Netlify gateway. */
+export function modelRoute(): 'own account' | 'netlify gateway' | 'none' {
+  if ((process.env.PILOT_ANTHROPIC_KEY || '').trim()) return 'own account';
+  return process.env.ANTHROPIC_API_KEY ? 'netlify gateway' : 'none';
 }

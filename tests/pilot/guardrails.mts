@@ -534,6 +534,18 @@ const shift = (await asResident(A, q => q(`select id from uc_pilot.commitments w
   check('R-18', 'The four kinds of number are removed in their common written forms, and ordinary sentences are left whole', badGone.length === 0 && badKept.length === 0, { badGone, badKept });
 }
 
+// ================================================================= 21b. the test can be taken out and studied
+{
+  const { exportAll, exportText } = await import('../../lib/pilot/export');
+  const x = await asResident(A, q => exportAll(q, zone));
+  const first = x.exchanges[0];
+  const t = exportText(x);
+  const leak = JSON.stringify(x).includes('I work nights on Tuesday') || JSON.stringify(x).includes('ugh my head hurts');
+  check('X-01', 'The export holds each exchange in order, with what the reply did and what the model asked for', x.exchanges.length > 20 && first.resident.said === 'Tomorrow I work 2 PM to 10 PM.' && first.actions[0]?.action === 'add_commitment' && first.model_steps.length === 2 && !!first.guide, { n: x.exchanges.length, steps: first.model_steps.length });
+  check('X-02', 'The export of one resident holds no word of another resident', !leak);
+  check('X-03', 'The text form reads from top to bottom and holds the File and the changes', t.includes('CONVERSATION') && t.includes('FILED | add_commitment') && t.includes('FILE: DAYS') && t.includes('CHANGES') && t.includes('became'), t.slice(0, 200));
+}
+
 // ================================================================= 22. the schema the app carries is the schema file
 {
   const { SCHEMA_SQL } = await import('../../lib/pilot/schema-sql');
