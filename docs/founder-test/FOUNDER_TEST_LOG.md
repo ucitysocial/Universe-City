@@ -28,6 +28,7 @@ No entry is a defect just because the prototype is unfinished. Do not report uns
 | ID | Surface | Finding / topic | Classification | Status |
 | --- | --- | --- | --- | --- |
 | FT-001 | Founder Test — first screen | Introduction explains test storage, access, model handling, and controls before conversation starts | Observed UI + candidate UX review | Observed; awaiting founder direction |
+| FT-002 | Conversation — empty state | The guide does not initiate the conversation; an empty state directs the founder to write first | Observed UI + onboarding question | Observed; awaiting founder direction |
 
 ---
 
@@ -66,11 +67,47 @@ Select **Start the conversation**; capture the first conversation screen and its
 
 ---
 
+## FT-002 — Conversation screen, first entry
+
+**Date observed:** October 11, 2026  
+**Evidence:** Second screenshot supplied by founder in the ChatGPT conversation. Image not uploaded to the GitHub repository.  
+**Environment:** Same Claude Founder Test Netlify Deploy Preview as FT-001; exact preview URL, branch, and commit remain unrecorded.  
+**Surface / state:** Screen shown after pressing **Start the conversation** on FT-001. No message has been sent yet.  
+**Status:** Observed; awaiting founder direction.
+
+### What is visible (confirmed from screenshot)
+
+- The left sidebar still has **Conversation**, **File**, and **Activity**; **Conversation** is selected.
+- The main area has the title **Conversation** and a short distinction: **"You are talking with the guide. The guide is Universe City software. Your agent is a person."**
+- The transcript area is empty. It reads: **"No message is here yet. Write about any part of your day or your life. The guide answers, and each entry it files is listed under its reply."**
+- At the bottom is an input with placeholder **"Write to the guide"** and a **"Send message"** button that appears disabled in the empty state.
+- The page shows no guide-initiated greeting, introductory question, visible Time intake step, or example conversation on this initial state.
+
+### Findings and questions
+
+**FT-002-A — Blank conversation entry (candidate UX review; no confirmed defect).** The founder is invited to write first, with a broad instruction to write about their day or life. This may leave a new resident uncertain where to begin. Compare this approach with the approved resident experience of a natural, guided conversation that avoids an unnecessary intake questionnaire. Determine whether the guide should open with a useful, human-readable first question rather than wait for an unsolicited first message. **This is a proposed test question, not founder-approved wording or behavior.**
+
+**FT-002-B — Guide response and filing are untested.** The screen promises that entries filed by the guide will appear under its replies. No replies, entries, or File view are visible in this screenshot. Test message handling, response relevance, filing attribution to actual statements, pending proposals versus approved entries, and the presentation of filed items. Do not treat the stated behavior as verified.
+
+**FT-002-C — Composer behaviors are untested.** The input and send button exist, but sending, loading, errors, multiline input, and message persistence are not demonstrated by this screenshot.
+
+**FT-002-D — Software/human distinction (observed wording).** The header explicitly distinguishes software guide from human agent. Compare future system responses against the claim; do not assume a human actually participates in the prototype.
+
+### Founder direction
+
+**Awaiting founder direction.** The founder supplied the first Conversation screenshot as part of an ongoing test. No changes to the layout, opening message, or filing presentation have been specifically requested or approved.
+
+### Next verification
+
+Send one short **fictional test message** with a specific commitment or scheduling fact (no real sensitive data), then capture the resulting guide reply and any entry shown underneath it. Inspect the **File** view for source attribution and approval state, and compare it to what the guide says was filed.
+
+---
+
 ## Findings and implementation tracking
 
 - **Confirmed defects:** None yet established from this screenshot alone.
-- **Potential improvements / review questions:** FT-001-A, FT-001-C.
-- **Unverified functional claims:** FT-001-B.
+- **Potential improvements / review questions:** FT-001-A, FT-001-C, FT-002-A, FT-002-D.
+- **Unverified functional claims:** FT-001-B, FT-002-B, FT-002-C.
 - **Approved fixes:** None yet.
 - **Pending retests:** None yet.
 
