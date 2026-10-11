@@ -396,7 +396,84 @@ A resident may not own a smartphone or may primarily use a computer. Guided Mode
 11. How do we distinguish ordinary auto-reminders from contact that must be attributed to the human agent under existing rules?
 12. When does the agent intervene proactively, and when should it allow quiet execution?
 
-## 17. Open design questions
+
+## 17. Guide Mode / Guided Life, conversational Time building, and resident-visible change history — October 11, 2026
+
+**Status:** founder-directed experience concepts, implementation details still to define. This section extends Section 16 without replacing the authoritative Time assessment, Operations, File, permissions, revision history, or review requirements.
+
+### 17.1 Names and sequence
+
+- **Guide Mode** is the name on the **agent side**.
+- **Guided Life** is the name on the **resident side**.
+- Build the **Time basics and an initial general seven-day schedule first**. Guided Life is a later interface for living and refining Time, not a separate schedule.
+- Do not require a finished full week before a resident can discuss a partially established day or receive help with an existing Plan.
+- Voice and text should reach **the same underlying Time questions, File context, change rules and permissions**. Voice may feel like a live phone conversation and support natural follow-up, but is not a separate assessment or second data store.
+
+### 17.2 Getting to know a real day conversationally
+
+A resident may optionally talk through a typical day in voice or text as part of already-defined Time work. In voice, it may feel like talking on the phone, sometimes while doing ordinary activities, rather than filling out many form fields. More detail can emerge naturally because asking and answering aloud can be easier.
+
+**Illustrative conversation, not a mandatory script:** “What do you usually do when you wake up?” → “I scroll TikTok.” → “Do you have a morning routine, such as brushing your teeth, washing your face, or getting ready?” → “Not really.” → “What's the first important commitment of your day?” → “Work at nine.” → “When do you need to leave?” → “Around eight thirty.” The agent can then ask if the resident **wants** to organize the time before departure, and prepare a routine for confirmation.
+
+Preserve distinctions between observed or self-reported behavior, resident-stated desires, suggested improvements, agreed commitments, and filed changes. Not having a formal routine does **not** imply failure to practice hygiene. Work or school is only an example of a first major commitment, not a universal assumption. If no firm commitment exists, explore what the resident wants from that part of their day. Do not repeat already-answered Time assessment questions.
+
+### 17.3 Habit change through useful alternatives, not scolding
+
+If someone reports waking and scrolling for a long time, do not default to “stop scrolling” or label the person. Discuss the impact *if relevant to their own commitments*, and offer a practical alternative: put wanted hygiene/preparation activities first and **postpone optional scrolling** until after them, if the resident likes that arrangement. Scrolling need not be prohibited or silently removed from the schedule.
+
+During early Time-building conversations, a **short explanation of why consistent routines can be useful** is appropriate when someone lacks or wants to change a routine. Save detailed educational lessons, varied scripts and narrated techniques for Guided Life. Routine proposals require the resident's participation and follow existing permissions. Where residents struggle, investigate making the routine achievable rather than increasing pressure; do not assume a routine must become smaller in every case.
+
+### 17.4 Voice technologies as a possible interface, not separate authority
+
+Investigate the OpenAI audio/realtime documentation (https://developers.openai.com/api/docs/guides/audio) as a **candidate technical foundation**, separating natural, interruptible two-way voice for conversational Time-building from narrated briefings/guidance and optional transcription. Select implementation after technical, privacy, cost and platform review. Audio, written input, and visible schedule interfaces must connect to **one File and one permission model**.
+
+The Agent remains a human; software-generated speech must be clearly attributed as software and not impersonate the human agent. A spoken exchange can support the agent's work but cannot silently establish durable facts or commitments without the approvals required by governing documents.
+
+### 17.5 Who sees the conversation and what it produced
+
+**Explicit founder direction:** On the agent side, **retain the conversation transcript** as working history accessible to the authorized human agent. On the resident side, prioritize **what came out of the conversation**: what was learned or agreed, what was **added, updated, changed, removed**, and what still needs an answer or approval. A resident must not have to read a transcript to understand their File.
+
+The resulting resident-facing **conversation summary must also be filed in the resident-visible File change-history experience**, not merely kept in the agent console or shown once when a call ends. The summary is an intelligible explanation of the results and is not itself proof that every proposed change was applied. Maintain clear distinctions between:
+- **Filed:** already executed/approved changes, with accurate before/after details and relevant linked Time or other Folder entry.
+- **Proposed / awaiting decision:** possible revisions that have **not** taken effect.
+- **Not changed:** substantive matters discussed without a durable File update, if worth carrying into subsequent work.
+- **Open follow up:** a required answer, action or confirmation, recorded under existing Time rules when applicable.
+- **Corrected or reversed:** later changes must remain traceable, not overwrite history or pretend the earlier revision never occurred.
+
+The summary should be concise in resident-facing language, usable from both the immediate conversation ending and later history, and linked to the relevant Folder/Plan entries rather than duplicating canonical truth. Residents should be able to inspect changes, flag a mistake and request or make an authorized correction. Avoid exposing unnecessary internal agent analysis as resident fact.
+
+**Illustrative summary after an authorized morning-routine conversation:**
+
+> **Added:** Morning hygiene, 7:15–7:35 AM, if actually confirmed and filed.
+>
+> **Changed:** Phone time moved after getting ready, if actually confirmed and filed.
+>
+> **Still to decide:** Exact departure time for work, if not yet confirmed.
+
+Never label an idea “added” when it is only suggested. The timestamp, source conversation/session, affected folders/commitments, revision references and approval/authorization state are design needs to resolve against existing file/revision infrastructure.
+
+### 17.6 File history is material for weekly review
+
+**Explicit founder direction:** Residents should be able to **add or refer to what changed during the week in their weekly review**. The resident-facing change log should therefore support retrieving the week's material additions, edits, removals, corrections and relevant unresolved proposals, with their dates and links to the underlying File entries.
+
+Proposed review workflow:
+1. Read filed changes and meaningful conversation summaries during the review period.
+2. Show an intelligible chronological or grouped **“What changed this week?”** recap.
+3. Let the resident select, comment on, or bring specific changes into their weekly review, rather than automatically interpreting all edits as achievements or failures.
+4. Distinguish **the Plan changing** from **the work being completed**; a scheduled activity moving is not proof it happened.
+5. Permit the resident to clarify why something changed and whether the updated arrangement is helping.
+6. File weekly-review conclusions and any subsequently approved corrections under the established File/Time rules, with links to the original events rather than a second, conflicting record.
+
+This should work for text and voice equally. The resident can use history even if they never use Guided Life. Define the resident-visible change-history surface, summary retention, recording/transcript consent, access controls, correction process, and weekly review integration before implementation; do not claim these surfaces are already built.
+
+### 17.7 Architectural principle and outstanding work
+
+**One conversation → grounded proposals/actions → existing File revision history → resident-visible result summary and weekly review retrieval.** Agent access to transcripts is separate from the resident-facing summary/history. Do not build a duplicate “Guided Life File,” a second schedule, or an independent approval path. Reconcile with `TIME.md`, `TIME_OPERATIONS.md`, existing immutable block revisions, and the current product's Session/history design before deciding storage, data retention, or who can see recordings/transcripts.
+
+**Implementation dependencies to investigate:** Time commitments/follow ups/ongoing work and Plan states; change events for entities other than blocks; human attribution versus clearly labeled software actions; sources for before/after summaries; resident history navigation; whether weekly review already has an authoritative design; transcript privacy and retention; voice interruption and fallback to text.
+
+
+## 18. Open design questions
 
 - How should a passing conversation statement be retained, structured, confirmed and made correctable?
 - What actions can software take on standing permission, and which need resident or agent approval?
@@ -409,7 +486,7 @@ A resident may not own a smartphone or may primarily use a computer. Guided Mode
 - What does human-agent oversight cost at different scales?
 - What is the appropriate relationship between substantive engagement, Grade and future programs?
 
-## 18. Application to the Time Curriculum — advisory only
+## 19. Application to the Time Curriculum — advisory only
 
 When designing Time's assessment and lessons:
 - Measure planning, execution, review and follow-through under the resident's established conditions.
@@ -421,9 +498,9 @@ When designing Time's assessment and lessons:
 - Preserve ordinary conversational pacing; Curriculum questions do not authorize an interrogation.
 - These considerations **inform drafting** but do not override current authoritative Time, Curriculum or Language Standard text.
 
-## 19. Editorial handoff
+## 20. Editorial handoff
 
-**Founder directions expressed:** natural conversation, low-friction access, focused Portal experience, pattern recognition central to representation, human agent responsibility, brief text-like messages, acknowledging the resident before a nonurgent observation, meaningful continuity rather than login farming; schedule-first exploration, large expandable time blocks, optional smaller steps, optional non-daunting progress support, and no presumption that all residents have daily routines or paid work; optional narrated Guided Mode for any relevant time block, spoken Plan briefing, activity-aware prompting, time-until-next-commitment reminders, curriculum-based education with evolving scripts, optional opt-in distraction controls, and practical re-planning when the resident falls behind or becomes overwhelmed.
+**Founder directions expressed:** natural conversation, low-friction access, focused Portal experience, pattern recognition central to representation, human agent responsibility, brief text-like messages, acknowledging the resident before a nonurgent observation, meaningful continuity rather than login farming; schedule-first exploration, large expandable time blocks, optional smaller steps, optional non-daunting progress support, and no presumption that all residents have daily routines or paid work; optional narrated Guided Mode for any relevant time block, spoken Plan briefing, activity-aware prompting, time-until-next-commitment reminders, curriculum-based education with evolving scripts, optional opt-in distraction controls, and practical re-planning when the resident falls behind or becomes overwhelmed; agent-side **Guide Mode**, resident-side **Guided Life**, conversational voice or text Time-building, agent transcript access, resident-visible outcomes and durable change summaries available to weekly review.
 
 **Unapproved proposals:** exact expanded-block layout, optional Guided Mode implementation, lesson/script framework, cross-folder audio privacy and timing rules, voice/alarm and phone distraction controls, specific automation/approval mechanics, retention and privacy decisions, alert thresholds, proposed tests and measurement criteria, escalations and new operative rules.
 
