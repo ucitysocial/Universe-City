@@ -1080,6 +1080,16 @@ p.px,p.lead.px{font-family:var(--record);font-weight:400;
 #menu a.menu-login{display:none}
 @media(max-width:372px){#menu a.menu-login{display:block}}
 </style>
+<script>
+/* An emailed link that the login service cannot return to its own page lands here.
+   This sends the visitor on to the page that handles the link. */
+(function(){
+  var q=new URLSearchParams(location.search),h=new URLSearchParams(location.hash.slice(1));
+  var code=q.get('code'),err=q.get('error_code')||h.get('error_code');
+  if(code){location.replace('/auth/callback?code='+encodeURIComponent(code));}
+  else if(err){location.replace('/login?link='+(err==='otp_expired'?'expired':'failed'));}
+})();
+</script>
 </head>
 <body>
 <nav><div class="w">
