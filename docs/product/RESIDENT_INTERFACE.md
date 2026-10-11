@@ -283,3 +283,16 @@ Required concepts:
 - a new resident sees entry work before the normal Resident Portal home
 
 The original decision to delay the normal Resident Portal home until initial Time information exists remains a working direction. Whether the resident establishes a seven day schedule, a daily Plan, or both immediately after Orientation still requires detailed design.
+
+
+## Agency Assessment conversation at Enrollment
+
+**WORKING direction, October 10, 2026**
+
+Enrollment begins with one open question about the resident's life. The resident chooses which part of their circumstances to discuss first. The assessment covers the resident's circumstances across all four departments and does not assume housing or household circumstances are the main subject.
+
+The initial response guides subsequent questions. The interface can present short replies, confirmation buttons, multiple choice options, and scales when the specific question warrants a structured answer. The resident is not presented with a long form at entry.
+
+The agent must establish enough initial information to represent the resident, including their stated circumstances, responsibilities, priorities, Start, and Target. The exact opening wording, required fields, question order, and thresholds for finishing Enrollment are not yet locked.
+
+Any interpretation of a resident's words is proposed for confirmation before it is placed on file. Software never presents itself as a human agent. Unanswered subjects remain open for future work.
