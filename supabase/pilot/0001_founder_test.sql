@@ -124,6 +124,7 @@ create table if not exists uc_pilot.turns (
   cache_read_tokens  int not null default 0,
   cache_write_tokens int not null default 0,
   cost_micro         bigint not null default 0,       -- millionths of a United States dollar
+  transcript         jsonb not null default '[]'::jsonb,  -- what the model asked for and what the server answered, so an interrupted reply continues where it stopped
   reply_id           uuid references uc_pilot.messages(id)
 );
 create index if not exists turns_user_day on uc_pilot.turns (user_id, started_at desc);
@@ -274,7 +275,7 @@ create table if not exists uc_pilot.actions (
   message_id uuid references uc_pilot.messages(id),
   tool       text not null,
   args       jsonb not null default '{}'::jsonb,
-  outcome    text not null check (outcome in ('filed','prepared','proposed','refused','failed','read','decided')),
+  outcome    text not null check (outcome in ('filed','unchanged','prepared','proposed','refused','failed','read','decided')),
   detail     text,
   target     text,
   target_id  uuid,
@@ -333,6 +334,9 @@ language plpgsql as $$
 declare
   who text;
 begin
+  if new.basis = 'agent_decision' and uc_pilot.actor() <> 'agent' then
+    raise exception 'An entry that rests on an agent decision is filed by a person.';
+  end if;
   if new.basis = 'resident_statement' then
     if new.source_message_id is null then
       raise exception 'An entry filed as the resident''s statement names the message it rests on.';
@@ -394,10 +398,78 @@ begin
   return new;
 end $$;
 
+-- A reference to a message, a statement, a weekly item, or a reply names a row of the same resident.
+-- The function reads as the working role, so row level security hides every other resident's rows from it.
+create or replace function uc_pilot.refs_guard() returns trigger
+language plpgsql as $$
+declare
+  k text;
+  v text;
+begin
+  for k, v in select key, value #>> '{}' from jsonb_each(to_jsonb(new) - 'search')
+               where (key like '%message_id' or key = 'reply_to') and jsonb_typeof(value) = 'string' loop
+    if not exists (select 1 from uc_pilot.messages m where m.id = v::uuid) then
+      raise exception 'An entry rests only on a message in the same resident''s conversation.';
+    end if;
+  end loop;
+  if tg_table_name = 'statements' then
+    if new.supersedes is not null and not exists (select 1 from uc_pilot.statements x where x.id = new.supersedes) then
+      raise exception 'A statement replaces only a statement of the same resident.';
+    end if;
+  elsif tg_table_name = 'commitments' then
+    if new.schedule_item_id is not null and not exists (select 1 from uc_pilot.schedule_items x where x.id = new.schedule_item_id) then
+      raise exception 'A commitment comes only from a weekly item of the same resident.';
+    end if;
+  elsif tg_table_name = 'actions' then
+    if new.turn_id is not null and not exists (select 1 from uc_pilot.turns x where x.id = new.turn_id) then
+      raise exception 'An action belongs only to a reply of the same resident.';
+    end if;
+  elsif tg_table_name = 'messages' then
+    if not exists (select 1 from uc_pilot.sessions x where x.id = new.session_id) then
+      raise exception 'A message belongs only to a session of the same resident.';
+    end if;
+  end if;
+  return new;
+end $$;
+
+-- A waiting item is decided once. A proposal is decided by a person. Who decided comes from the server's context.
+create or replace function uc_pilot.pending_guard() returns trigger
+language plpgsql as $$
+begin
+  if old.state <> 'open' then
+    raise exception 'A waiting item is decided once.';
+  end if;
+  if new.state <> 'open' then
+    if old.decider = 'agent' and uc_pilot.actor() <> 'agent' then
+      raise exception 'A proposal is decided by a person. Software and the resident do not decide it.';
+    end if;
+    new.decided_actor := uc_pilot.actor();
+    new.decided_at := now();
+  end if;
+  return new;
+end $$;
+
+-- Who closed a follow up comes from the server's context. A follow up for the agent is finished by the agent.
+create or replace function uc_pilot.follow_up_guard() returns trigger
+language plpgsql as $$
+begin
+  if old.state <> 'open' then
+    raise exception 'A follow up is closed once.';
+  end if;
+  if new.state <> 'open' then
+    if old.owner = 'agent' and new.state = 'done' and uc_pilot.actor() <> 'agent' then
+      raise exception 'A follow up that belongs to the agent is finished by the agent.';
+    end if;
+    new.closed_by := uc_pilot.actor();
+    new.closed_at := now();
+  end if;
+  return new;
+end $$;
+
 do $$
 declare t text;
 begin
-  foreach t in array array['messages','statements','schedule_items','commitments','plans','pending','follow_ups','actions'] loop
+  foreach t in array array['sessions','turns','messages','statements','schedule_items','commitments','plans','pending','follow_ups','actions'] loop
     execute format('drop trigger if exists %I on uc_pilot.%I', t || '_10_stamp', t);
     execute format('create trigger %I before insert on uc_pilot.%I for each row execute function uc_pilot.stamp()', t || '_10_stamp', t);
   end loop;
@@ -412,6 +484,22 @@ begin
     execute format('create trigger %I after update on uc_pilot.%I for each row execute function uc_pilot.keep_revision()', t || '_90_revision', t);
   end loop;
 end $$;
+
+do $$
+declare t text;
+begin
+  foreach t in array array['turns','messages','statements','schedule_items','commitments','plans','pending','follow_ups','actions'] loop
+    execute format('drop trigger if exists %I on uc_pilot.%I', t || '_15_refs', t);
+    execute format('create trigger %I before insert or update on uc_pilot.%I for each row execute function uc_pilot.refs_guard()', t || '_15_refs', t);
+  end loop;
+end $$;
+
+drop trigger if exists pending_40_guard on uc_pilot.pending;
+create trigger pending_40_guard before update on uc_pilot.pending
+  for each row execute function uc_pilot.pending_guard();
+drop trigger if exists follow_ups_40_guard on uc_pilot.follow_ups;
+create trigger follow_ups_40_guard before update on uc_pilot.follow_ups
+  for each row execute function uc_pilot.follow_up_guard();
 
 drop trigger if exists commitments_30_outcome on uc_pilot.commitments;
 create trigger commitments_30_outcome before insert or update on uc_pilot.commitments
@@ -432,20 +520,42 @@ begin
 end $$;
 
 -- No delete is granted on any table. Messages, actions, and revisions take no update.
+-- An update reaches only the columns named here. Who filed an entry, what it rests on, and who owns it never change.
 grant select                 on uc_pilot.access         to uc_pilot_resident;
 grant update (notice_seen_at, display_name, timezone) on uc_pilot.access to uc_pilot_resident;
-grant select, insert, update on uc_pilot.sessions       to uc_pilot_resident;
+grant select, insert         on uc_pilot.sessions       to uc_pilot_resident;
+grant update (last_at)       on uc_pilot.sessions       to uc_pilot_resident;
 grant select, insert         on uc_pilot.messages       to uc_pilot_resident;
-grant select, insert, update on uc_pilot.turns          to uc_pilot_resident;
-grant select, insert, update on uc_pilot.statements     to uc_pilot_resident;
-grant select, insert, update on uc_pilot.schedule_items to uc_pilot_resident;
-grant select, insert, update on uc_pilot.plans          to uc_pilot_resident;
-grant select, insert, update on uc_pilot.commitments    to uc_pilot_resident;
-grant select, insert, update on uc_pilot.pending        to uc_pilot_resident;
-grant select, insert, update on uc_pilot.follow_ups     to uc_pilot_resident;
+grant select, insert         on uc_pilot.turns          to uc_pilot_resident;
+grant update (state, started_at, finished_at, error, model, steps, input_tokens, output_tokens, cache_read_tokens, cache_write_tokens, cost_micro, reply_id, transcript)
+                             on uc_pilot.turns          to uc_pilot_resident;
+grant select, insert         on uc_pilot.statements     to uc_pilot_resident;
+grant update (state, ended_at, ended_by_message_id)
+                             on uc_pilot.statements     to uc_pilot_resident;
+grant select, insert         on uc_pilot.schedule_items to uc_pilot_resident;
+grant update (label, days, start_min, end_min, said, state, ended_at, ended_by_message_id)
+                             on uc_pilot.schedule_items to uc_pilot_resident;
+grant select, insert         on uc_pilot.plans          to uc_pilot_resident;
+grant update (state, confirmed_at, confirmed_via, confirmed_message_id, confirmed_items, realism)
+                             on uc_pilot.plans          to uc_pilot_resident;
+grant select, insert         on uc_pilot.commitments    to uc_pilot_resident;
+grant update (label, on_date, start_min, end_min, completion, schedule_item_id, execution, actual_start_min, actual_end_min, timing,
+              time_is_estimate, outcome_said, outcome_message_id, outcome_at, withdrawn_at, withdrawn_said, withdrawn_message_id)
+                             on uc_pilot.commitments    to uc_pilot_resident;
+grant select, insert         on uc_pilot.pending        to uc_pilot_resident;
+grant update (summary, payload, state, decided_via, decided_message_id, result)
+                             on uc_pilot.pending        to uc_pilot_resident;
+grant select, insert         on uc_pilot.follow_ups     to uc_pilot_resident;
+grant update (state, closed_said, closed_message_id)
+                             on uc_pilot.follow_ups     to uc_pilot_resident;
 grant select, insert         on uc_pilot.actions        to uc_pilot_resident;
 grant select                 on uc_pilot.revisions      to uc_pilot_resident;
-grant execute on all functions in schema uc_pilot to uc_pilot_resident;
+
+-- A function is open only to the working role, and only the ones it calls by name.
+-- The trigger functions are run by the triggers. No role calls them, so no role can attach one to a table of its own.
+revoke execute on all functions in schema uc_pilot from public;
+revoke execute on all functions in schema uc_pilot from uc_pilot_resident;
+grant execute on function uc_pilot.uid(), uc_pilot.actor(), uc_pilot.msg(), uc_pilot.turn(), uc_pilot.allowed() to uc_pilot_resident;
 
 -- ---------------------------------------------------------------- clearing the test
 

@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { modelName, pilotEnabled } from '@/lib/pilot/config';
+import { deployContext, modelName, pilotEnabled } from '@/lib/pilot/config';
 import { getDriver, withResident } from '@/lib/pilot/db';
 import { getModel } from '@/lib/pilot/model';
 import { PROMPT_VERSION } from '@/lib/pilot/prompt';
@@ -21,8 +21,8 @@ export async function GET(req: Request) {
     enabled: pilotEnabled(),
     prompt_version: PROMPT_VERSION,
     model: modelName(),
-    commit: process.env.COMMIT_REF || null,
-    context: process.env.CONTEXT || null,
+    commit: process.env.PILOT_COMMIT || null,
+    context: deployContext() || null,
     model_key_present: !!process.env.ANTHROPIC_API_KEY,
     model_address_present: !!process.env.ANTHROPIC_BASE_URL,
     database_address_present: !!process.env.PILOT_DATABASE_URL
@@ -31,7 +31,8 @@ export async function GET(req: Request) {
   if (url.searchParams.get('db') !== '0') {
     try {
       const d = await getDriver();
-      out.database = d.describe();
+      out.database = 'connected';
+      void d.describe();
       const facts = await d.tx(async q => (await q<any>(
         `select session_user::text as login, current_user::text as acting_as,
                 has_schema_privilege(session_user, 'uc_pilot', 'usage') as login_can_use_schema,

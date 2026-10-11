@@ -1,7 +1,15 @@
 // Settings for the founder test. Every value has a default, so a missing variable never opens the test wider.
 
+/** Where this build runs. Netlify names it while building: production, deploy-preview, or branch-deploy. */
+export function deployContext(): string {
+  return process.env.PILOT_CONTEXT || '';
+}
+
+/** The founder test runs on a preview that holds its database address. It never runs on a production deploy. */
 export function pilotEnabled(): boolean {
-  return !!process.env.PILOT_DATABASE_URL || process.env.PILOT_LOCAL === '1';
+  if (process.env.PILOT_LOCAL === '1' && process.env.NODE_ENV === 'development') return true;
+  if (deployContext() === 'production') return false;
+  return !!process.env.PILOT_DATABASE_URL;
 }
 
 export function modelName(): string {

@@ -253,11 +253,26 @@ const shift = (await asResident(A, q => q(`select id from uc_pilot.commitments w
   const kept = await count(A, 'commitments', `label = 'Call with landlord'`);
   check('G-25', 'A reply that stops part way is reported as failed, keeps the message, and lists what was done', broken.state === 'failed' && broken.reply === null && kept === 1 && broken.effects.length === 1, { state: broken.state, effects: broken.effects.length });
   const resumed = await send(A, 'Add a call with my landlord tomorrow at noon.', [
-    call('add_commitment', { date: tomorrow, label: 'Call with landlord', start: '12:00', quote: 'Add a call with my landlord tomorrow at noon' }),
     say('The call is on file for tomorrow at 12:00 PM.')
   ], key2);
-  const told = lastRequest!.system[1].text.includes('This reply was interrupted once');
-  check('G-26', 'Sending the message again finishes the reply and carries out no action twice', resumed.state === 'done' && !!resumed.reply && told && (await count(A, 'commitments', `label = 'Call with landlord'`)) === 1 && (await count(A, 'actions', `tool = 'add_commitment' and detail like '%landlord%' and outcome = 'filed'`)) === 1, { state: resumed.state, told });
+  const replay = JSON.stringify(lastRequest!.messages);
+  const told = replay.includes('"tool_use"') && replay.includes('"tool_result"') && replay.includes('Call with landlord');
+  check('G-26', 'Sending the message again continues from what the model already asked, and carries out no action twice', resumed.state === 'done' && !!resumed.reply && told && (await count(A, 'commitments', `label = 'Call with landlord'`)) === 1 && (await count(A, 'actions', `tool = 'add_commitment' and detail like '%landlord%' and outcome = 'filed'`)) === 1, { state: resumed.state, told });
+
+  // A reply that another request is writing right now is left to that request.
+  const key3 = randomUUID();
+  await send(A, 'Thanks.', [say('You are welcome.')], key3);
+  await withResident({ userId: A, actor: 'software' }, q => q(`update uc_pilot.turns set state = 'running', started_at = now() where message_id = (select id from uc_pilot.messages where request_key = $1)`, [key3]));
+  const callsBefore2 = calls;
+  const busy = await send(A, 'Thanks.', [say('THIS MUST NOT BE USED')], key3);
+  check('G-26b', 'A second request for a reply that is being written starts no second reply', busy.state === 'running' && calls === callsBefore2, busy.state);
+  await withResident({ userId: A, actor: 'software' }, q => q(`update uc_pilot.turns set state = 'done' where message_id = (select id from uc_pilot.messages where request_key = $1)`, [key3]));
+
+  // The cost of a model call counts toward the day's limit even when the reply then fails.
+  const spentBefore = (await asResident(A, q => q(`select coalesce(sum(cost_micro), 0)::float8 as c from uc_pilot.turns`)))[0].c;
+  await send(A, 'One more.', [call('get_day', { date: tomorrow }), new Error('stopped')]);
+  const spentAfter = (await asResident(A, q => q(`select coalesce(sum(cost_micro), 0)::float8 as c from uc_pilot.turns`)))[0].c;
+  check('G-26c', 'A model call is counted toward the daily limit as soon as it returns', spentAfter > spentBefore, { spentBefore, spentAfter });
 }
 
 // ================================================================= 10. one resident never reaches another
@@ -381,6 +396,142 @@ const shift = (await asResident(A, q => q(`select id from uc_pilot.commitments w
 {
   const cleared = await tryAs(B, 'resident', `select uc_pilot.clear_my_test_data() as removed`);
   check('G-50', 'Clearing the test removes resident B rows and leaves resident A rows', cleared.ok && (await count(B, 'messages')) === 0 && (await count(A, 'messages')) > 10, cleared);
+}
+
+
+// ================================================================= 20. findings of the independent review, kept as tests
+{
+  const C = randomUUID();
+  await addResident(db, C, 'made up resident C', { name: 'Cal', decides: true });
+  const cCount = (table: string, where = 'true') => count(C, table, where);
+
+  // Words the resident did not state as fact are never filed, whatever part of the sentence is quoted.
+  const tries: [string, Block[]][] = [
+    ['I worked until 2 and I might stop for groceries.', call('add_commitment', { date: today, label: 'Groceries', quote: 'I worked until 2' })],
+    ["I'll go to the gym tomorrow, maybe.", call('add_commitment', { date: tomorrow, label: 'Gym', quote: "I'll go to the gym tomorrow" })],
+    ["I'm not going to the gym tomorrow.", call('add_commitment', { date: tomorrow, label: 'Gym', quote: 'going to the gym tomorrow' })],
+    ["I don't work Mondays.", call('set_schedule_item', { label: 'Work', days: ['monday'], quote: "I don't work Mondays" })],
+    ['Would it be bad if I quit my job?', call('file_statement', { quote: 'I quit my job', topic: 'job', folder: 'Employment' })],
+    ['Do I work tomorrow?', call('add_commitment', { date: tomorrow, label: 'Work', quote: 'I work tomorrow' })],
+    ['My boss said I work Saturday.', call('add_commitment', { date: tomorrow, label: 'Work', quote: 'I work Saturday' })],
+    ["I'm unemployed now.", call('file_statement', { quote: 'employed now', topic: 'job', folder: 'Employment' })],
+    ['I might quit my job.', call('file_statement', { quote: 'I m', topic: 'job', folder: 'Employment' })],
+    ['I quit. My job was hard.', call('file_statement', { quote: 'quit my job', topic: 'job', folder: 'Employment' })],
+    ['I have a meeting tomorrow.', call('add_commitment', { date: tomorrow, label: 'Meeting', start: '09:00', quote: 'I have a meeting tomorrow' })]
+  ];
+  let leaked = 0;
+  const seen: string[] = [];
+  for (const [text, c] of tries) {
+    const r = await send(C, text, [c, say('Noted.')]);
+    // The first case files a different entry than the words support only if the label is wrong. Its quote is a true statement, so it is the one case that files.
+    seen.push(`${r.effects[0]?.outcome}`);
+    if (r.effects[0]?.outcome !== 'refused' && text !== tries[0][0]) leaked += 1;
+  }
+  const entries = (await cCount('commitments')) + (await cCount('statements')) + (await cCount('schedule_items'));
+  check('R-01', 'A thought, a question, a negation, another person\'s words, part of a word, and words joined across two sentences file no entry', leaked === 0 && entries === 1, seen);
+  const first = (await asResident(C, q => q(`select label, said from uc_pilot.commitments`)))[0];
+  check('R-02', 'An entry that is filed keeps the resident\'s words beside it, so a wrong label can be seen', first?.said === 'I worked until 2', first);
+
+  // A confirm needs words of agreement. A sentence of refusal confirms no entry.
+  const prep = await send(C, 'Let me think about a walk.', [call('prepare', { action: 'add_commitment', args: { date: tomorrow, label: 'Walk' } }), say('Do you want a walk on tomorrow?')]);
+  const card = (await asResident(C, q => q(`select id, summary from uc_pilot.pending where kind = 'add_commitment'`)))[0];
+  const no1 = await send(C, 'No, do not file that.', [call('resident_decision', { waiting_ref: card.id.slice(0, 8), decision: 'confirm', quote: 'file that' }), say('Left off.')]);
+  const no2 = await send(C, 'ugh my head hurts', [call('resident_decision', { waiting_ref: card.id.slice(0, 8), decision: 'confirm', quote: 'u' }), say('Rest.')]);
+  check('R-03', 'A confirm on a sentence of refusal, or on a sentence with no word of agreement, is refused and the item keeps waiting', no1.effects[0]?.outcome === 'refused' && no2.effects[0]?.outcome === 'refused' && (await cCount('pending', `state = 'open'`)) === 1 && (await cCount('commitments', `label = 'Walk'`)) === 0, [no1.effects[0]?.detail, no2.effects[0]?.detail]);
+
+  // The sentence on a waiting card is written by the server from the fields that will be filed.
+  check('R-04', 'The waiting card states the fields that will be filed, in the server\'s words', prep.effects[0]?.outcome === 'prepared' && card.summary.startsWith('Add for ') && card.summary.includes('Walk') && card.summary.includes('time not established'), card.summary);
+  await withResident({ userId: C, actor: 'resident' }, async q => decide({ q, userId: C, messageId: null, messageText: '', now: localNow(zone), basis: 'resident_confirmation', via: 'screen' }, card.id, 'confirm'));
+  check('R-05', 'A press files exactly the entry the card named', (await cCount('commitments', `label = 'Walk' and on_date = '${tomorrow}' and basis = 'resident_confirmation'`)) === 1);
+
+  // A Plan is confirmed as the list the resident was shown.
+  const day = addDays(today, 2);
+  await send(C, `Plan ${day}.`, [call('draft_plan', { date: day }), say('That day is empty so far.')]);
+  const planCard = (await asResident(C, q => q(`select id, summary from uc_pilot.pending where kind = 'confirm_plan'`)))[0];
+  const both = await send(C, 'Add the dentist that day at 3 PM. Yes, confirm it.', [
+    call('add_commitment', { date: day, label: 'Dentist', start: '15:00', quote: 'Add the dentist that day at 3 PM' }),
+    call('resident_decision', { waiting_ref: planCard.id.slice(0, 8), decision: 'confirm', quote: 'Yes, confirm it' }),
+    say('The dentist is added. Here is the day again.')
+  ]);
+  const afterAdd = (await asResident(C, q => q(`select summary, state from uc_pilot.pending where id = $1`, [planCard.id])))[0];
+  check('R-06', 'A Plan whose list changed in a reply cannot be confirmed in that reply, and its card shows the new list', both.effects[1]?.outcome === 'refused' && afterAdd.state === 'open' && afterAdd.summary.includes('Dentist') && (await cCount('plans', `state = 'confirmed'`)) === 0, [both.effects.map(e => e.outcome), afterAdd.summary]);
+  // The day changes behind the card, as a second browser tab would do it. The press then renews the card and confirms no Plan.
+  await withResident({ userId: C, actor: 'resident' }, q => q(`insert into uc_pilot.commitments (label, on_date, basis) values ('Pharmacy', $1::date, 'resident_confirmation')`, [day]));
+  const stale = await withResident({ userId: C, actor: 'resident' }, async q => decide({ q, userId: C, messageId: null, messageText: '', now: localNow(zone), basis: 'resident_confirmation', via: 'screen' }, planCard.id, 'confirm'));
+  const renewed = (await asResident(C, q => q(`select summary, state from uc_pilot.pending where id = $1`, [planCard.id])))[0];
+  check('R-07', 'A press on a Plan card whose day changed since it was shown confirms no Plan and renews the card', stale.outcome === 'unchanged' && renewed.state === 'open' && renewed.summary.includes('Pharmacy') && (await cCount('plans', `state = 'confirmed'`)) === 0, stale.detail);
+  const ok = await withResident({ userId: C, actor: 'resident' }, async q => decide({ q, userId: C, messageId: null, messageText: '', now: localNow(zone), basis: 'resident_confirmation', via: 'screen' }, planCard.id, 'confirm'));
+  check('R-08', 'The renewed card confirms the list it shows', ok.outcome === 'decided' && /Dentist/.test(ok.detail) && /Pharmacy/.test(ok.detail), ok.detail);
+
+  // Rules that hold in the database, whatever the server code does.
+  const st = (await asResident(C, q => q(`insert into uc_pilot.statements (said, topic, folder, basis) values ('I like tea', 'drinks', 'General', 'resident_confirmation') returning id`)))[0].id;
+  const u1 = await tryAs(C, 'software', `update uc_pilot.statements set filed_by = 'agent' where id = $1`, [st]);
+  const u2 = await tryAs(C, 'software', `update uc_pilot.statements set basis = 'agent_decision' where id = $1`, [st]);
+  const u3 = await tryAs(C, 'software', `update uc_pilot.statements set said = 'I like coffee' where id = $1`, [st]);
+  const u4 = await tryAs(C, 'software', `insert into uc_pilot.statements (said, topic, folder, basis) values ('Decided by nobody', 'x', 'General', 'agent_decision')`);
+  check('R-09', 'Who filed an entry, what it rests on, and its words cannot be changed, and software cannot file an agent decision', !u1.ok && !u2.ok && !u3.ok && !u4.ok, [u1.ok, u2.ok, u3.ok, u4.ok]);
+  const prop = (await withResident({ userId: C, actor: 'software' }, q => q(`insert into uc_pilot.pending (decider, kind, summary) values ('agent', 'file_interpretation', 'A reading') returning id`)))[0].id;
+  const p1 = await tryAs(C, 'software', `update uc_pilot.pending set state = 'confirmed' where id = $1`, [prop]);
+  const p2 = await tryAs(C, 'resident', `update uc_pilot.pending set state = 'confirmed' where id = $1`, [prop]);
+  const p3 = await tryAs(C, 'software', `update uc_pilot.pending set decider = 'resident' where id = $1`, [prop]);
+  const p4 = await tryAs(C, 'agent', `update uc_pilot.pending set state = 'declined', decided_via = 'desk' where id = $1 returning decided_actor`, [prop]);
+  check('R-10', 'The database lets only a person decide a proposal, and names that person as the one who decided', !p1.ok && !p2.ok && !p3.ok && p4.ok && (p4 as any).rows[0].decided_actor === 'agent', [p1.ok, p2.ok, p3.ok, p4]);
+  let attach = 'accepted';
+  try {
+    await withResident({ userId: C, actor: 'software' }, async q => {
+      await q(`create temp table mine (id uuid, user_id uuid)`);
+      await q(`create trigger x after update on mine for each row execute function uc_pilot.keep_revision()`);
+    });
+  } catch (e: any) { attach = String(e?.message || e); }
+  const t3 = await tryAs(C, 'software', `select uc_pilot.stamp()`);
+  check('R-11', 'The working role cannot attach the function that writes history to a table of its own', /permission denied for function/.test(attach) && !t3.ok, [attach, t3]);
+  const aMsg = (await asResident(A, q => q(`select id from uc_pilot.messages where speaker = 'resident' limit 1`)))[0].id;
+  const cSess = (await asResident(C, q => q(`select id from uc_pilot.sessions limit 1`)))[0].id;
+  const r1 = await tryAs(C, 'software', `insert into uc_pilot.messages (session_id, body, reply_to) values ($1, 'squat', $2)`, [cSess, aMsg]);
+  const r2 = await tryAs(C, 'software', `insert into uc_pilot.statements (said, topic, folder, basis, source_message_id) values ('x', 'x', 'General', 'resident_confirmation', $1)`, [aMsg]);
+  check('R-12', 'An entry or a reply cannot point at a message of another resident', !r1.ok && !r2.ok, [r1, r2]);
+
+  // The weekly schedule and the days it was placed on.
+  await send(C, 'I work Monday to Friday 9 AM to 5 PM.', [call('set_schedule_item', { label: 'Work', days: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'], start: '09:00', end: '17:00', quote: 'I work Monday to Friday 9 AM to 5 PM' }), say('On file.')]);
+  let fri = today; while (new Date(`${fri}T00:00:00Z`).getUTCDay() !== 5 || fri <= today) fri = addDays(fri, 1);
+  await send(C, `Plan ${fri}.`, [call('draft_plan', { date: fri }), say('Draft.')]);
+  const item = (await asResident(C, q => q(`select id from uc_pilot.schedule_items`)))[0].id as string;
+  await send(C, 'I no longer work Fridays.', [call('change_schedule_item', { ref: item.slice(0, 8), days: ['monday', 'tuesday', 'wednesday', 'thursday'], quote: 'I no longer work Fridays' }), say('Changed.')]);
+  const friRow = (await asResident(C, q => q(`select withdrawn_at is not null as off from uc_pilot.commitments where on_date = $1 and schedule_item_id = $2`, [fri, item])))[0];
+  check('R-13', 'A day dropped from a weekly item loses the commitment that was placed from it', friRow?.off === true, friRow);
+
+  // An entry that is already on file is reported as no change.
+  await send(C, 'Tuesday I work 9 to 5.', [call('add_commitment', { date: tomorrow, label: 'Shift', start: '09:00', end: '17:00', quote: 'Tuesday I work 9 to 5' }), say('On file.')]);
+  const dup = await send(C, 'Tuesday I work 2 to 10.', [call('add_commitment', { date: tomorrow, label: 'Shift', start: '14:00', end: '22:00', quote: 'Tuesday I work 2 to 10' }), say('That shift is already on file with a different time.')]);
+  check('R-14', 'A second add for an entry already on file changes no entry and is listed as no change', dup.effects[0]?.outcome === 'unchanged' && (await cCount('commitments', `label = 'Shift' and start_min = 540`)) === 1, dup.effects[0]);
+
+  // Clock times.
+  const shiftC = (await asResident(C, q => q(`select id from uc_pilot.commitments where label = 'Shift'`)))[0].id as string;
+  const x1 = await send(C, 'The shift is 9 to 9.', [call('change_commitment', { ref: shiftC.slice(0, 8), start: '09:00', end: '09:00', quote: 'The shift is 9 to 9' }), say('I need both times.')]);
+  const x2 = await send(C, 'The shift starts at 6 PM.', [call('change_commitment', { ref: shiftC.slice(0, 8), start: '18:00', quote: 'The shift starts at 6 PM' }), say('I need the end too.')]);
+  check('R-15', 'A span with the same start and end, and a new start past the end on file, are refused', x1.effects[0]?.outcome === 'refused' && x2.effects[0]?.outcome === 'refused' && (await cCount('commitments', `label = 'Shift' and start_min = 540 and end_min = 1020`)) === 1, [x1.effects[0]?.detail, x2.effects[0]?.detail]);
+
+  // Outcomes follow the resident's words.
+  await send(C, 'Yesterday I had the gym.', [call('add_commitment', { date: yesterday, label: 'Gym', quote: 'Yesterday I had the gym' }), say('On file.')]);
+  const gymC = (await asResident(C, q => q(`select id from uc_pilot.commitments where label = 'Gym' and on_date = $1`, [yesterday])))[0].id as string;
+  const o1 = await send(C, "I wasn't at the gym yesterday.", [call('report_outcome', { ref: gymC.slice(0, 8), execution: 'executed', quote: "I wasn't at the gym yesterday" }), say('Noted.')]);
+  const o2 = await send(C, 'I went to the gym yesterday.', [call('report_outcome', { ref: gymC.slice(0, 8), execution: 'did_not_happen', quote: 'I went to the gym yesterday' }), say('Noted.')]);
+  check('R-16', 'Words that say it did not happen cannot file executed, and words that say it happened cannot file did not happen', o1.effects[0]?.outcome === 'refused' && o2.effects[0]?.outcome === 'refused' && (await cCount('commitments', `label = 'Gym' and execution <> 'planned'`)) === 0, [o1.effects[0]?.detail, o2.effects[0]?.detail]);
+
+  // A draft Plan for a day that has passed is closed. It confirms no Plan.
+  const oldCard = (await withResident({ userId: C, actor: 'software' }, q => q(`insert into uc_pilot.pending (decider, kind, summary, payload) values ('resident', 'confirm_plan', 'Confirm the Plan.', $1::jsonb) returning id`, [JSON.stringify({ date: yesterday, items: [] })])))[0].id;
+  const late = await withResident({ userId: C, actor: 'resident' }, async q => decide({ q, userId: C, messageId: null, messageText: '', now: localNow(zone), basis: 'resident_confirmation', via: 'screen' }, oldCard, 'confirm'));
+  check('R-17', 'A draft Plan for a day that has passed is closed and confirms no Plan', /has passed/.test(late.detail) && (await cCount('plans', `plan_date = '${yesterday}'`)) === 0, late.detail);
+}
+
+// ================================================================= 21. numbers that are never kept, in more of the ways they are written
+{
+  const { removeNumbers } = await import('../../lib/pilot/guard');
+  const gone = ['4111 1111 1111 1111 123', '4111.1111.1111.1111', 'password is: hunter2', 'my password for the bank is hunter2', 'ssn: 123.45.6789', 'SSN = 123456789', 'PIN 4821', 'my password is correct horse battery staple'];
+  const kept = ['the pin is stuck in the board', 'my password is too weak', 'call me at 303-555-0100', 'I work 9 to 5 on 10/12/2026'];
+  const badGone = gone.filter(t => /4111|hunter2|6789|4821|horse/.test(removeNumbers(t).text));
+  const badKept = kept.filter(t => removeNumbers(t).text !== t);
+  check('R-18', 'The four kinds of number are removed in their common written forms, and ordinary sentences are left whole', badGone.length === 0 && badKept.length === 0, { badGone, badKept });
 }
 
 const failed = results.filter(r => !r.pass);

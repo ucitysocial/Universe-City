@@ -43,10 +43,10 @@ export async function admit(req: Request): Promise<{ userId: string; access: Acc
     // A write is accepted only from this site's own pages.
     const origin = req.headers.get('origin');
     const host = req.headers.get('x-forwarded-host') || req.headers.get('host');
-    if (origin && host) {
-      let from = '';
-      try { from = new URL(origin).host; } catch { /* no usable origin */ }
-      if (from !== host) return Response.json({ error: 'The request did not come from this site.' }, { status: 403 });
+    let from = '';
+    try { from = origin ? new URL(origin).host : ''; } catch { /* no usable origin */ }
+    if (!origin || !host || from !== host) {
+      return Response.json({ error: 'The request did not come from this site.' }, { status: 403 });
     }
   }
   const w = await who();

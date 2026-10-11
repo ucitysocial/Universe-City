@@ -83,7 +83,10 @@ export default async function FilePage() {
       {view.schedule.length > 0 && (
         <ul className="pt-list">
           {view.schedule.map(s => (
-            <li key={s.id}><strong>{s.label}</strong>. {sayDays(s.days)}, {saySpan(s.start_min, s.end_min)}.</li>
+            <li key={s.id}>
+              <strong>{s.label}</strong>. {sayDays(s.days)}, {saySpan(s.start_min, s.end_min)}.
+              {s.said && <div className="pt-meta">Your words: {s.said}</div>}
+            </li>
           ))}
         </ul>
       )}
@@ -111,7 +114,8 @@ export default async function FilePage() {
                     {c.time_is_estimate ? ' The time is a rough one, as you gave it.' : ''}
                     {c.completion ? ` Done means: ${c.completion}.` : ' What counts as done is still unknown.'}
                     {(c.actual_start_min !== null || c.actual_end_min !== null) ? ` Actual time you reported: ${saySpan(c.actual_start_min, c.actual_end_min)}.` : ''}
-                    {c.outcome_said ? ` Your words: ${c.outcome_said}` : ''}
+                    {c.said && c.basis !== 'schedule' ? ` Your words when it was filed: ${c.said}` : ''}
+                    {c.outcome_said ? ` Your words on the outcome: ${c.outcome_said}` : ''}
                   </div>
                 </li>
               );

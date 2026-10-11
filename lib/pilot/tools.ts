@@ -11,12 +11,12 @@
 import type { Q } from './db';
 import { isUuid, TS } from './db';
 import { FOLDERS } from '../domain/folders';
-import { clip, isRough, isTentative, plain, quoteIsIn, shortId } from './guard';
+import { checkAnswer, checkQuote, clip, hasNegation, isRough, plain, quotePresent, shortId, type QuoteRules } from './guard';
 import {
-  addDays, endAfter, isDate, parseClock, sayClock, sayDate, sayDays, saySpan, weekdayOf, type LocalNow
+  addDays, isDate, parseClock, sayDate, sayDays, saySpan, weekdayOf, type LocalNow
 } from './time';
 
-export type Outcome = 'filed' | 'prepared' | 'proposed' | 'refused' | 'failed' | 'read' | 'decided';
+export type Outcome = 'filed' | 'unchanged' | 'prepared' | 'proposed' | 'refused' | 'failed' | 'read' | 'decided';
 
 export type Result = {
   outcome: Outcome;
@@ -68,12 +68,28 @@ function dateArg(a: Args, key: string, required = true): string | null {
   return v;
 }
 
+const given = (a: Args, key: string) => a[key] !== undefined && a[key] !== null && a[key] !== '';
+
 function clockArg(a: Args, key: string): number | null {
-  const v = a[key];
-  if (v === undefined || v === null || v === '') return null;
-  const m = parseClock(v);
-  if (m === null) throw new Refusal(`Not done. ${String(v)} is no clock time. Write it on a 24 hour clock, as 14:00.`);
+  if (!given(a, key)) return null;
+  const m = parseClock(a[key]);
+  if (m === null) throw new Refusal(`Not done. ${String(a[key])} is no clock time. Write it on a 24 hour clock, as 14:00.`);
   return m;
+}
+
+/**
+ * A start and an end, as minutes after midnight. An end at or before its start is read as the next day.
+ * A span of 18 hours or more is refused: it is almost always a morning and an evening time mixed up.
+ */
+function span(start: number | null, endClock: number | null): { start: number | null; end: number | null } {
+  if (endClock === null) return { start, end: null };
+  let end = endClock === 0 ? 1440 : endClock;
+  if (start !== null) {
+    if (end === start) throw new Refusal('Not done. The start and the end are the same time. Ask the resident for both times.');
+    if (end < start) end += 1440;
+    if (end - start >= 18 * 60) throw new Refusal('Not done. That span is 18 hours or longer. Check morning and evening on a 24 hour clock, or ask the resident.');
+  }
+  return { start, end };
 }
 
 const DAY_WORDS: Record<string, number> = {
@@ -114,7 +130,7 @@ type Kind = keyof typeof TABLES;
 /** The language model sees the first eight characters of an id. The server finds the one row they name. */
 async function find(env: Env, kind: Kind, ref: unknown): Promise<string> {
   if (typeof ref !== 'string' || !/^[0-9a-f-]{6,36}$/i.test(ref.trim())) {
-    throw new Refusal(`Not done. ${String(ref)} is no entry reference.`);
+    throw new Refusal(`Not done. ${clip(String(ref), 40)} is no entry reference.`);
   }
   const r = ref.trim().toLowerCase();
   const rows = isUuid(r)
@@ -127,38 +143,31 @@ async function find(env: Env, kind: Kind, ref: unknown): Promise<string> {
 
 // ------------------------------------------------------------------ the resident's own words
 
-// A clause break. A lookahead keeps the subject with the clause that follows.
-const BOUNDARY = /[.!?;]\s+|,?\s+but\s+|\s+and\s+(?=(?:i|i'm|i'll|i've|i'd|we|then i)\b)|\s+so\s+(?=i\b)|\s+then\s+(?=i\b)/g;
-
-/** The part of the message from the last clause break up to the end of the quote. */
-export function clauseOf(message: string, quote: string): string {
-  const m = plain(message);
-  const q = plain(quote);
-  const at = m.indexOf(q);
-  if (at < 0) return q;
-  let start = 0;
-  for (const hit of m.slice(0, at).matchAll(BOUNDARY)) start = (hit.index ?? 0) + hit[0].length;
-  return m.slice(start, at + q.length);
-}
+const WHY: Record<string, string> = {
+  missing: 'A direct entry needs the quote field: the words from the resident\'s latest message that state it.',
+  not_in_message: 'The quote is not in the resident\'s latest message, inside one sentence, as whole words. File only what the resident wrote in that message. If the resident may want this kept, use prepare and ask.',
+  too_short: 'The quote is too short to state the entry. Quote at least three words, or the whole sentence.',
+  tentative: 'The resident said this as a thought, with a word such as might, maybe, or if. A thought stays in the conversation. Nothing is filed from it unless the resident asks to keep it. If the resident asks, use prepare.',
+  reported: 'The resident is passing on what another person said. Ask the resident whether it is so, and file the answer.',
+  question: 'The resident asked a question. A question files nothing. Answer it.',
+  negation_left_out: 'The resident\'s words hold a negation that the quote leaves out. Quote the whole clause, with the negation.',
+  negated: 'The resident\'s words say this is not happening or did not happen. This action files a thing that happens. File what the resident said.',
+  no_time: 'The entry carries a clock time and the resident\'s sentence holds none. Leave the time out, or ask.'
+};
 
 /**
  * A direct write rests on words the resident wrote in this message.
  * A write the resident confirmed rests on the confirmation.
  */
-function words(env: Env, a: Args, opts: { minWords?: number; allowTentative?: boolean } = {}): string | null {
+function words(env: Env, a: Args, rules: QuoteRules = {}): string | null {
   const quote = typeof a.quote === 'string' ? a.quote.replace(/\s+/g, ' ').trim() : '';
   if (env.basis === 'resident_confirmation') return quote ? clip(quote, 1000) : null;
-  if (!quote) throw new Refusal('Not filed. A direct entry needs the quote field: the words from the resident\'s latest message that state it.');
-  if (!quoteIsIn(quote, env.messageText, opts.minWords ?? 2)) {
-    throw new Refusal('Not filed. The quote is not in the resident\'s latest message. File only what the resident wrote in that message. If the resident may want this kept, use prepare and ask.');
-  }
-  if (!opts.allowTentative && isTentative(clauseOf(env.messageText, quote))) {
-    throw new Refusal('Not filed. The resident said this as a thought, with a word such as might or maybe. A thought stays in the conversation. Nothing is filed from it unless the resident asks to keep it. If the resident asks, use prepare.');
-  }
-  return clip(quote, 1000);
+  const r = checkQuote(quote, env.messageText, rules);
+  if (!r.ok) throw new Refusal(`Not filed. ${WHY[r.why]}`);
+  return clip(r.said, 1000);
 }
 
-const NEGATED = /\b(didn't|did not|never|couldn't|could not|wasn't able|was not able|skipped|missed|forgot to|haven't|have not|not yet|no longer)\b/i;
+const inWords = (said: string | null) => (said ? ` Your words: "${clip(said, 200)}"` : '');
 
 // ------------------------------------------------------------------ small reads used by several actions
 
@@ -210,6 +219,29 @@ function planList(rows: CommitmentRow[]) {
   }));
 }
 
+type PlanItem = { id: string; label: string; start_min: number | null; end_min: number | null; completion: string | null };
+const planItems = (rows: CommitmentRow[]): PlanItem[] =>
+  rows.filter(r => !r.withdrawn_at).map(r => ({ id: r.id, label: r.label, start_min: r.start_min, end_min: r.end_min, completion: r.completion }));
+const sameList = (a: PlanItem[], b: PlanItem[]) =>
+  JSON.stringify(a.map(i => [i.id, i.label, i.start_min, i.end_min])) === JSON.stringify(b.map(i => [i.id, i.label, i.start_min, i.end_min]));
+const planSentence = (date: string, items: PlanItem[]) => clip(items.length
+  ? `Confirm the Plan for ${sayDate(date)}: ${items.map(l => `${l.label} (${saySpan(l.start_min, l.end_min)})`).join('; ')}.`
+  : `Confirm the Plan for ${sayDate(date)}. No commitment is on it yet.`, 600);
+
+/**
+ * Keeps the card for a draft Plan equal to the day as it stands. The server writes the card from the entries.
+ * The card also holds the list it showed and the message during which the list last changed.
+ */
+async function refreshPlanCard(env: Env, date: string): Promise<void> {
+  const open = (await env.q<{ id: string; payload: any }>(
+    `select id, payload from uc_pilot.pending where state = 'open' and kind = 'confirm_plan' and payload ->> 'date' = $1 limit 1`, [date]))[0];
+  if (!open) return;
+  const items = planItems(await commitmentsOn(env, date));
+  if (sameList(items, Array.isArray(open.payload?.items) ? open.payload.items : [])) return;
+  await env.q(`update uc_pilot.pending set summary = $2, payload = $3::jsonb where id = $1`,
+    [open.id, planSentence(date, items), JSON.stringify({ date, items, listed_in: env.messageId })]);
+}
+
 // ------------------------------------------------------------------ the actions
 
 export type Tool = {
@@ -222,7 +254,7 @@ export type Tool = {
 
 const QUOTE = {
   type: 'string',
-  description: 'The exact words from the resident\'s latest message that state this. Copy them. The server checks them against the message and refuses the action when they are not there.'
+  description: 'The exact words from one sentence of the resident\'s latest message that state this, at least three words. Copy them, with any negation. The server checks them against the message and refuses the action when they are not there, when they are a thought, a question, or another person\'s words.'
 };
 const CLOCK = (what: string) => ({ type: 'string', description: `${what}, on a 24 hour clock, as 14:00. Leave it out when the resident did not give it.` });
 const DATE = (what: string) => ({ type: 'string', description: `${what}, as YYYY-MM-DD.` });
@@ -252,19 +284,19 @@ export const TOOLS: Tool[] = [
                        and ($3::date is null or (m.created_at at time zone $4)::date <= $3::date)
                        and ($5::text is null or m.speaker = $5)
                        and ($6::uuid is null or m.id <> $6)`;
-      const params = [query, from, to, zone, who, env.messageId];
       const cols = `m.id, m.speaker, m.body, to_char(m.created_at at time zone $4, 'FMDay, FMMonth FMDD, YYYY, FMHH12:MI AM') as said_at`;
-      let rows = await env.q<{ id: string; speaker: string; body: string; said_at: string }>(
+      type Hit = { id: string; speaker: string; body: string; said_at: string };
+      let rows = await env.q<Hit>(
         `select ${cols} from uc_pilot.messages m
           where m.search @@ websearch_to_tsquery('english', $1) ${filters}
-          order by ts_rank(m.search, websearch_to_tsquery('english', $1)) desc, m.seq desc limit 8`, params);
+          order by ts_rank(m.search, websearch_to_tsquery('english', $1)) desc, m.seq desc limit 8`, [query, from, to, zone, who, env.messageId]);
       if (rows.length === 0) {
-        const wordsList = plain(query).split(' ').filter(w => w.length > 2).slice(0, 5);
-        if (wordsList.length) {
-          rows = await env.q<{ id: string; speaker: string; body: string; said_at: string }>(
+        const list = likeList(query);
+        if (list) {
+          rows = await env.q<Hit>(
             `select ${cols} from uc_pilot.messages m
               where lower(m.body) like any ($1::text[]) ${filters}
-              order by m.seq desc limit 8`, [`{${wordsList.map(w => `"%${w.replace(/["\\%_]/g, '')}%"`).join(',')}}`, from, to, zone, who, env.messageId]);
+              order by m.seq desc limit 8`, [list, from, to, zone, who, env.messageId]);
         }
       }
       return {
@@ -288,9 +320,9 @@ export const TOOLS: Tool[] = [
     }, []),
     async run(env, a) {
       const query = text(a, 'query', 200, false);
-      const folder = a.folder ? folderArg(a) : null;
+      const folder = given(a, 'folder') ? folderArg(a) : null;
       const past = a.include_past === true;
-      const like = query ? `{${plain(query).split(' ').filter(w => w.length > 2).slice(0, 5).map(w => `"%${w.replace(/["\\%_]/g, '')}%"`).join(',')}}` : null;
+      const like = (query && likeList(query)) || '{}';
       const statements = await env.q<any>(
         `select id, said, topic, folder, state, basis, filed_by, about_date::text as about_date, supersedes,
                 to_char(created_at at time zone $4, 'FMMonth FMDD, YYYY') as filed_on
@@ -298,14 +330,14 @@ export const TOOLS: Tool[] = [
           where ($1::text is null or search @@ websearch_to_tsquery('english', $1) or lower(said || ' ' || topic) like any ($5::text[]))
             and ($2::text is null or folder = $2)
             and ($3::boolean or state = 'current')
-          order by created_at desc limit 20`, [query, folder, past, env.now.zone, like ?? '{}']);
+          order by created_at desc limit 20`, [query, folder, past, env.now.zone, like]);
       const commitments = query ? await env.q<any>(
         `select ${COMMITMENT_COLS} from uc_pilot.commitments
           where lower(label) like any ($1::text[]) and ($2::boolean or withdrawn_at is null)
-          order by on_date desc limit 12`, [like ?? '{}', past]) : [];
+          order by on_date desc limit 12`, [like, past]) : [];
       const schedule = query ? await env.q<any>(
         `select id, label, days, start_min, end_min, state from uc_pilot.schedule_items
-          where lower(label) like any ($1::text[]) and ($2::boolean or state = 'current') limit 8`, [like ?? '{}', past]) : [];
+          where lower(label) like any ($1::text[]) and ($2::boolean or state = 'current') limit 8`, [like, past]) : [];
       return {
         outcome: 'read',
         detail: `Looked on file${query ? ` for: ${clip(query, 80)}` : ''}${folder ? ` in ${folder}` : ''}. ${statements.length + commitments.length + schedule.length} found.`,
@@ -374,7 +406,7 @@ export const TOOLS: Tool[] = [
            select id, said, state, to_char(created_at at time zone $2, 'FMMonth FMDD, YYYY, FMHH12:MI AM') as filed_at
              from back order by depth`, [id, env.now.zone]);
       }
-      const show = (j: any, keys: string[]) => Object.fromEntries(keys.filter(k => !['search'].includes(k)).map(k => [k, j?.[k] ?? null]));
+      const show = (j: any, keys: string[]) => Object.fromEntries(keys.filter(k => k !== 'search').map(k => [k, j?.[k] ?? null]));
       return {
         outcome: 'read',
         detail: `Read the history of one ${kind.replace('_', ' ')}.`,
@@ -398,7 +430,7 @@ export const TOOLS: Tool[] = [
     description: 'Files something the resident directly said about their own life, in the resident\'s own words, under the folder it belongs to. Use it for a fact, a preference, a decision, or an event the resident stated plainly in the latest message and that is worth having on file later. Never use it for a thought, a guess, a joke, something another person said, or your own reading of the resident. Never file a third party\'s medical, financial, or legal detail.',
     input_schema: obj({
       quote: QUOTE,
-      topic: { type: 'string', description: 'A short plain label for finding this entry later, such as work schedule, landlord, or morning routine. Two to five words.' },
+      topic: { type: 'string', description: 'A short plain label for finding this entry later, in two to five words. Work schedule, landlord, and morning routine are three labels of the right size.' },
       folder: { type: 'string', description: 'The one folder name this belongs to, or General.' },
       about_date: DATE('The day the statement is about, when it is about one day')
     }, ['quote', 'topic', 'folder']),
@@ -410,7 +442,7 @@ export const TOOLS: Tool[] = [
       const same = await env.q<{ id: string }>(
         `select id from uc_pilot.statements where state = 'current' and lower(said) = lower($1) limit 1`, [said]);
       if (same.length) {
-        return { outcome: 'filed', detail: `Already on file under ${folder}: "${clip(said, 160)}"`, target: 'statements', targetId: same[0].id, data: { ref: shortId(same[0].id), already_on_file: true } };
+        return { outcome: 'unchanged', detail: `Already on file under ${folder}: "${clip(said, 160)}"`, target: 'statements', targetId: same[0].id, data: { ref: shortId(same[0].id), already_on_file: true } };
       }
       const row = (await env.q<{ id: string }>(
         `insert into uc_pilot.statements (said, topic, folder, about_date, basis) values ($1, $2, $3, $4::date, $5) returning id`,
@@ -452,12 +484,12 @@ export const TOOLS: Tool[] = [
     input_schema: obj({ ref: REF('the statement'), quote: QUOTE }, ['ref', 'quote']),
     async run(env, a) {
       const id = await find(env, 'statement', a.ref);
-      words(env, a);
+      const said = words(env, a);
       const old = (await env.q<any>(`select said, folder, state from uc_pilot.statements where id = $1`, [id]))[0];
       if (old.state !== 'current') throw new Refusal('Not done. That statement is already replaced or withdrawn.');
       await env.q(`select set_config('uc.reason', 'The resident withdrew it.', true)`);
       await env.q(`update uc_pilot.statements set state = 'withdrawn', ended_at = now(), ended_by_message_id = $2 where id = $1`, [id, env.messageId]);
-      return { outcome: 'filed', detail: `Withdrawn from ${old.folder}: "${clip(old.said, 160)}". The entry is kept in its history.`, target: 'statements', targetId: id };
+      return { outcome: 'filed', detail: `Withdrawn from ${old.folder}: "${clip(old.said, 160)}". The entry is kept in its history.${inWords(said)}`, target: 'statements', targetId: id };
     }
   },
 
@@ -465,7 +497,7 @@ export const TOOLS: Tool[] = [
   {
     name: 'set_schedule_item',
     group: 'file',
-    description: 'Files one thing that repeats on named days of the resident\'s week, such as a work shift or a class, as the resident stated it. Leave out a time the resident did not give. An unknown time stays unknown.',
+    description: 'Files one thing that repeats on named days of the resident\'s week, as the resident stated it. A work shift and a class are two cases. Leave out a time the resident did not give. An unknown time stays unknown.',
     input_schema: obj({
       label: { type: 'string', description: 'What it is, in a few plain words.' },
       days: { type: 'array', items: { type: 'string' }, description: 'The days of the week it falls on, as day names.' },
@@ -473,24 +505,23 @@ export const TOOLS: Tool[] = [
       quote: QUOTE
     }, ['label', 'days', 'quote']),
     async run(env, a) {
-      const said = words(env, a);
+      const said = words(env, a, { allowNegation: false, needsTime: given(a, 'start') || given(a, 'end') });
       const label = text(a, 'label', 120)!;
       const days = daysArg(a, 'days')!;
-      const start = clockArg(a, 'start');
-      const end = endAfter(start, clockArg(a, 'end'));
+      const { start, end } = span(clockArg(a, 'start'), clockArg(a, 'end'));
       const same = await env.q<{ id: string }>(
         `select id from uc_pilot.schedule_items where state = 'current' and lower(label) = lower($1) and days && $2::smallint[] limit 1`, [label, `{${days.join(',')}}`]);
       if (same.length) throw new Refusal(`Not filed. A weekly item named ${label} is already on file for one of those days, with the reference ${shortId(same[0].id)}. Use change_schedule_item to change it.`);
       const row = (await env.q<{ id: string }>(
         `insert into uc_pilot.schedule_items (label, days, start_min, end_min, said, basis) values ($1, $2::smallint[], $3, $4, $5, $6) returning id`,
         [label, `{${days.join(',')}}`, start, end, said, env.basis]))[0];
-      return { outcome: 'filed', detail: `Filed in the weekly schedule: ${label}, ${sayDays(days)}, ${saySpan(start, end)}.`, target: 'schedule_items', targetId: row.id, data: { ref: shortId(row.id) } };
+      return { outcome: 'filed', detail: `Filed in the weekly schedule: ${label}, ${sayDays(days)}, ${saySpan(start, end)}.${inWords(said)}`, target: 'schedule_items', targetId: row.id, data: { ref: shortId(row.id) } };
     }
   },
   {
     name: 'change_schedule_item',
     group: 'file',
-    description: 'Changes a weekly schedule item from now on, as the resident stated. Days already past keep what they had. Give only the fields that change.',
+    description: 'Changes a weekly schedule item from now on, as the resident stated. Days already past keep what they had. Give only the fields that change. When a time changes, give both the start and the end.',
     input_schema: obj({
       ref: REF('the weekly schedule item'),
       label: { type: 'string' }, days: { type: 'array', items: { type: 'string' } },
@@ -499,14 +530,14 @@ export const TOOLS: Tool[] = [
     }, ['ref', 'quote']),
     async run(env, a) {
       const id = await find(env, 'schedule_item', a.ref);
-      const said = words(env, a);
+      const said = words(env, a, { needsTime: given(a, 'start') || given(a, 'end') });
       const old = (await env.q<any>(`select label, days, start_min, end_min, state from uc_pilot.schedule_items where id = $1`, [id]))[0];
       if (old.state !== 'current') throw new Refusal('Not done. That weekly item has ended.');
       const label = text(a, 'label', 120, false) ?? old.label;
-      const days = daysArg(a, 'days', false) ?? old.days;
-      const start = a.start !== undefined && a.start !== null && a.start !== '' ? clockArg(a, 'start') : old.start_min;
-      const endRaw = a.end !== undefined && a.end !== null && a.end !== '' ? clockArg(a, 'end') : (old.end_min !== null ? old.end_min % 1440 : null);
-      const end = endAfter(start, endRaw);
+      const days: number[] = daysArg(a, 'days', false) ?? old.days;
+      const { start, end } = span(
+        given(a, 'start') ? clockArg(a, 'start') : old.start_min,
+        given(a, 'end') ? clockArg(a, 'end') : (old.end_min !== null ? old.end_min % 1440 : null));
       await env.q(`select set_config('uc.reason', 'The resident changed the weekly schedule.', true)`);
       await env.q(`update uc_pilot.schedule_items set label = $2, days = $3::smallint[], start_min = $4, end_min = $5, said = coalesce($6, said) where id = $1`,
         [id, label, `{${days.join(',')}}`, start, end, said]);
@@ -517,18 +548,27 @@ export const TOOLS: Tool[] = [
             and extract(dow from c.on_date)::smallint = any ($6::smallint[])
             and not exists (select 1 from uc_pilot.plans p where p.plan_date = c.on_date and p.state = 'confirmed')
         returning c.on_date::text as on_date`, [id, label, start, end, env.now.date, `{${days.join(',')}}`]);
+      // A day the item no longer falls on loses the commitment that was placed from it.
+      const dropped = await env.q<{ on_date: string }>(
+        `update uc_pilot.commitments c set withdrawn_at = now(), withdrawn_said = 'The weekly item no longer falls on this day.', withdrawn_message_id = $4
+          where c.schedule_item_id = $1 and c.on_date >= $2::date and c.execution = 'planned' and c.withdrawn_at is null
+            and not (extract(dow from c.on_date)::smallint = any ($3::smallint[]))
+            and not exists (select 1 from uc_pilot.plans p where p.plan_date = c.on_date and p.state = 'confirmed')
+        returning c.on_date::text as on_date`, [id, env.now.date, `{${days.join(',')}}`, env.messageId]);
       const held = await env.q<{ on_date: string }>(
         `select c.on_date::text as on_date from uc_pilot.commitments c
           where c.schedule_item_id = $1 and c.on_date >= $2::date and c.execution = 'planned' and c.withdrawn_at is null
             and exists (select 1 from uc_pilot.plans p where p.plan_date = c.on_date and p.state = 'confirmed')`, [id, env.now.date]);
+      for (const d of new Set([...moved, ...dropped].map(m => m.on_date))) await refreshPlanCard(env, d);
       return {
         outcome: 'filed',
-        detail: `Changed in the weekly schedule: ${label}, ${sayDays(days)}, ${saySpan(start, end)}. Before: ${old.label}, ${sayDays(old.days)}, ${saySpan(old.start_min, old.end_min)}.`,
+        detail: `Changed in the weekly schedule: ${label}, ${sayDays(days)}, ${saySpan(start, end)}. Before: ${old.label}, ${sayDays(old.days)}, ${saySpan(old.start_min, old.end_min)}.${inWords(said)}`,
         target: 'schedule_items', targetId: id,
         data: {
           days_ahead_updated: moved.map(m => m.on_date),
+          days_ahead_taken_off: dropped.map(m => m.on_date),
           confirmed_plans_left_as_they_were: held.map(h => h.on_date),
-          note: held.length ? 'A Plan the resident already confirmed keeps the earlier time. Ask the resident whether that day changes too.' : undefined
+          note: held.length ? 'A Plan the resident already confirmed keeps the earlier entry. Ask the resident whether that day changes too.' : undefined
         }
       };
     }
@@ -540,7 +580,7 @@ export const TOOLS: Tool[] = [
     input_schema: obj({ ref: REF('the weekly schedule item'), quote: QUOTE }, ['ref', 'quote']),
     async run(env, a) {
       const id = await find(env, 'schedule_item', a.ref);
-      words(env, a);
+      const said = words(env, a);
       const old = (await env.q<any>(`select label, days, state from uc_pilot.schedule_items where id = $1`, [id]))[0];
       if (old.state !== 'current') throw new Refusal('Not done. That weekly item has already ended.');
       await env.q(`select set_config('uc.reason', 'The resident ended the weekly item.', true)`);
@@ -550,7 +590,8 @@ export const TOOLS: Tool[] = [
           where c.schedule_item_id = $1 and c.on_date > $2::date and c.execution = 'planned' and c.withdrawn_at is null
             and not exists (select 1 from uc_pilot.plans p where p.plan_date = c.on_date and p.state = 'confirmed')
         returning c.on_date::text as on_date`, [id, env.now.date, env.messageId]);
-      return { outcome: 'filed', detail: `Ended in the weekly schedule: ${old.label}, ${sayDays(old.days)}. Days already past keep it.`, target: 'schedule_items', targetId: id, data: { days_ahead_taken_off: off.map(o => o.on_date) } };
+      for (const d of off) await refreshPlanCard(env, d.on_date);
+      return { outcome: 'filed', detail: `Ended in the weekly schedule: ${old.label}, ${sayDays(old.days)}. Days already past keep it.${inWords(said)}`, target: 'schedule_items', targetId: id, data: { days_ahead_taken_off: off.map(o => o.on_date) } };
     }
   },
 
@@ -558,7 +599,7 @@ export const TOOLS: Tool[] = [
   {
     name: 'add_commitment',
     group: 'file',
-    description: 'Files one commitment on one day because the resident stated it or asked for it: something the resident intends to do or has to do that day. Use it also for something that already happened today or earlier and was not on file, before reporting its outcome. Leave out a time the resident did not give. Never choose a time for the resident.',
+    description: 'Files one commitment on one day because the resident stated it or asked for it: an activity the resident intends to do or has to do that day. Use it also for an activity that already happened today or earlier and was not on file, before reporting its outcome. Leave out a time the resident did not give. Never choose a time for the resident.',
     input_schema: obj({
       date: DATE('The day'),
       label: { type: 'string', description: 'What it is, in a few plain words.' },
@@ -567,25 +608,30 @@ export const TOOLS: Tool[] = [
       quote: QUOTE
     }, ['date', 'label', 'quote']),
     async run(env, a) {
-      const said = words(env, a);
+      const said = words(env, a, { allowNegation: false, needsTime: given(a, 'start') || given(a, 'end') });
       const date = dateArg(a, 'date')!;
       const label = text(a, 'label', 120)!;
-      const start = clockArg(a, 'start');
-      const end = endAfter(start, clockArg(a, 'end'));
+      const { start, end } = span(clockArg(a, 'start'), clockArg(a, 'end'));
       const completion = text(a, 'done_means', 300, false);
       const rough = !!said && isRough(said) && (start !== null || end !== null);
       const same = await env.q<CommitmentRow>(
         `select ${COMMITMENT_COLS} from uc_pilot.commitments where on_date = $1::date and lower(label) = lower($2) and withdrawn_at is null limit 1`, [date, label]);
       if (same.length) {
-        return { outcome: 'filed', detail: `Already on file for ${sayDate(date)}: ${sayCommitment(same[0])}.`, target: 'commitments', targetId: same[0].id, data: { ref: shortId(same[0].id), already_on_file: true, hint: 'Use change_commitment to change it.' } };
+        return {
+          outcome: 'unchanged',
+          detail: `Already on file for ${sayDate(date)}, and left as it is: ${sayCommitment(same[0])}.`,
+          target: 'commitments', targetId: same[0].id,
+          data: { ref: shortId(same[0].id), already_on_file: true, nothing_changed: true, hint: 'The entry on file was left as it is. Use change_commitment to change its time or name.' }
+        };
       }
       const row = (await env.q<{ id: string }>(
         `insert into uc_pilot.commitments (label, on_date, start_min, end_min, completion, time_is_estimate, said, basis)
          values ($1, $2::date, $3, $4, $5, $6, $7, $8) returning id`, [label, date, start, end, completion, rough, said, env.basis]))[0];
+      await refreshPlanCard(env, date);
       const plan = (await env.q<any>(`select state from uc_pilot.plans where plan_date = $1::date`, [date]))[0];
       return {
         outcome: 'filed',
-        detail: `Filed for ${sayDate(date)}: ${label}, ${saySpan(start, end)}${rough ? ', as a rough time' : ''}.`,
+        detail: `Filed for ${sayDate(date)}: ${label}, ${saySpan(start, end)}${rough ? ', as a rough time' : ''}.${inWords(said)}`,
         target: 'commitments', targetId: row.id,
         data: {
           ref: shortId(row.id),
@@ -608,17 +654,22 @@ export const TOOLS: Tool[] = [
     }, ['ref', 'quote']),
     async run(env, a) {
       const id = await find(env, 'commitment', a.ref);
-      const said = words(env, a);
+      const said = words(env, a, { needsTime: given(a, 'start') || given(a, 'end') });
       const old = (await env.q<CommitmentRow>(`select ${COMMITMENT_COLS} from uc_pilot.commitments where id = $1`, [id]))[0];
       if (old.withdrawn_at) throw new Refusal('Not done. That commitment was taken off. Add it again as a new commitment if the resident wants it back.');
       if (old.execution !== 'planned') throw new Refusal('Not done. That commitment already has an outcome. Use report_outcome to correct what happened.');
       const date = dateArg(a, 'date', false) ?? old.on_date;
       const label = text(a, 'label', 120, false) ?? old.label;
-      const start = a.start !== undefined && a.start !== null && a.start !== '' ? clockArg(a, 'start') : old.start_min;
-      const endRaw = a.end !== undefined && a.end !== null && a.end !== '' ? clockArg(a, 'end') : (old.end_min !== null ? old.end_min % 1440 : null);
-      const end = endAfter(start, endRaw);
+      // A new start on an entry whose end stays would cross midnight by accident. Both times are asked for.
+      if (given(a, 'start') && !given(a, 'end') && old.end_min !== null) {
+        const s = clockArg(a, 'start')!;
+        if (s >= old.end_min % 1440 && old.end_min <= 1440) throw new Refusal('Not done. The new start is at or after the end on file. Give both the start and the end.');
+      }
+      const { start, end } = span(
+        given(a, 'start') ? clockArg(a, 'start') : old.start_min,
+        given(a, 'end') ? clockArg(a, 'end') : (old.end_min !== null ? old.end_min % 1440 : null));
       const completion = text(a, 'done_means', 300, false) ?? old.completion;
-      const rough = said && (a.start || a.end) ? isRough(said) : old.time_is_estimate;
+      const rough = said && (given(a, 'start') || given(a, 'end')) ? isRough(said) : old.time_is_estimate;
       await env.q(`select set_config('uc.reason', 'The resident changed it.', true)`);
       await env.q(
         `update uc_pilot.commitments set on_date = $2::date, label = $3, start_min = $4, end_min = $5, completion = $6, time_is_estimate = $7,
@@ -631,10 +682,12 @@ export const TOOLS: Tool[] = [
            values ($1, $2::date, $3, $4, $5, 'schedule', now(), $6, $7) on conflict (user_id, schedule_item_id, on_date) do nothing`,
           [old.label, old.on_date, old.start_min, old.end_min, old.schedule_item_id, `Moved to ${sayDate(date)}.`, env.messageId]);
       }
+      await refreshPlanCard(env, old.on_date);
+      if (date !== old.on_date) await refreshPlanCard(env, date);
       const now = (await env.q<CommitmentRow>(`select ${COMMITMENT_COLS} from uc_pilot.commitments where id = $1`, [id]))[0];
       return {
         outcome: 'filed',
-        detail: `Changed: ${sayCommitment(now)}, on ${sayDate(date)}. Before: ${old.label}, ${saySpan(old.start_min, old.end_min)}, on ${sayDate(old.on_date)}.`,
+        detail: `Changed: ${sayCommitment(now)}, on ${sayDate(date)}. Before: ${old.label}, ${saySpan(old.start_min, old.end_min)}, on ${sayDate(old.on_date)}.${inWords(said)}`,
         target: 'commitments', targetId: id, data: { ref: shortId(id) }
       };
     }
@@ -648,11 +701,12 @@ export const TOOLS: Tool[] = [
       const id = await find(env, 'commitment', a.ref);
       const said = words(env, a);
       const old = (await env.q<CommitmentRow>(`select ${COMMITMENT_COLS} from uc_pilot.commitments where id = $1`, [id]))[0];
-      if (old.withdrawn_at) return { outcome: 'filed', detail: `Already taken off: ${old.label} on ${sayDate(old.on_date)}.`, target: 'commitments', targetId: id };
+      if (old.withdrawn_at) return { outcome: 'unchanged', detail: `Already taken off: ${old.label} on ${sayDate(old.on_date)}.`, target: 'commitments', targetId: id };
       if (old.execution !== 'planned') throw new Refusal('Not done. That commitment already has an outcome on file.');
       await env.q(`select set_config('uc.reason', 'The resident took it off.', true)`);
       await env.q(`update uc_pilot.commitments set withdrawn_at = now(), withdrawn_said = $2, withdrawn_message_id = $3 where id = $1`, [id, said, env.messageId]);
-      return { outcome: 'filed', detail: `Taken off ${sayDate(old.on_date)}: ${old.label}. It is on file as a change. No outcome is on file for it.`, target: 'commitments', targetId: id };
+      await refreshPlanCard(env, old.on_date);
+      return { outcome: 'filed', detail: `Taken off ${sayDate(old.on_date)}: ${old.label}. It is on file as a change. No outcome is on file for it.${inWords(said)}`, target: 'commitments', targetId: id };
     }
   },
   {
@@ -668,27 +722,30 @@ export const TOOLS: Tool[] = [
     }, ['ref', 'execution', 'quote']),
     async run(env, a) {
       const id = await find(env, 'commitment', a.ref);
-      const said = words(env, a);
       const execution = a.execution;
       if (execution !== 'executed' && execution !== 'partly_executed' && execution !== 'did_not_happen') throw new Refusal('Not done. The execution value is not one of executed, partly_executed, did_not_happen.');
+      const said = words(env, a, {
+        allowNegation: execution !== 'executed',
+        needsTime: given(a, 'actual_start') || given(a, 'actual_end')
+      });
+      if (env.basis === 'resident_statement' && execution === 'did_not_happen' && said && !hasNegation(said)) {
+        throw new Refusal('Not filed. The resident\'s words do not say it did not happen. Report the outcome the resident stated.');
+      }
       const old = (await env.q<CommitmentRow>(`select ${COMMITMENT_COLS} from uc_pilot.commitments where id = $1`, [id]))[0];
       if (old.withdrawn_at) throw new Refusal('Not filed. That commitment was taken off. A commitment that was taken off takes no outcome.');
       if (old.on_date > env.now.date || (old.on_date === env.now.date && old.start_min !== null && old.start_min > env.now.minutes)) {
         throw new Refusal('Not filed. That commitment has not started yet. Time that has not passed holds no outcome. If the resident decided not to do it, use withdraw_commitment.');
       }
-      if (env.basis === 'resident_statement' && said && execution === 'executed' && NEGATED.test(clauseOf(env.messageText, said))) {
-        throw new Refusal('Not filed. The resident\'s words say it did not happen or is not finished. Report the outcome the resident stated.');
-      }
       const aStart = clockArg(a, 'actual_start') ?? old.actual_start_min;
-      const aEndRaw = clockArg(a, 'actual_end');
-      const aEnd = aEndRaw !== null ? endAfter(aStart ?? old.start_min, aEndRaw) : old.actual_end_min;
+      const aEndClock = clockArg(a, 'actual_end');
+      const aEnd = aEndClock !== null ? span(aStart ?? old.start_min, aEndClock).end : old.actual_end_min;
       let timing: string | null = old.timing;
       if (aStart !== null || aEnd !== null) {
         const sameStart = aStart === null || aStart === old.start_min;
         const sameEnd = aEnd === null || aEnd === old.end_min;
         timing = sameStart && sameEnd ? 'as_planned' : 'changed';
       } else if (a.went_as_planned === true) timing = 'as_planned';
-      const rough = said && (a.actual_start || a.actual_end) ? isRough(said) : old.time_is_estimate;
+      const rough = said && (given(a, 'actual_start') || given(a, 'actual_end')) ? isRough(said) : old.time_is_estimate;
       await env.q(`select set_config('uc.reason', $1, true)`, [old.execution === 'planned' ? 'The resident reported the outcome.' : 'The resident corrected the outcome.']);
       await env.q(
         `update uc_pilot.commitments set execution = $2, actual_start_min = $3, actual_end_min = $4, timing = $5, time_is_estimate = $6,
@@ -697,7 +754,7 @@ export const TOOLS: Tool[] = [
       const now = (await env.q<CommitmentRow>(`select ${COMMITMENT_COLS} from uc_pilot.commitments where id = $1`, [id]))[0];
       return {
         outcome: 'filed',
-        detail: `Outcome filed for ${sayDate(old.on_date)}: ${sayCommitment(now)}.${old.execution !== 'planned' ? ` The earlier report, ${old.execution.replace(/_/g, ' ')}, is kept in its history.` : ''}`,
+        detail: `Outcome filed for ${sayDate(old.on_date)}: ${sayCommitment(now)}.${old.execution !== 'planned' ? ` The earlier report, ${old.execution.replace(/_/g, ' ')}, is kept in its history.` : ''}${inWords(said)}`,
         target: 'commitments', targetId: id,
         data: { ref: shortId(id), timing: timing ?? 'not established', consequences: 'not established' }
       };
@@ -718,21 +775,18 @@ export const TOOLS: Tool[] = [
       let plan = (await env.q<any>(`select id, state from uc_pilot.plans where plan_date = $1::date`, [date]))[0];
       if (!plan) plan = (await env.q<any>(`insert into uc_pilot.plans (plan_date) values ($1::date) returning id, state`, [date]))[0];
       const rows = await commitmentsOn(env, date);
-      const list = planList(rows);
+      const items = planItems(rows);
       let pendingRef: string | undefined;
       if (plan.state === 'draft') {
-        const open = await env.q<{ id: string }>(
-          `select id from uc_pilot.pending where state = 'open' and kind = 'confirm_plan' and payload ->> 'date' = $1 limit 1`, [date]);
-        const summary = list.length
-          ? `Confirm the Plan for ${sayDate(date)}: ${list.map(l => `${l.label} (${l.time})`).join('; ')}.`
-          : `Confirm the Plan for ${sayDate(date)}. No commitment is on it yet.`;
-        if (open.length) {
-          await env.q(`update uc_pilot.pending set summary = $2 where id = $1`, [open[0].id, clip(summary, 600)]);
-          pendingRef = shortId(open[0].id);
+        const open = (await env.q<{ id: string }>(
+          `select id from uc_pilot.pending where state = 'open' and kind = 'confirm_plan' and payload ->> 'date' = $1 limit 1`, [date]))[0];
+        if (open) {
+          await refreshPlanCard(env, date);
+          pendingRef = shortId(open.id);
         } else {
           const p = (await env.q<{ id: string }>(
             `insert into uc_pilot.pending (decider, kind, summary, payload, rests_on) values ('resident', 'confirm_plan', $1, $2::jsonb, $3) returning id`,
-            [clip(summary, 600), JSON.stringify({ date }), 'The weekly schedule and the commitments on file for the day.']))[0];
+            [planSentence(date, items), JSON.stringify({ date, items, listed_in: env.messageId }), 'The weekly schedule and the commitments on file for the day.']))[0];
           pendingRef = shortId(p.id);
         }
       }
@@ -740,12 +794,12 @@ export const TOOLS: Tool[] = [
         outcome: 'prepared',
         detail: plan.state === 'confirmed'
           ? `Read the confirmed Plan for ${sayDate(date)}.`
-          : `Prepared a draft Plan for ${sayDate(date)} with ${list.length} ${list.length === 1 ? 'commitment' : 'commitments'}. It waits for your confirmation.`,
+          : `Prepared a draft Plan for ${sayDate(date)} with ${items.length} ${items.length === 1 ? 'commitment' : 'commitments'}. It waits for your confirmation.`,
         target: 'plans', targetId: plan.id,
         data: {
-          day: sayDate(date), plan_state: plan.state, placed_from_weekly_schedule: placed, commitments: list,
+          day: sayDate(date), plan_state: plan.state, placed_from_weekly_schedule: placed, commitments: planList(rows),
           waiting_ref: pendingRef,
-          next: plan.state === 'draft' ? 'Tell the resident what the day holds and ask what is different from usual. The resident confirms the Plan. Use resident_decision with waiting_ref when the resident confirms in words.' : undefined
+          next: plan.state === 'draft' ? 'Tell the resident what the day holds and ask what is different from usual. The resident confirms the Plan after seeing the list. Use resident_decision with waiting_ref when the resident confirms in a later message.' : undefined
         }
       };
     }
@@ -753,37 +807,36 @@ export const TOOLS: Tool[] = [
   {
     name: 'prepare',
     group: 'prepare',
-    description: 'Prepares one File entry for the resident to confirm or decline. Nothing is filed until the resident decides. Use it when you worked out the entry yourself, when the resident\'s words were tentative and the resident then asked to keep it, when a detail such as a time is your suggestion, or when two commitments compete for the same time. The action field names the entry that would be filed, and args holds that action\'s fields without a quote.',
+    description: 'Prepares one File entry for the resident to confirm or decline. Nothing is filed until the resident decides. Use it when you worked out the entry yourself, when the resident\'s words were tentative and the resident then asked to keep it, when a detail is your suggestion, or when two commitments compete for the same time. The action field names the entry that would be filed, and args holds that action\'s fields without a quote. The server writes the sentence the resident reads from those fields.',
     input_schema: obj({
       action: { type: 'string', enum: ['file_statement', 'set_schedule_item', 'change_schedule_item', 'end_schedule_item', 'add_commitment', 'change_commitment', 'withdraw_commitment'] },
-      args: { type: 'object', description: 'The fields of that action. For file_statement, put the text to file in summary.' },
-      summary: { type: 'string', description: 'One plain sentence the resident will read, stating exactly what would be filed.' },
+      args: { type: 'object', description: 'The fields of that action. For file_statement, put the exact text to file in summary.' },
       rests_on: { type: 'string', description: 'What this rests on, in a few words.' }
-    }, ['action', 'args', 'summary']),
+    }, ['action', 'args']),
     async run(env, a) {
       const action = String(a.action || '');
       if (!PREPARABLE.has(action)) throw new Refusal('Not done. That action cannot be prepared.');
-      const args = (a.args && typeof a.args === 'object' && !Array.isArray(a.args) ? a.args : {}) as Args;
-      const summary = text(a, 'summary', 600)!;
+      const args = (a.args && typeof a.args === 'object' && !Array.isArray(a.args) ? { ...(a.args as Args) } : {}) as Args;
+      delete args.quote;
       const restsOn = text(a, 'rests_on', 300, false);
-      await precheck(env, action, args);
+      const summary = await describe(env, action, args);
       const payload = JSON.stringify({ action, args });
       const open = await env.q<{ id: string }>(`select id from uc_pilot.pending where state = 'open' and kind = $1 and payload = $2::jsonb limit 1`, [action, payload]);
-      if (open.length) return { outcome: 'prepared', detail: `Already waiting for your answer: ${summary}`, target: 'pending', targetId: open[0].id, data: { waiting_ref: shortId(open[0].id) } };
+      if (open.length) return { outcome: 'unchanged', detail: `Already waiting for your answer: ${summary}`, target: 'pending', targetId: open[0].id, data: { waiting_ref: shortId(open[0].id) } };
       const p = (await env.q<{ id: string }>(
         `insert into uc_pilot.pending (decider, kind, summary, payload, rests_on) values ('resident', $1, $2, $3::jsonb, $4) returning id`,
         [action, summary, payload, restsOn]))[0];
-      return { outcome: 'prepared', detail: `Prepared for your answer: ${summary}`, target: 'pending', targetId: p.id, data: { waiting_ref: shortId(p.id), note: 'Nothing is filed yet. Ask the resident. Use resident_decision when the resident answers in words.' } };
+      return { outcome: 'prepared', detail: `Prepared for your answer: ${summary}`, target: 'pending', targetId: p.id, data: { waiting_ref: shortId(p.id), the_resident_will_read: summary, note: 'Nothing is filed yet. Ask the resident. Use resident_decision when the resident answers in a later message.' } };
     }
   },
   {
     name: 'resident_decision',
     group: 'decide',
-    description: 'Files the resident\'s answer to one item that is waiting for the resident: confirm or decline. Use it only when the resident\'s latest message clearly answers that item. A general yes with no item in view answers no item. An item you prepared in this same reply cannot be decided in this reply.',
+    description: 'Files the resident\'s answer to one item that is waiting for the resident: confirm or decline. Use it only when the resident\'s latest message clearly answers that item, with a word of agreement to confirm or a word of refusal to decline. A general yes with no item in view answers no item. An item you prepared or changed in this same reply cannot be decided in this reply.',
     input_schema: obj({
       waiting_ref: REF('the waiting item'),
       decision: { type: 'string', enum: ['confirm', 'decline'] },
-      quote: QUOTE,
+      quote: { type: 'string', description: 'The resident\'s words of agreement or refusal, copied from the latest message.' },
       realism_quote: { type: 'string', description: 'For a Plan only: the resident\'s words on how realistic the Plan feels, when the resident said so in the latest message.' }
     }, ['waiting_ref', 'decision', 'quote']),
     async run(env, a) {
@@ -792,11 +845,10 @@ export const TOOLS: Tool[] = [
       if (!decision) throw new Refusal('Not done. The decision is confirm or decline.');
       let realism: string | null = null;
       if (env.via === 'conversation') {
-        const quote = typeof a.quote === 'string' ? a.quote.trim() : '';
-        if (!quoteIsIn(quote, env.messageText, 1)) throw new Refusal('Not done. The quote is not in the resident\'s latest message. The resident decides in their own words or on the screen.');
-        if (decision === 'confirm' && isTentative(quote)) throw new Refusal('Not done. The resident\'s answer is tentative. The item keeps waiting.');
+        const ans = checkAnswer(a.quote, env.messageText, decision);
+        if (!ans.ok) throw new Refusal(`Not done. ${ans.why} The item keeps waiting. The resident can answer in plain words or press the button on the screen.`);
         if (typeof a.realism_quote === 'string' && a.realism_quote.trim()) {
-          if (!quoteIsIn(a.realism_quote, env.messageText, 1)) throw new Refusal('Not done. The realism quote is not in the resident\'s latest message.');
+          if (!quotePresent(a.realism_quote, env.messageText)) throw new Refusal('Not done. The realism quote is not in the resident\'s latest message.');
           realism = clip(a.realism_quote, 300);
         }
       }
@@ -821,7 +873,7 @@ export const TOOLS: Tool[] = [
       const folder = folderArg(a);
       const topic = text(a, 'topic', 80, false) ?? 'interpretation';
       const open = await env.q<{ id: string }>(`select id from uc_pilot.pending where state = 'open' and decider = 'agent' and lower(summary) = lower($1) limit 1`, [summary]);
-      if (open.length) return { outcome: 'proposed', detail: `Already waiting for your agent: ${summary}`, target: 'pending', targetId: open[0].id };
+      if (open.length) return { outcome: 'unchanged', detail: `Already waiting for your agent: ${summary}`, target: 'pending', targetId: open[0].id };
       const p = (await env.q<{ id: string }>(
         `insert into uc_pilot.pending (decider, kind, summary, payload, rests_on) values ('agent', 'file_interpretation', $1, $2::jsonb, $3) returning id`,
         [summary, JSON.stringify({ folder, topic }), restsOn]))[0];
@@ -848,7 +900,7 @@ export const TOOLS: Tool[] = [
       const what = text(a, 'what', 400)!;
       const due = dateArg(a, 'due_on', false);
       const same = await env.q<{ id: string }>(`select id from uc_pilot.follow_ups where state = 'open' and lower(what) = lower($1) limit 1`, [what]);
-      if (same.length) return { outcome: 'filed', detail: `Already open as a follow up: ${what}`, target: 'follow_ups', targetId: same[0].id, data: { ref: shortId(same[0].id) } };
+      if (same.length) return { outcome: 'unchanged', detail: `Already open as a follow up: ${what}`, target: 'follow_ups', targetId: same[0].id, data: { ref: shortId(same[0].id) } };
       const row = (await env.q<{ id: string }>(
         `insert into uc_pilot.follow_ups (owner, kind, what, due_on) values ($1, $2, $3, $4::date) returning id`, [owner, kind, what, due]))[0];
       const whose = owner === 'agent' ? 'your agent' : owner === 'resident' ? 'you' : 'software';
@@ -870,37 +922,77 @@ export const TOOLS: Tool[] = [
     async run(env, a) {
       const id = await find(env, 'follow_up', a.ref);
       const how = a.how === 'dropped' ? 'dropped' : 'done';
-      const said = words(env, a, { minWords: 1, allowTentative: how === 'dropped' });
+      let said: string | null;
+      if (how === 'dropped' && env.basis === 'resident_statement') {
+        const ans = checkAnswer(a.quote, env.messageText, 'drop');
+        if (!ans.ok) throw new Refusal(`Not done. ${ans.why}`);
+        said = ans.said;
+      } else {
+        said = words(env, a, { minWords: 2 });
+      }
       const old = (await env.q<any>(`select what, state, owner from uc_pilot.follow_ups where id = $1`, [id]))[0];
-      if (old.state !== 'open') return { outcome: 'filed', detail: `Already closed: ${old.what}`, target: 'follow_ups', targetId: id };
-      if (old.owner === 'agent' && how === 'done') throw new Refusal('Not done. A follow up that belongs to the agent is closed by the agent. The resident can drop it.');
-      await env.q(`update uc_pilot.follow_ups set state = $2, closed_at = now(), closed_said = $3, closed_message_id = $4, closed_by = uc_pilot.actor() where id = $1`, [id, how, said, env.messageId]);
-      return { outcome: 'filed', detail: `Follow up closed as ${how}: ${old.what}`, target: 'follow_ups', targetId: id };
+      if (old.state !== 'open') return { outcome: 'unchanged', detail: `Already closed: ${old.what}`, target: 'follow_ups', targetId: id };
+      if (old.owner === 'agent' && how === 'done') throw new Refusal('Not done. A follow up that belongs to the agent is finished by the agent. The resident can drop it.');
+      await env.q(`update uc_pilot.follow_ups set state = $2, closed_said = $3, closed_message_id = $4 where id = $1`, [id, how, said, env.messageId]);
+      return { outcome: 'filed', detail: `Follow up closed as ${how}: ${old.what}${inWords(said)}`, target: 'follow_ups', targetId: id };
     }
   }
 ];
 
-/** A prepared entry is checked when it is prepared, so the resident is never asked to confirm one that cannot be filed. */
-async function precheck(env: Env, action: string, args: Args): Promise<void> {
-  if (action === 'file_statement') {
-    if (!text(args, 'summary', 1000, false) && !text(args, 'quote', 1000, false)) throw new Refusal('Not done. A prepared statement needs the text to file, in summary.');
-    folderArg(args);
-    text(args, 'topic', 80);
-    dateArg(args, 'about_date', false);
-  } else if (action === 'set_schedule_item') {
-    text(args, 'label', 120); daysArg(args, 'days'); clockArg(args, 'start'); clockArg(args, 'end');
-  } else if (action === 'add_commitment') {
-    dateArg(args, 'date'); text(args, 'label', 120); clockArg(args, 'start'); clockArg(args, 'end');
-  } else if (action === 'change_schedule_item' || action === 'end_schedule_item') {
-    await find(env, 'schedule_item', args.ref); clockArg(args, 'start'); clockArg(args, 'end');
-  } else if (action === 'change_commitment' || action === 'withdraw_commitment') {
-    await find(env, 'commitment', args.ref); dateArg(args, 'date', false); clockArg(args, 'start'); clockArg(args, 'end');
-  }
-}
-
 const PREPARABLE = new Set(['file_statement', 'set_schedule_item', 'change_schedule_item', 'end_schedule_item', 'add_commitment', 'change_commitment', 'withdraw_commitment']);
 
 export const TOOL_BY_NAME: Record<string, Tool> = Object.fromEntries(TOOLS.map(t => [t.name, t]));
+
+/** A list of words as a Postgres text array of patterns. Quote marks, backslashes, and wildcard characters are dropped. */
+function likeList(query: string): string | null {
+  const list = plain(query).split(' ').map(w => w.replace(/[^a-z0-9']/g, '')).filter(w => w.length > 2).slice(0, 5);
+  return list.length ? `{${list.map(w => `"%${w}%"`).join(',')}}` : null;
+}
+
+/**
+ * The sentence the resident reads on a waiting card. The server writes it from the fields that would be filed,
+ * so the card and the entry cannot differ. It also checks the fields, so no card asks for an entry that cannot be filed.
+ */
+async function describe(env: Env, action: string, args: Args): Promise<string> {
+  if (action === 'file_statement') {
+    const said = text(args, 'summary', 1000);
+    text(args, 'topic', 80);
+    dateArg(args, 'about_date', false);
+    return clip(`Keep on file under ${folderArg(args)}: "${said}"`, 600);
+  }
+  if (action === 'set_schedule_item') {
+    const { start, end } = span(clockArg(args, 'start'), clockArg(args, 'end'));
+    return clip(`Add to the weekly schedule: ${text(args, 'label', 120)}, ${sayDays(daysArg(args, 'days')!)}, ${saySpan(start, end)}.`, 600);
+  }
+  if (action === 'add_commitment') {
+    const { start, end } = span(clockArg(args, 'start'), clockArg(args, 'end'));
+    const done = text(args, 'done_means', 300, false);
+    return clip(`Add for ${sayDate(dateArg(args, 'date')!)}: ${text(args, 'label', 120)}, ${saySpan(start, end)}.${done ? ` Done means: ${done}.` : ''}`, 600);
+  }
+  if (action === 'change_schedule_item' || action === 'end_schedule_item') {
+    const id = await find(env, 'schedule_item', args.ref);
+    const old = (await env.q<any>(`select label, days, start_min, end_min from uc_pilot.schedule_items where id = $1`, [id]))[0];
+    const was = `${old.label}, ${sayDays(old.days)}, ${saySpan(old.start_min, old.end_min)}`;
+    if (action === 'end_schedule_item') return clip(`End this weekly item from now on: ${was}.`, 600);
+    const { start, end } = span(
+      given(args, 'start') ? clockArg(args, 'start') : old.start_min,
+      given(args, 'end') ? clockArg(args, 'end') : (old.end_min !== null ? old.end_min % 1440 : null));
+    const days = daysArg(args, 'days', false) ?? old.days;
+    return clip(`Change the weekly schedule to: ${text(args, 'label', 120, false) ?? old.label}, ${sayDays(days)}, ${saySpan(start, end)}. It is now: ${was}.`, 600);
+  }
+  if (action === 'change_commitment' || action === 'withdraw_commitment') {
+    const id = await find(env, 'commitment', args.ref);
+    const old = (await env.q<CommitmentRow>(`select ${COMMITMENT_COLS} from uc_pilot.commitments where id = $1`, [id]))[0];
+    const was = `${old.label}, ${saySpan(old.start_min, old.end_min)}, on ${sayDate(old.on_date)}`;
+    if (action === 'withdraw_commitment') return clip(`Take off: ${was}.`, 600);
+    const { start, end } = span(
+      given(args, 'start') ? clockArg(args, 'start') : old.start_min,
+      given(args, 'end') ? clockArg(args, 'end') : (old.end_min !== null ? old.end_min % 1440 : null));
+    const date = dateArg(args, 'date', false) ?? old.on_date;
+    return clip(`Change to: ${text(args, 'label', 120, false) ?? old.label}, ${saySpan(start, end)}, on ${sayDate(date)}. It is now: ${was}.`, 600);
+  }
+  throw new Refusal('Not done. That action cannot be prepared.');
+}
 
 /**
  * The resident's answer to an item that waits for the resident.
@@ -912,14 +1004,14 @@ export async function decide(env: Env, pendingId: string, decision: 'confirm' | 
   if (!p) throw new Refusal('Not done. That item is not on file for this resident.');
   if (p.decider !== 'resident') throw new Refusal('Not done. That item is a proposal. A person decides it. The resident and software do not.');
   if (p.state !== 'open') {
-    return { outcome: 'decided', detail: `Already ${p.state}: ${p.summary}`, target: 'pending', targetId: p.id, data: { already: p.state } };
+    return { outcome: 'unchanged', detail: `Already ${p.state}: ${p.summary}`, target: 'pending', targetId: p.id, data: { already: p.state } };
   }
-  if (env.via === 'conversation' && p.source_message_id && p.source_message_id === env.messageId) {
-    throw new Refusal('Not done. This item was prepared in this same reply. The resident has not seen it yet. Ask, and decide it when the resident answers.');
+  if (env.via === 'conversation' && env.messageId && (p.source_message_id === env.messageId || p.payload?.listed_in === env.messageId)) {
+    throw new Refusal('Not done. This item was prepared or changed in this same reply. The resident has not seen it yet. Say what it holds, ask, and decide it when the resident answers.');
   }
-  const stamp = async (state: 'confirmed' | 'declined', result: unknown) => {
+  const stamp = async (state: 'confirmed' | 'declined' | 'withdrawn', result: unknown) => {
     await env.q(
-      `update uc_pilot.pending set state = $2, decided_at = now(), decided_via = $3, decided_message_id = $4, decided_actor = uc_pilot.actor(), result = $5::jsonb where id = $1`,
+      `update uc_pilot.pending set state = $2, decided_via = $3, decided_message_id = $4, result = $5::jsonb where id = $1`,
       [p.id, state, env.via, env.messageId, JSON.stringify(result ?? {})]);
   };
   if (decision === 'decline') {
@@ -931,9 +1023,23 @@ export async function decide(env: Env, pendingId: string, decision: 'confirm' | 
   if (p.kind === 'confirm_plan') {
     const date = String(p.payload?.date || '');
     if (!isDate(date)) throw new Refusal('Not done. The Plan this item names has no day.');
+    if (date < env.now.date) {
+      await stamp('withdrawn', { reason: 'the day passed' });
+      return { outcome: 'decided', detail: `That day has passed. The draft Plan for ${sayDate(date)} was closed. No Plan was confirmed.`, target: 'pending', targetId: p.id };
+    }
     await placeSchedule(confirmEnv, date);
     const rows = (await commitmentsOn(confirmEnv, date)).filter(r => !r.withdrawn_at);
-    const items = rows.map(r => ({ id: r.id, label: r.label, start_min: r.start_min, end_min: r.end_min, completion: r.completion }));
+    const items = planItems(rows);
+    // The resident confirms the list the card showed. When the day changed since, the card is renewed and asked again.
+    if (!sameList(items, Array.isArray(p.payload?.items) ? p.payload.items : [])) {
+      await env.q(`update uc_pilot.pending set summary = $2, payload = $3::jsonb where id = $1`,
+        [p.id, planSentence(date, items), JSON.stringify({ date, items, listed_in: env.messageId })]);
+      return {
+        outcome: 'unchanged',
+        detail: `The day changed after the Plan was shown, so no Plan was confirmed. The Plan now reads: ${items.length ? items.map(i => `${i.label} (${saySpan(i.start_min, i.end_min)})`).join('; ') : 'no commitment'}. It waits for your answer again.`,
+        target: 'pending', targetId: p.id, data: { commitments: planList(rows), note: 'Tell the resident what the day holds now and ask again.' }
+      };
+    }
     await env.q(`select set_config('uc.reason', 'The resident confirmed the Plan.', true)`);
     const plan = (await env.q<{ id: string }>(
       `insert into uc_pilot.plans (plan_date, state, confirmed_at, confirmed_via, confirmed_message_id, confirmed_items, realism)
@@ -955,7 +1061,6 @@ export async function decide(env: Env, pendingId: string, decision: 'confirm' | 
   const tool = TOOL_BY_NAME[action];
   if (!tool || !PREPARABLE.has(action)) throw new Refusal('Not done. The prepared item names an action that cannot be filed.');
   const args = { ...(p.payload?.args || {}) } as Args;
-  if (action === 'file_statement' && !args.quote && !args.summary) args.summary = p.summary;
   const done = await tool.run(confirmEnv, args);
   await stamp('confirmed', { detail: done.detail, target: done.target, target_id: done.targetId });
   return { outcome: 'decided', detail: `Confirmed. ${done.detail}`, target: done.target, targetId: done.targetId, data: done.data };
@@ -963,13 +1068,14 @@ export async function decide(env: Env, pendingId: string, decision: 'confirm' | 
 
 /**
  * A person, acting as the resident's agent, decides a proposal.
- * Software has no path to this function. The desk route calls it with the actor set to agent.
+ * Software has no path to this function. The desk route calls it with the actor set to agent,
+ * and the database refuses the change for any other actor.
  */
 export async function decideProposal(env: Env, pendingId: string, decision: 'confirm' | 'decline'): Promise<Result> {
   const p = (await env.q<any>(`select id, decider, kind, summary, payload, state from uc_pilot.pending where id = $1 for update`, [pendingId]))[0];
   if (!p) throw new Refusal('Not done. That proposal is not on file for this resident.');
   if (p.decider !== 'agent') throw new Refusal('Not done. That item waits for the resident.');
-  if (p.state !== 'open') return { outcome: 'decided', detail: `Already ${p.state}: ${p.summary}`, target: 'pending', targetId: p.id };
+  if (p.state !== 'open') return { outcome: 'unchanged', detail: `Already ${p.state}: ${p.summary}`, target: 'pending', targetId: p.id };
   let result: Record<string, unknown> = {};
   if (decision === 'confirm') {
     const row = (await env.q<{ id: string }>(
@@ -978,7 +1084,7 @@ export async function decideProposal(env: Env, pendingId: string, decision: 'con
     result = { statement_id: row.id };
   }
   await env.q(
-    `update uc_pilot.pending set state = $2, decided_at = now(), decided_via = 'desk', decided_actor = uc_pilot.actor(), result = $3::jsonb where id = $1`,
+    `update uc_pilot.pending set state = $2, decided_via = 'desk', result = $3::jsonb where id = $1`,
     [p.id, decision === 'confirm' ? 'confirmed' : 'declined', JSON.stringify(result)]);
   return {
     outcome: 'decided',

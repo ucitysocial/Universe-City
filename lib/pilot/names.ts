@@ -27,6 +27,7 @@ export const ACTION_NAME: Record<string, string> = {
 export const OUTCOME_WORD: Record<string, { word: string; tone: string }> = {
   filed: { word: 'Filed', tone: 'filed' },
   decided: { word: 'Decided', tone: 'filed' },
+  unchanged: { word: 'No change', tone: 'unknown' },
   prepared: { word: 'Waiting for you', tone: 'wait' },
   proposed: { word: 'Sent to your agent', tone: 'agent' },
   refused: { word: 'Left off the File', tone: 'no' },

@@ -16,6 +16,7 @@ type Thread = { messages: Msg[]; more: boolean; waiting: Waiting[]; noticeSeen: 
 const CHIP: Record<string, { word: string; tone: string }> = {
   filed: { word: 'Filed', tone: 'filed' },
   decided: { word: 'Decided', tone: 'filed' },
+  unchanged: { word: 'No change', tone: 'unknown' },
   prepared: { word: 'Waiting for you', tone: 'wait' },
   proposed: { word: 'Sent to your agent', tone: 'agent' },
   refused: { word: 'Left off the File', tone: 'no' },
@@ -82,15 +83,19 @@ export default function PilotConversation({ initial }: { initial: Thread }) {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
+        // The server turned the message away. It is put back in the box, so no word is lost.
         setErr(data.error || 'The message was not kept. Send it again.');
-      } else {
         setUnsent(null);
+        setDraft(d => d || text);
+        setSending(false);
+        return;
       }
     } catch {
-      setErr('The server did not answer in time. Your message may be kept. The conversation below shows what the server holds.');
+      setErr('The server did not answer in time. Your message may be kept. The conversation shows what the server holds once it loads.');
     }
     const now = await load();
-    if (now && now.messages.some(m => m.key === key)) setUnsent(null);
+    if (now) setUnsent(null);
+    else setErr('The conversation was not loaded again, because the server did not answer. Your message stays on this screen. Load the page again to see what the server holds.');
     setSending(false);
     box.current?.focus();
   }
@@ -122,7 +127,6 @@ export default function PilotConversation({ initial }: { initial: Thread }) {
   }
 
   const shown = unsent && !thread.messages.some(m => m.key === unsent.key) ? [...thread.messages, unsent] : thread.messages;
-  const effectsFor = (m: Msg) => (m.reply_to ? shown.find(x => x.id === m.reply_to)?.turn?.effects || [] : []);
   let lastDay = '';
 
   if (!thread.noticeSeen) {
@@ -146,7 +150,7 @@ export default function PilotConversation({ initial }: { initial: Thread }) {
               Netlify states that it stores no message and no reply. The terms Anthropic applies to that service were left unchecked for this test.
             </p>
             <p>
-              A payment card number, a government identification number, a bank account number, and a password are taken out of a message before it is kept.
+              A payment card number, a government identification number, a bank account number, and a password are taken out of a message before it is kept, in the common ways each is written. A number written in an unusual way can get through, so leave those four out of your messages.
             </p>
             <p>It stays until you clear it. The Activity page holds the control that clears your test data.</p>
             <p>You talk with the guide. The guide is Universe City software. Your agent is a person. No person reads this conversation unless you ask for one.</p>
@@ -181,7 +185,7 @@ export default function PilotConversation({ initial }: { initial: Thread }) {
           lastDay = day;
           const mine = m.speaker === 'resident';
           const failed = mine && m.turn?.state === 'failed' && !shown.some(x => x.reply_to === m.id);
-          const running = mine && (m.unsent || m.turn?.state === 'running') && !shown.some(x => x.reply_to === m.id);
+          const running = mine && ((m.unsent && sending) || m.turn?.state === 'running') && !shown.some(x => x.reply_to === m.id);
           return (
             <div key={m.id} style={{ display: 'contents' }}>
               {newDay && <p className="pt-kick" style={{ alignSelf: 'center' }}>{day}</p>}
@@ -191,7 +195,7 @@ export default function PilotConversation({ initial }: { initial: Thread }) {
                 {mine && m.removed && m.removed.length > 0 && (
                   <p className="pt-meta">Taken out before the message was kept: {m.removed.join(', ')}.</p>
                 )}
-                {!mine && <Effects list={effectsFor(m)} />}
+                {!mine && <Effects list={m.turn?.effects || []} />}
               </div>
               {running && <p className="pt-thinking">The guide is writing a reply.</p>}
               {failed && (

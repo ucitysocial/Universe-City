@@ -6,11 +6,11 @@
 //    activity list written in that same transaction. An action that was refused or failed is listed too.
 // 4. The answer is kept. The screen shows the resident the server's list of what happened.
 //
-// A resend of the same message returns the same answer. An interrupted reply can be finished without
-// carrying out any action twice.
+// A resend of the same message returns the same answer. What the model asked for is kept as it arrives,
+// so an interrupted reply continues from where it stopped and carries out no action twice.
 
 import { createHash, randomUUID } from 'node:crypto';
-import { costMicro, dailyCapMicro, LIMITS, type Usage } from './config';
+import { costMicro, dailyCapMicro, LIMITS } from './config';
 import { isUuid, TS, withResident, type Q } from './db';
 import { fileForModel, loadAccess, loadFile, type Access } from './file';
 import { cleanReply, clip, removeNumbers } from './guard';
@@ -27,7 +27,7 @@ export type MessageView = {
 };
 
 export type TurnResult = {
-  state: 'done' | 'running' | 'failed' | 'refused';
+  state: 'done' | 'running' | 'failed';
   message: MessageView | null;
   reply: MessageView | null;
   effects: Effect[];
@@ -50,21 +50,21 @@ export async function effectsOf(q: Q, turnId: string): Promise<Effect[]> {
       where turn_id = $1 and outcome <> 'read' order by seq`, [turnId]);
 }
 
+type Soft = { userId: string; messageId: string; turnId: string; messageText: string; zone: string };
+
 /** Carries out one action the model asked for. Returns what the model is told. */
-async function act(
-  ctx: { userId: string; messageId: string; turnId: string; messageText: string; zone: string },
-  name: string, input: Record<string, unknown>
-): Promise<{ text: string; isError: boolean }> {
+async function act(ctx: Soft, name: string, input: Record<string, unknown>): Promise<{ text: string; isError: boolean }> {
   const tool = TOOL_BY_NAME[name];
   const key = `${ctx.turnId}:${name}:${createHash('sha256').update(stable(input)).digest('hex').slice(0, 20)}`;
+  const run = { userId: ctx.userId, actor: 'software' as const, messageId: ctx.messageId, turnId: ctx.turnId };
   if (!tool) {
-    await withResident({ userId: ctx.userId, actor: 'software', messageId: ctx.messageId, turnId: ctx.turnId }, q =>
+    await withResident(run, q =>
       q(`insert into uc_pilot.actions (turn_id, message_id, tool, args, outcome, detail, idem_key) values ($1, $2, $3, $4::jsonb, 'refused', $5, $6)`,
         [ctx.turnId, ctx.messageId, clip(name, 60), '{}', 'That action is not on the list of actions software can take.', `${key}:${randomUUID()}`]));
     return { text: JSON.stringify({ ok: false, result: 'Not done. That action does not exist.' }), isError: true };
   }
   try {
-    const result = await withResident({ userId: ctx.userId, actor: 'software', messageId: ctx.messageId, turnId: ctx.turnId }, async q => {
+    const result = await withResident(run, async q => {
       const before = await q<any>(`select outcome, detail from uc_pilot.actions where idem_key = $1`, [key]);
       if (before.length) return { outcome: before[0].outcome, detail: before[0].detail, data: { already_done_in_this_reply: true } } as Result;
       const env: Env = {
@@ -82,10 +82,10 @@ async function act(
   } catch (e: any) {
     const refused = e instanceof Refusal;
     // A database rule that stopped the write is a refusal too. Its sentence is written for a reader.
-    const fromRule = !refused && typeof e?.message === 'string' && /^(An |A |No |The )/.test(e.message) && e?.code === 'P0001';
+    const fromRule = !refused && e?.code === 'P0001' && typeof e?.message === 'string';
     const detail = refused || fromRule ? String(e.message) : 'Not done. The server could not carry out the action. Nothing was filed.';
     try {
-      await withResident({ userId: ctx.userId, actor: 'software', messageId: ctx.messageId, turnId: ctx.turnId }, q =>
+      await withResident(run, q =>
         q(`insert into uc_pilot.actions (turn_id, message_id, tool, args, outcome, detail, idem_key) values ($1, $2, $3, $4::jsonb, $5, $6, $7)`,
           [ctx.turnId, ctx.messageId, name, JSON.stringify(input || {}), refused || fromRule ? 'refused' : 'failed', clip(detail, 900), `${key}:${randomUUID()}`]));
     } catch { /* the activity list could not be written. The model is still told the action did not happen. */ }
@@ -125,8 +125,7 @@ export async function receive(userId: string, rawText: string, requestKey: strin
   const start = await withResident({ userId, actor: 'resident' }, async q => {
     const access = await loadAccess(q);
     if (!access) throw new NoAccess('This account is not part of the founder test.');
-    const existing = (await q<MessageView>(`select ${MESSAGE_COLS} from uc_pilot.messages where request_key = $1`, [requestKey]))[0];
-    let message = existing;
+    let message = (await q<MessageView>(`select ${MESSAGE_COLS} from uc_pilot.messages where request_key = $1`, [requestKey]))[0];
     if (!message) {
       const last = (await q<any>(`select id, last_at > now() - interval '4 hours' as live from uc_pilot.sessions order by last_at desc limit 1`))[0];
       const sessionId = last?.live ? last.id : (await q<any>(`insert into uc_pilot.sessions default values returning id`))[0].id;
@@ -137,31 +136,30 @@ export async function receive(userId: string, rawText: string, requestKey: strin
         [sessionId, cleaned.text, requestKey, cleaned.removed.length ? `{${cleaned.removed.map(r => `"${r}"`).join(',')}}` : null]))[0]
         || (await q<MessageView>(`select ${MESSAGE_COLS} from uc_pilot.messages where request_key = $1`, [requestKey]))[0];
     }
-    const turn = (await q<any>(
-      `select id, state, reply_id, started_at < now() - ($2 || ' milliseconds')::interval as stale from uc_pilot.turns where message_id = $1`,
-      [message.id, String(LIMITS.runningStaleMs)]))[0];
-    if (turn?.state === 'done') {
-      const reply = (await q<MessageView>(`select ${MESSAGE_COLS} from uc_pilot.messages where id = $1`, [turn.reply_id]))[0] || null;
-      return { access, message, done: { reply, effects: await effectsOf(q, turn.id) }, turnId: turn.id as string, running: false, spent: 0 };
+    const made = (await q<any>(
+      `insert into uc_pilot.turns (message_id, prompt_version) values ($1, $2) on conflict (message_id) do nothing returning id`, [message.id, PROMPT_VERSION]))[0];
+    let turnId: string;
+    let transcript: Turn[] = [];
+    if (made) {
+      turnId = made.id;
+    } else {
+      const turn = (await q<any>(`select id, state, reply_id from uc_pilot.turns where message_id = $1`, [message.id]))[0];
+      turnId = turn.id;
+      if (turn.state === 'done') {
+        const reply = (await q<MessageView>(`select ${MESSAGE_COLS} from uc_pilot.messages where id = $1`, [turn.reply_id]))[0] || null;
+        return { access, message, done: { reply, effects: await effectsOf(q, turn.id) }, turnId, running: false, spent: 0, transcript };
+      }
+      // Only one request finishes an interrupted reply. The row is claimed in one statement, so a second request finds it taken.
+      const claimed = (await q<any>(
+        `update uc_pilot.turns set state = 'running', started_at = now(), finished_at = null, error = null
+          where id = $1 and (state = 'failed' or (state = 'running' and started_at < now() - ($2 || ' milliseconds')::interval))
+        returning transcript`, [turnId, String(LIMITS.runningStaleMs)]))[0];
+      if (!claimed) return { access, message, done: null, turnId, running: true, spent: 0, transcript };
+      transcript = Array.isArray(claimed.transcript) ? claimed.transcript : [];
     }
-    if (turn?.state === 'running' && !turn.stale) return { access, message, done: null, turnId: turn.id as string, running: true, spent: 0 };
     const spent = (await q<any>(
       `select coalesce(sum(cost_micro), 0)::float8 as c from uc_pilot.turns where (started_at at time zone $1)::date = (now() at time zone $1)::date`, [access.timezone]))[0].c as number;
-    let turnId: string;
-    if (turn) {
-      turnId = turn.id;
-      await q(`update uc_pilot.turns set state = 'running', started_at = now(), finished_at = null, error = null where id = $1`, [turnId]);
-    } else {
-      const made = (await q<any>(
-        `insert into uc_pilot.turns (message_id, prompt_version) values ($1, $2) on conflict (message_id) do nothing returning id`, [message.id, PROMPT_VERSION]))[0];
-      if (!made) {
-        // Another request for the same message started the reply a moment ago.
-        const other = (await q<any>(`select id from uc_pilot.turns where message_id = $1`, [message.id]))[0];
-        return { access, message, done: null, turnId: other.id as string, running: true, spent };
-      }
-      turnId = made.id;
-    }
-    return { access, message, done: null, turnId, running: false, spent };
+    return { access, message, done: null, turnId, running: false, spent, transcript };
   });
 
   if (start.done) return { state: 'done', message: start.message, reply: start.done.reply, effects: start.done.effects };
@@ -170,13 +168,12 @@ export async function receive(userId: string, rawText: string, requestKey: strin
   const access: Access = start.access;
   const message = start.message;
   const turnId = start.turnId;
-  const soft = { userId, messageId: message.id, turnId, messageText: message.body, zone: access.timezone };
-  const usage: Usage = { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 };
-  let steps = 0;
+  const soft: Soft = { userId, messageId: message.id, turnId, messageText: message.body, zone: access.timezone };
+  const run = { userId, actor: 'software' as const, messageId: message.id, turnId };
   let modelUsed = getModel().name();
 
   const finish = async (body: string, state: 'done' | 'failed', error?: string): Promise<TurnResult> =>
-    withResident({ userId, actor: 'software', messageId: message.id, turnId }, async q => {
+    withResident(run, async q => {
       let reply: MessageView | null = null;
       if (state === 'done') {
         reply = (await q<MessageView>(
@@ -184,11 +181,8 @@ export async function receive(userId: string, rawText: string, requestKey: strin
            on conflict (reply_to) where reply_to is not null do nothing returning ${MESSAGE_COLS}`, [message.id, body]))[0]
           || (await q<MessageView>(`select ${MESSAGE_COLS} from uc_pilot.messages where reply_to = $1`, [message.id]))[0];
       }
-      await q(
-        `update uc_pilot.turns set state = $2, finished_at = now(), error = $3, model = $4, steps = $5, input_tokens = $6, output_tokens = $7,
-                cache_read_tokens = $8, cache_write_tokens = $9, cost_micro = cost_micro + $10, reply_id = $11 where id = $1`,
-        [turnId, state, error ? clip(error, 500) : null, modelUsed, steps, usage.input, usage.output, usage.cacheRead, usage.cacheWrite,
-          costMicro(modelUsed, usage), reply?.id || null]);
+      await q(`update uc_pilot.turns set state = $2, finished_at = now(), error = $3, model = $4, reply_id = $5 where id = $1`,
+        [turnId, state, error ? clip(error, 500) : null, modelUsed, reply?.id || null]);
       return { state, message, reply, effects: await effectsOf(q, turnId), note: state === 'failed' ? body : undefined };
     });
 
@@ -201,25 +195,17 @@ export async function receive(userId: string, rawText: string, requestKey: strin
   }
 
   try {
-    const before = await withResident({ userId, actor: 'software', messageId: message.id, turnId }, async q => {
+    const before = await withResident(run, async q => {
       const view = await loadFile(q, access.timezone);
       const recent = await q<MessageView>(
         `select * from (select ${MESSAGE_COLS}, seq from uc_pilot.messages where id <> $1 and seq < (select seq from uc_pilot.messages where id = $1)
                          order by seq desc limit $2) t order by seq`, [message.id, LIMITS.recentMessages]);
-      const earlier = await effectsOf(q, turnId);
-      return { view, recent, earlier };
+      return { view, recent };
     });
-
-    const dynamic = [
-      fileForModel(before.view, access.display_name),
-      before.earlier.length
-        ? `\nThis reply was interrupted once. These actions were already carried out for the resident's latest message. Do not carry them out again:\n${before.earlier.map(e => `  ${e.tool}: ${e.detail}`).join('\n')}`
-        : ''
-    ].join('\n');
 
     const system = [
       { type: 'text' as const, text: SYSTEM, cache_control: { type: 'ephemeral' as const } },
-      { type: 'text' as const, text: dynamic }
+      { type: 'text' as const, text: fileForModel(before.view, access.display_name) }
     ];
     const tools = TOOLS.map(t => ({ name: t.name, description: t.description, input_schema: t.input_schema }));
     const messages: Turn[] = historyFor(before.recent, access.timezone);
@@ -228,30 +214,48 @@ export async function receive(userId: string, rawText: string, requestKey: strin
     if (lastTurn && lastTurn.role === 'user') lastTurn.content = `${lastTurn.content as string}\n\n${mine}`;
     else messages.push({ role: 'user', content: mine });
 
+    // What the model already asked for in this reply, and what the server answered. Empty on a first attempt.
+    const transcript: Turn[] = start.transcript;
+    const keep = () => withResident(run, q => q(`update uc_pilot.turns set transcript = $2::jsonb where id = $1`, [turnId, JSON.stringify(transcript)]));
+    const answer = async (calls: Extract<Block, { type: 'tool_use' }>[]) => {
+      const results: Block[] = [];
+      for (const c of calls) {
+        const r = await act(soft, c.name, (c.input || {}) as Record<string, unknown>);
+        results.push({ type: 'tool_result', tool_use_id: c.id, content: r.text, is_error: r.isError || undefined });
+      }
+      transcript.push({ role: 'user', content: results });
+      await keep();
+    };
+    const callsIn = (content: string | Block[]) =>
+      (Array.isArray(content) ? content : []).filter((b): b is Extract<Block, { type: 'tool_use' }> => b.type === 'tool_use');
+
+    // An interrupted reply stopped after the model asked and before every answer was kept. The same requests are answered now.
+    const tail = transcript[transcript.length - 1];
+    if (tail && tail.role === 'assistant' && callsIn(tail.content).length) await answer(callsIn(tail.content));
+
     const t0 = Date.now();
-    let actions = 0;
+    let steps = transcript.filter(t => t.role === 'assistant').length;
+    let actions = transcript.reduce((n, t) => n + (t.role === 'assistant' ? callsIn(t.content).length : 0), 0);
     let finalText = '';
     while (steps < LIMITS.steps) {
       const late = Date.now() - t0 > LIMITS.softDeadlineMs;
       const allow = !late && steps < LIMITS.steps - 1 && actions < LIMITS.actionsPerReply;
-      const res = await getModel().create({ system, tools, messages, maxTokens: 900, allowActions: allow });
+      const res = await getModel().create({ system, tools, messages: [...messages, ...transcript], maxTokens: 900, allowActions: allow });
       steps += 1;
       modelUsed = res.model || modelUsed;
-      usage.input += res.usage.input; usage.output += res.usage.output;
-      usage.cacheRead += res.usage.cacheRead; usage.cacheWrite += res.usage.cacheWrite;
-      const calls = res.content.filter((b): b is Extract<Block, { type: 'tool_use' }> => b.type === 'tool_use');
+      // What the call cost is written as soon as it is known, so a reply that is cut off still counts toward the day's limit.
+      await withResident(run, q => q(
+        `update uc_pilot.turns set steps = steps + 1, model = $2, input_tokens = input_tokens + $3, output_tokens = output_tokens + $4,
+                cache_read_tokens = cache_read_tokens + $5, cache_write_tokens = cache_write_tokens + $6, cost_micro = cost_micro + $7 where id = $1`,
+        [turnId, modelUsed, res.usage.input, res.usage.output, res.usage.cacheRead, res.usage.cacheWrite, costMicro(modelUsed, res.usage)]));
+      const calls = callsIn(res.content).slice(0, Math.max(0, LIMITS.actionsPerReply - actions));
       const said = res.content.filter((b): b is Extract<Block, { type: 'text' }> => b.type === 'text').map(b => b.text).join('\n').trim();
       if (calls.length === 0 || !allow) { finalText = said; break; }
-      messages.push({ role: 'assistant', content: res.content });
-      const results: Block[] = [];
-      for (const c of calls) {
-        actions += 1;
-        const r = actions > LIMITS.actionsPerReply
-          ? { text: JSON.stringify({ ok: false, result: 'Not done. This reply reached its limit of actions.' }), isError: true }
-          : await act(soft, c.name, (c.input || {}) as Record<string, unknown>);
-        results.push({ type: 'tool_result', tool_use_id: c.id, content: r.text, is_error: r.isError || undefined });
-      }
-      messages.push({ role: 'user', content: results });
+      actions += calls.length;
+      // The model's requests are kept before any of them is carried out.
+      transcript.push({ role: 'assistant', content: res.content.filter(b => b.type === 'text' || calls.includes(b as any)) });
+      await keep();
+      await answer(calls);
     }
 
     const body = cleanReply(finalText);
@@ -261,7 +265,11 @@ export async function receive(userId: string, rawText: string, requestKey: strin
     return finish(body, 'done');
   } catch (e: any) {
     const why = typeof e?.message === 'string' ? e.message : 'unknown';
-    return finish('No reply was written, because the language model or the database did not answer. Your message is kept. The list under this note shows each action that was carried out before the reply stopped. Send the message again to finish the reply. No action is carried out twice.', 'failed', why);
+    try {
+      return await finish('No reply was written, because the language model or the database did not answer. Your message is kept. The list under this note shows each action that was carried out before the reply stopped. Send the message again to finish the reply. No action is carried out twice.', 'failed', why);
+    } catch {
+      return { state: 'failed', message, reply: null, effects: [], note: 'No reply was written, because the database did not answer. Your message is kept.' };
+    }
   }
 }
 
@@ -277,24 +285,27 @@ export async function thread(userId: string, opts: { before?: string | null; lim
                        order by m.seq desc limit $2) t order by t.seq_n`, [opts.before && isUuid(opts.before) ? opts.before : null, limit + 1]);
     const more = rows.length > limit;
     const page = more ? rows.slice(1) : rows;
-    const ids = page.filter(m => m.speaker === 'resident').map(m => m.id);
-    const turns = ids.length ? await q<any>(
-      `select t.id, t.message_id, t.state, t.error, t.started_at < now() - ($2 || ' milliseconds')::interval as stale
-         from uc_pilot.turns t where t.message_id = any ($1::uuid[])`, [`{${ids.join(',')}}`, String(LIMITS.runningStaleMs)]) : [];
+    // A reply shows what its own turn did, even when the resident message it answers sits on an earlier page.
+    const asked = [...new Set(page.map(m => (m.speaker === 'resident' ? m.id : m.reply_to)).filter((x): x is string => !!x))];
+    const turns = asked.length ? await q<any>(
+      `select t.id, t.message_id, t.state, t.started_at < now() - ($2 || ' milliseconds')::interval as stale
+         from uc_pilot.turns t where t.message_id = any ($1::uuid[])`, [`{${asked.join(',')}}`, String(LIMITS.runningStaleMs)]) : [];
     const effects = turns.length ? await q<Effect & { turn_id: string }>(
       `select turn_id, tool, outcome, detail, target, target_id from uc_pilot.actions
         where turn_id = any ($1::uuid[]) and outcome <> 'read' order by seq`, [`{${turns.map((t: any) => t.id).join(',')}}`]) : [];
+    const turnFor = (messageId: string | null) => {
+      const t = messageId ? turns.find((x: any) => x.message_id === messageId) : null;
+      return t ? { state: (t.state === 'running' && t.stale ? 'failed' : t.state) as string, effects: effects.filter(e => e.turn_id === t.id).map(({ turn_id, ...e }) => e) } : null;
+    };
     return {
       access,
       more,
-      messages: page.map(m => {
-        const t = turns.find((x: any) => x.message_id === m.id);
-        return {
-          id: m.id, speaker: m.speaker, body: m.body, created_at: m.created_at, removed: m.removed, reply_to: m.reply_to,
-          key: m.speaker === 'resident' ? m.request_key ?? null : null,
-          turn: t ? { state: t.state === 'running' && t.stale ? 'failed' : t.state, effects: effects.filter(e => e.turn_id === t.id) } : null
-        };
-      })
+      messages: page.map(m => ({
+        id: m.id, speaker: m.speaker, body: m.body, created_at: m.created_at, removed: m.removed, reply_to: m.reply_to,
+        key: m.speaker === 'resident' ? m.request_key ?? null : null,
+        // On a resident message: the state of its reply. On a reply: what that reply did.
+        turn: turnFor(m.speaker === 'resident' ? m.id : m.reply_to)
+      }))
     };
   });
 }

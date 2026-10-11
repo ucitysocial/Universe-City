@@ -4,7 +4,9 @@ import { supabaseServer } from '@/lib/supabase/server';
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
-  const next = searchParams.get('next') ?? '/portal';
+  // The page to open after the link is a path on this site. A full address is replaced with the Resident Portal.
+  const asked = searchParams.get('next') ?? '';
+  const next = /^\/(?![\/\\])[^\s]*$/.test(asked) ? asked : '/portal';
   const publicAppUrl = process.env.NEXT_PUBLIC_PUBLIC_APP_URL ?? origin;
   if (code) {
     const { error } = await supabaseServer().auth.exchangeCodeForSession(code);

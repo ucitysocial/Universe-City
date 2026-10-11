@@ -6,7 +6,9 @@ import { supabaseBrowser } from '@/lib/supabase/client';
 
 export default function Login() {
   const router = useRouter();
-  const next = useSearchParams().get('next') || '/portal';
+  // The page to open after login is a path on this site. A full address or a script is replaced with the Resident Portal.
+  const asked = useSearchParams().get('next') || '';
+  const next = /^\/(?![\/\\])[^\s]*$/.test(asked) ? asked : '/portal';
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [err, setErr] = useState<string | null>(null);
