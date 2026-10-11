@@ -473,7 +473,162 @@ This should work for text and voice equally. The resident can use history even i
 **Implementation dependencies to investigate:** Time commitments/follow ups/ongoing work and Plan states; change events for entities other than blocks; human attribution versus clearly labeled software actions; sources for before/after summaries; resident history navigation; whether weekly review already has an authoritative design; transcript privacy and retention; voice interruption and fallback to text.
 
 
-## 18. Open design questions
+## 18. Guided Life beyond scheduled routines: voice calls, work, home, procedures and spontaneous sessions — October 11, 2026
+
+**Status:** Detailed working exploration. Names and design preferences are founder directions; product behavior, technical choices, permissions and implementations are not approved merely by appearing here. Read Sections 16–17 together with this section. The governing \`LANGUAGE_STANDARD.md\`, \`TIME.md\`, \`TIME_OPERATIONS.md\`, relevant folder documents and existing File architecture take precedence.
+
+### 18.1 Founder direction: broad applicability across the 48 Folders
+
+Guided Life is a resident-facing way to obtain contextual support while actually living their day. Guide Mode names the associated agent-side experience. **Do not narrow this concept to getting ready, hygiene, Time, or Career Development.** Explore it across the full four-department, 48-folder scope as each folder and its curriculum become operational.
+
+The central opportunity is the intersection of:
+- **Time:** What is planned, what is happening, the next commitment, and what may need to change.
+- **Relevant folder knowledge and curriculum:** What to know and how to learn or carry out a particular activity, with source-checked instruction.
+- **The one Resident File:** Established circumstances, relevant personal preferences, approved instructions, linked procedures, follow ups, and corrections.
+- **The resident's choice:** Whether to begin a session, listen, speak, share their screen, accept a suggestion, or update a Plan.
+
+Use the existing vocabulary and data governance. A guided session is an interface/workflow, **not** a new Folder, File, schedule, or independent source of truth. Other 44 folders are not presented as currently operational merely because this section imagines later use.
+
+### 18.2 Native app: an optional incoming-call-style invitation
+
+**Explicit founder preference:** If a future native app supports it and the resident opts in, an invitation to Guided Life should **feel like a phone call**: ring or notify, show who is inviting the resident and why, and allow **Answer** or **Decline**. The call is an app-based live voice session rather than a cellular telephone call or a telephone number.
+
+Possible contexts selected by the resident include:
+- Starting a Morning Plan or a scheduled guided routine.
+- Beginning a workday or planned work session.
+- A weekly review.
+- A later session the resident requested or specifically authorized.
+
+Example fictional invitation: "Guided Life — Morning Plan" at the time the resident chose. If answered, start the voice session and an appropriately brief Plan briefing; if declined, do not claim the resident began the routine or missed a commitment. Provide ordinary notification, silence, reschedule, and text/screen alternatives. Personal details on a locked screen must respect privacy settings.
+
+**Technical constraint:** Native operating systems regulate call-style experiences differently from ordinary notifications and alarms. iOS CallKit/PushKit is associated with genuine VoIP use; Android incoming-call/full-screen notifications have permissions and eligibility constraints. A simulated incoming-call UI *inside an opened app* is a different capability from a genuine incoming-call presentation on a locked device. Research platform policy before promising a system-level incoming-call screen. No requirement for a full-time microphone, actual telephone service, or intrusive ringing. Do not use call UI to disguise or impersonate a human: software voice must be clearly identified.
+
+### 18.3 Hybrid audio approach: conversations versus listening
+
+**Preferred research direction, not yet a provider/model commitment:** Evaluate OpenAI's current audio documentation at https://developers.openai.com/api/docs/guides/audio and its realtime speech and speech-synthesis options.
+
+Use a potentially higher-interaction **realtime voice experience** where the resident and software naturally converse, interrupt each other, answer questions, make decisions, or work through changes to Time. Use potentially **lighter spoken narration** for briefings, steps, vetted curriculum, transitions and time reminders when there is no reason to keep a realtime microphone-on interaction alive.
+
+Both voice methods and text use the **same underlying Time/File workflows**, permission checks, outcome recording, agent review, and resident-visible change history. An individual may switch modalities. The first prototype need not provide background voice, an app-level incoming call, or a continuous listening session.
+
+Evaluate latency, interruption handling, costs of long sessions, text/audio provenance, reliability when connection drops, headphones and accessibility, user-initiated stop/pause, transcript privacy, screen lock, and background execution. Never equate an active microphone or delivered audio with evidence of execution.
+
+### 18.4 Working with Guided Life: discover what the resident actually does
+
+**Founder example:** A resident starts the first work hour with a voice conversation: "What do you have to do today?" The conversation may reveal routine reports, repetitive invoice work, a difficult inbox, undocumented procedures, responsibilities they do not fully understand, and aspirations beyond the present job.
+
+One work session may combine:
+1. **Discover:** Learn the present workload, sequence of responsibilities, dependencies, constraints, procedures and where the resident currently struggles. Ask only useful follow-up questions.
+2. **Organize:** Use the existing Plan and Time's permissions to prepare workable commitments or follow ups, accounting for firm deadlines and already planned work.
+3. **Guide:** Help with an actual task, including steps the resident can follow as they work.
+4. **Develop:** Where relevant, connect observed responsibilities and stated goals to the appropriate Career Development folder's approved curriculum as that material becomes available.
+5. **Review:** Compare the proposed action and reported outcome; prepare accurate File changes and resident-visible explanations.
+
+**Fictional inbox example:** Resident says their inbox is overwhelming. The agent may propose a thirty-minute organization block after lunch over the next several workdays *if that fits the resident's actual workload and they agree*. Later guided sessions can teach organization techniques, creating labels and folders, deciding how to triage incoming mail, and developing an SOP for recurring management. Do not silently schedule an invented daily obligation. Neither the resident nor the agent must know the final professional development objective before the conversation begins.
+
+**Career progression insight:** A resident who produces reports but does not know why the figures matter may benefit from instruction about interpreting them; someone with recurring undocumented processes may benefit from SOP development; someone aiming for management may benefit from identifying transferable skills. Avoid unwarranted assessments about competence or performance. Folders and curricula establish what education is valid; a single work session is not itself a formal position, Grade, assessment, or finding.
+
+### 18.5 Future screen sharing: observe, document, practice and develop
+
+**Strong founder interest:** With deliberate screen-share permission, a resident could show Guided Life the actual workflow they are performing. For example, they demonstrate preparing a Friday report, processing invoices, building spreadsheet formulas, or organizing inbox labels while explaining their choices.
+
+Potential session loop:
+1. **Observe the visible workflow**, ask for missing context; distinguish what was on-screen from what the resident said.
+2. **Identify candidate steps, dependencies and repetitive work**, without assuming the observed version is best or compliant.
+3. **Prepare a draft reusable procedure or SOP**, citing the session context and identifying steps needing confirmation.
+4. **Review and approve** the instructions with the resident/authorized responsible person before treating them as accurate reusable material.
+5. **Guide later repetitions** from the last applicable reviewed version; vary explanations based on reported familiarity and actual issues, not guesses of mastery.
+6. **Revise under provenance/version history** when software, workplace requirements, equipment, or the resident's method changes.
+
+Illustrative dialogue: "This is the report I submit every Friday." → "Walk me through how you prepare it." → "You look up that number each week. Is there a reason it needs manual entry?" → "Want me to draft those steps as an SOP for review?"
+
+Avoid implying Guided Life can always recognize applications, inspect arbitrary private systems, click controls, record the screen, or automate employer software. **Screen sharing is not computer control.** Native/browsers need explicit capture permission and clear visibility/stop controls. The resident must not expose coworker information, credentials, protected health information, regulated data or proprietary employer material without appropriate authorization. Define capture retention, redaction and workspace/security boundaries before implementing.
+
+### 18.6 Reusable personal procedures connected to the existing File
+
+**Explicit founder preference:** Guided Life should be able to recall a resident-reviewed procedure on demand — for example, "Walk me through that Friday report again" — and help them carry it out without repeating initial discovery each time.
+
+Explore a **growing collection of reusable instructions organized under the appropriate existing Folders and linked to Time's relevant commitments**. Do not create a competing new standalone File. Define procedure identity, applicable context, owner, content source, steps, status (draft/reviewed/superseded), last review, history, and permission to reuse. Reusing instructions must not silently copy confidential employer workflows across residents or suggest that an AI-generated SOP is automatically authoritative.
+
+This is not just a static recording: as the resident learns, instructions can become shorter; when they request a refresher they can receive fuller steps; if the work changes, the agent can help amend the applicable procedure with review and history. The material should continue to work through text or screen for someone who does not want voice.
+
+**Possible proactive prompt:** When a resident is demonstrating a new repeatable task, Guided Life may ask at a suitable stopping point whether they want to document it for future use. Do not record or retain everything merely because a microphone or screen share is on.
+
+### 18.7 Household and everyday examples across folders
+
+Explore comparable procedural and curriculum guidance wherever the activity and the relevant folder legitimately intersect:
+
+- **Laundry:** Check clothing and garment labels, sort by appropriate care requirements, load and run the correct cycle, transfer or hang dry when needed; use an agreed recurring Time commitment if the resident wants one. Teach only safe, source-checked care recommendations.
+- **Cleaning a bathroom:** Discuss supplies on hand, safe product use and ventilation, a workable order of tasks, and a repeatable cleaning routine appropriate to the home. Never recommend mixing incompatible cleaning chemicals or assume what cleaning supplies are available.
+- **Making a bed:** A short optional step-by-step routine for a beginner; for someone experienced, a single cue may be sufficient. This should not become a mandatory performative habit.
+- **Grocery shopping:** Before leaving, consult authorized Inventory information and an actual shopping objective, planned meals if on file, applicable spending constraints and available time. While shopping, help compare unit prices from provided/authorized information, adjust the list, and answer questions. Afterward, use confirmed purchased items to propose or make permitted Inventory updates; being at a store does not prove an item was bought.
+- **Other possible activities:** Household repairs, studying, errands, preparing for an appointment, recurring workplace reports, caring responsibilities, and cooking, subject to the relevant folder scope, curriculum maturity and safety needs.
+
+The resident should experience **one coherent activity** rather than having to select five folders. Time handles timing; the relevant folders contribute reliable content, context and approved records. No promise that inventory, meals, finances, transportation, and other dependencies are fully integrated until verified.
+
+### 18.8 Spontaneous sessions — the resident may call even without a scheduled block
+
+**Explicit founder decision: YES.** Guided Life must be conceptualized to support **resident-initiated, unplanned sessions** as well as deliberately scheduled sessions. A resident might start a call while shopping, cleaning a messy kitchen, learning an unfamiliar job task, or reacting to changed plans.
+
+Fictional exchange:
+
+> Resident: "I've got ten minutes on my break. I'm at the store."
+>
+> Guided Life: "Are you picking up something specific?"
+>
+> Resident: "Just dinner stuff."
+>
+> Guided Life: "Want to check what you already have and make a quick list? You said you have about ten minutes."
+
+Crucial distinction: A work block on the schedule and a reported trip during a break **can coexist**. This report alone does not establish that the resident missed work, that the entire work block is invalid, or that purchases occurred.
+
+If the resident instead reports, "They sent us home early," the established Plan may actually need to change. The agent/software can prepare a revision to affected commitments, check consequences and dependent plans, and execute only changes authorized under Time's existing permissions. Speak naturally and ask the smallest necessary question.
+
+A spontaneous conversation may result in **no File changes**. It may provide immediate education or help, reveal information to verify, document a reported event with the correct status, open a follow up, or lead to a proposed/revised Plan. Do not impose a permanent commitment simply because someone requested momentary help.
+
+### 18.9 Planned, reported and established outcome must remain distinct
+
+**Founder's core observation:** A thousand delivered notifications cannot tell us whether the resident **actually did** what was planned. The system must not fabricate execution from calendar time, reminder delivery, microphone activity, GPS presence, screen sharing, or session attendance.
+
+Keep at least these concepts separate:
+- **Planned:** "Work 9 AM to 5 PM" exists as an intended block/commitment under current Time rules.
+- **Reported:** "I went to the grocery store during my break" is a resident statement about an event. Its interpretation and placement may need follow up.
+- **Execution outcome:** Use Time's actual defined outcomes and evidence rules; determine what was executed, partially executed or did not happen according to the commitment's conditions.
+- **Timing:** Capture a changed start/end or departure accurately, separately from execution.
+- **Consequences and alternatives:** Preserve reported or otherwise established consequences and what alternative was used under Time's existing defined fields.
+
+A spoken call is a potential *source of an update*, not proof of all details. A timer ending is not proof. Schedule revisions, resident reports and assessed execution outcomes should remain reviewable in the File with provenance, approvals and appropriate history.
+
+### 18.10 Resident-visible history and weekly review extend to spontaneous sessions
+
+Apply Section 17's **resident-facing change-summary and durable File-history direction** to work calls, screen-assisted sessions, household activities and spontaneous calls.
+
+Afterward, show what was **actually added, changed, removed or corrected**; what is only proposed; what the resident reported without confirmed outcome; and which follow ups remain open. The authorized human agent can retain/access transcripts as specified in Section 17, but the Resident should not need to read a transcript to learn the result.
+
+Example: “Reported: a grocery stop during the work break”; “Proposed: tomorrow's shopping list”; “Added: a thirty-minute inbox organization commitment” **only if actually authorized and filed**. These entries should be linked to their source sessions and underlying Time/Inventory/relevant Folder revisions, and available for **‘What changed this week?’** in the resident's weekly review. The resident can clarify what changed or request corrections. A report of a purchased item is not equivalent to a confirmed Inventory update without the applicable rules.
+
+### 18.11 Open session-duration design choice
+
+The discussion has established support for **resident-initiated calls in and out** and optional planned invitations. It has **not settled** whether the app should also permit long-running, continuous daily audio sessions.
+
+Research active-call versus intermittent-session models for privacy, consent, device battery, networking, context continuity, practical voice latency, interruption of workplace/personal activities, user access to history, and cost. A persistent microphone should never be the default assumption or required for participation. Pausing or ending a session must not erase a proposed change or falsely mark a commitment complete.
+
+### 18.12 Prototype sequence and validations
+
+Keep the agreed build dependency: **Time basics and a usable general Schedule first**. Then demonstrate one end-to-end flow that uses existing File rules and history:
+1. Resident opens a Time conversation through text (voice added through a shared workflow).
+2. Discusses actual daily activities, or starts a spontaneous relevant session.
+3. Software/human agent prepares necessary Plan or Folder changes.
+4. Existing permission and approval rules govern what is actually filed.
+5. Resident sees a clear result: filed versus proposed versus still unknown.
+6. Resident can retrieve the change in their File history and later weekly review.
+
+Later prototypes can evaluate interactive voice with interruption, optional call-like invitations in native apps, guided steps/time cues, cross-folder curriculum, deliberate screen sharing and one reusable SOP, then broader guided sessions across folder types.
+
+**Further questions:** Where do reusable procedures belong without duplicating Folder-owned data? Which existing entities need immutable revisions beyond Time blocks? How are transient task observations separated from durable File facts? How do agents review/revise proposed procedures? What are acceptable voice/recording policies and workplace protections? How should curriculum sources and professional advice be checked? Which technical approach satisfies Apple/Android call restrictions without misleading residents?
+
+
+## 19. Open design questions
 
 - How should a passing conversation statement be retained, structured, confirmed and made correctable?
 - What actions can software take on standing permission, and which need resident or agent approval?
@@ -486,7 +641,7 @@ This should work for text and voice equally. The resident can use history even i
 - What does human-agent oversight cost at different scales?
 - What is the appropriate relationship between substantive engagement, Grade and future programs?
 
-## 19. Application to the Time Curriculum — advisory only
+## 20. Application to the Time Curriculum — advisory only
 
 When designing Time's assessment and lessons:
 - Measure planning, execution, review and follow-through under the resident's established conditions.
@@ -498,9 +653,9 @@ When designing Time's assessment and lessons:
 - Preserve ordinary conversational pacing; Curriculum questions do not authorize an interrogation.
 - These considerations **inform drafting** but do not override current authoritative Time, Curriculum or Language Standard text.
 
-## 20. Editorial handoff
+## 21. Editorial handoff
 
-**Founder directions expressed:** natural conversation, low-friction access, focused Portal experience, pattern recognition central to representation, human agent responsibility, brief text-like messages, acknowledging the resident before a nonurgent observation, meaningful continuity rather than login farming; schedule-first exploration, large expandable time blocks, optional smaller steps, optional non-daunting progress support, and no presumption that all residents have daily routines or paid work; optional narrated Guided Mode for any relevant time block, spoken Plan briefing, activity-aware prompting, time-until-next-commitment reminders, curriculum-based education with evolving scripts, optional opt-in distraction controls, and practical re-planning when the resident falls behind or becomes overwhelmed; agent-side **Guide Mode**, resident-side **Guided Life**, conversational voice or text Time-building, agent transcript access, resident-visible outcomes and durable change summaries available to weekly review.
+**Founder directions expressed:** natural conversation, low-friction access, focused Portal experience, pattern recognition central to representation, human agent responsibility, brief text-like messages, acknowledging the resident before a nonurgent observation, meaningful continuity rather than login farming; schedule-first exploration, large expandable time blocks, optional smaller steps, optional non-daunting progress support, and no presumption that all residents have daily routines or paid work; optional narrated Guided Mode for any relevant time block, spoken Plan briefing, activity-aware prompting, time-until-next-commitment reminders, curriculum-based education with evolving scripts, optional opt-in distraction controls, and practical re-planning when the resident falls behind or becomes overwhelmed; agent-side **Guide Mode**, resident-side **Guided Life**, conversational voice or text Time-building, agent transcript access, resident-visible outcomes and durable change summaries available to weekly review; optional call-style native invitations, a hybrid voice model, work-session discovery and career development, deliberate screen sharing, resident-reviewed reusable SOPs, everyday guided activities across relevant Folders, and spontaneous calls that help reconcile reported life with Time without inventing execution.
 
 **Unapproved proposals:** exact expanded-block layout, optional Guided Mode implementation, lesson/script framework, cross-folder audio privacy and timing rules, voice/alarm and phone distraction controls, specific automation/approval mechanics, retention and privacy decisions, alert thresholds, proposed tests and measurement criteria, escalations and new operative rules.
 
