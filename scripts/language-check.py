@@ -87,6 +87,8 @@ def tsx_lines(path):
     classes = set(re.findall(r'className="([^"]+)"', s))
     for expr in re.findall(r"className=\{([^}]*)\}", s):
         classes.update(m[0] or m[1] or m[2] for m in re.findall(r"'([^']*)'|\"([^\"]*)\"|`([^`]*)`", expr))
+    # A list of element ids is code. A resident never reads an id.
+    classes.update(re.findall(r'(?:aria-describedby|aria-labelledby|aria-controls|htmlFor|id)="([^"]+)"', s))
     classes = {c.strip() for c in classes}
     for m in re.finditer(r">([^<>{}\n]*[A-Za-z][^<>{}\n]*)<", s):
         t = html.unescape(m.group(1)).strip()
