@@ -25,4 +25,4 @@ The total on October 10, 2026 was 238. A commit shall not raise the total.
 11. Metaphor and every other figure of speech are prohibited. Each sentence is literally true as written.
 12. Resident facing text contains no hyphen and no dash.
 13. A button that performs an action contains a verb and a specific object. Continue, Get started, and Next are prohibited.
-14. Text signed by the founder in the first person is text the founder wrote or approved. Do not write new sentences in her name.
+14. The chapters of the Founder book in `ucitysocial/founder.html` are in the founder's own voice. The Language Standard does not govern them. Do not rewrite her sentences to meet these rules. Do not write new sentences in her name. Clause 4.6 states the rule.

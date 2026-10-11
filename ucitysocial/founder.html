@@ -77,7 +77,9 @@ a{color:inherit}
 .zone:focus-visible{outline:2px solid var(--burgundy);outline-offset:-4px}
 
 /* type inside the book */
-.flow p{margin:0;orphans:2;widows:2;break-inside:avoid;-webkit-column-break-inside:avoid}
+.flow p{margin:0;orphans:2;widows:2}
+.ch>h2+p{display:flow-root}
+.ch>h2+p,.tp p,.kick,.end{break-inside:avoid;-webkit-column-break-inside:avoid}
 .flow p+p{margin-top:.6em}
 .flow h2{margin:0 0 20px;font:500 31px/1.1 var(--reading);letter-spacing:-.012em;break-after:avoid;-webkit-column-break-after:avoid}
 .kick{margin:0 0 13px;font:14px/1.2 var(--record);letter-spacing:.2em;text-transform:uppercase;color:var(--burgundy)}
@@ -108,6 +110,10 @@ a{color:inherit}
 .fin{break-inside:avoid;-webkit-column-break-inside:avoid}
 #endMark{display:block;height:1px}
 .end{margin:26px 0 0;text-align:center;color:var(--burgundy);font:22px/1 var(--ui);text-indent:0}
+.flow .artifact{display:block;margin:16px 0 0;padding:11px 14px;border:1px solid rgba(20,10,12,.4);border-left:4px solid var(--burgundy);color:var(--ink);font:600 14px/1.3 var(--ui);text-decoration:none;break-inside:avoid;-webkit-column-break-inside:avoid}
+.flow .artifact:hover{background:rgba(20,10,12,.06)}
+.flow .artifact::after{content:' \2197'}
+.flow .artifact+p{margin-top:16px}
 .flow .back{display:block;margin:22px auto 0;width:max-content;max-width:100%;padding:11px 18px;border:2px solid var(--ink);background:var(--paper);color:var(--ink);font:600 14px/1.2 var(--ui);text-decoration:none;box-shadow:4px 4px 0 var(--ink)}
 
 /* controls */
@@ -219,103 +225,111 @@ a{color:inherit}
         <div class="row"><dt>2015 to 2020</dt><dd>I work in multifamily interior design. I see how much money goes into building housing. I cannot work out why living in it keeps costing more.</dd></div>
         <div class="row"><dt>2016</dt><dd>My mom dies. I am 20.</dd></div>
         <div class="row"><dt>2018</dt><dd>I start a podcast named Blank Univercity. I design its first logo myself. Then I pay an artist to redraw it.</dd></div>
-        <div class="row"><dt>2021</dt><dd>I move to Denver. I look into community development corporations. I build a project for the Denver Housing Authority.</dd></div>
-        <div class="row"><dt>2022 to 2025</dt><dd>I work in community management, at a nonprofit for homeless youth, and at a community radio station. I attend hospitality school. Each job changes how I define the folders.</dd></div>
+        <div class="row"><dt>2021</dt><dd>I move from Dallas to Denver.</dd></div>
+        <div class="row"><dt>2023</dt><dd>I present a proposal to the Denver Housing Authority. It has twelve areas, each named after a constellation.</dd></div>
+        <div class="row"><dt>2022 to 2025</dt><dd>I work in community management, at a nonprofit for homeless youth, and at a community radio station. I attend culinary school. Each job changes how I define the folders.</dd></div>
         <div class="row"><dt>January 2026</dt><dd>I expand the first model of twelve folders into four departments with twelve folders each.</dd></div>
         <div class="row"><dt>Now</dt><dd>I am <span data-age>30</span>. I am the first resident of Universe City. I run all forty eight folders on my own life first, in public. I publish the numbers as I go.</dd></div>
        </dl>
       </section>
 
-      <section class="ch" id="ch1" data-title="I was 20." data-toc="I was 20.">
+<!-- founder-voice:start  The chapters are in the founder's own words. The Language Standard does not apply here. See clause 4.6. -->
+      <section class="ch" id="ch1" data-title="She just knew me." data-toc="She just knew me.">
        <p class="kick">Chapter 01 &middot; 2016</p>
-       <h2>I was 20.</h2>
-       <p>My mom died in 2016. I was 20, heading into 21.</p>
-       <p>She was the person I could call. She was the person I could move back in with. She had known me since the day I was born.</p>
-       <p>She taught me how to handle parts of everyday life before I knew how to manage them myself.</p>
-       <p>After she died, I understood how much administrative work she had been doing with me. She helped me keep information in order. She helped me make decisions. She helped me handle responsibilities I had not learned to manage yet.</p>
-       <blockquote class="pull">I was now the person responsible for understanding myself as fully as she did.</blockquote>
+       <h2>She just knew me.</h2>
+       <p>My mom died in 2016. I was 20.</p>
+       <p>She just knew me.</p>
+       <p>She was always someone I could call on. Someone who was always checking in on me, letting me know I was loved, reminding me of who I am. My strengths. My weaknesses.</p>
+       <p>She was the best hugger in the world. She had the best laugh ever.</p>
+       <p>When she died, I felt this huge hole in my chest. The way I&rsquo;m sure some people feel that didn&rsquo;t get to experience having a mother like mine.</p>
+       <p>Losing her created this huge contrast for me that&rsquo;s hard to explain. But I knew I had to quickly adapt. And that still took 10 years, and will probably take another 10.</p>
+       <p>It made me think of all the compliments I got for being so well mannered, organized, systems oriented. It&rsquo;s because I learned a lot of these traits passively from her.</p>
+       <p>The point of Universe City is to be able to help people do the same thing in their lives without having a mom like mine.</p>
       </section>
 
-      <section class="ch" id="ch2" data-title="Adulthood felt enormous." data-toc="Adulthood felt enormous.">
-       <p class="kick">Chapter 02</p>
-       <h2>Adulthood felt enormous.</h2>
-       <p>I was now responsible for every part of my own life.</p>
-       <p>I did not have clear standards for myself. I made decisions without a plan. No person could tell me what deserved my attention first.</p>
-       <p>Parents often do part of this work for their children. Some people lose that support. Some people never have it.</p>
-       <blockquote class="pull">I knew I was not the only person who felt that way.</blockquote>
+      <section class="ch" id="ch2" data-title="I guess anything goes now." data-toc="I guess anything goes now.">
+       <p class="kick">Chapter 02 &middot; 2016 to 2020</p>
+       <h2>I guess anything goes now.</h2>
+       <p>After she died, I started to push a lot of people away. I ended a long-term relationship. I kept friends at arm&rsquo;s length. I developed an unhealthy relationship with work.</p>
+       <p>And to be frank, I was very angry at God.</p>
+       <p>I was like, I guess anything goes now.</p>
+       <p>To be honest, I spent those first 4 years after losing her extremely distracted. But also working a lot. Making bad decisions. And yet, still trying to make sense of it all.</p>
+       <blockquote class="pull">I don&rsquo;t think I was searching. I think I was trying to heal using the tools I had always used to self-soothe.</blockquote>
+       <p>Even as a kid I was obsessed with owning anything. I had a dog walking business. Anytime we went to the pool I wanted to sell snacks and Slurpees.</p>
+       <p>My mom would make us create PowerPoint presentations if we wanted things or wanted to do special things. So I was used to having to think it through, create a plan, present it. And I loved it.</p>
+       <p>I would role play owning a homeless shelter when I was 10 instead of playing with Barbies. I wanted to open a daycare in our garage when I was in 4th grade. A year later I was calling all the woodshop companies out of the Yellow Pages to see if they had any spare wood, because I was convinced I could build my own car.</p>
+       <p>I was also the kid that asked for a camera and a computer every Christmas or birthday if I didn&rsquo;t have one. Always filming skits and videos, from when we were like 7 years old all the way through high school and to now.</p>
+       <p>Same with singing. I used to want to be a big performer, but it was really so I could make enough money to retire my mom. Even before I knew what retirement was.</p>
+       <p>On career day they would come to school with those books to ask us what we wanted to be. I would just flip to the back, where the highest salaries were. In like 6th grade I decided I was going to be an anesthesiologist, because they made the most in the book.</p>
+       <p>I loved animals. Always bringing animals home. Calling bird sanctuaries if I found an injured bird.</p>
+       <p>I had a great childhood. And I naturally reached for those things.</p>
+       <p>And then I realized they weren&rsquo;t enough.</p>
       </section>
 
       <section class="ch" id="ch3" data-title="Blank Univercity" data-toc="Blank Univercity">
        <p class="kick">Chapter 03 &middot; 2018</p>
        <h2>Blank Univercity</h2>
-       <p>In 2018 I started a podcast. I named it Blank Univercity.</p>
-       <p>I was creating from grief. I was processing in public what had happened to me.</p>
-       <p>On the podcast I joked that grief had sent me to Street University. The joke was about becoming emotionally hardened. I felt tougher and more guarded than I had been before my mom died.</p>
-       <p>I designed the first logo myself. Then I paid an artist to redraw it.</p>
-       <p>Blank Univercity was tied to a social media identity I no longer use. One question from the podcast stayed with me.</p>
-       <blockquote class="pull">What are people expected to know about adulthood, even though nobody formally teaches it?</blockquote>
+       <p>Trying to make sense of it all is why I started the Blank Univercity podcast in 2018. I used my creative abilities to try to vocalize what I was feeling in the best way I knew how! Podcast!!</p>
+       <p>I talked about love, sex, death, grief, feeling lost, feeling confused. And although it felt like a great outlet, I still struggled with actively learning how to navigate and build off of what I was feeling outside the realms of creativity.</p>
        <p>The name Universe City came from Blank Univercity.</p>
+       <p>Around this time in 2018 was the first time I considered moving from Texas to Denver. I was OBSESSED with learning about community development corporations, and with creating education for people looking to buy homes and make their cost of living more affordable.</p>
+       <p>But I have always been obsessed with housing. So much so that my former operations exec at the interior design company gifted me 4% equity in a land acquisition deal he made from my research and my yapping about this in general.</p>
+       <p>I was basically trying to make modular homes or trailer homes popular again. Delete the stigma and allow people the opportunity to own something. With the advancements of modular housing, I saw a real way in.</p>
+       <p>But then I just kept getting distracted. Working multiple jobs. Songwriting, which I&rsquo;ve done since I was a kid. Several podcasts and creative ventures.</p>
+       <p>I just felt tired and burnt out.</p>
       </section>
 
-      <section class="ch" id="ch4" data-title="Working with kids changed the question." data-toc="Working with kids changed the question.">
+      <section class="ch" id="ch4" data-title="Train like a winner." data-toc="Train like a winner.">
        <p class="kick">Chapter 04</p>
-       <h2>Working with kids changed the question.</h2>
-       <p>I worked with kids at two organizations. One was a nonprofit for homeless youth.</p>
-       <p>I started asking what a child should understand before adulthood begins.</p>
-       <p>I started thinking in terms of preparedness.</p>
-       <blockquote class="pull">What do these kids need to understand to be prepared for adulthood?</blockquote>
+       <h2>Train like a winner.</h2>
+       <p>The first thing I do when my life feels off is create a plan, a schedule, and a list of things that I need to do to keep me on track.</p>
+       <p>I didn&rsquo;t even think about life as a system. I just knew a calendar and organizing was where I started. And always some form of adhering to a sleep and wake time, a gym schedule, and an eating routine.</p>
+       <p>I knew because of my childhood. I come from a pretty athletic family, and playing sports kind of instilled that discipline of, okay, if you want to win you have to train like a winner. Go to sleep on time. Wake up on time. Work out. Eat healthy. Read. Those things I got from sports.</p>
+       <p>It started out as printouts I would hang on my wall, where I would check off things I did around my house. One in the kitchen for dishes and groceries. Another for reading my books or practicing singing. Cleaning my bathroom.</p>
+       <p>But those systems did not upkeep well.</p>
+       <blockquote class="pull">I think that almost made it easier to let chaos build, because I knew I could clean it up.</blockquote>
+       <p>What was frustrating was the fact that I knew I could get back on track and maintain for at least 2 weeks. Seriously. In the earlier years I would track it. One time I was like, OMG, I&rsquo;m on week 8 of this and I haven&rsquo;t fallen off and started binging or allowing my home to get super messy again.</p>
+       <p>So I struggled with allowing chaos to brew, even though I knew it would happen again.</p>
       </section>
 
-      <section class="ch" id="ch5" data-title="What makes a life easier to manage?" data-toc="What makes a life easier to manage?">
-       <p class="kick">Chapter 05</p>
-       <h2>What makes a life easier to manage?</h2>
-       <p>For years I asked versions of that one question.</p>
-       <p>What does a person need to write down? What needs a schedule? What needs a rule? What needs a plan?</p>
-       <p>My mom was an engineer. She thought in systems. I recognize the same instinct in myself.</p>
-       <blockquote class="pull">I inherited her instinct to look for structure.</blockquote>
-      </section>
-
-      <section class="ch" id="ch6" data-title="The constellations" data-toc="The constellations">
-       <p class="kick">Chapter 06</p>
-       <h2>The constellations</h2>
-       <p>My mom loved the moon and the constellations.</p>
-       <p>As Blank Univercity became Universe City, I used the constellations as structure. Each department has 12 folders. Each folder position matches one of the 12 zodiac constellations. Aries is Folder 01.</p>
-       <p>The constellations exist whether or not a person believes in astrology.</p>
-       <blockquote class="pull">I built this structure myself. I used the constellations to build it.</blockquote>
-      </section>
-
-      <section class="ch" id="ch7" data-title="Where I come from" data-toc="Where I come from">
-       <p class="kick">Chapter 07</p>
-       <h2>Where I come from</h2>
-       <p>Both of my parents were Libras. They were born on the same day.</p>
-       <p>Law and order were present in my upbringing. So were dysfunction, inconsistency, and the outlaw side of life.</p>
-       <p>I can see my upbringing in Universe City. It has folders named Standards, Mediation, Boundary, and Law.</p>
-       <p>I know what life is like when rules and records are inconsistent or missing.</p>
-      </section>
-
-      <section class="ch" id="ch8" data-title="Universe big. City small." data-toc="Universe big. City small.">
-       <p class="kick">Chapter 08 &middot; The name</p>
-       <h2>Universe big. City small.</h2>
-       <p>I kept thinking about problems that are too large for one person to solve. Hunger is one. Homelessness is one.</p>
-       <p>I asked myself a question. What is it going to take to create a better world?</p>
-       <blockquote class="pull">It is going to take U in your CITY.</blockquote>
-       <p>The universe is big. A city is small enough for one person to act in.</p>
-      </section>
-
-      <section class="ch" id="ch9" data-title="I am 30 now." data-toc="I am 30 now.">
-       <p class="kick">Chapter 09 &middot; <span data-year>2026</span></p>
-       <h2>I am <span data-age>30</span> now.</h2>
-       <p>I have spent most of my twenties building a way to make everyday life easier to manage.</p>
-       <p>I started Universe City in 2018. I am still its first resident.</p>
-       <p>Universe City provides life management. It does not provide therapy. It does not provide case management.</p>
-       <p>It provides the structure of the help a parent gives. It does not replace the relationship.</p>
-       <p>In the long term, I want practical life management education to be available in schools and communities.</p>
+      <section class="ch" id="ch5" data-title="12 just isn’t enough." data-toc="12 just isn’t enough.">
+       <p class="kick">Chapter 05 &middot; 2023 to 2026</p>
+       <h2>12 just isn&rsquo;t enough.</h2>
+       <p>It sounds fucked up to say, but parts of me felt like many adults were doomed. They were either too buried in work, overly distracted, didn&rsquo;t care, or I felt like the matrix had already swallowed them whole.</p>
+       <p>So naturally I was like, how can we make this something our young ones can learn early, so they don&rsquo;t need this as supplemental education once they get to the point of having to manage it all?</p>
+       <p>It really started with working with the Denver Housing Authority. I presented a proposal that only had 12 areas. Each one still aligned with the stars and the signs of the zodiac, but it was really for family management.</p>
+       <a class="artifact" href="/universe-city-news-august-2023.pdf" target="_blank" rel="noopener">Read the August 2023 edition of Universe City News</a>
+       <p>I don&rsquo;t know how I tried to fit so much into 12 little buckets. But that was really the starting point. Activism turned into so many things. These 12 evolved into so many things, until I realized 12 just isn&rsquo;t enough.</p>
+       <p>It clicked in 2026.</p>
+       <p>I was burnt out from working in community radio. And although I had also worked with other youth organizations, I found myself getting distracted in those orgs&rsquo; missions and kept putting Universe City off to the side.</p>
+       <p>December 2025 I turned 30, and something within me said:</p>
+       <blockquote class="pull">HEY. STOP NEGLECTING THIS.</blockquote>
+       <p>So from then on I began thinking and building.</p>
+       <p>I was financially in a very comfortable spot in my life. I lived in a nice big fancy apartment in North Boulder all by myself. I was working ungodly hours. And I just still felt unfulfilled. I just felt like, &ldquo;I still don&rsquo;t care.&rdquo;</p>
+       <p>I thought having a cool sounding job and making decent money would fill some hole, but it didn&rsquo;t. And I kept distracting myself. I went to culinary school while I was working at a youth shelter, a job I got and HAD while working in community radio. I literally had 2 jobs and was in culinary school to end 2024.</p>
+       <p>I was just repeating old habits of work horsing to fill this void, or just feeling like I had to stay on go.</p>
+       <p>So to start 2026, I told myself I would take a genuine risk. Quit my job with no backup and live like Eckhart Tolle, the author of The Power of Now.</p>
+       <p>I wanted to believe the universe had my back. And that it would push me to want to work on this more if I put myself in the very position this operating system is meant to help.</p>
+       <p>No job. Rent due. Having to move out. No idea of where to go next.</p>
+       <p>And I just locked in.</p>
+       <p>I completely downsized my wardrobe. I purchased refillable items for my inventory. I limited my resources down to only the exact things I needed. I have footage of this process.</p>
+       <p>But it wasn&rsquo;t until I was unemployed, packing up my place into storage, that the 4 departments arrived.</p>
+       <p>I was thinking through inventory and housing and moving and how overwhelming all that was. I was looking at the one department, Life Management at the time, thinking, where does this fit???</p>
+       <p>The first folder in Life Management was originally Standards, which it still is to this day. Standards was what tipped me off to being like, wait. I don&rsquo;t actually want to work here. I don&rsquo;t want to do this.</p>
+       <p>Everything else formed from that moment on.</p>
+       <p>I knew housing was going to be one in itself. It took such a long time to refine the folders within it. At multiple points they were rooms. Living room, kitchen, bedroom. But that didn&rsquo;t feel right.</p>
+       <p>Obviously after quitting a job I started to think about all that goes into getting a job, keeping a job, and excelling in your work. I spent a lot of time reflecting on the 30+ jobs I&rsquo;ve had in my only <span data-age>30</span> years of life. I feel like I&rsquo;ve done every job under the sun. So that was one I knew other people struggled with.</p>
+       <p>It started with the department names. So we had Life Management. Then we built Housing. Then Career.</p>
+       <p>Personal Assessment was next. Because now that my life was rocked, I did what I always did. I need a schedule. A routine. Wake and sleep times. Where are my documents at? What should I be eating and doing to remain healthy?</p>
+       <p>I only changed the name to Agency Assessment so it could become something agents and residents begin with. That is enrollment. Assessing where you stand in those 12 areas before getting into the others.</p>
+       <p>But those things will develop and change.</p>
        <div class="fin">
         <p class="end" aria-hidden="true">&#9733;</p>
         <a class="back" href="/">Return to the homepage</a>
         <span id="endMark"></span>
        </div>
       </section>
+<!-- founder-voice:end -->
 
      </div>
     </div>
@@ -456,8 +470,6 @@ a{color:inherit}
     if(age>=30){
       document.querySelectorAll('[data-age]').forEach(e=>{e.textContent=age});
       document.querySelectorAll('[data-year]').forEach(e=>{e.textContent=now.year});
-      const last=$('ch9'),title='I am '+age+' now.';
-      last.dataset.title=title;last.dataset.toc=title;
     }
   }catch(e){}
 

@@ -130,11 +130,13 @@ CORRECT Key Performance Indicators. Information Technology.
 
 4.5 The client does not choose a tone, a personality, or a profanity setting for the agent. Those settings in Version 3 are removed.
 
-4.6 Founder layer. Text written in the first person and signed by the founder. Every requirement in this document applies, with one exception and one addition.
+4.6 Founder layer. Text written in the first person and signed by the founder. The Founder book at `ucitysocial/founder.html` is the Founder layer.
 
-4.6.1 The exception. The reader check in clause 6.5 does not apply. Each sentence shall be true of the founder.
+4.6.1 This document does not govern the chapters of the Founder book. The chapters are written in the founder's own voice. Her cadence, her humor, her profanity, her figures of speech, and her punctuation stay as she wrote them. The founder ruled this on October 10, 2026.
 
-4.6.2 The addition. Every sentence signed by the founder is a sentence the founder wrote or approved.
+4.6.2 Every sentence signed by the founder is a sentence the founder wrote or approved. An agent or a software tool may arrange and trim her sentences. An agent or a software tool shall not rewrite her sentences to meet this document.
+
+4.6.3 The defined terms in section 2 keep their meaning inside the Founder book. The site header, the site menu, and the buttons on the Founder page are interface text. Section 7 governs them.
 
 4.7 No layer changes the vocabulary layer, the prohibitions in section 10, or a stated fact.
 
@@ -715,6 +717,7 @@ DO That is outside what I do. It is worth raising with a doctor. Do you want the
 | October 10, 2026 | 3 to 4 | Three stage arc replaces four stage arc. |
 | October 10, 2026 | 3 to 4 | The agent is a person. Tone and profanity settings removed. |
 | October 10, 2026 | 3 to 4 | Founder layer added. |
+| October 10, 2026 | 4 | Founder layer changed. The chapters of the Founder book are outside this document. Ruled by the founder. |
 | October 10, 2026 | 3 to 4 | Reader check added: seventh grader, person without housing, person who has never managed their own affairs. |
 | October 10, 2026 | 3 to 4 | Picture is a failure replaced by the literal truth check and the scene prohibition. |
 | October 10, 2026 | 3 to 4 | Placeholder list extended from six words to ten. Fix changed from a list of cases to the exact class. |

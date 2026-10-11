@@ -48,6 +48,8 @@ def static_lines(path):
     s = open(path, encoding="utf8").read()
     i = s.find("<body")
     s = s[i:] if i >= 0 else s
+    # The Founder book chapters are in the founder's own voice. Clause 4.6 puts them outside the standard.
+    s = re.sub(r"<!-- founder-voice:start[\s\S]*?<!-- founder-voice:end -->", "\n", s)
     js = " ".join(re.findall(r"<script[^>]*>([\s\S]*?)</script>", s))
     s = re.sub(r"<(script|style)[\s\S]*?</\1>", "\n", s)
     out = []
