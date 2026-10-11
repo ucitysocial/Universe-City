@@ -1818,6 +1818,7 @@ if(dash){
  var budget=85;
  var groceryTime='Thursday at 6:15 PM';
  var inventoryReviewed=false;
+ var firstBody=body.innerHTML, firstStatus=status.innerHTML;
 
  function msg(dept,system,text){
   return '<div class="thread-turn agent dept-message '+dept+' is-new"><div class="thread-label">'+system+'</div><div class="thread-bubble">'+text+'</div></div>';
@@ -1892,7 +1893,7 @@ if(dash){
  /* Keep the newest reply and its buttons on screen. The page moves, so the reader does not scroll. */
  var navEl=document.querySelector('nav');
  var reduceMotion=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
- var firstNew=null, followQueued=false;
+ var firstNew=null, followQueued=false, skipFollow=false;
  function follow(){
   followQueued=false;
   var topLimit=(navEl?navEl.getBoundingClientRect().bottom:0)+12;
@@ -1910,6 +1911,7 @@ if(dash){
      if(!firstNew&&r.addedNodes[i].nodeType===1) firstNew=r.addedNodes[i];
     }
    });
+   if(skipFollow){skipFollow=false;firstNew=null;return;}
    if(!followQueued){followQueued=true;requestAnimationFrame(follow);}
   }).observe(body,{childList:true});
  }
@@ -1997,7 +1999,16 @@ if(dash){
   }
 
   if(choice==='reset'){
-   location.reload();
+   /* Put the example back to its first state in place. A page reload kept the old scroll position on a shorter page. */
+   budget=85;groceryTime='Thursday at 6:15 PM';inventoryReviewed=false;
+   skipFollow=true;
+   body.innerHTML=firstBody;
+   status.innerHTML=firstStatus;
+   var limit=navEl?navEl.getBoundingClientRect().bottom:0;
+   var section=demo.closest('section')||demo;
+   var fits=demo.getBoundingClientRect().bottom-section.getBoundingClientRect().top<=window.innerHeight-limit;
+   var move=fits?section.getBoundingClientRect().top-limit:demo.getBoundingClientRect().top-limit-12;
+   window.scrollBy({top:move,behavior:reduceMotion?'auto':'smooth'});
   }
  });
 })();
