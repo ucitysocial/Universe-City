@@ -27,7 +27,7 @@ export default async function Apply() {
               <span>01</span>
               <div>
                 <strong>Your agent</strong>
-                <p>Someone to help organize the moving parts, follow up, and keep the work moving.</p>
+                <p>A person who helps organize the moving parts, follows up, and keeps the work moving.</p>
               </div>
             </div>
             <div>

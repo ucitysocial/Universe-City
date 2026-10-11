@@ -20,7 +20,7 @@ export default function OrientationTour() {
     {
       target: 'file',
       eyebrow: '01 · Your folders',
-      title: 'Everything has a place.',
+      title: 'Every record has a folder.',
       body: 'Your life is organized across four departments and 48 folders. You do not have to set them all up. Universe City builds and maintains the systems with you over time.'
     },
     {

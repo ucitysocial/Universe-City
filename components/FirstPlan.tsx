@@ -34,7 +34,7 @@ const KIND_OPTIONS: { value: Kind; label: string }[] = [
   { value: 'appointment', label: 'Appointment' },
   { value: 'travel', label: 'Travel' },
   { value: 'household', label: 'Household' },
-  { value: 'caring', label: 'Caring for someone' },
+  { value: 'caring', label: 'Caring for a person' },
   { value: 'people', label: 'Time with people' },
   { value: 'rest', label: 'Rest / open time' },
   { value: 'building', label: 'Something I am building' },
@@ -201,7 +201,7 @@ export default function FirstPlan({
           <span className="plan-step">01</span>
           <div>
             <h2>What already has to happen?</h2>
-            <p>Work, appointments, errands, care, travel, rest — anything tomorrow already has to hold.</p>
+            <p>Work, appointments, errands, care, travel, rest, and every other commitment tomorrow already holds.</p>
           </div>
         </div>
 
@@ -236,13 +236,13 @@ export default function FirstPlan({
         <div className="plan-section-head">
           <span className="plan-step">02</span>
           <div>
-            <h2>Anything you want tomorrow to be different from usual?</h2>
+            <h2>What do you want tomorrow to be different from usual?</h2>
             <p>One small move is enough. “Nothing” is a valid answer.</p>
           </div>
         </div>
         <div className="progress-grid">
           <input
-            placeholder="Optional — e.g. 30 minutes on my portfolio"
+            placeholder="Optional. Example: 30 minutes on my portfolio"
             value={progressLabel}
             onChange={e => setProgressLabel(e.target.value)}
           />
@@ -287,7 +287,7 @@ export default function FirstPlan({
           <span className="plan-step">04</span>
           <div>
             <h2>How should we follow up?</h2>
-            <p>You are choosing support, not signing up to be nagged about every item forever.</p>
+            <p>You are choosing the support you want.</p>
           </div>
         </div>
         <div className="choice-grid">

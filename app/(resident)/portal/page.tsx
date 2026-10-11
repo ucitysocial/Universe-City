@@ -36,7 +36,7 @@ export default async function PortalHome({
           <div>
             <p className="kick">Time is running</p>
             <h2>Your first Plan is ready.</h2>
-            <p>Live the day. Universe City now has something real to compare with what actually happens.</p>
+            <p>Live the day. Universe City now has a plan to compare with what actually happens.</p>
           </div>
           <a className="btn ghost compact" href="/portal/time">Open Time</a>
         </div>

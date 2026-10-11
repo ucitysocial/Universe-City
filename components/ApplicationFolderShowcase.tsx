@@ -15,7 +15,7 @@ const folders = [
       },
       {
         title: "Add the parts that repeat.",
-        body: "Your agent adds work, commuting, meals, sleep, appointments, responsibilities and the things you want more time for.",
+        body: "Your agent adds work, commuting, meals, sleep, appointments, responsibilities and the activities you want more time for.",
       },
       {
         title: "See the week day by day.",
@@ -51,7 +51,7 @@ const folders = [
       },
       {
         title: "Use receipts and orders as evidence.",
-        body: "Receipts and order records can update item, quantity, price, date and merchant without making you re-enter the purchase.",
+        body: "Receipts and order records can update item, quantity, price, date and merchant without making you enter the purchase again.",
       },
       {
         title: "Let the baseline improve over time.",
@@ -99,7 +99,7 @@ const folders = [
       },
       {
         title: "Turn the pattern into a candidate standard.",
-        body: "A routine such as training three times a week or avoiding gluten is proposed back to you in plain language.",
+        body: "The routine in that pattern is proposed back to you in plain language.",
       },
       {
         title: "Confirm why it matters.",

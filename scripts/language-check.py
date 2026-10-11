@@ -40,6 +40,21 @@ RULES = [
 HYPHEN_OK = re.compile(r"\b(en-US|e-mail|[A-Z][a-z]+-[A-Z][a-z]+)\b")
 
 
+# Clause 6.8.4. A dictionary definition of a general word is the universal use.
+# These are the dictionary definitions shown under nine folder names.
+UNIVERSAL_DEFINITIONS = {
+    "The measured period in which something takes place.",
+    "Keeping something running the way you want it to run.",
+    "Arranging things into a working order.",
+    "Facts recorded about something.",
+    "The work of keeping something in working condition.",
+    "A plan setting out when things will happen.",
+    "The ability to do something well, gained through practice.",
+    "The extent of what something covers.",
+    "Deciding the order in which things get done.",
+}
+
+
 def sentences(text):
     return [s.strip() for s in re.split(r"(?<=[.!?])\s+(?=[A-Z\"“])", text) if s.strip()]
 
@@ -68,12 +83,19 @@ def static_lines(path):
 def tsx_lines(path):
     s = open(path, encoding="utf8").read()
     out = []
+    # A list of style class names is code. It is not text a resident reads.
+    classes = set(re.findall(r'className="([^"]+)"', s))
+    for expr in re.findall(r"className=\{([^}]*)\}", s):
+        classes.update(m[0] or m[1] or m[2] for m in re.findall(r"'([^']*)'|\"([^\"]*)\"|`([^`]*)`", expr))
+    classes = {c.strip() for c in classes}
     for m in re.finditer(r">([^<>{}\n]*[A-Za-z][^<>{}\n]*)<", s):
         t = html.unescape(m.group(1)).strip()
         if len(t) > 1 and not re.search(r"=>|&&|\|\||;$", t):
             out.append(t)
     for m in re.finditer(r"(?<![\w/@.])'((?:[^'\\\n]|\\.){12,})'|\"((?:[^\"\\\n]|\\.){12,})\"|`([^`$]{12,})`", s):
         v = (m.group(1) or m.group(2) or m.group(3) or "").replace("\\'", "'").strip()
+        if v in classes:
+            continue
         if " " in v and re.search(r"[A-Za-z]{3,} [a-z]{2,}", v) and not re.search(r"^(use client|[@./])|className|[{};=<>]|\b(px|rem|rgba?|var\()", v):
             out.append(v)
     return out
@@ -101,6 +123,8 @@ def check(lines):
                 continue
             seen.add(s)
             for name, rx in RULES:
+                if name.startswith("6.8") and s.strip() in UNIVERSAL_DEFINITIONS:
+                    continue
                 if name.startswith("7.5"):
                     m = rx.search(s.strip())
                 elif name.startswith("5.13"):
