@@ -72,13 +72,13 @@ Existing repository rules remain foundational:
 
 See the repository root `README.md`.
 
-### 4. Dashboard, File, Sessions, Agent
+### 4. Resident Portal home, File, Sessions, Agent
 
 **WORKING / partially LOCKED**
 
 The resident experience is becoming four connected layers:
 
-**Dashboard** — useful, current information about the resident's life.
+**Resident Portal home** — useful, current information about the resident's life.
 
 **File** — organized source of truth across the four departments and 48 folders.
 
@@ -88,7 +88,7 @@ The resident experience is becoming four connected layers:
 
 Important distinction:
 
-> Dashboard = what matters now.  
+> Resident Portal home = what matters now.  
 > File = what is currently maintained.  
 > Session = how the File got there.  
 > Agent = how the resident communicates with Universe City across all of it.
@@ -101,9 +101,7 @@ The emerging Time model is centered on a very simple recurring question:
 
 > Did today go as planned?
 
-The daily loop is:
-
-**PLAN → LIVE → REVIEW → LEARN → PLAN AGAIN**
+The daily work compares the Plan with what the resident reports happened. The exact sequence of daily interactions is under review.
 
 A Plan is not the same as the Schedule.
 
@@ -113,6 +111,10 @@ A Plan is not the same as the Schedule.
 - **Schedule** = recurring structure that becomes increasingly accurate as Universe City learns from repeated Plans and Actuals.
 
 See `systems/TIME.md`.
+
+## Standards and unresolved entry sequence
+
+`LANGUAGE_STANDARD.md` Version 4 governs terminology, including Application, Enrollment, Agency Assessment, File, Folder, Record, System, Start, Target, Position, and Report. Older notes in this product directory may contain retired words. Application comes before Enrollment, and residency begins at Enrollment. The order of Agency Assessment, Orientation, payment, and initial Time work within entry is not yet settled. Do not build an entry flow from an older diagram.
 
 ## Product documents
 
