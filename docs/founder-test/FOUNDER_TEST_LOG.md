@@ -29,6 +29,7 @@ No entry is a defect just because the prototype is unfinished. Do not report uns
 | --- | --- | --- | --- | --- |
 | FT-001 | Founder Test — first screen | Introduction explains test storage, access, model handling, and controls before conversation starts | Observed UI + candidate UX review | Observed; awaiting founder direction |
 | FT-002 | Conversation — empty state | The guide does not initiate the conversation; an empty state directs the founder to write first | Observed UI + onboarding question | Observed; awaiting founder direction |
+| FT-003 | Conversation — scheduling uncertainty | Guide navigates variable schedule and treats a tentative arrival as unconfirmed, but pauses its dialogue at a confirmation request | Observed working behavior + interaction review | Observed; clarification pending |
 
 ---
 
@@ -103,11 +104,57 @@ Send one short **fictional test message** with a specific commitment or scheduli
 
 ---
 
+## FT-003 — Tentative arrival and pending confirmation
+
+**Date observed:** October 11, 2026  
+**Evidence:** Third screenshot supplied in ChatGPT; underlying transcript is not yet provided. Screenshot itself is not uploaded to the public repository.  
+**Environment:** Claude Founder Test, Conversation view.  
+**Surface / state:** Several scheduling facts have been discussed; a one-day shift is on file and the guide asks the founder to clarify an uncertain arrival time.  
+**Status:** Observed; clarification pending. No approved change yet.
+
+### Founder feedback (expressly reported)
+
+- The founder reports that the guide is **handling a complicated, variable bar schedule well** and navigating follow-up questions effectively.
+- The founder specifically values the guide noticing that an answer prefaced with **"probably"** was uncertain, rather than silently making it a confirmed start time.
+- Concern raised: after presenting a confirmation/edit request, **the guide says nothing further**. The founder notices the conversation appears to stall at the proposed change.
+- The full conversation transcript may be supplied later; do not claim these screenshots cover the complete history.
+
+### What the screenshot demonstrates
+
+- Earlier messages produce **FILED** indicators for multiple Time-related facts. A one-day shift is then represented with a date and with an unspecified start/end time.
+- The guide asks for the intended arrival time instead of treating the establishment's opening time as the person's work start time.
+- After a tentative arrival answer, the guide says it **has not filed** that time, seeks explicit permission to set the start, and leaves the end open.
+- A **WAITING FOR YOU** line shows a proposed change from an unspecified start to a specific start; this is presented separately from **FILED** entries.
+- The composer is visible. **The screenshot does not prove the composer is disabled or that further messages are blocked.** It proves the last displayed guide response ends at a confirmation question.
+
+### Findings
+
+**FT-003-A — Positive: uncertainty and precision preserved (observed and founder-endorsed).** The guide distinguishes a tentative arrival estimate from a definite shift start; the next File update is shown as pending rather than silently confirmed. It separately preserves unknown end time. Retain this behavior during future iterations; verify it across different phrasings in the transcript or follow-up tests.
+
+**FT-003-B — Positive: contextual scheduling (founder-reported, partially visible).** The guide reportedly follows a variable working schedule well. The visible exchange distinguishes location opening time, personal arrival time, and unknown end time. More of the dialogue must be inspected before judging overall reliability.
+
+**FT-003-C — Potential conversational dead end (candidate review, not proven blocking defect).** The latest guide reply asks to approve a File change and does not offer another conversational step. Verify whether the founder can continue discussing other scheduling details or topics with a proposed File change pending. Decide with the founder whether confirmation should be a nonblocking workflow and whether the guide should continue naturally while maintaining an explicit pending state. Do not equate an unanswered question with a technically blocked interface.
+
+**FT-003-D — Proposal semantics (to verify).** Determine whether accepting the proposed time means the founder has explicitly upgraded a tentative estimate into a firm start time, or whether the File supports an estimated/provisional start distinct from a confirmed obligation. The current screenshot demonstrates the request for confirmation but not the outcome. An approval must not erase the original tentative language or source message.
+
+**FT-003-E — Data correctness following confirmation (untested).** Test yes, no, correction, deferral, and a new-topic response while **WAITING FOR YOU** is present. Inspect the File and Activity log for exact source linkage, revision history, pending-state resolution, and accurate date/time.
+
+### Founder direction
+
+Founder has **positively endorsed uncertainty recognition and follow-up quality** and flagged that the dialogue ends after the confirmation request. A particular replacement prompt, nonblocking flow, or UI update **has not yet been explicitly approved**.
+
+### Next verification
+
+First test whether a natural response such as deferring the arrival estimate and continuing with another scheduling detail works while the proposed change remains pending. Then test approving or correcting that one change and inspect whether the conversation resumes and the File preserves the evidence. Review the complete transcript when provided.
+
+---
+
 ## Findings and implementation tracking
 
-- **Confirmed defects:** None yet established from this screenshot alone.
-- **Potential improvements / review questions:** FT-001-A, FT-001-C, FT-002-A, FT-002-D.
-- **Unverified functional claims:** FT-001-B, FT-002-B, FT-002-C.
+- **Confirmed defects:** None yet established from the supplied screenshots. A pending confirmation may pause the dialogue; actual blocking is not established.
+- **Potential improvements / review questions:** FT-001-A, FT-001-C, FT-002-A, FT-002-D, FT-003-C, FT-003-D.
+- **Observed positive behavior:** FT-003-A and founder-reported FT-003-B. These are not yet full end-to-end verification.
+- **Unverified functional claims:** FT-001-B; FT-002-B and FT-002-C are partially observed through FT-003; FT-003-E remains untested.
 - **Approved fixes:** None yet.
 - **Pending retests:** None yet.
 
