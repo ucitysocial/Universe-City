@@ -296,3 +296,11 @@ The initial response guides subsequent questions. The interface can present shor
 The agent must establish enough initial information to represent the resident, including their stated circumstances, responsibilities, priorities, Start, and Target. The exact opening wording, required fields, question order, and thresholds for finishing Enrollment are not yet locked.
 
 Any interpretation of a resident's words is proposed for confirmation before it is placed on file. Software never presents itself as a human agent. Unanswered subjects remain open for future work.
+
+### Confirm understanding before the next question
+
+**WORKING direction, October 10, 2026**
+
+After a resident's opening response, show a concise account of the information identified, linked to the appropriate folders. Identify each proposed statement as awaiting confirmation. Offer explicit choices to confirm or correct the statements before writing interpreted information to the File. Preserve the resident's original words separately from any proposed interpretation. Do not derive Start, Target, or Position from a general narrative when the required assessment selections have not been made.
+
+The assessment must establish four distinct outputs: who the resident says they are, their reported present condition, their intended condition, and the questions and work needed to determine their position. The exact fields and minimum coverage for Enrollment remain under review. Interaction should be useful even when a resident provides only a short opening response.
