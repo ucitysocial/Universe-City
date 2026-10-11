@@ -32,6 +32,9 @@ No entry is a defect just because the prototype is unfinished. Do not report uns
 | FT-003 | Conversation — scheduling uncertainty | Tentative time triggers explicit confirmation; on approval, the guide resumes questioning | Positive finding + follow-up retest | Partially retested; deferral still untested |
 | FT-004 | Conversation — filing feedback | Long status blurbs and a repeated approval that claims an unchanged value was changed | Founder-requested UX + confirmed duplicate-action feedback | Cleanup required; see #23, #24 |
 | FT-005 | Conversation — next question | The guide asks the founder to choose the next task instead of continuing the original schedule request | Founder-identified continuity issue | Cleanup required; see #22 |
+| FT-006 | File — working interface | Current File reads like a static report and differs markedly from the established Universe City Window OS-style Resident Portal | Founder-directed primary visual redesign | Main visual priority; #25 |
+| FT-007 | Conversation — mobile composer | Keep the approved conversation layout, with composer anchored to bottom on mobile as in a messaging app | Founder requirement; mobile behavior not yet verified | Implement and device-test; #26 |
+| FT-008 | Public website — account state | No visible Log out and homepage appears anonymous after returning via logo on www.ucitysocial.com | Founder-reported issues; missing UI confirmed by code | Fix and verify session handling; #27 |
 
 ---
 
@@ -241,17 +244,65 @@ These are suggested examples for design discussion, **not implemented UI copy**.
 
 ---
 
+## FT-006 — File needs to match the established Universe City workspace
+
+**Evidence:** Screenshot of the founder mockup **Your File in this test**, shared October 11, 2026. The screenshot is described here and not uploaded to this public repository.
+
+**Founder feedback and priority:** The File screen is too plain and visually different from the Window OS-style interface already designed for Universe City. The founder says **this is the main visual issue to fix**, while specifically endorsing the Conversation layout.
+
+**Observed UI:** One text-heavy page with a relatively narrow column and stacked categories: Waiting for your answer; Proposals waiting for a person; Time, Weekly schedule and Days; What you said by folder; Follow ups; Still unknown; Changes and earlier versions. It accurately represents some File information but behaves visually like a report, with little folder/path navigation evident.
+
+**Relevant approved interface direction:** `docs/product/RESIDENT_INTERFACE.md` calls for a stable three-part desktop workspace: File/folder navigation on the left, selected content in the center, and contextual Agent on the right. It uses a navigable tree, active selection, breadcrumb, nested records, and compact status/history. `DESIGN_SYSTEM.md` specifies differentiated working surfaces. The founder calls this a Window OS-style interface. The approved specification forbids draggable floating windows, so keep the static shell unless the founder explicitly revises that decision.
+
+**Direction:** Rebuild File as the existing resident working surface, not a new generic summary page. Preserve Time records, unknown states, proposals, source links, and history; represent them through meaningful navigation and selected content. Do not show empty records as a long series of explanatory paragraphs. Keep the approved Conversation interaction style and functionality.
+
+**Implementation:** [#25 — File workspace visual rebuild](https://github.com/ucitysocial/Universe-City/issues/25). **Status:** Main visual priority, not yet implemented.
+
+---
+
+## FT-007 — Mobile chat input anchored at bottom
+
+**Founder requirement:** Retain the current Conversation layout. On mobile, the text input and send button must remain fixed to the usable bottom of the conversation screen, similar to a conventional messaging thread. The composer should not move unpredictably with the conversation scroll, keyboard, or page viewport.
+
+**Evidence status:** The screenshots demonstrate desktop Conversation layout only. The founder specified the desired mobile behavior but did not provide a screenshot of a mobile layout defect. Treat the mobile implementation as a requirement to build/verify.
+
+**Acceptance:** A single scrolling transcript with a stable composer visible above the on-screen keyboard and safe area. Check long histories, multiline typing, keyboard open/close, iOS and Android viewports, scroll position preservation, and no awkward double scrolling. Desktop Conversation layout remains recognizable.
+
+**Implementation:** [#26 — Mobile composer stability](https://github.com/ucitysocial/Universe-City/issues/26). **Status:** Founder direction, pending implementation and device verification.
+
+---
+
+## FT-008 — Public website sign-out and signed-in navigation continuity
+
+**Scope:** Canonical public **www.ucitysocial.com**, **not** the founder-only test.
+
+**Founder-observed issues:** There is no usable sign-out option while logged into the regular website, and navigating to the homepage via the logo makes it appear that the resident is no longer logged in.
+
+**Code review (October 11, 2026):**
+- Static marketing homepage `ucitysocial/index.html` displays a fixed **Log in** action and **Apply for residency**, with no sign-out UI or session-aware logic.
+- Next `components/SiteHeader.tsx` conditionally shows **Resident Portal** versus **Log in**, but does not provide Log out.
+- `components/ResidentFileNav.tsx` shows **Account** and **Replay orientation**, without Log out.
+- `ucitysocial/_redirects` proxies application/auth routes to the Next stage host, while the public marketing homepage is static. This explains why the homepage displays anonymous controls even after login.
+
+**Important distinction:** The code confirms misleading account navigation and no visible sign-out path. It does not prove that Supabase session cookies or credentials are actually invalidated when returning home. A secure end-to-end retest across canonical domain variants is required.
+
+**Direction:** Add a working Supabase Log out action. Keep authenticated navigation coherent between the Resident Portal and the public homepage, including after following the site wordmark. Preserve valid auth sessions across route transitions; reflect real signed-in status rather than static anonymous copy. Test both www and non-www addresses and mobile.
+
+**Implementation:** [#27 — Public account status and Log out](https://github.com/ucitysocial/Universe-City/issues/27). **Status:** Founder-reported, code-supported navigation issue; root cause of any true session loss remains unverified.
+
+---
+
 ## Findings and implementation tracking
 
 - **Confirmed duplicate-action issue:** FT-004-C and exported JSON: a screen action already confirmed and saved the new start; a later typed confirmation invoked an additional no-op action and was labeled Changed.
 - **Source of earlier inconsistency established:** FT-004-B: the first screen confirmation had already changed the stored start before the repeated chat confirmation. No premature write was established.
-- **Founder-requested improvements:** FT-004-A: concise inline filing and confirmation summaries; FT-005: continue the original schedule purpose and choose the next relevant question.
+- **Founder-requested improvements:** FT-004-A: concise inline filing and confirmation summaries; FT-005: continue the original schedule purpose and choose the next relevant question; FT-006: make File match the established Resident Portal working interface; FT-007: stable mobile conversation composer; FT-008: usable Log out and authenticated public navigation.
 - **Potential improvements / review questions:** FT-001-A, FT-001-C, FT-002-A, FT-002-D, FT-003-D; FT-003-C is partially retested (approval works; deferral untested).
 - **Observed positive behavior:** FT-003-A, founder-reported FT-003-B, and FT-004-D (conversation continues after confirmation).
 - **Unverified functional claims:** FT-001-B; FT-002-B and FT-002-C partially observed; FT-003-E and FT-004-B require File/Activity/history inspection.
 - **Approved direction for future improvement:** Shorten and clarify the feedback beneath guide responses (FT-004-A); final copy and implementation not yet approved.
-- **Code fixes deployed:** None through this founder-testing log. Session 01 paused for cleanup; priority issues #22, #23, #24.
-- **Pending retests:** FT-005 next question after a confirmation; FT-004 repeated confirmation by both screen and chat; FT-004 concise feedback; FT-003 deferred proposal.
+- **Code fixes deployed:** None through this founder-testing log. Session 01 paused for cleanup. Behavioral priorities #22 and #23; primary visual priority #25; public navigation #27; feedback #24; mobile composer #26.
+- **Pending retests:** FT-005 next question after a confirmation; FT-004 repeated confirmation by both screen and chat; FT-004 concise feedback; FT-003 deferred proposal; FT-006 File navigation/design; FT-007 mobile keyboard/composer; FT-008 public homepage auth state and sign-out.
 
 ### Maintenance rules
 
