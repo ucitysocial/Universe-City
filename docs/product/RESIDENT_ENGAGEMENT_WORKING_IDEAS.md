@@ -2,7 +2,7 @@
 
 **Status:** WORKING IDEAS / NOT APPROVED FOR IMPLEMENTATION  
 **Origin:** "Universe City Resident Engagement and Software Experience," working document dated October 11, 2026 (17 pages).  
-**Scope:** Cross-department (all 48 folders), not solely Time or Genesis.  
+**Scope:** Cross-department resident engagement across all 48 folders. Time is the existing daily planning and coordination foundation; Genesis is outside this document's central scope.  
 **Authority:** This document does **not** supersede `LANGUAGE_STANDARD.md`, approved product specifications, folder specifications, or operations policies. Check the current live governing files before implementing anything.  
 **Maintenance:** Preserve ideas as proposals, distinguish founder directions from unapproved designs, and log changes with a date. This repository Markdown is a structured working reference drawn from the original Word working document, not a claim that these proposals are approved.
 
@@ -137,7 +137,97 @@ The example **requires those past missed commitments and Saturday shift to be ge
 
 Before sending software-prepared agent communication, ask: Was the present subject acknowledged? Is this the right moment for the pattern? Is its evidence genuine and dated? Is the message concise? Are the consequences truly known? Does it help with the new activity *and* established commitments? Is it within authorized folder scope? Would one question be better?
 
-## 15. Open design questions
+## 15. October 11 synthesis — expand what Universe City already defines
+
+**Founder instruction:** Engagement research must expand the actual Universe City model rather than proposing an alternative intake, new daily planning system, or universal routine. The next design work is how the established systems feel while residents use them, especially during a real day.
+
+### 15.1 Authoritative existing foundation
+
+The following is **already decided at the specification/product-direction level**, not newly proposed here.
+
+- `docs/PRODUCT_BIBLE.md` and `docs/DECISIONS.md`: Universe City builds and maintains the resident's systems. The resident provides circumstances, decisions, corrections, and actions only they can carry out. One File spans 48 folders; Time, Inventory, Salary, and Standards are foundation folders.
+- `docs/systems/TIME.md` Version 4: Time handles **planning, execution, review, and follow through**. The agent builds the seven day schedule from conversation; clients can also edit it by hand. No one has to fill an empty calendar. The schedule represents the recurring week; the **Plan** holds commitments for a particular day.
+- Time starts with actual circumstances and collects only what is needed. Every commitment has a scheduled block and conditions as relevant: Timing, Completion, Consequences, Standards, and Follow through. These are **internal conditions, not a fixed questionnaire**.
+- Time separates block from commitment, commitment execution from ongoing work, planned from done, and estimated from observed. A changed time alone does not prove that execution failed. Unreported completion remains unknown.
+- Time provides optional **Morning Plan**, selective contact during the day, and regular **Daily Close**. The client controls amount and timing of contact. Daily Close reviews what actually happened and confirms the next day's Plan.
+- A commitment arising in another folder is linked into Time when it needs scheduling. The original folder continues to own the subject information. Time coordinates it; do not duplicate records.
+- Standing permissions cover specified routine work. Software can carry out that work and must identify automated messages honestly. Interpretive changes and decisions beyond permission require the applicable approval process.
+- `docs/product/RESIDENT_INTERFACE.md` and `docs/DECISIONS.md`: the Resident Portal has an organized File, useful home, and persistent agent communication. Current desktop shell direction is File at left, main content in the center, agent at right. The four-Department-square Today view remains an **engagement concept to reconcile**, not a replacement for that locked shell.
+- `docs/product/AGENT_MODEL.md`: follow-up is selective. The service should get quieter as stable behaviors are understood. Avoid creating a second inbox or routine questions with no purpose.
+- `docs/research/PLANNING.md`: distinguishes intentions and action, planning for friction, actual-versus-planned review, and learning from adjustment.
+
+**Implementation reality is separate.** `docs/systems/TIME_OPERATIONS.md` identifies several defined but unbuilt mechanics for commitments, follow ups, and ongoing work. `app/(resident)/portal/time/page.tsx`, `components/FirstPlan.tsx`, and `lib/domain/time.ts` retain earlier implementation concepts. Do not infer a feature is live simply because it is specified, or treat earlier UI code as superseding Time Version 4.
+
+### 15.2 Founder concept: schedule first, with progressive detail
+
+The founder prefers opening into the **schedule or daily Plan first**, rather than an automatic agent-led conversation, when the resident chooses to view their day.
+
+The schedule provides the broad periods of time. Selecting a block gradually reveals:
+
+1. **Day overview:** time, label, and the main commitments; calm enough to scan at once.
+2. **Expanded block:** what the resident plans to execute in that period; relevant steps and linked ongoing work.
+3. **Connected information:** only the relevant detail from other folders, with clear distinction between an established commitment, an unresolved follow up, and a suggestion.
+4. **Source folder:** the resident can inspect the actual record or system when more detail is needed.
+
+Examples are **illustrative only**, never default assumptions about what every resident does:
+
+- A self-described getting-ready block might contain washing up, clothes, breakfast, and packing. These need not each occupy separate large time blocks.
+- A paid work block might make the relevant Career Development information available: a Key Performance Indicators review, a Resources question for HR, an Information Technology problem, or an Advancement discussion. Such items only appear when supported by the resident's File or active work; not all folder systems are operational.
+- A person attending school, caring for another person, unemployed, retired, between jobs, or with irregular hours may have completely different blocks. **No universal morning, evening, night, employment, or school routine.**
+
+The point is **progressive disclosure**, not new categories of required life activity. Large blocks provide orientation; relevant information appears when the resident asks to go deeper. Folder links should reuse actual records and permissions rather than duplicate the information inside the schedule.
+
+### 15.3 Optional activity checklists and execution experience
+
+A resident may want to mark the individual steps of an established commitment as they work through it. The experience could be satisfying because it helps them see which work remains and where they are in their Plan.
+
+**Still a concept to research:** some blocks may have several actionable steps while others may contain one action, passive time, rest, or no checklist at all. A step shown under an expanded block should be a real reported/planned action, a clearly marked suggested action, or linked ongoing work. Do not generate obligatory micro-tasks for engagement. Do not imply an unchecked item is missed, or that ticking a box proves all completion conditions were met without the governing evidence/confirmation rule.
+
+Time Version 4 already supports the distinction between a commitment being executed and other follow through remaining open. **Proposed presentation:** a compact progress indicator may summarize which *confirmed or resident-reported* steps are done, without grading the resident by quantity.
+
+### 15.4 Optional focus session or progress timer
+
+**Founder idea, exploratory:** Residents who find execution support motivating could start an activity session from an expanded time block, such as `Start morning` or `Start work`. The interface could show calm elapsed progress, a current step, and the remaining planned actions. The design must avoid a daunting countdown, urgency theatrics, or a race against the clock.
+
+**It is optional.** Many clients neither need nor want a timer. They must retain the full schedule, checklist (when applicable), manual editing, and conversational reporting **without** running a session.
+
+Potential modes to investigate, rather than prescribe:
+- no timer at all; ordinary schedule navigation and updates;
+- a subtle elapsed-time indicator;
+- progress through acknowledged steps;
+- optional comparison of planned versus reported actual duration to help correct future schedules.
+
+A session starting or reaching its allotted duration does **not** mean the commitment was executed. The client or authorized evidence supplies the outcome. Estimates remain estimates until a relevant observed report is available. Pause, interruptions, accessibility, and use on shared or low-power devices need research.
+
+**Device independence:** The primary interaction must work in the browser on desktop, tablet, or phone without requiring an installed app. A resident might have no smartphone. A mobile-only distraction restriction cannot be a condition of participating in Time.
+
+**Optional future phone feature:** The founder also imagined reducing phone distractions while a focus session is active. Explore only as an explicit, reversible, device-supported opt-in. A website cannot universally lock a person's phone or block all other apps. Platform permissions and accessibility differ. Do not design a coercive lock, prevent calls or access to essential functions, or claim this exists.
+
+### 15.5 How expansion supports the agent's existing job
+
+The visual block and the agent are coordinated views of the same File. The agent can already apply Time Version 4's rules to check:
+- What the client actually planned and authorized.
+- What they have reported executing, partly executing, changing, or not executing.
+- Which consequences, minimums, linked folder requirements, and follow ups matter.
+- Whether a competing commitment requires the client's decision.
+- Whether a relevant pattern deserves a short, appropriately timed observation.
+
+The agent is not obliged to talk merely because the resident expands a block, ticks a step, or begins a focus session. Clear progress can be shown silently. Software can prepare permitted changes; only approved or authorized actions actually change the File.
+
+### 15.6 Priority engagement questions to investigate
+
+1. What precisely appears at each expansion level, without duplicating canonical File content?
+2. Should the expanded block show only **scheduled commitments**, or also clearly distinguished **linked open follow ups and optional suggestions**? How does the resident prevent clutter?
+3. Which blocks benefit from component steps or checklists, and how are those steps established naturally rather than imposed?
+4. When does checking a step constitute a resident report of execution, and when is it merely a visual marker? How does this reconcile with Time's Completion condition and four independent outcome fields?
+5. What display of elapsed time feels supportive versus distracting, and how can a client turn it off permanently?
+6. How does a session move between phone and web or survive loss of connection without corrupting observed time?
+7. How should the agent use repeated **reported** durations to propose a schedule correction without treating inferred time as confirmed observation?
+8. How does the experience change for someone with no regular routine or fixed daily schedule, while preserving the same Time rules?
+9. Does the optional timer measurably improve follow through for interested residents compared with checklist-only or schedule-only experiences?
+10. How do time blocks link into future Career Development and other folders without implying all 48 are presently implemented?
+
+## 16. Open design questions
 
 - How should a passing conversation statement be retained, structured, confirmed and made correctable?
 - What actions can software take on standing permission, and which need resident or agent approval?
@@ -150,7 +240,7 @@ Before sending software-prepared agent communication, ask: Was the present subje
 - What does human-agent oversight cost at different scales?
 - What is the appropriate relationship between substantive engagement, Grade and future programs?
 
-## 16. Application to the Time Curriculum — advisory only
+## 17. Application to the Time Curriculum — advisory only
 
 When designing Time's assessment and lessons:
 - Measure planning, execution, review and follow-through under the resident's established conditions.
@@ -162,10 +252,10 @@ When designing Time's assessment and lessons:
 - Preserve ordinary conversational pacing; Curriculum questions do not authorize an interrogation.
 - These considerations **inform drafting** but do not override current authoritative Time, Curriculum or Language Standard text.
 
-## 17. Editorial handoff
+## 18. Editorial handoff
 
-**Founder directions expressed:** natural conversation, low-friction access, focused Portal experience, pattern recognition central to representation, human agent responsibility, brief text-like messages, acknowledging the resident before a nonurgent observation, meaningful continuity rather than login farming.
+**Founder directions expressed:** natural conversation, low-friction access, focused Portal experience, pattern recognition central to representation, human agent responsibility, brief text-like messages, acknowledging the resident before a nonurgent observation, meaningful continuity rather than login farming; schedule-first exploration, large expandable time blocks, optional smaller steps, optional non-daunting progress support, and no presumption that all residents have daily routines or paid work.
 
-**Unapproved proposals:** specific automation/approval mechanics, retention and privacy decisions, alert thresholds, portal wireframes, proposed tests and measurement criteria, engagement cadence, escalations and new operative rules.
+**Unapproved proposals:** exact expanded-block layout, optional focus session and phone distraction controls, specific automation/approval mechanics, retention and privacy decisions, alert thresholds, proposed tests and measurement criteria, escalations and new operative rules.
 
 When another working chat updates this file, append/revise clearly labeled ideas and dates; do not silently reclassify proposals as approved policy. Reconcile suggested changes against `LANGUAGE_STANDARD.md`, `docs/systems/TIME.md` and relevant product/Operations documents **before** moving them to authoritative specifications.
