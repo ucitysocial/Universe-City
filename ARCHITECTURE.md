@@ -29,26 +29,26 @@ so an extra meeting is always possible and "since last review" is deterministic
 rather than guessed.
 
 **Nothing is deleted because it changed.** A retired standard keeps its row. A
-corrected block keeps its history. A cancelled membership keeps the case.
+corrected block keeps its history. A cancelled residency keeps the case.
 
 ## RLS matrix
 
 Service means the service role key, used only by webhooks and server jobs.
 Every cell is enforced at the database, not in a query or a component.
 
-### Member owned. They write it.
+### Resident owned. They write it.
 
 `blocks` · `standards` · `inventory_items` · `entries` · `statements` · `salary`
 
 | | SELECT | INSERT | UPDATE | DELETE |
 |---|---|---|---|---|
-| Member (own) | yes | yes | yes | yes |
-| Member (other) | no | no | no | no |
+| Resident (own) | yes | yes | yes | yes |
+| Resident (other) | no | no | no | no |
 | Agent | yes | yes | yes | **no** |
 | Service | yes | yes | yes | yes |
 
-An agent can correct a record on a member's behalf. An agent cannot delete a
-member's record, because representing somebody is not owning them.
+An agent can correct a record on a resident's behalf. An agent cannot delete a
+resident's record, because representing somebody is not owning them.
 
 ### System owned. No client writes at all.
 
@@ -56,7 +56,7 @@ member's record, because representing somebody is not owning them.
 
 | | SELECT | INSERT | UPDATE | DELETE |
 |---|---|---|---|---|
-| Member (own) | yes, except stripe_events | no | no | no |
+| Resident (own) | yes, except stripe_events | no | no | no |
 | Agent | yes, except stripe_events | no | no | no |
 | Service | yes | yes | yes | yes |
 | Trigger | writes `block_revisions` as SECURITY DEFINER | | | |
@@ -67,25 +67,25 @@ revision is immutable even for the service role path through PostgREST.
 `stripe_events` has RLS enabled and no policy of any kind, so it is invisible to
 every client.
 
-### Agent owned. The member reads.
+### Agent owned. The resident reads.
 
 `proposals` · `reviews`
 
 | | SELECT | INSERT | UPDATE | DELETE |
 |---|---|---|---|---|
-| Member (own) | yes | no | no | no |
+| Resident (own) | yes | no | no | no |
 | Agent | yes | yes | yes | no |
 | Service | yes | yes | yes | yes |
 
-This is what stops a member approving a proposal about themselves, and what
+This is what stops a resident approving a proposal about themselves, and what
 keeps meeting decisions trustworthy.
 
 ### profiles. The row is theirs. Four columns are not.
 
 | | SELECT | INSERT | UPDATE | DELETE |
 |---|---|---|---|---|
-| Member (own) | yes | own id only | yes, guarded columns | no |
-| Member (other) | no | no | no | no |
+| Resident (own) | yes | own id only | yes, guarded columns | no |
+| Resident (other) | no | no | no | no |
 | Agent | yes | no | yes | no |
 | Service | yes | yes | yes | yes |
 
@@ -94,9 +94,9 @@ keeps meeting decisions trustworthy.
 Postgres cannot scope a policy to a column, so `uc_guard_profile` is a trigger
 that raises when a protected column changed and the caller is not an agent.
 
-**Member may change:** `name`, `city`, `timezone`.
+**Resident may change:** `name`, `city`, `timezone`.
 
-**Only an agent or the service role may change:** `role`, `membership`,
+**Only an agent or the service role may change:** `role`, `residency`,
 `case_no`, `represented_since`.
 
 **Nobody may change through the profile:** `email`. It is the authentication
@@ -109,10 +109,10 @@ disagree.
 `blocks.source`, `entries.source` and `proposals.origin` describe who actually
 created the information. They are not user-selectable metadata.
 
-A member's write is forced to `member` regardless of what was sent. An agent may
+A resident's write is forced to `resident` regardless of what was sent. An agent may
 write `agent` and is refused `ai`. Only a server-side path with the service role
 can record `ai`. The revision trigger derives origin from the authenticated
-actor rather than from the row, so a member cannot make their own history claim
+actor rather than from the row, so a resident cannot make their own history claim
 it came from AI.
 
 ## Case numbers
@@ -154,7 +154,7 @@ record inside an environment and is a convenience, never a substitute.
 `past_due` on a failed payment. `canceled` on cancellation, where the record
 stays and the systems close.
 
-Membership is set from the webhook only. A browser returning from checkout is
+Residency is set from the webhook only. A browser returning from checkout is
 not proof of payment.
 
 

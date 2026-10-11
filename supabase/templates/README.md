@@ -87,7 +87,7 @@ Keep:
 - no promotional sections
 - restrained department-color stripe
 - black / white / ivory
-- account / membership / resident language
+- account / residency / resident language
 
 Avoid:
 - resident-facing "File" language

@@ -1,6 +1,6 @@
 # Universe City
 
-A responsive website. Public site, member area, private agent console.
+A responsive website. Public site, Resident Portal, private agent console.
 
     npm install
     cp .env.example .env.local        # fill it in
@@ -8,13 +8,14 @@ A responsive website. Public site, member area, private agent console.
 
 ## Order of setup
 
-1. Supabase project. Run `supabase/migrations/0001_init.sql` in the SQL editor.
-   It creates the schema, row level security, the profile trigger, and the
-   block revision trigger.
+1. Supabase project. Run the files in `supabase/migrations/` in number order in
+   the SQL editor. They create the schema, row level security, the profile
+   trigger, and the block revision trigger.
 2. Make yourself an agent:
    `update profiles set role = 'agent' where email = 'you@example.com';`
-3. Stripe. One recurring membership product. Put the configured Stripe price id in
-   `STRIPE_PRICE_MEMBERSHIP`. Point a webhook at `/api/stripe/webhook` for
+3. Stripe. One recurring residency product. Put the configured Stripe price id in
+   `STRIPE_PRICE_RESIDENCY`. The code still reads `STRIPE_PRICE_MEMBERSHIP` when
+   the new name is not set. Point a webhook at `/api/stripe/webhook` for
    `checkout.session.completed`, `customer.subscription.updated` and
    `customer.subscription.deleted`.
 4. Netlify. Production public traffic is served at `https://ucitysocial.com`.
@@ -23,7 +24,7 @@ A responsive website. Public site, member area, private agent console.
 
 ## The rules this codebase exists to keep
 
-Nothing is recorded that the member did not say.
+Nothing is recorded that the resident did not say.
 
 A correction revises the record and keeps what was believed before it.
 `block_revisions` is written by a database trigger, so it cannot be skipped.
@@ -68,7 +69,7 @@ The public marketing source lives in `ucitysocial/` and is served on `https://uc
 Canonical static public routes include:
 
 - `/`
-- `/membership`
+- `/residency`
 - `/agency-assessment`
 - `/housing-stability`
 - `/career-development`
@@ -87,7 +88,18 @@ These include:
 - `/reset`
 - `/auth/*`
 - `/api/*`
-- `/member/*`
+- `/portal/*` (the Resident Portal. `/member/*` redirects here.)
 - `/agent/*`
 
 The public shell used by the Next application must stay aligned with the current static marketing shell. Do not treat the stage application's old homepage or older public components as the marketing source of truth.
+
+## Where the decisions live
+
+- `LANGUAGE_STANDARD.md` governs every word a resident reads. `AGENTS.md` lists the rules broken most often.
+- `DESIGN_SYSTEM.md` governs visual and interaction decisions.
+- `ARCHITECTURE.md` states who may read and write each table.
+- `docs/PRODUCT_BIBLE.md` is the product brain: what is locked, what is still being worked out, and what is ready to build. `docs/systems/TIME.md` is the Time folder. `docs/product/RESIDENT_INTERFACE.md` is the Resident Portal.
+
+## Branches
+
+`main` is the only long lived branch. Pushing to `main` publishes both sites. A working branch is deleted after it is merged.
