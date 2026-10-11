@@ -114,7 +114,7 @@ See `systems/TIME.md`.
 
 ## Standards and unresolved entry sequence
 
-`LANGUAGE_STANDARD.md` Version 4 governs terminology, including Application, Enrollment, Agency Assessment, File, Folder, Record, System, Start, Target, Position, and Report. Older notes in this product directory may contain retired words. Application comes before Enrollment, and residency begins at Enrollment. The order of Agency Assessment, Orientation, payment, and initial Time work within entry is not yet settled. Do not build an entry flow from an older diagram.
+`LANGUAGE_STANDARD.md` Version 4 governs terminology, including Application, Enrollment, Agency Assessment, File, Folder, Record, System, Start, Target, Position, and Report. Older notes in this product directory may contain retired words. Application comes before Enrollment, and residency begins at Enrollment. Entry sequence: Application, email confirmation, Enrollment through initial Agency Assessment, Orientation, then initial Time work. Payment timing remains unresolved. Do not build an entry flow from an older diagram.
 
 ## Product documents
 
