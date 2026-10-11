@@ -88,6 +88,8 @@ Department I, Agency Assessment. Log. Version 1, October 11, 2026. The dated log
 
 2.17 The sender rule in `TIME.md` 5.4.12 was reviewed and kept. A message from the agent and an automated Universe City message stay distinct.
 
+2.18 `LANGUAGE_STANDARD.md` 3.20 was changed to match `TIME.md` 5.9. Position now informs the assessment and identifies where work exists. Clauses 3.20.1 to 3.20.3 were added. Clauses 3.12 and 12.7 and the change record of the standard carry the date. Start, Target, Position, Report, and Grade keep their definitions. `TIME.md` was not changed. Ruled by the founder.
+
 ## 3. Errors found
 
 3.1 October 11, 2026. Version 3 listed five features as live that the repository does not hold: plain language collection, the day view by whole hours, the month view, direct editing by hand, and reminders. Corrected in `TIME.md` 14.3.
@@ -112,7 +114,11 @@ Department I, Agency Assessment. Log. Version 1, October 11, 2026. The dated log
 
 4.4 Decisions D-010 to D-017 call the person a resident. `TIME.md` calls the person a client, as `LANGUAGE_STANDARD.md` requires for an agent document. The two words name one person.
 
-4.5 `LANGUAGE_STANDARD.md` 3.20 states that order of work is determined by position. `TIME.md` 5.9 retires that rule for Time. `LANGUAGE_STANDARD.md` 12.7 lists clause 3.20 as kept from Version 3 without review. The standard governs until its clause is changed.
+4.5 `LANGUAGE_STANDARD.md` 3.20 states that order of work is determined by position. `TIME.md` 5.9 retires that rule for Time. `LANGUAGE_STANDARD.md` 12.7 lists clause 3.20 as kept from Version 3 without review. The standard governs until its clause is changed. Closed October 11, 2026. See 2.18.
+
+4.6 `LANGUAGE_STANDARD.md` 3.20 keeps a third output, engagement level, which sets how much the agent asks for. `TIME.md` 5.9.3 retires the Version 3 rule that set how often the agent asks by the twelve answers. The two overlap. The standard lists the engagement level output as kept without review. Open.
+
+4.7 The Curriculum of August 28, 2026 holds a table for each question that states what the agent does at each start band. Those tables rest on the retired rules. They are part of the Curriculum revision in `TIME.md` 15.1. Open.
 
 ## 5. Ideas held for later
 

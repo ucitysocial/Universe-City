@@ -1,6 +1,6 @@
 # Language Standard
 
-Internal specification. Version 4, October 10, 2026. Requirements for all Universe City written output. Supersedes Version 3 of August 28, 2026.
+Internal specification. Version 4, October 11, 2026. Requirements for all Universe City written output. Supersedes Version 3 of August 28, 2026.
 
 This file governs wording in this repository. `DESIGN_SYSTEM.md` and `SYSTEM_EXPLANATION_STANDARD.md` are governed by it. Where either file disagrees with this one, this file governs.
 
@@ -100,7 +100,7 @@ CORRECT Key Performance Indicators. Information Technology.
 
 3.11 The agent is a person. Software prepares work for the agent. Software is never called the agent.
 
-3.12 Clauses 3.13 to 3.20 are kept from Version 3. They were not reviewed on October 10, 2026.
+3.12 Clauses 3.13 to 3.20 are kept from Version 3. They were not reviewed on October 10, 2026. Clause 3.20 was changed on October 11, 2026 on order of work only.
 
 3.13 Each folder contains twelve questions. Each question presents ten written options. The client selects one option for start and one for target.
 
@@ -116,7 +116,13 @@ CORRECT Key Performance Indicators. Information Technology.
 
 3.19 No folder depends on another folder having been completed first. A folder that requires another folder to exist before it can function is not compliant.
 
-3.20 The answers produce three outputs. Order of work, determined by position. Baseline, which stops the agent from requesting what is already on file. Engagement level, which sets how much the agent asks for.
+3.20 The answers produce three outputs. Position, which informs the assessment and identifies where work exists. Baseline, which stops the agent from requesting what is already on file. Engagement level, which sets how much the agent asks for.
+
+3.20.1 Position does not set the order of work. The order in which a report lists positions is the order of that list only.
+
+3.20.2 The agent determines the next action from five factors: the information still missing, the commitments the client has established, the importance of the work to the client, the consequences on file, and the client's preferences.
+
+3.20.3 A need that is urgent or tied to a date is addressed when it arises, whatever its position. The agent is never required to address the lowest position first.
 
 ## 4. Layers
 
@@ -694,7 +700,7 @@ DO That is outside what I do. It is worth raising with a doctor. Do you want the
 
 12.6 Clause 8.3.3. The order of questions, teaching layer, and system does not match the three stage arc.
 
-12.7 Start, Target, Position, Report, and Grade. Clauses 3.13 to 3.20 and sections 8 and 9 were kept from Version 3 without review.
+12.7 Start, Target, Position, Report, and Grade. Clauses 3.13 to 3.20 and sections 8 and 9 were kept from Version 3 without review. Clause 3.20 was changed on October 11, 2026 on order of work. Its baseline and engagement level outputs remain without review.
 
 12.8 Housing Stability. Transportation, Privacy, Technology, Administration, and Law concern infrastructure. The department name is kept for this version. Renaming is deferred until after launch.
 
@@ -725,5 +731,6 @@ DO That is outside what I do. It is worth raising with a doctor. Do you want the
 | October 10, 2026 | 3 to 4 | List clause widened from three item lists to every list. |
 | October 10, 2026 | 3 to 4 | Button rule split into action buttons, names of places, and answers. Duration narrowed to tasks longer than one minute. |
 | October 10, 2026 | 3 to 4 | No hyphen and no dash in resident facing text. United States English rule moved in from the Master Index. |
+| October 11, 2026 | 4 | Clause 3.20 changed. Position informs the assessment and identifies work. Position does not set the order of work. The agent determines the next action from five factors. Ruled by the founder. |
 
 Governed by the Document Standard for document formatting.

@@ -274,4 +274,4 @@ The fixed rule of lowest Position first is retired for Time. The agent selects t
 
 Executed and confirmed successful are two results. A commitment is executed when its Completion condition is met. It is confirmed successful only when the resident has confirmed that no commitment or condition was affected. Consequences that are not established are never counted as no harm.
 
-`LANGUAGE_STANDARD.md` 3.20 still states order of work by Position. That clause is unreviewed under clause 12.7 and needs the matching change.
+`LANGUAGE_STANDARD.md` 3.20 was changed to match on October 11, 2026. Start, Target, Position, Report, and Grade keep their definitions. Position informs the assessment and identifies where work exists. Position does not set the order of work. Clauses 3.20.1 to 3.20.3 state the rule.
