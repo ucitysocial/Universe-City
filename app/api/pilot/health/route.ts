@@ -1,20 +1,12 @@
-import { timingSafeEqual } from 'node:crypto';
 import { randomUUID } from 'node:crypto';
 import { modelName, pilotEnabled } from '@/lib/pilot/config';
 import { getDriver, withResident } from '@/lib/pilot/db';
 import { getModel } from '@/lib/pilot/model';
 import { PROMPT_VERSION } from '@/lib/pilot/prompt';
+import { operatorOk } from '@/lib/pilot/operator';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
-
-function keyOk(given: string | null): boolean {
-  const want = process.env.PILOT_SELFTEST_KEY || '';
-  if (!want || !given) return false;
-  const a = Buffer.from(given);
-  const b = Buffer.from(want);
-  return a.length === b.length && timingSafeEqual(a, b);
-}
 
 /**
  * States whether the parts of the founder test are connected. It returns no secret and no resident data.
@@ -22,7 +14,7 @@ function keyOk(given: string | null): boolean {
  */
 export async function GET(req: Request) {
   const url = new URL(req.url);
-  if (!keyOk(url.searchParams.get('key') || req.headers.get('x-pilot-key'))) {
+  if (!(await operatorOk(req))) {
     return Response.json({ error: 'Not found.' }, { status: 404 });
   }
   const out: Record<string, unknown> = {
