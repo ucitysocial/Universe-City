@@ -15,6 +15,14 @@ on:
         description: 'A short name for this run'
         required: false
         default: 'run'
+      mode:
+        description: 'http calls the preview for each step. local runs the server logic on the runner with a database in memory and sends only the model call to the preview.'
+        required: false
+        default: 'http'
+      model:
+        description: 'For local mode: the model to ask for. Empty uses the preview default.'
+        required: false
+        default: ''
   push:
     branches: [pilot/founder-test]
     paths:
@@ -39,7 +47,19 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: node tests/pilot/hosted/run.mjs
+      - if: ${{ github.event.inputs.mode == 'local' }}
+        run: npm install --no-audit --no-fund --ignore-scripts
+      - if: ${{ github.event.inputs.mode == 'local' }}
+        run: npx tsx tests/pilot/hosted/scenario.mts
+        env:
+          PREVIEW: https://deploy-preview-19--universecitystage.netlify.app
+          PULL_REQUEST: '19'
+          STEPS: ${{ github.event.inputs.steps }}
+          LABEL: ${{ github.event.inputs.label }}
+          PILOT_MODEL: ${{ github.event.inputs.model }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - if: ${{ github.event.inputs.mode != 'local' }}
+        run: node tests/pilot/hosted/run.mjs
         env:
           PREVIEW: https://deploy-preview-19--universecitystage.netlify.app
           PULL_REQUEST: '19'

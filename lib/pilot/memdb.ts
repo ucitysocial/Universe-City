@@ -1,8 +1,7 @@
 // A database in memory, built from the same schema as the hosted one.
 //
-// The check route uses it to run made up conversations against the real language model with no hosted database.
-// It lives as long as the server process that built it. Its data is lost when that process ends. It never holds
-// a resident's File: only the check route reaches it, and only for the two made up residents named here.
+// Local work uses it to open the screens with no hosted database. It lives as long as the process that built it.
+// It never holds a resident's File. A production server never builds one.
 
 import { randomUUID } from 'node:crypto';
 import type { Driver, Q } from './db';

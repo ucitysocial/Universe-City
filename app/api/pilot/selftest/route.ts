@@ -1,7 +1,6 @@
 import { randomUUID } from 'node:crypto';
-import { isUuid, withDriver, withResident } from '@/lib/pilot/db';
+import { isUuid, withResident } from '@/lib/pilot/db';
 import { loadAccess, loadFile } from '@/lib/pilot/file';
-import { MEM_RESIDENTS, memDb } from '@/lib/pilot/memdb';
 import { operatorOk } from '@/lib/pilot/operator';
 import { saySpan, sayDays } from '@/lib/pilot/time';
 import { sayCommitment } from '@/lib/pilot/tools';
@@ -16,16 +15,12 @@ export const maxDuration = 60;
  *
  * It speaks only for a resident whose row in the test list is marked made up.
  * It cannot speak for the founder, whatever key or id it is given.
- *
- * With mem=1 the conversation runs against a database in memory that holds two made up residents and
- * no other row. That database belongs to this request alone. No other request is pointed at it.
  */
 export async function GET(req: Request) {
   const url = new URL(req.url);
   if (!(await operatorOk(req))) {
     return Response.json({ error: 'Not found.' }, { status: 404 });
   }
-  const mem = url.searchParams.get('mem') === '1';
   const which = url.searchParams.get('who') === 'b' ? 1 : 0;
 
   const work = async (userId: string, extra: Record<string, unknown>) => {
@@ -76,10 +71,6 @@ export async function GET(req: Request) {
   };
 
   try {
-    if (mem) {
-      const m = await memDb();
-      return await withDriver(m.driver, () => work(MEM_RESIDENTS[which], { mem_instance: m.instance }));
-    }
     const ids = (process.env.PILOT_SELFTEST_USERS || '').split(/[\s,]+/).filter(isUuid);
     const userId = ids[which];
     if (!userId) return Response.json({ error: 'No made up resident is configured.' }, { status: 400 });

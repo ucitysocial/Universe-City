@@ -49,7 +49,6 @@ function pathOf(step) {
   if (typeof step === 'string') return step;
   const q = new URLSearchParams();
   q.set('who', step.who === 'b' ? 'b' : 'a');
-  if (mem) q.set('mem', '1');
   if (step.fresh) q.set('fresh', '1');
   if (step.say) q.set('say', step.say);
   if (step.rk) q.set('rk', step.rk);

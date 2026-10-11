@@ -1,21 +1,9 @@
 /** @type {import('next').NextConfig} */
 export default {
   reactStrictMode: true,
-  // The check route of the founder test can build a database in memory. The package that does it is loaded from
-  // node_modules at run time, and its two data files are named here so the build carries them.
-  experimental: {
-    serverComponentsExternalPackages: ['@electric-sql/pglite'],
-    outputFileTracingIncludes: {
-      '/api/pilot/selftest': [
-        './node_modules/@electric-sql/pglite/package.json',
-        './node_modules/@electric-sql/pglite/dist/*.js',
-        './node_modules/@electric-sql/pglite/dist/*.cjs',
-        './node_modules/@electric-sql/pglite/dist/*.wasm',
-        './node_modules/@electric-sql/pglite/dist/*.data',
-        './node_modules/@electric-sql/pglite/dist/fs/**'
-      ]
-    }
-  },
+  // Local work on the founder test builds a database in memory. That package is loaded from node_modules when it
+  // is asked for, and stays outside the bundle.
+  experimental: { serverComponentsExternalPackages: ['@electric-sql/pglite'] },
   // Netlify sets these while it builds. They are fixed into the build so the server can read them at run time.
   // The founder test uses them to stay off a production deploy.
   env: {
