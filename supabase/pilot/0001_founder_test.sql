@@ -546,7 +546,7 @@ grant select, insert         on uc_pilot.pending        to uc_pilot_resident;
 grant update (summary, payload, state, decided_via, decided_message_id, result)
                              on uc_pilot.pending        to uc_pilot_resident;
 grant select, insert         on uc_pilot.follow_ups     to uc_pilot_resident;
-grant update (state, closed_said, closed_message_id)
+grant update (what, due_on, state, closed_said, closed_message_id)
                              on uc_pilot.follow_ups     to uc_pilot_resident;
 grant select, insert         on uc_pilot.actions        to uc_pilot_resident;
 grant select                 on uc_pilot.revisions      to uc_pilot_resident;

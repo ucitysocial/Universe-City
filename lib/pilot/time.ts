@@ -101,8 +101,10 @@ export function sayWhen(iso: string, zone: string): string {
 export function sayDays(days: number[]): string {
   const sorted = [...new Set(days)].sort((a, b) => a - b);
   if (sorted.length === 7) return 'every day';
-  if (sorted.join(',') === '1,2,3,4,5') return 'Monday to Friday';
   if (sorted.join(',') === '0,6') return 'Saturday and Sunday';
+  // Three or more days in a row read as a range: Tuesday to Saturday.
+  const inRow = sorted.every((d, i) => i === 0 || d === sorted[i - 1] + 1);
+  if (sorted.length >= 3 && inRow) return `${weekdayName(sorted[0])} to ${weekdayName(sorted[sorted.length - 1])}`;
   const names = sorted.map(weekdayName);
   if (names.length === 1) return names[0];
   return `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`;

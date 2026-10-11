@@ -457,14 +457,20 @@ export const TOOLS: Tool[] = [
     input_schema: obj({
       ref: REF('the statement being corrected'),
       quote: QUOTE,
+      stands_alone: { type: 'boolean', description: 'True when the quoted words state the whole fact by themselves. False when they only correct one part, as in I meant Thursday. With false, the server keeps the earlier words and adds the correction after them.' },
       topic: { type: 'string', description: 'A new label, when the old one no longer fits.' }
     }, ['ref', 'quote']),
     async run(env, a) {
       const id = await find(env, 'statement', a.ref);
-      const said = words(env, a) ?? text(a, 'summary', 1000)!;
+      const quoted = words(env, a, { minWords: 2 }) ?? text(a, 'summary', 1000)!;
       const old = (await env.q<any>(`select said, topic, folder, state, about_date::text as about_date from uc_pilot.statements where id = $1`, [id]))[0];
       if (old.state !== 'current') throw new Refusal('Not done. That statement was already replaced or withdrawn. Look up the current one.');
       const topic = text(a, 'topic', 80, false) ?? old.topic;
+      // A correction that does not stand on its own, such as "I meant Thursday", is kept together with the words it corrects.
+      // Both parts are the resident's own words. Nothing is rewritten.
+      const alone = a.stands_alone === true || (a.stands_alone !== false && quoted.split(' ').length >= 5 && !/^(no|nope|actually|i meant|sorry|wait)\b/i.test(quoted));
+      const earlier = String(old.said).split(' Corrected: ')[0];
+      const said = alone ? quoted : clip(`${earlier}${/[.!?]$/.test(earlier) ? '' : '.'} Corrected: ${quoted}`, 1000);
       const row = (await env.q<{ id: string }>(
         `insert into uc_pilot.statements (said, topic, folder, about_date, basis, supersedes) values ($1, $2, $3, $4::date, $5, $6) returning id`,
         [said, topic, old.folder, old.about_date, env.basis, id]))[0];
@@ -911,6 +917,28 @@ export const TOOLS: Tool[] = [
         outcome: 'filed', detail: `Follow up opened for ${whose}: ${what}`, target: 'follow_ups', targetId: row.id,
         data: { ref: shortId(row.id), note: owner === 'agent' ? 'No person has seen this yet. Say that the request is on file for the agent. Do not say a person will reply by a set time.' : undefined }
       };
+    }
+  },
+  {
+    name: 'change_follow_up',
+    group: 'follow_up',
+    description: 'Changes what an open follow up asks for or the day it is needed by, because the resident stated the change. The earlier values are kept in its history.',
+    input_schema: obj({
+      ref: REF('the follow up'),
+      what: { type: 'string', description: 'What is needed now, in one plain sentence.' },
+      due_on: DATE('The new day it is needed by'),
+      quote: QUOTE
+    }, ['ref', 'quote']),
+    async run(env, a) {
+      const id = await find(env, 'follow_up', a.ref);
+      const said = words(env, a, { minWords: 2 });
+      const old = (await env.q<any>(`select what, due_on::text as due_on, state from uc_pilot.follow_ups where id = $1`, [id]))[0];
+      if (old.state !== 'open') throw new Refusal('Not done. That follow up is closed.');
+      const what = text(a, 'what', 400, false) ?? old.what;
+      const due = dateArg(a, 'due_on', false) ?? old.due_on;
+      await env.q(`select set_config('uc.reason', 'The resident changed it.', true)`);
+      await env.q(`update uc_pilot.follow_ups set what = $2, due_on = $3::date where id = $1`, [id, what, due]);
+      return { outcome: 'filed', detail: `Follow up changed: ${what}${due ? `, needed by ${sayDate(due)}` : ''}. Before: ${old.what}${old.due_on ? `, needed by ${sayDate(old.due_on)}` : ''}.${inWords(said)}`, target: 'follow_ups', targetId: id };
     }
   },
   {

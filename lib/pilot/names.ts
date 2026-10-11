@@ -19,6 +19,7 @@ export const ACTION_NAME: Record<string, string> = {
   resident_decision: 'File your answer',
   propose_to_agent: 'Send a proposal to your agent',
   open_follow_up: 'Open a follow up',
+  change_follow_up: 'Change a follow up',
   close_follow_up: 'Close a follow up',
   screen_decision: 'Your press on the screen',
   desk_decision: 'A decision by a person'
