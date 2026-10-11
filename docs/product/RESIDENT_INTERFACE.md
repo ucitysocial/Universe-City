@@ -37,11 +37,11 @@ Persistent access to:
 - 48 folders
 - nested folder/session organization
 
-### Center — Workspace
+### Center — Resident Portal content
 
 Shows one primary context at a time:
 
-- Dashboard
+- Resident Portal home
 - folder/system
 - Session
 - record/detail
@@ -59,16 +59,16 @@ The frame is static.
 
 ---
 
-## Dashboard
+## Resident Portal home
 
-**LOCKED: the dashboard remains important.**
+**LOCKED: the Resident Portal home remains important.**
 
-The main dashboard is the resident's current-life view.
+The Resident Portal home presents current information from the resident's systems.
 
 It may eventually show:
 
 - Today
-- current/next Plan item
+- next planned commitment
 - schedule
 - money/obligations
 - upcoming appointments/deadlines
@@ -77,13 +77,13 @@ It may eventually show:
 - current system work
 - resident-selected persistent information
 
-The dashboard is **derived from maintained systems**.
+The Resident Portal home is **derived from maintained systems**.
 
 It does not own duplicate truth.
 
 Example:
 
-- schedule widget reads Time/Schedule
+- schedule view reads Time/Schedule
 - registration deadline reads Regulation
 - money obligation reads Finance
 - work commitment may read Career Schedule
@@ -192,7 +192,7 @@ Potential uses:
 - thin folder rule
 - title accent
 - breadcrumb marker
-- small dashboard origin indicator
+- small source indicator
 - status/department dot
 
 Example:
@@ -243,7 +243,7 @@ Not yet locked.
 
 Mobile should preserve the same conceptual model:
 
-- Dashboard
+- Resident Portal home
 - File
 - Agent
 - current context/path
@@ -259,17 +259,17 @@ See open questions.
 
 **LOCKED direction**
 
-The resident journey should use the existing account + membership infrastructure:
+The confirmed entry order is Application followed by Enrollment. Residency starts at Enrollment. The details within Enrollment remain under review.
 
 ```
-Create account
-→ Confirm email
-→ Activate membership
-→ Orientation in the real resident interface
-→ Time first
-→ Build tomorrow's Plan
-→ Normal dashboard
+Application
+→ Email confirmation
+→ Enrollment (internal order under review)
+→ First seven day schedule and commitments (placement under review)
+→ Resident Portal home
 ```
+
+Agency Assessment is Department I. The relationship between its initial work and Enrollment must be decided before the entry sequence is implemented. Orientation belongs in the Resident Portal; its position within Enrollment remains open. Payment timing also remains open. Do not interpret legacy membership activation as a required entry step.
 
 Orientation should highlight the actual resident shell rather than use a disconnected slideshow.
 
@@ -277,8 +277,8 @@ Required concepts:
 
 - walkthrough may be skipped
 - orientation can be replayed later
-- File / Workspace / Agent are introduced in place
+- File, Resident Portal content, and Agent are introduced in place
 - Time is explicitly identified as the first focus
-- a new resident does not land on a mostly-empty normal dashboard before a first Plan exists
+- a new resident sees entry work before the normal Resident Portal home
 
-The first normal dashboard should appear after Time has enough initial Plan data to show something meaningful.
+The original decision to delay the normal Resident Portal home until initial Time information exists remains a working direction. Whether the resident completes a seven day schedule, a daily Plan, or both during Enrollment requires a product decision.
