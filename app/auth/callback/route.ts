@@ -7,7 +7,8 @@ export async function GET(request: NextRequest) {
   // The page to open after the link is a path on this site. A full address is replaced with the Resident Portal.
   const asked = searchParams.get('next') ?? '';
   const next = /^\/(?![\/\\])[^\s]*$/.test(asked) ? asked : '/portal';
-  const publicAppUrl = process.env.NEXT_PUBLIC_PUBLIC_APP_URL ?? origin;
+  // A preview keeps the visitor on the preview. The login cookie belongs to the address that received the link.
+  const publicAppUrl = process.env.PILOT_CONTEXT === 'deploy-preview' ? origin : (process.env.NEXT_PUBLIC_PUBLIC_APP_URL ?? origin);
   if (code) {
     const { error } = await supabaseServer().auth.exchangeCodeForSession(code);
     if (!error) return NextResponse.redirect(`${publicAppUrl}${next}`);

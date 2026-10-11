@@ -551,6 +551,15 @@ grant update (what, due_on, state, closed_said, closed_message_id)
 grant select, insert         on uc_pilot.actions        to uc_pilot_resident;
 grant select                 on uc_pilot.revisions      to uc_pilot_resident;
 
+-- Each function looks names up in this schema and in the built in catalog alone, whatever the caller's search path holds.
+do $$
+declare f text;
+begin
+  foreach f in array array['uid','actor','msg','turn','stamp','rests_on_resident','outcome_guard','fixed_columns','refs_guard','pending_guard','follow_up_guard'] loop
+    execute format('alter function uc_pilot.%I() set search_path = uc_pilot, pg_temp', f);
+  end loop;
+end $$;
+
 -- A function is open only to the working role, and only the ones it calls by name.
 -- The trigger functions are run by the triggers. No role calls them, so no role can attach one to a table of its own.
 revoke execute on all functions in schema uc_pilot from public;

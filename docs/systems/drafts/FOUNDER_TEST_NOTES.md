@@ -16,9 +16,17 @@ Written October 11, 2026. Branch `pilot/founder-test`. Pull request 19. The pull
 
 2.1 The preview is the Netlify deploy preview of pull request 19. The screens answer Not Found on a production deploy.
 
-2.2 The test data belongs in one separate schema, `uc_pilot`, built by `supabase/pilot/0001_founder_test.sql`. That file is not a migration. It changes no table in `public` or `auth`.
+2.2 The test data is held in one separate schema, `uc_pilot`, inside the Universe City database. The founder approved that place on October 11, 2026. The schema is built by `supabase/pilot/0001_founder_test.sql`. That file is not a migration. It changes no table in `public` or `auth`. No web key of the site reaches the schema: the roles `anon`, `authenticated`, and `service_role` hold no privilege in it.
 
-2.3 The language model is Claude, reached through the Netlify AI Gateway. No key for it is stored in the repository or in the site settings.
+2.3 The hosted schema was compared with the file on October 11, 2026, part by part: columns, constraints, indexes, triggers, policies, functions, grants, and row level security. Each part equals the file. One function in the file is absent from the hosted schema: `clear_my_test_data`. Clause 5.7 states why.
+
+2.4 The test list holds three rows: the founder's login, and two made up residents named Dana and Marcus. The checks speak only for the two made up residents.
+
+2.5 The language model is Claude Sonnet 5.5. It is reached through the Netlify AI Gateway, and Netlify bills the founder's Netlify account for each reply. The founder chose on October 11, 2026 to pay Anthropic directly. When the variable `PILOT_ANTHROPIC_KEY` holds her key, each reply goes to Anthropic under her own account. No key is stored in the repository.
+
+2.6 The preview reads four Netlify variables, each set for deploy previews alone and each marked secret: `PILOT_DATABASE_URL`, `PILOT_DATABASE_CA`, `PILOT_SELFTEST_KEY`, and `PILOT_SELFTEST_USERS`.
+
+2.7 One resident's replies stop for the day when their model cost reaches 1 dollar. `PILOT_DAILY_CAP_USD` changes that amount.
 
 ## 3. Choices made for this test
 
@@ -43,11 +51,25 @@ Each row is a choice for the test. None is a ruling.
 
 ## 4. What the server keeps, whatever the model asks
 
-4.1 `tests/pilot/guardrails.mts` holds 71 checks. Each runs the server and the schema against a database in memory with a scripted stand in for the model. Run `npm install`, then `npm run test:pilot`.
+4.1 `tests/pilot/guardrails.mts` holds 74 checks. Each runs the server and the schema against a database in memory with a scripted stand in for the model. Run `npm install`, then `npm run test:pilot`.
 
 4.2 An independent review of the code was run on October 11, 2026. Its findings and what was done about each are in section 6.
 
 4.3 Conversations with the real model were run with made up residents, from GitHub Actions. The results are comments on pull request 19.
+
+4.4 The hosted preview and the hosted database were checked on October 11, 2026:
+
+| Check | Result |
+|---|---|
+| The database login role, before it takes the working role | It can use no table in the schema and it bypasses no rule |
+| A resident who is outside the test list | Reads 0 rows. A write is refused by row level security |
+| The connection to the database | Encrypted, and the database's certificate is verified against the authority's certificate |
+| A conversation of 8 messages as Dana | A weekly schedule item, a Finance statement, a commitment, a confirmed Plan, a corrected time with its history, and a reported outcome were filed. The database rows match the replies |
+| A question as Marcus about Dana's entries | The guide found no entry. Marcus's File is empty |
+| Each screen and each route, asked with no login | Each screen sends the visitor to Log in. Each route answers 401 or 404 |
+| A write that names a different site as its origin | Refused with 403 |
+
+4.5 The cost of those 9 hosted messages was 14 cents. The first message of a conversation costs 3 cents and each later message costs 1 to 2 cents.
 
 ## 5. What it does not do
 
@@ -63,6 +85,10 @@ Each row is a choice for the test. None is a ruling.
 
 5.6 The model's replies are checked for a hyphen and a dash after they are written. The other clauses of the Language Standard are given to the model as instructions and are not checked by code.
 
+5.7 The Clear my test data button clears no row yet. The database tool asks the founder to confirm each statement that holds a delete, and the function that clears the test holds one. The function is installed when the founder confirms it. Until then the button states that the function is not installed. For the same reason the rows of Dana and Marcus stay in the schema.
+
+5.8 The founder's own login was not used in a check. The screens were checked with no login, and the server was checked with the made up residents.
+
 ## 6. Review findings
 
 | Finding | Status |
@@ -75,14 +101,24 @@ Each row is a choice for the test. None is a ruling.
 | A Plan confirm used the list at press time | Fixed. The Plan is confirmed as the list shown |
 | A resumed reply could file twice | Fixed. The model's requests are kept as they arrive, and one request claims the reply |
 | Number removal missed common written forms | Improved. A number written in an unusual way can still pass. The notice says so |
-| The database connection did not verify the database's certificate | Open until the test database is connected. The code verifies when the authority's certificate is set |
+| The database connection did not verify the database's certificate | Fixed. The authority's certificate is set and the connection is verified. The certificate was taken from the first connection. It was not compared with a second published copy |
+| The database functions read the caller's search path | Fixed. Each function reads this schema and the built in catalog alone |
+| The database login can call the functions in `public` that every visitor of the site can call | Open. The grant is to every role in the database, so the login gains no reach that a visitor lacks. Closing it changes `public` |
 | The working role could attach the history function to a table of its own | Fixed |
 | Rules that held only in code | Fixed. Updates reach named columns, and the database decides who may decide a proposal |
 
-## 7. Removing the test
+## 7. Taking the test out to study it
 
-7.1 Close pull request 19 and delete the branch.
+7.1 The Activity screen holds two downloads. Each holds the whole test for the login that asks: every message word for word, every File entry with the words it rests on, every change with what the entry said before, every action the server took with its result, and the model, tokens, and cost of each reply.
 
-7.2 Run the three statements at the top of `supabase/pilot/0001_founder_test.sql`.
+7.2 One download is a JSON file for a tool to read. Its format name is `universe-city-founder-test-export-1`. The other is a plain text file that reads from top to bottom.
 
-7.3 Delete the Netlify variables whose names start with `PILOT_`.
+7.3 The address is `/api/pilot/export`, and `/api/pilot/export?format=text` for the text file. It answers only the resident who is logged in, and only with that resident's rows.
+
+## 8. Removing the test
+
+8.1 Close pull request 19 and delete the branch.
+
+8.2 Run the three statements at the top of `supabase/pilot/0001_founder_test.sql`.
+
+8.3 Delete the Netlify variables whose names start with `PILOT_`.
