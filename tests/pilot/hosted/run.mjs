@@ -30,6 +30,24 @@ async function get(path) {
   }
 }
 
+// A step { open: '/path' } asks the preview as a visitor with no login. It follows no redirect.
+// With post: true it sends an empty write that names the preview as its origin.
+async function open(step) {
+  const t0 = Date.now();
+  try {
+    const res = await fetch(`${base}${step.open}`, {
+      method: step.post ? 'POST' : 'GET', redirect: 'manual',
+      headers: step.post ? { 'content-type': 'application/json', origin: step.origin === false ? 'https://example.com' : base } : {},
+      body: step.post ? '{}' : undefined
+    });
+    const text = await res.text();
+    let body; try { body = JSON.parse(text); } catch { body = text.replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>|<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 240); }
+    return { status: res.status, ms: Date.now() - t0, body: { goes_to: res.headers.get('location'), cache: res.headers.get('cache-control'), body } };
+  } catch (e) {
+    return { status: 0, ms: Date.now() - t0, body: String(e?.message || e) };
+  }
+}
+
 let input;
 try { input = JSON.parse(process.env.STEPS || 'null'); } catch { input = null; }
 const mem = !!(input && !Array.isArray(input) && input.mem);
@@ -63,7 +81,7 @@ for (let attempt = 0; attempt < 4; attempt++) {
   let instance = null;
   let moved = false;
   for (const step of steps) {
-    const r = await get(pathOf(step));
+    const r = step && typeof step === 'object' && step.open ? await open(step) : await get(pathOf(step));
     const here = r.body?.mem_instance ?? null;
     if (mem && here) {
       if (instance && here !== instance) { moved = true; break; }
