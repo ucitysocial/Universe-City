@@ -29,7 +29,8 @@ No entry is a defect just because the prototype is unfinished. Do not report uns
 | --- | --- | --- | --- | --- |
 | FT-001 | Founder Test — first screen | Introduction explains test storage, access, model handling, and controls before conversation starts | Observed UI + candidate UX review | Observed; awaiting founder direction |
 | FT-002 | Conversation — empty state | The guide does not initiate the conversation; an empty state directs the founder to write first | Observed UI + onboarding question | Observed; awaiting founder direction |
-| FT-003 | Conversation — scheduling uncertainty | Guide navigates variable schedule and treats a tentative arrival as unconfirmed, but pauses its dialogue at a confirmation request | Observed working behavior + interaction review | Observed; clarification pending |
+| FT-003 | Conversation — scheduling uncertainty | Tentative time triggers explicit confirmation; on approval, the guide resumes questioning | Positive finding + follow-up retest | Partially retested; deferral still untested |
+| FT-004 | Conversation — filing feedback | Verbose filing/activity text and apparent identical before/after change confuse the founder | Founder-requested UX improvement + possible data defect | Triage; fix not implemented |
 
 ---
 
@@ -139,6 +140,12 @@ Send one short **fictional test message** with a specific commitment or scheduli
 
 **FT-003-E — Data correctness following confirmation (untested).** Test yes, no, correction, deferral, and a new-topic response while **WAITING FOR YOU** is present. Inspect the File and Activity log for exact source linkage, revision history, pending-state resolution, and accurate date/time.
 
+### Follow-up result: founder confirmed the tentative time (same test, later screenshot)
+
+The founder replied **"just confirm 3PM"**. The guide then said the shift was on file starting at 3:00 PM, with the end left open, and asked: **"Do you want to plan that day, or is there something else to sort out first?"**
+
+**Updated assessment of FT-003-C:** The interface accepted a confirmation and resumed the conversation. The earlier screenshot showed an unanswered confirmation prompt, **not a proven conversation-blocking defect**. The behavior with a declined or deferred confirmation remains untested. The subsequent **FILED** notice is documented separately in **FT-004** because the apparent before/after state conflicts with the earlier pending confirmation.
+
 ### Founder direction
 
 Founder has **positively endorsed uncertainty recognition and follow-up quality** and flagged that the dialogue ends after the confirmation request. A particular replacement prompt, nonblocking flow, or UI update **has not yet been explicitly approved**.
@@ -149,14 +156,70 @@ First test whether a natural response such as deferring the arrival estimate and
 
 ---
 
+## FT-004 — Filing summary clarity and possible no-op confirmation
+
+**Date observed:** October 11, 2026  
+**Evidence:** Fourth screenshot supplied by the founder in ChatGPT (continuation of FT-003). Screenshot itself is not added to the public repository. Full transcript pending.  
+**Surface / state:** The founder accepts the guide's proposed shift start time and sees the guide's reply with an automatic **FILED** line.  
+**Status:** Founder-requested UX change to track; implementation not authorized or completed. Data-state discrepancy to investigate.
+
+### Exact behavior observed
+
+- After a **WAITING FOR YOU** proposal to set the shift's start time, the founder replies: **"just confirm 3PM"**.
+- The guide says the shift is filed, its end remains unspecified, and the dialogue continues with a question about planning the day or addressing something else.
+- The same guide reply also says: **"The entry already showed 3:00 PM before this change, so nothing is different."**
+- The **FILED** line reads, in part: **"Changed: Bar shift, starts 3:00 PM, end not established ... Before: Bar shift, starts 3:00 PM, end not established ... Your words: 'just confirm 3PM'"**.
+- In the prior screenshot, the **WAITING FOR YOU** proposal said the *current* entry had **time not established**. This is inconsistent with the later **Before** snapshot showing a 3:00 PM start.
+
+### Founder feedback and requested direction
+
+The founder says the automatic blurbs underneath guide replies are unnecessarily wordy and difficult to understand. The founder asks for them to be **shorter or more summarized** and suggests an example along the lines of **"Uncertainty confirmed: bar shift start 3PM, Oct 16, 2026"**. Preserve that example as the founder's desired concise style, without treating those exact words as finalized product copy.
+
+**Candidate compact presentation, for the founder to approve or adjust:**
+
+- On approval: **"Confirmed: Bar shift starts at 3:00 PM on Friday, October 16. End time unknown."**
+- For an unresolved estimate: **"Awaiting confirmation: Bar shift start estimated at 3:00 PM on Friday, October 16."**
+- For an actual correction: **"Updated: Bar shift start changed from [old time] to [new time] on [date]."**
+- If there was no actual change, do not label it **Changed**. Show an accurate confirmation result, with full event details in File or Activity.
+
+These are suggested examples for design discussion, **not implemented UI copy**. Exact timestamps, source excerpts, and before/after revisions remain available through audit/history and should not be discarded just to simplify the inline feedback.
+
+### Findings
+
+**FT-004-A — Founder-requested UX improvement: readable filing feedback.** The current **FILED** and **WAITING FOR YOU** blurbs repeat long internal record descriptions and exact resident wording, making the conversation harder to read. The founder explicitly asks for shorter, clearer status summaries. Prefer a human-readable outcome, date, and any material unknown; keep detailed provenance and history in their proper views.
+
+**FT-004-B — Potential data/proposal integrity defect: inconsistent state (high priority to investigate).** An earlier pending proposal described **Before** as unspecified time; after approval, the dialogue and audit text describe **Before** as already 3:00 PM. This may be stale state, premature writes, a no-op update, a presentation bug, or some combination. The screenshot alone cannot identify which. Verify in the File, revisions, Activity actions, and database source history before asserting a root cause.
+
+**FT-004-C — Incorrect change semantics if before equals after (observed UI contradiction).** The displayed event says **Changed** while its stated before/after values are identical. If the underlying data truly did not change, the system should not present a modification; if a proposed change did occur, the old value needs to be displayed accurately. Retain an audit event for the confirmation action without fabricating a changed field.
+
+**FT-004-D — Guide continuation (positive retest).** After approval, the guide asks how to proceed with the day rather than ending the conversation. FT-003-C is therefore only an unanswered-prompt UX concern so far, not evidence of a locked conversation.
+
+### Founder direction / approval scope
+
+**Founder requested that these findings be recorded in GitHub and that filing blurbs be made easier to understand.** Treat the concise-summary goal as founder direction for a future code change. The specific wording and technical implementation remain to be decided. This log entry does **not** edit, deploy, or approve changes to the running prototype.
+
+### Retest instructions for Claude / implementer
+
+1. Establish a new dated entry with genuinely unknown start and end times, then submit a tentative start ("probably").
+2. Check the File *before* confirmation: tentative or pending proposal must be distinguishable from confirmed start; original message remains intact.
+3. Confirm the time once. Compare proposal before-state, accepted after-state, persisted data, revision/event history, and the inline **FILED** summary.
+4. Confirm a second time and verify idempotence: no false "Changed" entry for an unchanged field.
+5. Decline/defer another estimate and start a new topic. The conversation should remain usable; no unconfirmed schedule time should silently become confirmed.
+6. Validate the one-line status copy and verify detailed evidence remains reachable through File/Activity.
+
+---
+
 ## Findings and implementation tracking
 
-- **Confirmed defects:** None yet established from the supplied screenshots. A pending confirmation may pause the dialogue; actual blocking is not established.
-- **Potential improvements / review questions:** FT-001-A, FT-001-C, FT-002-A, FT-002-D, FT-003-C, FT-003-D.
-- **Observed positive behavior:** FT-003-A and founder-reported FT-003-B. These are not yet full end-to-end verification.
-- **Unverified functional claims:** FT-001-B; FT-002-B and FT-002-C are partially observed through FT-003; FT-003-E remains untested.
-- **Approved fixes:** None yet.
-- **Pending retests:** None yet.
+- **Confirmed UI contradiction:** FT-004-C labels a confirmation **Changed** although its visible before/after values are identical. The actual stored change remains unverified.
+- **Possible data integrity problem:** FT-004-B: earlier proposal said time not established, but the later before-snapshot shows the new time.
+- **Founder-requested improvement:** FT-004-A: shorter, clearer inline filing and confirmation summaries.
+- **Potential improvements / review questions:** FT-001-A, FT-001-C, FT-002-A, FT-002-D, FT-003-D; FT-003-C is partially retested (approval works; deferral untested).
+- **Observed positive behavior:** FT-003-A, founder-reported FT-003-B, and FT-004-D (conversation continues after confirmation).
+- **Unverified functional claims:** FT-001-B; FT-002-B and FT-002-C partially observed; FT-003-E and FT-004-B require File/Activity/history inspection.
+- **Approved direction for future improvement:** Shorten and clarify the feedback beneath guide responses (FT-004-A); final copy and implementation not yet approved.
+- **Code fixes deployed:** None through this founder-testing log.
+- **Pending retests:** FT-003 deferral/new topic, FT-004 before/after storage and repeated confirmation, filing feedback readability.
 
 ### Maintenance rules
 
