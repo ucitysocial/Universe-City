@@ -8,7 +8,7 @@ Before a commit, run:
 python3 scripts/language-check.py
 ```
 
-The total on October 10, 2026 was 238. A commit shall not raise the total.
+The total on October 10, 2026 is 0. A commit shall not raise the total.
 
 ## The rules that are broken most often
 
