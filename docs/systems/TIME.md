@@ -385,3 +385,16 @@ Initial sequence:
 The first Plan should include a scheduled Universe City touchpoint so engagement time is not treated as something the resident must simply remember.
 
 A resident who says the Plan feels ambitious or unlikely should be invited to simplify or move something before saving it.
+
+## Commitment conditions
+
+**LOCKED product direction, October 10, 2026.**
+
+For each commitment the agent seeks four separate facts:
+
+1. **Timing:** required time, deadline, and permitted flexibility.
+2. **Completion:** what the resident says must happen for the commitment to be fulfilled.
+3. **Consequences:** what the resident says would be affected by delay, change, or noncompletion, and what the resident later reports actually happened. Anticipated and reported consequences are distinct.
+4. **Standards:** which established minimums from Standards apply. An unknown or unestablished minimum remains unknown; none is invented.
+
+The agent uses what is already on file and asks for the missing condition only when needed for the next decision. These four fields are internal assessment requirements, not a mandatory four question script. A resident may state several conditions at once. Timing changes can still lead to successful execution if completion occurs and no resident established condition is harmed. A completed action with a reported adverse consequence is recorded as completed with consequence, not automatically classified as fully successful. Preserve the source, timing, and status of every claim.
