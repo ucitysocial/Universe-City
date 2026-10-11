@@ -4,7 +4,7 @@ import { supabaseServer } from '@/lib/supabase/server';
 import { figures, type Block } from '@/lib/domain/time';
 
 export type Brief = {
-  header: { name: string; case_no: string; membership: string;
+  header: { name: string; case_no: string; residency: string;
             represented_since: string | null; period: [string, string]; scheduled_for: string | null };
   since_last: { kind: string; what: string; at: string }[];
   time: { observed: number; required: number; planned: number; estimated: number; unaccounted: number;
@@ -57,7 +57,7 @@ export async function buildBrief(userId: string, periodStart: string, periodEnd:
   return {
     header: {
       name: profile?.name ?? '', case_no: profile?.case_no ?? '',
-      membership: profile?.membership ?? 'none',
+      residency: profile?.residency ?? 'none',
       represented_since: profile?.represented_since ?? null,
       period: [periodStart, periodEnd], scheduled_for: scheduledFor
     },

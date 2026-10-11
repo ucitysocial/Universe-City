@@ -17,7 +17,7 @@ export default function SiteHeader({ signedIn }: { signedIn: boolean }) {
 
           <div className="public-actions">
             {signedIn
-              ? <Link className="public-signin" href="/member">Resident Portal</Link>
+              ? <Link className="public-signin" href="/portal">Resident Portal</Link>
               : <Link className="public-signin" href="/login">Log in</Link>}
             {!signedIn && <a className="public-apply" href={mainSiteUrl + '/apply'}>Apply for residency</a>}
 
@@ -52,7 +52,7 @@ export default function SiteHeader({ signedIn }: { signedIn: boolean }) {
                 <a href={mainSiteUrl + '/#business'}>Residency</a>
                 <a href={mainSiteUrl + '/founder'}>Founder</a>
                 {signedIn
-                  ? <Link className="public-menu-login" href="/member">Resident Portal</Link>
+                  ? <Link className="public-menu-login" href="/portal">Resident Portal</Link>
                   : <Link className="public-menu-login" href="/login">Log in</Link>}
               </div>
 

@@ -22,8 +22,8 @@ export async function POST(req: NextRequest) {
     { auth: { persistSession: false } }
   );
 
-  const setMembership = async (userId: string, status: string, sub?: Stripe.Subscription) => {
-    const membership =
+  const setResidency = async (userId: string, status: string, sub?: Stripe.Subscription) => {
+    const residency =
       status === 'active' || status === 'trialing' ? 'active' :
       status === 'past_due' || status === 'unpaid' ? 'past_due' : 'canceled';
 
@@ -37,8 +37,8 @@ export async function POST(req: NextRequest) {
       updated_at: new Date().toISOString()
     });
 
-    const patch: Record<string, unknown> = { membership };
-    if (membership === 'active') patch.represented_since = new Date().toISOString().slice(0, 10);
+    const patch: Record<string, unknown> = { residency };
+    if (residency === 'active') patch.represented_since = new Date().toISOString().slice(0, 10);
     await admin.from('profiles').update(patch).eq('id', userId);
   };
 
@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
       const userId = s.client_reference_id;
       if (userId && s.subscription) {
         const sub = await stripe.subscriptions.retrieve(s.subscription as string);
-        await setMembership(userId, sub.status, sub);
+        await setResidency(userId, sub.status, sub);
       }
       break;
     }
@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
     case 'customer.subscription.deleted': {
       const sub = event.data.object as Stripe.Subscription;
       const userId = sub.metadata?.supabase_user;
-      if (userId) await setMembership(userId, sub.status, sub);
+      if (userId) await setResidency(userId, sub.status, sub);
       break;
     }
   }

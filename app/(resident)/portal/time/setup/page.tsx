@@ -5,12 +5,12 @@ import { addDays, today } from '@/lib/domain/dates';
 
 export default async function TimeSetupPage() {
   const profile = await currentProfile();
-  if (!profile) redirect('/login?next=/member/time/setup');
+  if (!profile) redirect('/login?next=/portal/time/setup');
 
   const { count } = await supabaseServer().from('blocks')
     .select('id', { count: 'exact', head: true });
 
-  if ((count ?? 0) > 0) redirect('/member/time');
+  if ((count ?? 0) > 0) redirect('/portal/time');
 
   const tz = profile.timezone ?? 'America/Denver';
   const tomorrow = addDays(today(tz), 1);

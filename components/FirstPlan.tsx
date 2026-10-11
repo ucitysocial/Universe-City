@@ -180,7 +180,7 @@ export default function FirstPlan({
       return;
     }
 
-    router.push('/member?plan=ready');
+    router.push('/portal?plan=ready');
     router.refresh();
   }
 

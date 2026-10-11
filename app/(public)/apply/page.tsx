@@ -8,7 +8,7 @@ export default async function Apply() {
   const profile = await currentProfile();
   const mainSiteUrl = process.env.NEXT_PUBLIC_MARKETING_SITE_URL ?? 'https://www.ucitysocial.com';
 
-  if (profile?.membership === 'active') redirect('/member');
+  if (profile?.residency === 'active') redirect('/portal');
 
   return (
     <div className="application-page">

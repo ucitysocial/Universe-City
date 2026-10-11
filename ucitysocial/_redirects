@@ -21,8 +21,10 @@
 /reset/* https://universecitystage.netlify.app/reset/:splat 200
 /auth/* https://universecitystage.netlify.app/auth/:splat 200
 /api/* https://universecitystage.netlify.app/api/:splat 200
-/member https://universecitystage.netlify.app/member 200
-/member/* https://universecitystage.netlify.app/member/:splat 200
+/member /portal 301
+/member/* /portal/:splat 301
+/portal https://universecitystage.netlify.app/portal 200
+/portal/* https://universecitystage.netlify.app/portal/:splat 200
 /agent https://universecitystage.netlify.app/agent 200
 /agent/* https://universecitystage.netlify.app/agent/:splat 200
 /_next/* https://universecitystage.netlify.app/_next/:splat 200

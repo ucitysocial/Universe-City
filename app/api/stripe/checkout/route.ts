@@ -26,8 +26,8 @@ export async function POST() {
   const session = await stripe.checkout.sessions.create({
     mode: 'subscription',
     customer,
-    line_items: [{ price: process.env.STRIPE_PRICE_MEMBERSHIP!, quantity: 1 }],
-    success_url: `${site}/member?welcome=1`,
+    line_items: [{ price: (process.env.STRIPE_PRICE_RESIDENCY ?? process.env.STRIPE_PRICE_MEMBERSHIP)!, quantity: 1 }],
+    success_url: `${site}/portal?welcome=1`,
     cancel_url: `${site}/apply`,
     client_reference_id: user.id,
     subscription_data: { metadata: { supabase_user: user.id } }

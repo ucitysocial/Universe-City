@@ -16,7 +16,7 @@ export default async function AccountPage() {
 
       <h2 style={{ marginTop: 40, fontSize: 20 }}>Residency</h2>
       <p style={{ marginTop: 8 }}>
-        {profile?.membership}
+        {profile?.residency}
         {sub?.current_period_end ? ` · renews ${String(sub.current_period_end).slice(0, 10)}` : ''}
       </p>
       <div style={{ marginTop: 18 }}><Billing /></div>

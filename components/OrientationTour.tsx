@@ -64,7 +64,7 @@ export default function OrientationTour() {
   const step = steps[index];
   const finish = () => {
     document.body.classList.remove('tour-active');
-    router.push('/member/time/setup');
+    router.push('/portal/time/setup');
     router.refresh();
   };
 

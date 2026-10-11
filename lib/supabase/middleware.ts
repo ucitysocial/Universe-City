@@ -22,7 +22,7 @@ export async function updateSession(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   const path = request.nextUrl.pathname;
 
-  if (!user && (path.startsWith('/member') || path.startsWith('/agent'))) {
+  if (!user && (path.startsWith('/portal') || path.startsWith('/agent'))) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
     url.searchParams.set('next', path);
@@ -33,7 +33,7 @@ export async function updateSession(request: NextRequest) {
     const { data } = await supabase.from('profiles').select('role').eq('id', user.id).single();
     if (data?.role !== 'agent') {
       const url = request.nextUrl.clone();
-      url.pathname = '/member';
+      url.pathname = '/portal';
       return NextResponse.redirect(url);
     }
   }

@@ -6,17 +6,17 @@ export default async function AgentHome() {
   const { data: reviews } = await sb.from('reviews')
     .select('id, user_id, scheduled_for, status, period_start, period_end')
     .in('status', ['scheduled', 'open']).order('scheduled_for');
-  const { data: members } = await sb.from('profiles')
-    .select('id, name, case_no, membership').eq('role', 'member');
+  const { data: clients } = await sb.from('profiles')
+    .select('id, name, case_no, residency').eq('role', 'resident');
 
-  const nameOf = (id: string) => members?.find(m => m.id === id)?.name ?? id.slice(0, 8);
+  const nameOf = (id: string) => clients?.find(m => m.id === id)?.name ?? id.slice(0, 8);
 
   return (
     <>
       <p className="kick">Agent</p>
       <h1 style={{ fontSize: 32, marginTop: 8 }}>This week</h1>
       <p style={{ color: 'var(--dim)' }}>
-        {members?.filter(m => m.membership === 'active').length ?? 0} represented
+        {clients?.filter(m => m.residency === 'active').length ?? 0} represented
         &middot; {reviews?.length ?? 0} reviews to run
       </p>
 
@@ -38,15 +38,15 @@ export default async function AgentHome() {
         </ul>
       ) : <p className="note">Nothing scheduled.</p>}
 
-      <h2 style={{ marginTop: 44, fontSize: 20 }}>Members</h2>
+      <h2 style={{ marginTop: 44, fontSize: 20 }}>Clients</h2>
       <ul className="rows" style={{ maxWidth: 720 }}>
-        {members?.map(m => (
+        {clients?.map(m => (
           <li key={m.id}>
             <span className="rn vt">{m.case_no?.slice(-4)}</span>
             <span style={{ flex: 1 }}>
               <Link href={`/agent/clients/${m.id}`}>{m.name ?? 'Unnamed'}</Link>
             </span>
-            <span className="lab" style={{ color: 'var(--dim)' }}>{m.membership}</span>
+            <span className="lab" style={{ color: 'var(--dim)' }}>{m.residency}</span>
           </li>
         ))}
       </ul>

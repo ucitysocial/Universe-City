@@ -6,7 +6,7 @@ import { supabaseBrowser } from '@/lib/supabase/client';
 
 export default function Login() {
   const router = useRouter();
-  const next = useSearchParams().get('next') || '/member';
+  const next = useSearchParams().get('next') || '/portal';
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [err, setErr] = useState<string | null>(null);

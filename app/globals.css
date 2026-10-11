@@ -77,17 +77,17 @@ section.dark .rows li{border-color:rgba(244,239,233,.22)}
 .agent-copy .rows li{border-color:rgba(255,255,255,.22)}
 .agent-copy .rows li .rn{color:rgba(255,255,255,.6)}
 .agent-copy h2{margin-top:10px;max-width:20ch}
-.membership-section{background:var(--paper2);padding:78px 0 86px}
-.membership-layout{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(300px,.75fr);gap:56px;align-items:stretch}
-.membership-copy{max-width:680px}
-.membership-copy h2{margin-top:10px;max-width:22ch}
-.membership-copy>p:last-child{margin-top:20px;max-width:60ch}
-.membership-price-card{background:#fff;color:var(--ink);border:2px solid var(--ink);box-shadow:var(--shadow);padding:34px;display:flex;flex-direction:column;justify-content:space-between;min-height:230px}
-.membership-price-card .price{margin:0}
-.membership-price-card .price .n{color:var(--I)}
-.membership-price-card .price .lab{color:var(--dim)}
-.membership-cta{align-self:flex-start;background:var(--I);color:#fff;text-decoration:none;font-weight:700;padding:12px 16px}
-.membership-cta:hover{text-decoration:underline;text-underline-offset:4px}
+.residency-section{background:var(--paper2);padding:78px 0 86px}
+.residency-layout{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(300px,.75fr);gap:56px;align-items:stretch}
+.residency-copy{max-width:680px}
+.residency-copy h2{margin-top:10px;max-width:22ch}
+.residency-copy>p:last-child{margin-top:20px;max-width:60ch}
+.residency-price-card{background:#fff;color:var(--ink);border:2px solid var(--ink);box-shadow:var(--shadow);padding:34px;display:flex;flex-direction:column;justify-content:space-between;min-height:230px}
+.residency-price-card .price{margin:0}
+.residency-price-card .price .n{color:var(--I)}
+.residency-price-card .price .lab{color:var(--dim)}
+.residency-cta{align-self:flex-start;background:var(--I);color:#fff;text-decoration:none;font-weight:700;padding:12px 16px}
+.residency-cta:hover{text-decoration:underline;text-underline-offset:4px}
 
 /* ---------------- application ---------------- */
 .application-page{background:
@@ -330,7 +330,7 @@ h3{font-size:19px;font-weight:600}
 .zodiac-symbol{font-family:'VT323',monospace;font-size:22px;line-height:1}
 .zodiac-label{font-size:18px;padding:0 10px 1px}
 
-/* ---------------- member and agent shells ---------------- */
+/* ---------------- resident and agent shells ---------------- */
 .work{display:grid;grid-template-columns:230px minmax(0,1fr);min-height:100dvh}
 .side{border-right:3px solid var(--ink);padding:24px 16px;background:var(--paper)}
 .side .mark{font-size:22px}
@@ -350,10 +350,10 @@ h3{font-size:19px;font-weight:600}
   .public-menu-panel{right:12px}
   .public-footer-grid{grid-template-columns:1fr 1fr}
   .hero-section{padding:62px 0 58px}
-  .systems-section,.agent-section,.membership-section{padding:58px 0}
+  .systems-section,.agent-section,.residency-section{padding:58px 0}
   .agent-copy{padding:30px 24px}
-  .membership-layout{grid-template-columns:1fr;gap:28px}
-  .membership-price-card{min-height:200px}
+  .residency-layout{grid-template-columns:1fr;gap:28px}
+  .residency-price-card{min-height:200px}
   .application-layout{grid-template-columns:1fr;gap:32px;padding-top:48px;padding-bottom:64px}
   .application-card{position:static}
   .application-folder-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}

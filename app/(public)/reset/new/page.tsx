@@ -15,7 +15,7 @@ export default function NewPassword() {
     const { error } = await supabaseBrowser().auth.updateUser({ password });
     setBusy(false);
     if (error) { setErr(error.message); return; }
-    router.push('/member');
+    router.push('/portal');
     router.refresh();
   }
 

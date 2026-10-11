@@ -26,10 +26,10 @@ export default async function ClientFile({ params }: { params: { id: string } })
   return (
     <div style={{ maxWidth: 820 }}>
       {/* 1 */}
-      <p className="kick">Member file</p>
+      <p className="kick">Client file</p>
       <h1 style={{ fontSize: 32, marginTop: 8 }}>{profile.name}</h1>
       <p style={{ color: 'var(--dim)' }}>
-        {profile.case_no} &middot; {profile.membership}
+        {profile.case_no} &middot; {profile.residency}
         {profile.represented_since ? ` · represented since ${profile.represented_since}` : ''}
         <br />Week of {brief.header.period[0]} to {brief.header.period[1]}
       </p>

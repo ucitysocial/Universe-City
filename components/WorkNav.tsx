@@ -11,7 +11,7 @@ export default function WorkNav({ items, foot }:
       <nav>
         {items.map(i => (
           <Link key={i.href} href={i.href}
-                aria-current={path === i.href || (i.href !== '/member' && i.href !== '/agent' && path.startsWith(i.href)) ? 'page' : undefined}>
+                aria-current={path === i.href || (i.href !== '/portal' && i.href !== '/agent' && path.startsWith(i.href)) ? 'page' : undefined}>
             {i.label}
           </Link>
         ))}

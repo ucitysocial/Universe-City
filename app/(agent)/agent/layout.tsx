@@ -5,14 +5,14 @@ import { currentProfile } from '@/lib/supabase/server';
 export default async function AgentLayout({ children }: { children: React.ReactNode }) {
   const me = await currentProfile();
   if (!me) redirect('/login?next=/agent');
-  if (me.role !== 'agent') redirect('/member');
+  if (me.role !== 'agent') redirect('/portal');
 
   return (
     <div className="work agent">
       <WorkNav
         items={[
           { href: '/agent', label: 'This week' },
-          { href: '/agent/clients', label: 'Members' }
+          { href: '/agent/clients', label: 'Clients' }
         ]}
         foot={<>{me.name}<br />Agent</>}
       />

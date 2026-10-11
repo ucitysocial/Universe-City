@@ -6,8 +6,8 @@ import { usePathname } from 'next/navigation';
 import { DEPARTMENTS, FOLDERS } from '@/lib/domain/folders';
 
 const ROUTES: Record<string, string> = {
-  Time: '/member/time',
-  Standards: '/member/standards'
+  Time: '/portal/time',
+  Standards: '/portal/standards'
 };
 
 export default function ResidentFileNav({
@@ -21,17 +21,17 @@ export default function ResidentFileNav({
 }) {
   const path = usePathname();
   const isCurrent = (href: string) =>
-    path === href || (href !== '/member' && path.startsWith(href));
+    path === href || (href !== '/portal' && path.startsWith(href));
 
   return (
     <aside className="resident-file" data-tour="file">
       <div>
-        <Link href="/member" className="mark resident-mark">universe&#9733;city</Link>
+        <Link href="/portal" className="mark resident-mark">universe&#9733;city</Link>
         <p className="file-label">Folders</p>
       </div>
 
       <nav className="file-primary" aria-label="Resident navigation">
-        <Link className={isCurrent('/member') ? 'file-home current' : 'file-home'} href="/member">
+        <Link className={isCurrent('/portal') ? 'file-home current' : 'file-home'} href="/portal">
           Resident Portal
         </Link>
 
@@ -87,8 +87,8 @@ export default function ResidentFileNav({
           <strong>{name || 'Resident'}</strong>
           <span>{caseNo}</span>
         </div>
-        <Link href="/member/account">Account</Link>
-        <Link href="/member/orientation?replay=1">Replay orientation</Link>
+        <Link href="/portal/account">Account</Link>
+        <Link href="/portal/orientation?replay=1">Replay orientation</Link>
       </div>
     </aside>
   );

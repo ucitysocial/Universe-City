@@ -1,5 +1,5 @@
-/** Every day and week boundary is computed in the member's own zone.
- *  toISOString is UTC and will give a Denver member the wrong week after 5pm. */
+/** Every day and week boundary is computed in the resident's own zone.
+ *  toISOString is UTC and will give a Denver resident the wrong week after 5pm. */
 
 export function localParts(at: Date, timeZone: string) {
   const f = new Intl.DateTimeFormat('en-CA', {

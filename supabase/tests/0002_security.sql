@@ -3,7 +3,7 @@
 -- Run in the Supabase SQL editor after 0002. Each test asserts and raises on
 -- failure, so a clean run means every one passed.
 --
--- These impersonate a member and an agent by setting the request claims the
+-- These impersonate a resident and an agent by setting the request claims the
 -- way PostgREST does. Nothing here needs the client.
 
 begin;
@@ -16,12 +16,12 @@ begin
   delete from profiles where id in (m, a);
   insert into auth.users (id, email, encrypted_password, email_confirmed_at,
                           raw_app_meta_data, raw_user_meta_data, aud, role)
-  values (m, 'test.member@uc.test', '', now(), '{}', '{"name":"Test Member"}', 'authenticated', 'authenticated'),
+  values (m, 'test.resident@uc.test', '', now(), '{}', '{"name":"Test Resident"}', 'authenticated', 'authenticated'),
          (a, 'test.agent@uc.test',  '', now(), '{}', '{"name":"Test Agent"}',  'authenticated', 'authenticated')
   on conflict (id) do nothing;
   -- the signup trigger made the profiles. Promote one and mark both as test.
   update profiles set role = 'agent', is_test = true where id = a;
-  update profiles set is_test = true, membership = 'active' where id = m;
+  update profiles set is_test = true, residency = 'active' where id = m;
 end $$;
 
 create or replace function uc_as(uid uuid) returns void
@@ -36,7 +36,7 @@ language sql as $$
 $$;
 
 -- ================================================================
--- TEST 1. A member cannot make themselves an agent.
+-- TEST 1. A resident cannot make themselves an agent.
 -- ================================================================
 do $$
 declare m uuid := '11111111-1111-1111-1111-111111111111';
@@ -49,31 +49,31 @@ begin
   end;
   perform uc_as_service();
   if not failed or (select role from profiles where id = m) = 'agent' then
-    raise exception 'TEST 1 FAILED. A member escalated to agent.';
+    raise exception 'TEST 1 FAILED. A resident escalated to agent.';
   end if;
   raise notice 'TEST 1 passed. Role is protected.';
 end $$;
 
 -- ================================================================
--- TEST 2. A member cannot mark themselves paid.
+-- TEST 2. A resident cannot mark themselves paid.
 -- ================================================================
 do $$
 declare m uuid := '11111111-1111-1111-1111-111111111111';
 declare failed boolean := false;
 begin
   perform uc_as_service();
-  update profiles set membership = 'none' where id = m;
+  update profiles set residency = 'none' where id = m;
   perform uc_as(m);
   begin
-    update profiles set membership = 'active' where id = m;
+    update profiles set residency = 'active' where id = m;
   exception when others then failed := true;
   end;
   perform uc_as_service();
-  if not failed or (select membership from profiles where id = m) = 'active' then
-    raise exception 'TEST 2 FAILED. A member granted themselves membership.';
+  if not failed or (select residency from profiles where id = m) = 'active' then
+    raise exception 'TEST 2 FAILED. A resident granted themselves residency.';
   end if;
-  update profiles set membership = 'active' where id = m;
-  raise notice 'TEST 2 passed. Membership is protected.';
+  update profiles set residency = 'active' where id = m;
+  raise notice 'TEST 2 passed. Residency is protected.';
 end $$;
 
 -- ================================================================
@@ -86,13 +86,13 @@ begin
   update profiles set name = 'Renamed', city = 'Denver', timezone = 'America/Denver' where id = m;
   perform uc_as_service();
   if (select name from profiles where id = m) <> 'Renamed' then
-    raise exception 'TEST 3 FAILED. A member cannot edit their own name.';
+    raise exception 'TEST 3 FAILED. A resident cannot edit their own name.';
   end if;
-  raise notice 'TEST 3 passed. Member editable columns still work.';
+  raise notice 'TEST 3 passed. Resident editable columns still work.';
 end $$;
 
 -- ================================================================
--- TEST 4. The correction test. A member updates a block, the revision
+-- TEST 4. The correction test. A resident updates a block, the revision
 --         appears automatically, and they cannot touch it afterwards.
 -- ================================================================
 do $$
@@ -124,20 +124,20 @@ begin
   begin
     update block_revisions set after = '{}'::jsonb where block_id = b;
   exception when others then failed := true; end;
-  if not failed then raise exception 'TEST 4 FAILED. A member rewrote their own audit trail.'; end if;
+  if not failed then raise exception 'TEST 4 FAILED. A resident rewrote their own audit trail.'; end if;
 
   failed := false;
   begin
     delete from block_revisions where block_id = b;
   exception when others then failed := true; end;
-  if not failed then raise exception 'TEST 4 FAILED. A member deleted a revision.'; end if;
+  if not failed then raise exception 'TEST 4 FAILED. A resident deleted a revision.'; end if;
 
   perform uc_as_service();
   raise notice 'TEST 4 passed. Corrections revise, history is immutable.';
 end $$;
 
 -- ================================================================
--- TEST 5. Provenance. A member cannot claim their write came from AI.
+-- TEST 5. Provenance. A resident cannot claim their write came from AI.
 -- ================================================================
 do $$
 declare m uuid := '11111111-1111-1111-1111-111111111111';
@@ -148,16 +148,16 @@ begin
   values (m, current_date, '09:00', '10:00', 'Claimed as AI', 'rest', 'ai')
   returning id into b;
 
-  if (select source from blocks where id = b) <> 'member' then
-    raise exception 'TEST 5 FAILED. A member set their own provenance to ai.';
+  if (select source from blocks where id = b) <> 'resident' then
+    raise exception 'TEST 5 FAILED. A resident set their own provenance to ai.';
   end if;
 
   update blocks set source = 'agent' where id = b;
-  if (select source from blocks where id = b) <> 'member' then
-    raise exception 'TEST 5 FAILED. A member changed provenance to agent.';
+  if (select source from blocks where id = b) <> 'resident' then
+    raise exception 'TEST 5 FAILED. A resident changed provenance to agent.';
   end if;
 
-  if (select origin from block_revisions where block_id = b order by at desc limit 1) <> 'member' then
+  if (select origin from block_revisions where block_id = b order by at desc limit 1) <> 'resident' then
     raise exception 'TEST 5 FAILED. The revision recorded the wrong origin.';
   end if;
 
@@ -166,7 +166,7 @@ begin
 end $$;
 
 -- ================================================================
--- TEST 6. A member cannot approve their own proposal.
+-- TEST 6. A resident cannot approve their own proposal.
 -- ================================================================
 do $$
 declare m uuid := '11111111-1111-1111-1111-111111111111';
@@ -186,7 +186,7 @@ begin
 
   perform uc_as_service();
   if not failed and (select state from proposals where id = p) = 'confirmed' then
-    raise exception 'TEST 6 FAILED. A member approved their own proposal.';
+    raise exception 'TEST 6 FAILED. A resident approved their own proposal.';
   end if;
 
   failed := false;
@@ -197,7 +197,7 @@ begin
   exception when others then failed := true; end;
   perform uc_as_service();
   if not failed then
-    raise exception 'TEST 6 FAILED. A member inserted a proposal.';
+    raise exception 'TEST 6 FAILED. A resident inserted a proposal.';
   end if;
 
   -- and an agent can, with the decision recorded
@@ -211,7 +211,7 @@ begin
 end $$;
 
 -- ================================================================
--- TEST 7. A member cannot write their own subscription.
+-- TEST 7. A resident cannot write their own subscription.
 -- ================================================================
 do $$
 declare m uuid := '11111111-1111-1111-1111-111111111111';
@@ -228,7 +228,7 @@ begin
 
   perform uc_as_service();
   if not failed and (select status from subscriptions where user_id = m) = 'active' then
-    raise exception 'TEST 7 FAILED. A member wrote their own subscription.';
+    raise exception 'TEST 7 FAILED. A resident wrote their own subscription.';
   end if;
 
   failed := false;
@@ -238,19 +238,19 @@ begin
     on conflict (user_id) do update set status = 'active';
   exception when others then failed := true; end;
   perform uc_as_service();
-  if not failed then raise exception 'TEST 7 FAILED. A member inserted a subscription.'; end if;
+  if not failed then raise exception 'TEST 7 FAILED. A resident inserted a subscription.'; end if;
 
   -- but they can read it
   perform uc_as(m);
   if (select count(*) from subscriptions where user_id = m) <> 1 then
-    raise exception 'TEST 7 FAILED. A member cannot read their own subscription.';
+    raise exception 'TEST 7 FAILED. A resident cannot read their own subscription.';
   end if;
   perform uc_as_service();
   raise notice 'TEST 7 passed. Subscriptions come from Stripe only.';
 end $$;
 
 -- ================================================================
--- TEST 8. One member cannot see another. RLS, not the interface.
+-- TEST 8. One resident cannot see another. RLS, not the interface.
 -- ================================================================
 do $$
 declare m uuid := '11111111-1111-1111-1111-111111111111';
@@ -269,15 +269,15 @@ begin
 
   perform uc_as(m);
   select count(*) into n from blocks where user_id = other;
-  if n <> 0 then raise exception 'TEST 8 FAILED. A member read another member''s blocks.'; end if;
+  if n <> 0 then raise exception 'TEST 8 FAILED. A resident read another resident''s blocks.'; end if;
 
   select count(*) into n from profiles where id = other;
-  if n <> 0 then raise exception 'TEST 8 FAILED. A member read another member''s profile.'; end if;
+  if n <> 0 then raise exception 'TEST 8 FAILED. A resident read another resident''s profile.'; end if;
 
   -- the agent can, because representing them is the job
   perform uc_as(a);
   select count(*) into n from blocks where user_id = other;
-  if n <> 1 then raise exception 'TEST 8 FAILED. The agent cannot read a member record.'; end if;
+  if n <> 1 then raise exception 'TEST 8 FAILED. The agent cannot read a resident record.'; end if;
 
   -- but cannot delete it
   declare failed boolean := false;
@@ -285,7 +285,7 @@ begin
     delete from blocks where user_id = other;
   exception when others then failed := true; end;
   if not failed and (select count(*) from blocks where user_id = other) = 0 then
-    raise exception 'TEST 8 FAILED. The agent deleted a member record.';
+    raise exception 'TEST 8 FAILED. The agent deleted a resident record.';
   end if;
 
   perform uc_as_service();

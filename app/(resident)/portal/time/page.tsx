@@ -20,7 +20,7 @@ export default async function TimePage() {
   const sb = supabaseServer();
   const { count: allTime } = await sb.from('blocks')
     .select('id', { count: 'exact', head: true });
-  if ((allTime ?? 0) === 0) redirect('/member/time/setup');
+  if ((allTime ?? 0) === 0) redirect('/portal/time/setup');
 
   const { data } = await sb.from('blocks')
     .select('*').gte('date', start).lte('date', end).order('starts_at');

@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 
-export default function Membership() {
+export default function Residency() {
   const mainSiteUrl = process.env.NEXT_PUBLIC_MARKETING_SITE_URL ?? 'https://ucitysocial.com';
   redirect(mainSiteUrl + '/residency');
 }

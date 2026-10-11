@@ -29,7 +29,7 @@ export type Block = {
   label: string; kind: Kind; status: BlockStatus;
   paid: 'paid' | 'unpaid' | 'none';
   cost_of: string | null; note: string | null;
-  source?: 'member' | 'agent' | 'ai';
+  source?: 'resident' | 'agent' | 'ai';
   created_at?: string; updated_at?: string;
 };
 

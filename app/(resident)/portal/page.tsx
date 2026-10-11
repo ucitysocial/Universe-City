@@ -4,12 +4,12 @@ import { LIVE_FOLDERS, deptOf } from '@/lib/domain/folders';
 import { figures, type Block } from '@/lib/domain/time';
 import { weekBounds } from '@/lib/domain/dates';
 
-export default async function MemberHome({
+export default async function PortalHome({
   searchParams
 }: {
   searchParams?: { welcome?: string; plan?: string };
 }) {
-  if (searchParams?.welcome === '1') redirect('/member/orientation');
+  if (searchParams?.welcome === '1') redirect('/portal/orientation');
 
   const profile = await currentProfile();
   const sb = supabaseServer();
@@ -17,7 +17,7 @@ export default async function MemberHome({
   const { count: allTime } = await sb.from('blocks')
     .select('id', { count: 'exact', head: true });
 
-  if ((allTime ?? 0) === 0) redirect('/member/orientation');
+  if ((allTime ?? 0) === 0) redirect('/portal/orientation');
 
   const { start, end } = weekBounds(profile?.timezone ?? 'America/Denver');
 
@@ -38,7 +38,7 @@ export default async function MemberHome({
             <h2>Your first Plan is ready.</h2>
             <p>Live the day. Universe City now has something real to compare with what actually happens.</p>
           </div>
-          <a className="btn ghost compact" href="/member/time">Open Time</a>
+          <a className="btn ghost compact" href="/portal/time">Open Time</a>
         </div>
       )}
 
@@ -93,7 +93,7 @@ export default async function MemberHome({
                 </p>
                 {live && (
                   <p style={{ marginTop: 12 }}>
-                    <a className="btn ghost" href={`/member/${x.name.toLowerCase()}`}>Open {x.name}</a>
+                    <a className="btn ghost" href={`/portal/${x.name.toLowerCase()}`}>Open {x.name}</a>
                   </p>
                 )}
               </div>
