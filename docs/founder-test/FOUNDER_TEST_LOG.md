@@ -30,7 +30,8 @@ No entry is a defect just because the prototype is unfinished. Do not report uns
 | FT-001 | Founder Test — first screen | Introduction explains test storage, access, model handling, and controls before conversation starts | Observed UI + candidate UX review | Observed; awaiting founder direction |
 | FT-002 | Conversation — empty state | The guide does not initiate the conversation; an empty state directs the founder to write first | Observed UI + onboarding question | Observed; awaiting founder direction |
 | FT-003 | Conversation — scheduling uncertainty | Tentative time triggers explicit confirmation; on approval, the guide resumes questioning | Positive finding + follow-up retest | Partially retested; deferral still untested |
-| FT-004 | Conversation — filing feedback | Verbose filing/activity text and apparent identical before/after change confuse the founder | Founder-requested UX improvement + possible data defect | Triage; fix not implemented |
+| FT-004 | Conversation — filing feedback | Long status blurbs and a repeated approval that claims an unchanged value was changed | Founder-requested UX + confirmed duplicate-action feedback | Cleanup required; see #23, #24 |
+| FT-005 | Conversation — next question | The guide asks the founder to choose the next task instead of continuing the original schedule request | Founder-identified continuity issue | Cleanup required; see #22 |
 
 ---
 
@@ -209,17 +210,48 @@ These are suggested examples for design discussion, **not implemented UI copy**.
 
 ---
 
+## FT-005 — Guide should carry the stated purpose forward
+
+**Observed October 11, 2026. Founder request:** Stop this session, review the exports, and fix the conversational sequence before deeper testing. The first substantive request was to organize an irregular schedule. At the end, the guide asked the founder whether to plan the dated shift or discuss another topic. The founder expects the guide to determine the next useful question from what was said at the beginning, and to keep organizing the schedule without requiring the founder to manage the conversation.
+
+**Status:** Confirmed founder feedback; **P0** implementation issue [#22](https://github.com/ucitysocial/Universe-City/issues/22).
+
+**Governing rules already exist:** `docs/systems/TIME.md` 5.9 and 6.1–6.2; `LANGUAGE_STANDARD.md` 3.20.2; `docs/product/AGENT_OPERATING_ARCHITECTURE.md`. These require purposeful follow-up based on missing information, established commitments, importance, consequences, and preferences. This is a prototype implementation problem rather than a request to change the rules.
+
+**Acceptance:** After resolving a dated shift's time, ask one relevant unanswered question advancing the resident's original request. Do not offer generic choices about whether to continue planning. Preserve uncertainty, existing context, and the resident's right to change topics. Do not force a predetermined questionnaire.
+
+**Next session:** Retest after #22, #23, and #24 have been addressed. The text and JSON exports from this session are retained outside the public repository.
+
+---
+
+## Export review — Session 01 stopping point
+
+**Export received:** Two files, text and JSON, timestamped 5:45 PM Denver on October 11. They cover **7 exchanges, 14 messages, 8 actions, 4 filed statements, 1 dated commitment, 0 weekly schedule entries, 0 Plans, 1 later-confirmed pending item, and 2 database changes**. These counts do not establish completion of the Time system. Raw exports are not committed because this repository is public.
+
+**FT-004 root-cause clarification from action chronology:**
+1. A dated commitment was added with unknown start/end.
+2. The tentative start created a pending approval, with the stored start still unknown.
+3. A **screen confirmation at 5:41:17 PM** changed the stored start from null to 900 minutes (3 PM) and marked the pending item confirmed.
+4. A **typed confirmation at 5:42:55 PM** repeated the same approval. The tool was invoked again at 5:42:58 PM and reported **Changed** with identical Before/After times.
+5. The export records **no third database change** for the redundant typed approval. The earlier claim that the first approval may have filed the time prematurely is therefore unsupported. This is confirmed duplicate-action handling and misleading UI feedback; see [#23](https://github.com/ucitysocial/Universe-City/issues/23). The long inline result remains a separate founder-requested presentation change; see [#24](https://github.com/ucitysocial/Universe-City/issues/24).
+
+**Positive findings retained:** The guide maintained a variable shift pattern, distinguished business opening time from actual arrival, left end times unknown, and sought confirmation for a tentative start. When the confirmation succeeded it could respond; its next question did not advance the original purpose.
+
+**Session status:** Testing paused for cleanup. No software changes or fixes have been deployed by the review. The active cleanup issues are [#22](https://github.com/ucitysocial/Universe-City/issues/22), [#23](https://github.com/ucitysocial/Universe-City/issues/23), and [#24](https://github.com/ucitysocial/Universe-City/issues/24).
+
+---
+
 ## Findings and implementation tracking
 
-- **Confirmed UI contradiction:** FT-004-C labels a confirmation **Changed** although its visible before/after values are identical. The actual stored change remains unverified.
-- **Possible data integrity problem:** FT-004-B: earlier proposal said time not established, but the later before-snapshot shows the new time.
-- **Founder-requested improvement:** FT-004-A: shorter, clearer inline filing and confirmation summaries.
+- **Confirmed duplicate-action issue:** FT-004-C and exported JSON: a screen action already confirmed and saved the new start; a later typed confirmation invoked an additional no-op action and was labeled Changed.
+- **Source of earlier inconsistency established:** FT-004-B: the first screen confirmation had already changed the stored start before the repeated chat confirmation. No premature write was established.
+- **Founder-requested improvements:** FT-004-A: concise inline filing and confirmation summaries; FT-005: continue the original schedule purpose and choose the next relevant question.
 - **Potential improvements / review questions:** FT-001-A, FT-001-C, FT-002-A, FT-002-D, FT-003-D; FT-003-C is partially retested (approval works; deferral untested).
 - **Observed positive behavior:** FT-003-A, founder-reported FT-003-B, and FT-004-D (conversation continues after confirmation).
 - **Unverified functional claims:** FT-001-B; FT-002-B and FT-002-C partially observed; FT-003-E and FT-004-B require File/Activity/history inspection.
 - **Approved direction for future improvement:** Shorten and clarify the feedback beneath guide responses (FT-004-A); final copy and implementation not yet approved.
-- **Code fixes deployed:** None through this founder-testing log.
-- **Pending retests:** FT-003 deferral/new topic, FT-004 before/after storage and repeated confirmation, filing feedback readability.
+- **Code fixes deployed:** None through this founder-testing log. Session 01 paused for cleanup; priority issues #22, #23, #24.
+- **Pending retests:** FT-005 next question after a confirmation; FT-004 repeated confirmation by both screen and chat; FT-004 concise feedback; FT-003 deferred proposal.
 
 ### Maintenance rules
 
