@@ -38,7 +38,7 @@ This file governs wording in this repository. `DESIGN_SYSTEM.md` and `SYSTEM_EXP
 | Client | The same person, in agent documents and in the agent console. | member, user, participant |
 | Agent | The person who represents the client. | coach, advisor, counselor, assistant, bot |
 | Application | The first step of entry. The person gives basic details and is entered into Universe City. | signup, registration |
-| Enrollment | The second step of entry. The resident gets their schedule and makes their first commitments. | onboarding |
+| Enrollment | The second step of entry. Agency Assessment establishes initial information, Start, and Target. | onboarding |
 | Intake | The first stage of work in a folder. The record is put on file for the first time. | None listed |
 | Review | The meeting between a resident and their agent. | None listed |
 | Resident Portal | The part of the website a resident logs in to. | dashboard, member area, workspace |
@@ -688,7 +688,7 @@ DO That is outside what I do. It is worth raising with a doctor. Do you want the
 
 12.3 Payment. Whether payment belongs to application or to enrollment.
 
-12.4 Orientation. The Resident Portal contains a step named Orientation. Its place inside enrollment is not defined.
+12.4 Orientation. Orientation takes place after Enrollment and before the first Time work in the Resident Portal. Its exact content remains under review.
 
 12.5 Durations. Clause 7.6 requires a measured duration. No task has been timed.
 
