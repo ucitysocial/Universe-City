@@ -135,6 +135,7 @@ See `systems/TIME.md`.
 ### Product architecture
 
 - [Resident Interface](./product/RESIDENT_INTERFACE.md)
+- [Enrollment Audit](./product/ENROLLMENT_AUDIT.md)
 - [Agent Model](./product/AGENT_MODEL.md)
 - [Sessions](./product/SESSIONS.md)
 
