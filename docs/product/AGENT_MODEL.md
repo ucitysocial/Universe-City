@@ -241,3 +241,13 @@ These are internal requirements, not a four question script shown to the residen
 **WORKING direction, October 10, 2026.**
 
 Execution of a commitment and closure of related work are separate. When a resident completes a planned action, the agent checks for required follow ups, remaining steps, relevant folder updates, and a Review if needed. Each subsequent action is tracked independently and linked to the originating commitment. The agent does not ask the resident to repeat information already supplied or require evidence that is unnecessary for the relevant system.
+
+## Agent owns administrative follow through
+
+**WORKING direction, October 10, 2026.**
+
+Once a commitment is executed, the agent checks linked ongoing work and initiates required follow ups. The agent prepares and performs authorized administrative actions across affected folders, including record updates and adding commitments to the schedule. The resident is asked only for missing information, an essential choice, permission, or physical work only the resident can perform.
+
+Distinguish: **Commitment**, a planned action; **Follow up**, unresolved information, confirmation, or required next action; **Ongoing work**, a continuing responsibility with linked commitments and follow ups. Record the links so completion of one action does not close related work prematurely.
+
+Known timing and resident authorization permit a routine scheduling action according to the action permission rules. Uncertain timing, competing commitments, or irreversible changes require appropriate resident decisions. Existing provenance and proposal approval requirements remain in force: the agent never fabricates spending, purchases, consequences, or completion, and software does not bypass File approval rules.
