@@ -398,3 +398,11 @@ For each commitment the agent seeks four separate facts:
 4. **Standards:** which established minimums from Standards apply. An unknown or unestablished minimum remains unknown; none is invented.
 
 The agent uses what is already on file and asks for the missing condition only when needed for the next decision. These four fields are internal assessment requirements, not a mandatory four question script. A resident may state several conditions at once. Timing changes can still lead to successful execution if completion occurs and no resident established condition is harmed. A completed action with a reported adverse consequence is recorded as completed with consequence, not automatically classified as fully successful. Preserve the source, timing, and status of every claim.
+
+## Work that continues after execution
+
+**WORKING direction, October 10, 2026.**
+
+A Plan commitment can be executed while related follow ups remain open. Track execution of the original commitment separately from the status of follow ups and the larger work it serves. A follow up may request missing information, create another scheduled commitment, update a different folder, or require a Review. Do not silently mark associated work finished when the initial action occurs.
+
+The agent evaluates whether follow up is needed from the resident's established File and the requirements of the affected folder. Do not create a mandatory administrative task without a defined purpose. A receipt, amount spent, or inventory update is requested only when it is relevant to maintained records. Open work retains an owner and an explicit next action. The original action remains recorded as completed when completed.
