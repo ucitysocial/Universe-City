@@ -19,6 +19,7 @@ Filed October 11, 2026. Each file in this folder is a draft or a reference. No f
 | `LANGUAGE_STANDARD_DRAFT.md` | The Language Standard as revised on October 11, 2026 | `LANGUAGE_STANDARD.md` |
 | `CONSOLIDATED_OPERATIONS_REVIEW.md` | A review of the Operations draft, written outside this repository | None. It is a reference |
 | `CONSOLIDATED_DEVELOPMENTS_REVIEW.md` | A review of the Developments draft, written outside this repository | None. It is a reference |
+| `SHARED_ARCHITECTURE_REVIEW.md` | A review of the shared dependency list, written outside this repository | None. It is a reference |
 | `tests/` | The files that tested the tables and queries proposed in the Operations draft | None |
 
 ## 3. How the drafts cite each other
@@ -27,11 +28,11 @@ Filed October 11, 2026. Each file in this folder is a draft or a reference. No f
 
 3.2 The Operations draft cites clauses of `TIME.md` that exist only in `TIME_DRAFT.md`. Sections 5.10 to 5.14 are the largest group. A reader who checks a clause number opens `TIME_DRAFT.md`.
 
-3.3 The two reviews cite the clause numbers of the Operations draft and the Developments draft. The filed Operations document ends at section 9. Sections 10 to 20 and the two appendixes exist only in the draft.
+3.3 The two consolidated reviews cite the clause numbers of the Operations draft and the Developments draft. The filed Operations document ends at section 9. Sections 10 to 20 and the two appendixes exist only in the draft.
 
 3.4 Folder 01 Time Curriculum, Version 2, and Folder 01 Time Research are Word files. They are held outside the repository.
 
-## 4. The two reviews
+## 4. The three reviews
 
 4.1 Each review was supplied by the founder as a Word file on October 11, 2026. Each was converted to Markdown with its wording unchanged.
 
@@ -39,7 +40,7 @@ Filed October 11, 2026. Each file in this folder is a draft or a reference. No f
 
 4.3 Each decision that a review recommends waits for the founder. A recommendation in a review is read as a proposal.
 
-4.4 When the Operations document is revised, `CONSOLIDATED_OPERATIONS_REVIEW.md` is read with it. When the Developments document is revised, `CONSOLIDATED_DEVELOPMENTS_REVIEW.md` is read with it.
+4.4 When the Operations document is revised, `CONSOLIDATED_OPERATIONS_REVIEW.md` is read with it. When the Developments document is revised, `CONSOLIDATED_DEVELOPMENTS_REVIEW.md` is read with it. When `ARCHITECTURE.md` or a document in `docs/product/` takes up a shared requirement, `SHARED_ARCHITECTURE_REVIEW.md` is read with it.
 
 ## 5. The tests
 
