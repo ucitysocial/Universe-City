@@ -55,7 +55,7 @@ Preserve the repository rule:
 
 The resident's File is the durable organized record across the four departments / 48 folders.
 
-The dashboard may summarize it. Conversation may discuss it. Neither replaces it.
+The Resident Portal home may display information derived from it. Conversation may discuss it. Neither replaces it.
 
 ---
 
@@ -84,20 +84,18 @@ Do not import the broadcast studio metaphor, scene controls, outputs, floating p
 The desktop resident experience should be structurally stable:
 
 - **Left:** File/navigation
-- **Center:** Dashboard or current folder/session/work
+- **Center:** Resident Portal home or current folder/session/work
 - **Right:** Agent
 
 The frame should not behave like a movable-window desktop.
 
 Responsive/mobile treatment remains open.
 
-### D-008 — Dashboard remains a primary useful surface
+### D-008 — Resident Portal home remains a primary useful surface
 
 **Status:** LOCKED
 
-Universe City still has a main resident dashboard with useful current information.
-
-The dashboard is a view into maintained systems, not a competing record.
+The Resident Portal includes a home view of current information. It reads from maintained systems. The File remains the source of record.
 
 ### D-009 — Universe City visual palette
 
@@ -184,13 +182,13 @@ The product should become quieter as it learns what is stable.
 Created October 9, 2026 as the initial decision register.
 
 
-### D-015 — Orientation precedes the normal resident dashboard
+### D-015 — Entry into the Resident Portal
 
-**Status:** LOCKED direction
+**Status:** REOPENED October 10, 2026 for sequencing
 
-After account creation, email confirmation, and membership activation, a new resident enters Orientation in the real resident interface. They may skip the walkthrough, and it must be replayable later.
+The earlier sequence placed Orientation after email confirmation and membership activation, then placed Time before the normal Resident Portal home. The October 10 Language Standard defines Application as the first step and Enrollment as the second. Residency begins at Enrollment. The timing of payment, the placement of Orientation, and the relationship of Agency Assessment work to Enrollment remain unresolved.
 
-A new resident does not begin on the normal dashboard before establishing an initial Time Plan.
+**Still LOCKED as an interface direction:** Orientation takes place in the actual Resident Portal. The walkthrough can be skipped and replayed. Initial Time work should precede the normal Resident Portal home. The exact first schedule and Plan requirements await review.
 
 ### D-016 — Universe City engagement belongs on the Plan
 
@@ -222,10 +220,10 @@ Avoid:
 
 Prefer:
 - create account
-- activate membership
+- begin enrollment
 - confirm email
 - your systems
-- your Plan
+- your schedule
 - your history
 - your information
 
