@@ -227,7 +227,176 @@ The agent is not obliged to talk merely because the resident expands a block, ti
 9. Does the optional timer measurably improve follow through for interested residents compared with checklist-only or schedule-only experiences?
 10. How do time blocks link into future Career Development and other folders without implying all 48 are presently implemented?
 
-## 16. Open design questions
+
+## 16. Guided Mode — detailed exploratory concept, October 11, 2026
+
+**Origin:** Founder and younger brother's JARVIS-like concept, developed through discussion. **Status: WORKING IDEA / RESEARCH.** Guided Mode is an *optional way to execute work already established in Time and relevant folders*. It does not redefine Time, replace Daily Close or Morning Plan, require residents to have routines, or imply an alarm/voice/blocking implementation exists.
+
+### 16.1 Experience and participation choices
+
+The resident can use their Plan in several ways, without penalty or hierarchy of worth:
+
+- **Schedule only:** Look at the day, expand blocks when useful, manually update the schedule, or converse with the agent. No narration, session, checklist, or tracking requirement.
+- **Screen-guided:** Start any selected block; show the present step, next step, and meaningful progress. Use touch, keyboard, or other accessible controls.
+- **Voice-guided:** Optionally put on headphones and hear spoken briefings, guidance, curriculum, and useful time reminders. Voice may initiate prompts automatically, rather than waiting for a wake phrase each time. The client can interrupt, answer by voice when practical, or use visible controls.
+- **Distraction support:** An additional, separate opt-in possibility that may restrict selected distractions on supported devices. It is not a prerequisite of participation or a condition for proving completion.
+
+The same framework could support getting ready, work, school, commuting, household tasks, caring responsibilities, study, errands, exercise, preparing for an appointment, or any other resident-established schedule block. Do not assume a fixed morning, evening, paid employment, or conventional household routine. Some blocks may have no steps and require no guidance.
+
+The proposed name **Guided Mode** is a working interface label only. The approved Time terms, including block, commitment, Plan, follow up, execution, and ongoing work, remain unchanged.
+
+### 16.2 Opening: a brief daily Plan refresher, then begin
+
+The founder prefers **schedule first**. When a resident deliberately starts a guided day or morning, a useful spoken overview can create direction without interrogating them upon waking or reading a long list of every item.
+
+The briefing might cover, in priority order:
+
+1. The most important confirmed commitments and timing already in the day's Plan.
+2. The next firm appointment or departure and the actual time available until it.
+3. Preparation, travel, or recovery blocks that are recorded as costs of those commitments.
+4. One or two important decisions or relevant follow ups that may affect execution.
+5. A direct, easy transition into the first activity.
+
+**Example with fictional on-file details:** “Good morning. You have work at nine, groceries after work, and dinner with your sister tonight. We need to leave by eight thirty. You've got an hour and a half before departure. Let's start with getting ready.”
+
+This should sound like an agent who understands the whole day, not an exhaustive status report. The point of hearing a busy Plan is to recognize what needs doing and begin. The resident may choose whether the briefing plays at all and how much detail it gives. No routine question is required unless an answer will change the Plan or determine an authorized action.
+
+### 16.3 Activity-aware narration: listening versus responding
+
+Founder direction: **Do not ask for an answer when someone's mouth or hands are occupied.** During a shower, brushing teeth, driving, carrying items, or similar activities, spoken reminders and education may still be appropriate but an interactive question may not be.
+
+Proposed distinction:
+
+- **Briefing:** Announce the actual Plan, time available, important preparation and imminent commitments.
+- **Guidance:** Narrate current steps, explain why a step matters, and provide calm progress updates. The listener may remain silent.
+- **Conversation:** Ask for decisions, clarification, confirmation, or personal preferences at moments the resident can comfortably respond.
+
+The agent may deliberately hold a nonurgent HR question, date-planning detail, or personal follow up until breakfast, a transition, or another available moment. Avoid assuming the interface can detect a shower, busy hands, or attention; use the *known scheduled activity, resident preferences and optional resident controls*, and keep any inferred state uncertain. When driving, narration must avoid distracting interactions and prioritize safety.
+
+Speech should not be constant simply because speech is available. Adjustable quiet periods, a pause, skip, mute, repeat, and a way to switch to visual-only operation matter. Residents can opt out of automated prompts.
+
+### 16.4 Time awareness without a daunting countdown
+
+The founder wants to know **how much usable time remains before the next commitment**, including time for travel, changing clothes, other preparation, and any inflexible departure. That helps them prioritize rather than discover too late that they have run out of time.
+
+Example fictional arrangement: it is 7:00 AM; work is at 9:00 AM; the recorded commute requires leaving at 8:30 AM. There are **90 minutes until departure**, not 120 minutes of preparation time. The established Plan might contain thirty minutes for showering and dressing, twenty for breakfast, ten for packing, and thirty of available flexibility. The agent can express those facts simply, with a calm visual summary.
+
+During the session, useful reminders can occur **throughout**, based on an approaching deadline, departure, the amount of planned work remaining and the resident's contact preferences. Possible voice messages:
+
+> “You've got an hour before you need to leave.”
+
+> “Thirty minutes until departure. Getting dressed and packing are still on your Plan.”
+
+These must be derived from actual, timezone-aware timings and known or explicitly estimated durations. Do not invent commute length or pretend that a variable commute is fixed. Show whether a figure is planned, estimated, or observed. Avoid an intimidating large red countdown, constant pressure, or repeated prompts without new information.
+
+**Optional display choices:** a gentle “time until next commitment” readout, elapsed-time indicator, progress through confirmed steps, or no timer. The person may prefer spoken time cues without staring at numbers.
+
+### 16.5 Progression can be proactive or resident-controlled
+
+The founder wants a **combination**:
+
+- The experience can tell the resident what comes next and offer an estimated time for the step.
+- When done, the resident can say “I'm finished” or activate a button to move on immediately.
+- The interface can check in gently if the time exceeds the resident's planned or previously reported duration.
+- If extra time is needed, the resident can say so or select an extension without restarting the day or triggering a failure state.
+- A narration sequence can proceed automatically when no reply is needed. Do not mark the *commitment* executed just because narration finished or a timer reached zero.
+
+There is no requirement to repeatedly ask “Are you done?” Each question must have an actual purpose in Time's rules. Source evidence, reporting, and the Completion condition still govern execution. A checklist tick may be a resident report of a step; whether it establishes full commitment execution depends on its stated conditions and must be researched.
+
+### 16.6 Curriculum-guided activity: teaching while doing
+
+Founder example: a 15-minute guided shower with spoken instructions and brief explanations of *why* actions matter, or a guided toothbrushing session with practical technique. This could make activities more interesting and make them easier to begin, especially when motivation is low. Other possible future contexts include household cleaning, education/study, preparation for work, and Career Development actions.
+
+**This must use the actual appropriate folder's approved curriculum and research as its factual foundation**, and should not invent health or hygiene claims. Time establishes *when* an action happens and how it relates to commitments. The relevant folder owns its *subject* and educational content. If the relevant curriculum is unapproved or the folder is not operational, treat the lesson as future exploration and do not represent it as an official live lesson.
+
+Proposed user-selectable **depths of narration**:
+
+- **Basic guidance:** concise starting cue, transitions, and timing when relevant.
+- **Learn as you go:** step-level narration plus short explanations selected from approved material.
+- **Full guided lesson:** longer educational narration and carefully timed demonstrations/check-ins, only where the resident specifically wants more detail.
+
+The resident can switch levels by activity or by session. A full explanation is not required to obtain the benefits of the Time schedule. Accessibility and suitability matter: someone may prefer short text prompts, silence, translated material when available, or no lesson.
+
+### 16.7 Progressive, varied scripts rather than repetitive playback
+
+**Explicit founder preference: progression.** The resident should **not hear the exact same script every time**. Investigate **approved script frameworks** from which context-specific versions can be prepared, rather than asking a model to invent a new lesson without a factual source.
+
+A proposed script framework can contain:
+
+1. **Purpose and required facts:** what the session actually teaches or supports; the approved folder source.
+2. **Core verified steps:** procedural instructions or essential safety/accuracy information which must not be changed by improvisation.
+3. **Optional educational material:** rotating concepts, deeper explanations, small contextual examples, and reminders of prior lessons.
+4. **Relevant File context:** current Plan, upcoming appointments or commitments, the resident's stated preferences and standards, linked open follow ups, and previous session feedback.
+5. **Narration timing:** when to brief, give noninteractive instruction, ask a real question, or stay silent.
+6. **Progression rules:** initial detailed walkthroughs, later lighter touch, new educational material or refreshers when useful, more detail on request, and adaptation when the resident reports difficulty.
+7. **Reviewability:** identifiable source and version so the human agent can inspect the basis of an educational message and correct erroneous context.
+
+Progression should follow **evidence of the resident's familiarity or stated preference**, not an automatic assumption that completing three sessions means mastery. Some activities benefit from consistent steps but varied explanation. The resident can always request a repeat of a previous explanation.
+
+### 16.8 Relevant whole-life context can be woven into a session
+
+The founder strongly endorses references to relevant information from **other folders** and the File during Guided Mode. Examples include an upcoming date, an HR benefits question, an appointment, or preparation for a professional commitment. This should make guidance feel attentive to the resident's life rather than like a generic prerecorded video.
+
+**Founder example, not a default beauty standard:** while showering the day before a date, the guidance might mention extra grooming **only if the resident's File supports it as a preference or stated plan**, e.g. “You've got your date tomorrow. You mentioned wanting extra grooming beforehand; want to make time for that?” The agent should ask when the resident can respond, not while their mouth is occupied or showering. If the resident says they prefer to do it tomorrow, the Plan can be adjusted under the existing permissions. Do not assume shaving is necessary for a date.
+
+Unrelated-but-relevant information should be *timed*, not dumped into the session. A 7:00 AM briefing may mention the one or two most useful points; other items can be introduced later at a better activity transition. No requirement to fill silence with conversation.
+
+**Proactive pattern awareness** still applies: an evidence-based pattern involving repeatedly missed next-day commitments may deserve mention while planning an evening out, but with natural acknowledgement and conversational pacing where circumstances are nonurgent.
+
+### 16.9 The real value: revise the Plan when execution goes sideways
+
+**Explicit founder direction:** when the client feels rushed or overwhelmed, the agent helps them **think through what to do next**. This is central to representation, not a mere timer feature.
+
+Example, fiction: the resident planned a thirty-minute shower, took forty-five minutes, and now has 25 minutes until departure. They still need to dress, pack and eat. Instead of a buzzer or scolding, the agent can say, in separate brief messages:
+
+> “You've got 25 minutes until you need to leave.”
+
+> “Getting dressed and packing your bag are still on your Plan.”
+
+> “We can move breakfast until later. Let's get you dressed first.”
+
+This example only works if moving breakfast is genuinely compatible with the resident's stated needs, other commitments, and standards. A real agent must not assume that eating is optional for a particular client, or that a dependent activity can be skipped.
+
+The process to investigate:
+
+1. Identify what has actually happened and what is still **unknown**. Elapsed time alone does not prove a task remains incomplete.
+2. Recalculate the remaining time before the next fixed commitment, including preparation/travel costs already on file.
+3. Check the recorded importance, consequences, timing flexibility, minimums, and linked unfinished work.
+4. **Prepare one workable next action** or a small number of meaningful alternatives rather than requiring the resident to perform all the planning while stressed.
+5. Carry out changes already covered by standing permission; seek the client's decision for competing commitments, newly adopted obligations, or other changes reserved for them under Time §5.6.
+6. Keep completed work executed; reschedule follow ups or ongoing work still open; report what was changed and preserve provenance.
+7. Revisit the Plan during Daily Close and propose improved future time estimates based on actual reports.
+
+**Distinguish two conditions:** *behind schedule* needs a practical revision of timing and work; *overwhelmed even with sufficient time* may need one immediately manageable action before the full Plan is presented again.
+
+Example of the latter: resident says, “I have so much to do. I don't know where to start.” The agent checks the already confirmed Plan, relevant consequences and resident preferences, and can offer one grounded action: “Okay. Let's start with getting dressed.” That is a suggested starting action, not a claim that the resident has executed it.
+
+The resident decides what to do; the agent provides context and practical organization. Avoid guilt, compliance games, or turning distress into extra engagement requirements. For residents who do not want narration, comparable Plan-revision help must remain available through screen and ordinary conversation.
+
+### 16.10 Alarms, headphones, web availability and blocking constraints
+
+The younger brother's illustrative “JARVIS” idea includes Universe City itself being the morning alarm, a day briefing, and optional hands-free progression through the schedule.
+
+**This is an exploratory experience, not a present capability.** A normal browser cannot guarantee reliable device wake alarms, locked-screen continuous listening, or system-wide application blocking across every operating system. Native mobile, browser/PWA, permissions, platform-specific notification, audio and accessibility constraints need separate investigation.
+
+A resident may not own a smartphone or may primarily use a computer. Guided Mode should offer a usable screen-based experience without headphones, microphones, permissions, or device restrictions. A voice-led session can begin when the resident connects headphones if desired; auto-detection and playback rules need research. Any blocking is **opt-in, reversible, selective**, and must preserve emergency and essential communication. Residents can bypass restrictions, so the motivation must come from useful guidance, autonomy, visible progress, and a Plan that works, not fear of losing device access.
+
+### 16.11 Questions to research before an implementation proposal
+
+1. How can the existing schedule and Plan represent nested steps without creating a duplicate second schedule or altering Time's defined data types prematurely?
+2. What is the smallest usable Guided Mode experience on a web browser? Which capabilities genuinely require native mobile?
+3. Which voice experiences are viable during device lock, with wired/Bluetooth headphones, interrupted network access, no microphone, or other accessibility needs?
+4. How is the narration paced around no-reply activities; how can someone say “repeat,” “skip,” “done,” “more time,” or “quiet” without interruption?
+5. How does time-remaining guidance account for unknown or estimated durations and departure costs, without false precision?
+6. How should optional focus/distraction restrictions respect choice, emergency exceptions, and third-party platform limitations?
+7. How are curriculum scripts governed, sourced, reviewed, versioned and advanced through new lessons without repeated stale narration or hallucinated instruction?
+8. How does the resident opt into or out of bringing cross-folder reminders and sensitive personal context into audio, particularly where others might hear headphones/speakers?
+9. When does a step completion require evidence or client confirmation, and what may software update under standing permissions?
+10. What meaningful improvements should we test: completed/adjusted commitments, less planning burden, resident understanding of Time, or a resident's ability to resume after being overwhelmed—not raw listening time?
+11. How do we distinguish ordinary auto-reminders from contact that must be attributed to the human agent under existing rules?
+12. When does the agent intervene proactively, and when should it allow quiet execution?
+
+## 17. Open design questions
 
 - How should a passing conversation statement be retained, structured, confirmed and made correctable?
 - What actions can software take on standing permission, and which need resident or agent approval?
@@ -240,7 +409,7 @@ The agent is not obliged to talk merely because the resident expands a block, ti
 - What does human-agent oversight cost at different scales?
 - What is the appropriate relationship between substantive engagement, Grade and future programs?
 
-## 17. Application to the Time Curriculum — advisory only
+## 18. Application to the Time Curriculum — advisory only
 
 When designing Time's assessment and lessons:
 - Measure planning, execution, review and follow-through under the resident's established conditions.
@@ -252,10 +421,10 @@ When designing Time's assessment and lessons:
 - Preserve ordinary conversational pacing; Curriculum questions do not authorize an interrogation.
 - These considerations **inform drafting** but do not override current authoritative Time, Curriculum or Language Standard text.
 
-## 18. Editorial handoff
+## 19. Editorial handoff
 
-**Founder directions expressed:** natural conversation, low-friction access, focused Portal experience, pattern recognition central to representation, human agent responsibility, brief text-like messages, acknowledging the resident before a nonurgent observation, meaningful continuity rather than login farming; schedule-first exploration, large expandable time blocks, optional smaller steps, optional non-daunting progress support, and no presumption that all residents have daily routines or paid work.
+**Founder directions expressed:** natural conversation, low-friction access, focused Portal experience, pattern recognition central to representation, human agent responsibility, brief text-like messages, acknowledging the resident before a nonurgent observation, meaningful continuity rather than login farming; schedule-first exploration, large expandable time blocks, optional smaller steps, optional non-daunting progress support, and no presumption that all residents have daily routines or paid work; optional narrated Guided Mode for any relevant time block, spoken Plan briefing, activity-aware prompting, time-until-next-commitment reminders, curriculum-based education with evolving scripts, optional opt-in distraction controls, and practical re-planning when the resident falls behind or becomes overwhelmed.
 
-**Unapproved proposals:** exact expanded-block layout, optional focus session and phone distraction controls, specific automation/approval mechanics, retention and privacy decisions, alert thresholds, proposed tests and measurement criteria, escalations and new operative rules.
+**Unapproved proposals:** exact expanded-block layout, optional Guided Mode implementation, lesson/script framework, cross-folder audio privacy and timing rules, voice/alarm and phone distraction controls, specific automation/approval mechanics, retention and privacy decisions, alert thresholds, proposed tests and measurement criteria, escalations and new operative rules.
 
 When another working chat updates this file, append/revise clearly labeled ideas and dates; do not silently reclassify proposals as approved policy. Reconcile suggested changes against `LANGUAGE_STANDARD.md`, `docs/systems/TIME.md` and relevant product/Operations documents **before** moving them to authoritative specifications.
