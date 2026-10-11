@@ -6,19 +6,25 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:pilot": "tsx tests/pilot/guardrails.mts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.133.0",
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.45.4",
     "next": "14.2.35",
+    "pg": "^8.23.1",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "stripe": "^16.12.0"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.8",
     "@types/node": "^22",
+    "@types/pg": "^8.23.1",
     "@types/react": "^18",
+    "tsx": "^4.23.15",
     "typescript": "^5.6.2"
   }
 }
