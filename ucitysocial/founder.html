@@ -317,7 +317,7 @@ a{color:inherit}
        <p>And then eventually it would happen again.</p>
       </section>
 
-      <section class="ch" id="ch5" data-title="From 12 buckets to the current structure" data-toc="From 12 buckets to the current structure">
+      <section class="ch" id="ch5" data-title="From 12 buckets to the current structure" data-run="" data-toc="From 12 buckets to the current structure">
        <p class="kick">Chapter 05 &middot; 2023 to 2026</p>
        <h2>From 12 buckets to the current structure</h2>
        <p>Parts of me felt like a lot of adults were already gone.</p>
@@ -413,8 +413,10 @@ a{color:inherit}
   const calm=matchMedia('(prefers-reduced-motion:reduce)');
   let page=0,total=1,step=0,per=2,marks=[];
 
-  /* Every measured element is a block that starts at the left edge of its column. */
-  const pageOf=el=>Math.max(0,Math.round(el.offsetLeft/step));
+  /* Every measured element is a block that starts at the left edge of its column.
+     The position is read from the drawn boxes. Safari reports offsetLeft as 0 for
+     every element inside columns, which made the book one page long on iPhone. */
+  const pageOf=el=>Math.max(0,Math.round((el.getBoundingClientRect().left-flow.getBoundingClientRect().left)/step));
 
   function buildContents(){
     toc.innerHTML='';
@@ -432,8 +434,8 @@ a{color:inherit}
     per=phone.matches?1:2;
     const gap=parseFloat(getComputedStyle(flow).columnGap)||0;
     step=(viewport.getBoundingClientRect().width+gap)/per;
-    total=pageOf(endMark)+1;
-    marks=[...flow.querySelectorAll('[data-title]')].map(s=>({title:s.dataset.title,page:pageOf(s)}));
+    total=Math.max(pageOf(endMark)+1,Math.round((flow.scrollWidth+gap)/step)||1);
+    marks=[...flow.querySelectorAll('[data-title]')].map(s=>({title:s.dataset.run!==undefined?s.dataset.run:s.dataset.title,page:pageOf(s)}));
     toc.querySelectorAll('a').forEach(a=>{a.lastChild.textContent=String(pageOf($(a.dataset.target))+1)});
   }
 
