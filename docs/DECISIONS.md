@@ -184,11 +184,11 @@ Created October 9, 2026 as the initial decision register.
 
 ### D-015 — Entry into the Resident Portal
 
-**Status:** REOPENED October 10, 2026 for sequencing
+**Status:** LOCKED sequencing; Time details remain WORKING
 
-The earlier sequence placed Orientation after email confirmation and membership activation, then placed Time before the normal Resident Portal home. The October 10 Language Standard defines Application as the first step and Enrollment as the second. Residency begins at Enrollment. The timing of payment, the placement of Orientation, and the relationship of Agency Assessment work to Enrollment remain unresolved.
+Application precedes Enrollment. Enrollment consists of the initial Agency Assessment, which establishes general information, Start, and Target. Residency begins at Enrollment. Orientation follows Enrollment in the actual Resident Portal. Initial Time work follows Orientation. The resident does not build the Time system during Enrollment.
 
-**Still LOCKED as an interface direction:** Orientation takes place in the actual Resident Portal. The walkthrough can be skipped and replayed. Initial Time work should precede the normal Resident Portal home. The exact first schedule and Plan requirements await review.
+The Orientation walkthrough can be skipped and replayed. Initial Time work precedes the normal Resident Portal home. The exact schedule and Plan requirements await review. Payment timing remains unresolved.
 
 ### D-016 — Universe City engagement belongs on the Plan
 
