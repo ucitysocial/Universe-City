@@ -1,0 +1,15 @@
+import { fresh, as, svc, people, attempt } from './base.mjs';
+const db = await fresh(); const { r, a } = await people(db);
+await db.exec(`grant all on all tables in schema public to authenticated, service_role;`);
+await as(db, a);
+console.log('B-14 agent writes a block and names no source:', (await attempt(db, `insert into blocks(user_id,date,starts_at,label,kind) values ('${r}','2026-10-10','10:00','x','rest') returning source`)).rows);
+await svc(db);
+console.log('B-14 service role writes a block and names no source:', (await attempt(db, `insert into blocks(user_id,date,starts_at,label,kind) values ('${r}','2026-10-10','11:00','y','rest') returning source`)).rows);
+await as(db, r);
+const s = (await db.query(`insert into statements(user_id,said) values ('${r}','I work Tuesdays') returning id`)).rows[0].id;
+console.log('B-15 client edits a statement:', JSON.stringify(await attempt(db, `update statements set said='I never said that' where id='${s}' returning said`)));
+console.log('B-15 client deletes a statement:', JSON.stringify(await attempt(db, `delete from statements where id='${s}'`)));
+await as(db, a);
+console.log('B-16 agent writes a statement for the client:', JSON.stringify(await attempt(db, `insert into statements(user_id,said) values ('${r}','The client said this') returning id is not null ok`)));
+await svc(db);
+console.log('   statements left:', (await db.query(`select said from statements`)).rows);
