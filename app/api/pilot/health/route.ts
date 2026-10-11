@@ -42,7 +42,10 @@ export async function GET(req: Request) {
       const facts = await d.tx(async q => (await q<any>(
         `select session_user::text as login, current_user::text as acting_as,
                 has_schema_privilege(session_user, 'uc_pilot', 'usage') as login_can_use_schema,
-                has_table_privilege(session_user, 'uc_pilot.messages', 'select') as login_can_read_messages,
+                (select count(*)::int from pg_class c join pg_namespace n on n.oid = c.relnamespace
+                  where n.nspname = 'uc_pilot' and c.relkind = 'r'
+                    and (has_table_privilege(session_user, c.oid, 'select') or has_table_privilege(session_user, c.oid, 'insert')
+                      or has_table_privilege(session_user, c.oid, 'update') or has_table_privilege(session_user, c.oid, 'delete'))) as tables_the_login_can_touch,
                 (select rolbypassrls or rolsuper from pg_roles where rolname = session_user) as login_bypasses_rules`))[0]);
       out.database_login = facts;
       // A resident who is not in the test reads nothing and writes nothing.
