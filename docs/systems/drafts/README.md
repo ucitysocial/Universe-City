@@ -20,6 +20,7 @@ Filed October 11, 2026. Each file in this folder is a draft or a reference. No f
 | `CONSOLIDATED_OPERATIONS_REVIEW.md` | A review of the Operations draft, written outside this repository | None. It is a reference |
 | `CONSOLIDATED_DEVELOPMENTS_REVIEW.md` | A review of the Developments draft, written outside this repository | None. It is a reference |
 | `SHARED_ARCHITECTURE_REVIEW.md` | A review of the shared dependency list, written outside this repository | None. It is a reference |
+| `FOUNDER_TEST_NOTES.md` | What the founder test is, the choices made to build it, and what it does not do | None. It is a working note |
 | `tests/` | The files that tested the tables and queries proposed in the Operations draft | None |
 
 ## 3. How the drafts cite each other
