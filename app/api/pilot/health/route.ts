@@ -67,6 +67,32 @@ export async function GET(req: Request) {
     }
   }
 
+  // Whether this server can build the database in memory that the check route uses, one stage at a time.
+  const stage = parseInt(url.searchParams.get('memstage') || '0', 10);
+  if (stage > 0) {
+    const t0 = Date.now();
+    const mb = () => Math.round(process.memoryUsage().rss / 1048576);
+    const m: Record<string, unknown> = { limit_mb: process.env.AWS_LAMBDA_FUNCTION_MEMORY_SIZE || null, start_mb: mb() };
+    try {
+      const { PGlite } = await import('@electric-sql/pglite');
+      m.imported_ms = Date.now() - t0; m.imported_mb = mb();
+      if (stage > 1) {
+        const db = new PGlite();
+        await db.waitReady;
+        m.ready_ms = Date.now() - t0; m.ready_mb = mb();
+        if (stage > 2) {
+          const r = await db.query('select version() as v');
+          m.version = String((r.rows[0] as any).v).slice(0, 40);
+          m.query_ms = Date.now() - t0;
+        }
+        await db.close();
+      }
+    } catch (e: any) {
+      m.error = String(e?.stack || e?.message || e).slice(0, 600);
+    }
+    out.mem = m;
+  }
+
   const models = (url.searchParams.get('models') || '').split(',').map(s => s.trim()).filter(Boolean).slice(0, 4);
   if (models.length) {
     const tried: Record<string, unknown> = {};
