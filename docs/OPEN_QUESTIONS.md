@@ -8,6 +8,8 @@ These are unresolved decisions worth protecting from accidental implementation.
 
 ### OQ-001 — What exactly is a Plan item?
 
+**Answered in part October 11, 2026.** `systems/TIME.md` 3.3 states the fields of a commitment and the three facts needed before it goes on a Plan. Storage is marked To define in `systems/TIME_OPERATIONS.md` 2.2.
+
 Need to define:
 
 - required fields
@@ -19,6 +21,8 @@ Need to define:
 - relationship to recurring Schedule items
 
 ### OQ-002 — What are the Plan outcomes?
+
+**Resolved October 11, 2026.** `systems/TIME.md` 3.3.5 to 3.3.12 holds the outcome in four separate fields: Execution, Timing, Consequences, and Alternative. Section 11.6 states what counts as successful execution.
 
 Current candidates:
 
@@ -34,6 +38,8 @@ Questions:
 - When is timing drift meaningful versus close enough?
 
 ### OQ-003 — Evening vs morning cadence
+
+**Resolved October 11, 2026.** `systems/TIME.md` 5.4 sets three points of contact in the day: the Morning Plan, during the day, and Daily Close. The resident chooses how much contact they receive.
 
 Strong current idea:
 
@@ -83,6 +89,8 @@ May be useful internally without being shown as labels.
 
 ### OQ-007 — What triggers proactive Agent outreach?
 
+**Resolved in principle October 11, 2026.** `systems/TIME.md` 5.4.10 and section 7 state the factors and the triggers. The exact criteria are marked To define in `systems/TIME_OPERATIONS.md` sections 7 and 8.
+
 Need explicit decision logic for:
 
 - before-plan check
@@ -94,6 +102,8 @@ Need explicit decision logic for:
 - resident-requested accountability
 
 ### OQ-008 — How do residents control follow-up style?
+
+**Resolved in principle October 11, 2026.** `systems/TIME.md` 5.4.9 lets the resident turn each kind of contact on separately. The settings are marked To define in `systems/TIME_OPERATIONS.md` section 7.
 
 Need preference model for:
 
@@ -118,6 +128,8 @@ Possibilities:
 Need avoid making the right rail noisy.
 
 ### OQ-010 — How are AI and humans represented?
+
+**Resolved for Time October 11, 2026.** `systems/TIME.md` 5.2 and 5.4.12. The agent is the accountable person. Software carries out permitted work and is shown as automated. The on screen label is marked To define in `systems/TIME_OPERATIONS.md` 7.10.
 
 Need to preserve transparency:
 
@@ -281,6 +293,8 @@ Current model treats these as foundations, but exact sequencing and overlap need
 
 ### OQ-024 — When is a system "configured/current"?
 
+**Resolved for Time October 11, 2026.** `systems/TIME.md` section 10 states three operational conditions.
+
 Need an operational definition that is better than "resident completed setup."
 
 ---
@@ -296,5 +310,7 @@ Need an operational definition that is better than "resident completed setup."
 Payment at Application or Enrollment remains unresolved under `LANGUAGE_STANDARD.md` clause 12.3. Do not require payment at a specific point in resident facing instructions until this is decided.
 
 ### OQ-027 — What is the first Time requirement?
+
+**Resolved October 11, 2026.** Both. `systems/TIME.md` 9.3: the Resident Portal home opens when the first seven day schedule is on file and the resident has confirmed the first Plan. A completed week of activity is not required.
 
 Initial Time work follows Orientation. Resolve whether the resident establishes a seven day schedule, a daily Plan, or both before the normal Resident Portal home becomes available.

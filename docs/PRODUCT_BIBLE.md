@@ -110,7 +110,7 @@ A Plan is not the same as the Schedule.
 - **Difference** = what deserves understanding.
 - **Schedule** = recurring structure that becomes increasingly accurate as Universe City learns from repeated Plans and Actuals.
 
-See `systems/TIME.md`.
+See `systems/TIME.md`. Since October 11, 2026 that file holds the Version 4 specification. Where this section and the specification differ, the specification governs.
 
 ## Standards and unresolved entry sequence
 
@@ -130,7 +130,9 @@ See `systems/TIME.md`.
 
 ### Systems
 
-- [Time](./systems/TIME.md)
+- [Time, the specification](./systems/TIME.md)
+- [Time Operations, how the system runs](./systems/TIME_OPERATIONS.md)
+- [Time Developments, the dated log](./systems/TIME_DEVELOPMENTS.md)
 
 ### Product architecture
 

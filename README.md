@@ -98,7 +98,7 @@ The public shell used by the Next application must stay aligned with the current
 - `LANGUAGE_STANDARD.md` governs every word a resident reads. `AGENTS.md` lists the rules broken most often.
 - `DESIGN_SYSTEM.md` governs visual and interaction decisions.
 - `ARCHITECTURE.md` states who may read and write each table.
-- `docs/PRODUCT_BIBLE.md` is the product brain: what is locked, what is still being worked out, and what is ready to build. `docs/systems/TIME.md` is the Time folder. `docs/product/RESIDENT_INTERFACE.md` is the Resident Portal.
+- `docs/PRODUCT_BIBLE.md` is the product brain: what is locked, what is still being worked out, and what is ready to build. `docs/systems/TIME.md` is the Time folder specification. `docs/systems/TIME_OPERATIONS.md` states how the Time system runs and what is still to define. `docs/systems/TIME_DEVELOPMENTS.md` is the dated log of changes to Time. `docs/product/RESIDENT_INTERFACE.md` is the Resident Portal.
 
 ## Branches
 

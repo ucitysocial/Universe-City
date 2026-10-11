@@ -228,3 +228,40 @@ Prefer:
 - your information
 
 File can still appear where it genuinely names the organized structure, especially in Agent/internal context and restrained interface labeling.
+
+
+## Time, Version 4
+
+### D-019: Three Time documents in the repository
+
+**Status:** LOCKED, October 11, 2026
+
+`docs/systems/TIME.md` is the finished Time specification and the authoritative copy. `docs/systems/TIME_OPERATIONS.md` holds the mechanics and marks each undecided one as To define. `docs/systems/TIME_DEVELOPMENTS.md` is the dated log of how the thinking changed. A Word file is an export. Open thinking does not go in `TIME.md`.
+
+The Time Curriculum and the Time Research are not in the repository yet and are not revised.
+
+### D-020: Integrity reads Time
+
+**Status:** LOCKED, October 11, 2026
+
+Integrity covers every commitment the resident made, at work and outside work. Integrity reads the commitment entries already kept in Time. It creates no second schedule and no second copy of a commitment. Time holds when a commitment is scheduled and what happened to it.
+
+### D-021: Software carries out permitted work
+
+**Status:** LOCKED, October 11, 2026
+
+The agent is the accountable human representative. Software carries out defined work under rules and permissions. With a standing permission, software carries out the permitted action with no person releasing it. Software is never called the agent.
+
+A person is required when the permission does not clearly cover the action, when judgment is needed beyond the established rule, when the action would change the resident's File or obligations in a way that requires interpretation, or when the resident asks for review by a person.
+
+### D-022: Contact
+
+**Status:** LOCKED direction, October 11, 2026. Settings and delivery are marked To define in Time Operations.
+
+Contact has three origins: resident requested, permitted automatic, and agent initiated. Contact takes place at three points in the day: the Morning Plan, during the day, and Daily Close. Daily Close is the regular contact and is not the only one. The resident chooses how much contact they receive and when. Routine authorized work proceeds with no reply from the resident.
+
+### D-023: Time Version 4 resolutions
+
+**Status:** LOCKED, October 11, 2026
+
+A purchase amount is filed in Finance. The Resident Portal home opens when the first seven day schedule is on file and the first Plan is confirmed. Time is operational on three conditions. The free first day is retired. `docs/systems/TIME_DEVELOPMENTS.md` 2.9 lists every resolution and where it sits in the specification.
