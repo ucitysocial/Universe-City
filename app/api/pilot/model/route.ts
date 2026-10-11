@@ -24,10 +24,10 @@ export async function POST(req: Request) {
     maxTokens: Math.min(Math.max(parseInt(body.maxTokens, 10) || 900, 16), 1200),
     allowActions: body.allowActions !== false
   };
-  // A run can name one of the models the gateway lists. The name is checked against a short fixed list.
+  // A run can name the model to ask. The name is checked for shape, and the gateway refuses a model it does not list.
   const asked = new URL(req.url).searchParams.get('model') || '';
   const before = process.env.PILOT_MODEL;
-  if (['claude-sonnet-5-5', 'claude-haiku-4-5', 'claude-opus-5-5', 'claude-sonnet-4-6'].includes(asked)) process.env.PILOT_MODEL = asked;
+  if (/^claude-[a-z0-9-]{3,40}$/.test(asked)) process.env.PILOT_MODEL = asked;
   try {
     return Response.json(await getModel().create(request), { headers: { 'cache-control': 'no-store' } });
   } catch (e: any) {

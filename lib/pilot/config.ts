@@ -23,6 +23,7 @@ const PRICES: Record<string, { input: number; output: number; read: number; writ
   'claude-sonnet-4-6': { input: 3, output: 15, read: 0.3, write: 3.75 },
   'claude-sonnet-4-5': { input: 3, output: 15, read: 0.3, write: 3.75 },
   'claude-haiku-4-5': { input: 1, output: 5, read: 0.1, write: 1.25 },
+  'claude-haiku-5-5': { input: 0.1, output: 0.5, read: 0.01, write: 0.12 },
   'claude-opus-5-5': { input: 4, output: 20, read: 0.2, write: 5 }
 };
 
