@@ -331,10 +331,10 @@ a.pt-btn{text-decoration:none;display:inline-block}
 .cal-bar{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;margin:0 0 12px}
 .cal-title{font-size:18px;font-weight:700;margin-right:auto;white-space:nowrap}
 .cal-seg{display:inline-flex;border:2px solid var(--ink);background:#fff}
-.cal-seg a{padding:5px 11px;font-size:13.5px;font-weight:600;text-decoration:none;color:var(--ink);border-right:2px solid var(--ink);white-space:nowrap}
-.cal-seg a:last-child{border-right:0}
-.cal-seg a:hover{background:var(--paper)}
-.cal-seg a.on{background:var(--ink);color:var(--paper)}
+.cal-seg a,.cal-seg button{padding:5px 11px;font-size:13.5px;font-weight:600;text-decoration:none;color:var(--ink);border:0;border-right:2px solid var(--ink);white-space:nowrap;background:none;font-family:inherit;cursor:pointer;line-height:1.35}
+.cal-seg a:last-child,.cal-seg button:last-child{border-right:0}
+.cal-seg a:hover,.cal-seg button:hover{background:var(--paper)}
+.cal-seg a.on,.cal-seg button.on{background:var(--ink);color:var(--paper)}
 .cal-scroll{overflow-x:auto;border:2px solid var(--ink);background:#fff}
 .cal{--h:60px;--cols:7;--hours:16;display:grid;grid-template-columns:50px repeat(var(--cols),minmax(0,1fr));min-width:700px}
 .cal.single{grid-template-columns:50px minmax(0,1fr);min-width:0}
@@ -366,7 +366,7 @@ a.pt-btn{text-decoration:none;display:inline-block}
   background:var(--fc);color:var(--ft);border:2px solid var(--ink);padding:2px 6px 0}
 .cal-block.step{box-shadow:0 0 0 1.5px #fff}
 .cal-block.split{left:calc(var(--lane) / var(--lanes) * 100% + 2px);right:auto;width:calc(100% / var(--lanes) - 4px)}
-.cal-text{display:flex;flex-direction:column;gap:1px;overflow:hidden;max-height:calc(var(--clear) * var(--h) / 60 - 7px)}
+.cal-text{display:flex;flex-direction:column;gap:1px;overflow:hidden;max-height:calc(var(--clear) * var(--h) / 60 - 8px)}
 .cal-block b{font-size:12px;font-weight:700;line-height:1.25}
 .cal-time{font-family:'VT323',monospace;font-size:15px;line-height:1.02}
 .cal-time i{font-style:normal;display:inline-block;white-space:nowrap;margin-right:.45em}
@@ -396,10 +396,10 @@ a.pt-btn{text-decoration:none;display:inline-block}
 .cal-block.open-start .cal-text{max-height:calc(var(--clear) * var(--h) / 60 - 22px)}
 .cal-block.weekly.open-end::after,.cal-block.weekly.open-start::after{background:none;border-image:linear-gradient(to bottom,var(--fc),transparent) 1}
 
-.cal-legend{margin:10px 0 0;display:grid;gap:5px}
-.cal-legend p{display:flex;flex-wrap:wrap;gap:4px 16px;margin:0;font-family:'VT323',monospace;font-size:16px;color:var(--ink2);line-height:1.2}
-.cal-legend span{display:inline-flex;align-items:center;gap:6px}
-.cal-key{position:relative;flex:none;display:inline-block;width:20px;height:13px;border:2px solid var(--ink);background:var(--fc);box-sizing:border-box}
+.cal-legend{display:flex;flex-wrap:wrap;align-items:center;gap:4px 16px;margin:8px 0 0;font-family:'VT323',monospace;font-size:16px;color:var(--ink2);line-height:1.2}
+.cal-legend span{display:inline-flex;align-items:center;gap:5px}
+.cal-legend span:first-child .cal-key{margin-right:-2px}
+.cal-key{position:relative;flex:none;display:inline-block;width:16px;height:12px;border:2px solid var(--ink);background:var(--fc);box-sizing:border-box}
 .cal-key.executed{box-shadow:inset 5px 0 0 var(--ink),inset 7px 0 0 var(--paper)}
 .cal-key.weekly{background:#fff;border:2px dashed var(--fc);box-shadow:inset 4px 0 0 var(--fc)}
 .cal-key.open{border-bottom:0;height:9px;margin-bottom:6px}
@@ -431,7 +431,7 @@ a.pt-btn{text-decoration:none;display:inline-block}
 
 @media (max-width:860px){
   .cal-title{width:100%;font-size:16px}
-  .cal-seg a{padding:6px 9px;font-size:13px}
+  .cal-seg a,.cal-seg button{padding:6px 9px;font-size:13px}
   .cal{min-width:780px}
   .cal.single{min-width:0}
   .mon-cell{min-height:58px;padding:4px}
@@ -478,3 +478,12 @@ a.pt-btn{text-decoration:none;display:inline-block}
 .sum-wait .pt-btn{padding:7px 10px;font-size:13px}
 .sum-gap{font-size:14px;line-height:1.4;margin:0;padding-left:10px;border-left:4px solid var(--rule)}
 .sum-more{font-size:13.5px;font-weight:600;color:var(--ink)}
+
+/* The whole day on one screen: an hour is short, so a block holds one line and its open lower edge is short. */
+.cal.fit .cal-block{padding:1px 5px 0}
+.cal.fit .cal-block b{font-size:11.5px;line-height:1.2}
+.cal.fit .cal-text{max-height:calc(var(--clear) * var(--h) / 60 - 7px)}
+.cal.fit .cal-block.executed,.cal.fit .cal-block.partly{padding-left:14px}
+.cal.fit .cal-block.open-end{height:calc(var(--len) * var(--h) / 60 - 8px)}
+.cal.fit .cal-block.open-end::after{height:6px}
+.cal.fit .cal-block.open-end .cal-text{max-height:calc(var(--clear) * var(--h) / 60 - 13px)}

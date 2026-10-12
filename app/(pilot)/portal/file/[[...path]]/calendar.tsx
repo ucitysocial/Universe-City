@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react';
 import Link from 'next/link';
+import PilotCalZoom from '@/components/PilotCalZoom';
 import { DEPARTMENTS } from '@/lib/domain/folders';
 import { addMonths, hourShort, KIND_WORD, monthEnd, monthStart, weekStart, type CalDay, type Calendar, type CalItem, type Placed } from '@/lib/pilot/calendar';
 import { SCHEDULE_PATH, TIME_PATH } from '@/lib/pilot/paths';
@@ -47,25 +48,23 @@ export function CalendarBar({ view, on, today }: { view: CalView; on: string; to
         <Link href={weekHref(on)} className={view === 'week' ? 'on' : undefined} aria-current={view === 'week' ? 'page' : undefined}>Week</Link>
         <Link href={monthHref(on)} className={view === 'month' ? 'on' : undefined} aria-current={view === 'month' ? 'page' : undefined}>Month</Link>
       </span>
+      {view !== 'month' && <PilotCalZoom />}
     </div>
   );
 }
 
-/** What each color and each kind of block means. It sits under the calendar. */
+/** What the colors and the kinds of block mean, in one line under the calendar. A color is the department of the folder. */
 export function Legend({ month = false }: { month?: boolean }) {
   return (
-    <div className="cal-legend">
-      <p>
-        {DEPARTMENTS.map(d => <span key={d.key}><i className={`cal-key d-${d.key}`} />{d.name}</span>)}
-      </p>
-      <p>
-        <span><i className="cal-key d-I" />Planned</span>
-        <span><i className="cal-key d-I executed" />Executed, as you reported it</span>
-        <span><i className="cal-key d-I weekly" />Weekly schedule, on a day ahead</span>
-        {!month && <span><i className="cal-key d-I open" />End unknown</span>}
-        {month && <span><i className="cal-key strip" />The bar under a date shows the day from midnight to midnight. The filled part is the time of an entry.</span>}
-      </p>
-    </div>
+    <p className="cal-legend">
+      <span title={DEPARTMENTS.map(d => d.name).join(', ')}>
+        {DEPARTMENTS.map(d => <i key={d.key} className={`cal-key d-${d.key}`} aria-label={d.name} />)}
+        Department
+      </span>
+      <span><i className="cal-key d-I executed" />Executed</span>
+      <span><i className="cal-key d-I weekly" />Weekly routine</span>
+      {!month && <span><i className="cal-key d-I open" />End unknown</span>}
+    </p>
   );
 }
 

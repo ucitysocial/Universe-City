@@ -26,13 +26,16 @@ export default function PilotCalFocus({ on }: { on: string }) {
         const time = text?.querySelector<HTMLElement>('.cal-time');
         if (!text || !name) continue;
         const whole = block.dataset.name || name.textContent || '';
-        const over = () => text.scrollHeight > text.clientHeight + 1 || name.scrollWidth > name.clientWidth + 1;
+        const over = () => text.scrollHeight > text.clientHeight || name.scrollWidth > name.clientWidth + 1;
         name.textContent = whole;
+        name.hidden = false;
         if (time) time.hidden = false;
         if (!over()) continue;
         if (time) time.hidden = true;
         const words = whole.split(/\s+/);
         for (let n = words.length - 1; n >= 1 && over(); n--) name.textContent = `${words.slice(0, n).join(' ')} ...`;
+        // A strip too short for one word shows its color alone. Pressing it opens the entry.
+        if (over()) name.textContent = '';
       }
     };
     fit();
