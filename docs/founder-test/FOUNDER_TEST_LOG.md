@@ -38,6 +38,7 @@ No entry is a defect just because the prototype is unfinished. Do not report uns
 | FT-009 | Working shell — conversation location | Left File/conversation navigation, center active workspace, right decisions/context; not a permanent right-rail chat | New founder prototype direction; preview not yet verified | In progress with Claude; #30 |
 | FT-010 | Time — visual schedule | Daily, weekly, and monthly visual calendar with time-positioned blocks is the Time system, not merely stored entries | Founder core product requirement; partial existing spec, missing views | In progress with Claude; #29 |
 | FT-011 | Resident Portal — visual review package | Updated three-panel File/Conversation, visual calendars, record editor and mobile screenshots supplied as a static walkthrough | Screenshot evidence only; functional claims unverified | Received; awaiting founder review and runnable preview |
+| FT-012 | Portal Home — global UI scale | Entire desktop portal appears miniature: narrow nav/context, undersized cards/type, large unused center | Founder-directed size and readability correction | P0 design fix requested; #32 |
 
 ---
 
@@ -374,17 +375,44 @@ Request the **actual Netlify deploy preview URL and commit SHA** when Claude fin
 
 ---
 
+## FT-012 — Resident Portal desktop scale and legibility
+
+**Date reported:** October 11, 2026.  
+**Evidence:** Founder-supplied screenshot of the actual Netlify Founder Test Resident Portal Home, approximately 1728 × 888 in captured pixels. Not added as a raw image to the public repo.  
+**Priority:** P0 interface sizing and readability, independent of the visual architecture. [Issue #32](https://github.com/ucitysocial/Universe-City/issues/32).
+
+### What is visible
+
+A three-zone layout (dark left File/navigation rail, central Home work area, narrow right "Now on file" panel) exists, but it is disproportionately tiny on desktop. The navigation is approximately 155 px wide, the right context rail about 180 px, Home's My File and Conversation tiles ~200 px wide each, and type looks extremely small. Most of the Home center surface is unused; the editor rests along the bottom but is likewise thin. These are visual estimates, not computed CSS measurements. Because the embedded Netlify preview toolbar also looks small, verify **browser zoom at 100%** before assigning all fault to styles.
+
+### Founder direction
+
+The founder rejects the miniature appearance and wants the actual portal sized like readable, full-size working software. **Preserve Universe City brand palette, fonts and rectangular visual language.** Do not simply enlarge a screenshot, force a page zoom transform, or turn the app into generic oversized rounded cards.
+
+### Implementation acceptance
+
+- Audit root `font-size`, `rem` scale, `zoom`, `transform`, viewport meta and desktop layout variables; verify normal 100% browser zoom.
+- Desktop starting proportions: File rail approximately 250–280 px, right context 290–340 px, center responsive `minmax(0, 1fr)`; make panel widths adaptable and context collapsible.
+- Body/conversation text 16 px, action labels at least 14 px, meaningful metadata 12–13 px minimum and headings around 24–32 px. Use existing Montserrat/VT323 appropriately.
+- Home tiles expand and become easy to interact with instead of staying huddled in the top-left. Use available center space thoughtfully with normal readable cards, icon sizing, spacing and click targets.
+- Verify Conversation, File and day/week/month Time views at 1728×888, 1440×900, 1280×800; check tablet and phone adaptations separately. Keep mobile composer anchored, and the calendar usable.
+- Founder visually reviews actual 100%-zoom before/after screenshots before any issue closure.
+
+**Status:** Reported and logged while Founder Test is under review. No code changed by this log.
+
+---
+
 ## Findings and implementation tracking
 
 - **Confirmed duplicate-action issue:** FT-004-C and exported JSON: a screen action already confirmed and saved the new start; a later typed confirmation invoked an additional no-op action and was labeled Changed.
 - **Source of earlier inconsistency established:** FT-004-B: the first screen confirmation had already changed the stored start before the repeated chat confirmation. No premature write was established.
-- **Founder-requested improvements:** FT-004-A: concise inline filing and confirmation summaries; FT-005: agent-led next question; FT-006: YAPTAIN-inspired File; FT-007: stable mobile composer; FT-008: authentic public navigation and Log out; FT-009: full center Conversation and right decisions; FT-010: Time day/week/month visual calendar.
+- **Founder-requested improvements:** FT-004-A: concise filing; FT-005: agent-led next question; FT-006: YAPTAIN-inspired File; FT-007: mobile composer; FT-008: public navigation/Log out; FT-009: center Conversation and right decisions; FT-010: visual Time calendar; FT-012: correct global sizing and legibility.
 - **Potential improvements / review questions:** FT-001-A, FT-001-C, FT-002-A, FT-002-D, FT-003-D; FT-003-C is partially retested (approval works; deferral untested).
 - **Observed positive behavior:** FT-003-A, founder-reported FT-003-B, and FT-004-D (conversation continues after confirmation).
 - **Unverified functional claims:** FT-001-B; FT-002-B and FT-002-C partially observed; FT-003-E and FT-004-B require File/Activity/history inspection.
 - **Approved direction for future improvement:** Shorten and clarify the feedback beneath guide responses (FT-004-A); final copy and implementation not yet approved.
 - **Code fixes deployed:** None through this founder-testing log. Session 01 paused for cleanup. Behavioral priorities #22 and #23; primary visual priority #25; public navigation #27; feedback #24; mobile composer #26.
-- **Pending retests:** FT-005 next purposeful question; FT-004 duplicate confirmation and concise feedback; FT-003 deferral; FT-006 File navigation; FT-007 mobile composer; FT-008 public auth; FT-009 center chat/right context shell; FT-010 Time calendar day/week/month, data synchronization and manual edits; FT-011 new screenshots versus actual running preview.
+- **Pending retests:** FT-005 next purposeful question; FT-004 duplicate confirmation and concise feedback; FT-003 deferral; FT-006 File navigation; FT-007 mobile composer; FT-008 public auth; FT-009 center chat/right context shell; FT-010 Time calendar day/week/month, data synchronization and manual edits; FT-011 screenshots versus actual running preview; FT-012 100%-zoom full-size responsive sizing in the real preview.
 
 ### Maintenance rules
 
