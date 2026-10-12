@@ -7,12 +7,16 @@ import { popData } from '@/app/(pilot)/portal/file/[[...path]]/calendar';
 import { spanWords } from '@/lib/pilot/browse';
 import type { Board } from '@/lib/pilot/board';
 import { belongsTo } from '@/lib/pilot/dept';
-import { slugOf, SCHEDULE_PATH, TIME_PATH } from '@/lib/pilot/paths';
+import { DEPARTMENTS, FOLDERS } from '@/lib/domain/folders';
+import { folderPath, SCHEDULE_PATH, TIME_PATH } from '@/lib/pilot/paths';
 import { sayDate, weekdayName, weekdayOf } from '@/lib/pilot/time';
 
 const short = (date: string) => sayDate(date).replace(/, \d{4}$/, '');
 
-/** The dashboard: now or coming up, one view the resident picks, and Pending. It sits at the right of every page. */
+/**
+ * The dashboard: now or coming up, one view the resident picks, and Pending. The views are the calendar and the four
+ * departments. It sits at the right of every page.
+ */
 export default function PilotBoard({ board }: { board: Board }) {
   const { panel, today, days, folders } = board;
   const { now: cur, then } = panel;
@@ -46,28 +50,10 @@ export default function PilotBoard({ board }: { board: Board }) {
     </div>
   );
 
-  const views = [
-    { key: 'calendar', label: 'Calendar', color: 'var(--I)', node: calendar },
-    ...folders.map(f => ({
-      key: slugOf(f.name), label: f.name, color: f.color,
-      node: (
-        <div className="dash-sec">
-          <div className="dash-h">
-            <h2>{f.name}</h2>
-            <Link href={f.href} className="dash-more">Open the folder</Link>
-          </div>
-          <div className="dash-said">
-            {f.lines.map(l => (
-              <Link key={l.key} href={l.href} className="dash-st" style={{ '--fc': f.color } as CSSProperties}>
-                <b>{l.title}</b>
-                <span>{l.sub}</span>
-              </Link>
-            ))}
-          </div>
-        </div>
-      )
-    }))
-  ];
+  const depts = DEPARTMENTS.map(d => ({
+    key: d.key, name: d.name, color: d.color,
+    folders: FOLDERS.filter(f => f.dept === d.key && f.name !== 'Time').map(f => ({ name: f.name, href: folderPath(f.name) }))
+  }));
 
   return (
     <div className="board">
@@ -82,7 +68,7 @@ export default function PilotBoard({ board }: { board: Board }) {
       ) : (
         <p className="dash-now none">Nothing is on file for the rest of today or tomorrow.</p>
       )}
-      <PilotBoardTabs views={views} />
+      <PilotBoardTabs calendar={calendar} depts={depts} filled={folders} />
       <div className="dash-sec">
         <div className="dash-h"><h2>Pending</h2>{waiting > 0 && <span className="dash-count">{waiting}</span>}</div>
         <div className="dash-pending"><PilotPending panel={panel} /></div>

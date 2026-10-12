@@ -229,6 +229,9 @@ alter table uc_pilot.commitments    add column if not exists folder text;
 -- A note on a commitment is a statement that names the commitment it is about.
 alter table uc_pilot.statements     add column if not exists commitment_id uuid references uc_pilot.commitments(id);
 create index if not exists statements_commitment on uc_pilot.statements (commitment_id) where commitment_id is not null;
+-- How a statement reads in the File: one short sentence the agent writes from the resident's words. The words
+-- themselves stay in said, so each entry still shows what it rests on.
+alter table uc_pilot.statements     add column if not exists entry text check (entry is null or length(entry) between 1 and 200);
 
 -- ---------------------------------------------------------------- waiting for a decision
 

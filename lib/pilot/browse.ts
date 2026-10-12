@@ -265,10 +265,10 @@ export async function loadWeeklyItem(q: Q, id: string) {
 // ------------------------------------------------------------------ what the resident said
 
 export type StatementFull = {
-  id: string; said: string; topic: string; folder: string; state: string; basis: string; filed_by: string; about_date: string | null;
+  id: string; said: string; entry: string | null; topic: string; folder: string; state: string; basis: string; filed_by: string; about_date: string | null;
   supersedes: string | null; created_at: string; ended_at: string | null; source_message_id: string | null; ended_by_message_id: string | null;
 };
-const STATEMENT = `id, said, topic, folder, state, basis, filed_by, about_date::text as about_date, supersedes,
+const STATEMENT = `id, said, entry, topic, folder, state, basis, filed_by, about_date::text as about_date, supersedes,
   ${TS('created_at')} as created_at, ${TS('ended_at')} as ended_at, source_message_id, ended_by_message_id`;
 
 /** The statements in one folder: what is current first, then what was replaced or withdrawn. */

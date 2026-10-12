@@ -573,13 +573,15 @@ export const TOOLS: Tool[] = [
     input_schema: obj({
       quote: QUOTE,
       topic: { type: 'string', description: 'A short plain label for finding this entry later, in two to five words. Work schedule, landlord, and morning routine are three labels of the right size.' },
+      entry: { type: 'string', description: 'How the entry reads in the File: one short plain sentence that states the fact, written by you from the resident\'s words, with no filler and no quotation. Wants 8 hours of sleep a night. Works at the bar on Fridays. Pays rent on the first of the month. The resident\'s exact words stay in quote.' },
       folder: { type: 'string', description: 'The one folder name this belongs to, or General.' },
       about_date: DATE('The day the statement is about, when it is about one day'),
       about_ref: { type: 'string', description: 'The reference of one commitment, when the resident gives a note about that commitment. The note then shows on the commitment. Leave it out for every other statement.' }
-    }, ['quote', 'topic', 'folder']),
+    }, ['quote', 'topic', 'entry', 'folder']),
     async run(env, a) {
       const said = words(env, a) ?? text(a, 'summary', 1000)!;
       const topic = text(a, 'topic', 80)!;
+      const entry = text(a, 'entry', 200, false) ?? null;
       const folder = folderArg(a);
       // A note about one commitment names it, and takes its day when no day is given.
       const noteOn = given(a, 'about_ref') ? await find(env, 'commitment', a.about_ref) : null;
@@ -595,9 +597,9 @@ export const TOOLS: Tool[] = [
         };
       }
       const row = (await env.q<{ id: string }>(
-        `insert into uc_pilot.statements (said, topic, folder, about_date, basis, commitment_id) values ($1, $2, $3, $4::date, $5, $6) returning id`,
-        [said, topic, folder, about, env.basis, noteOn]))[0];
-      return { outcome: 'filed', detail: `Filed under ${folder}: "${clip(said, 160)}"`, brief: `Filed: ${topic}, under ${folder}.`, target: 'statements', targetId: row.id, data: { ref: shortId(row.id), folder, topic } };
+        `insert into uc_pilot.statements (said, topic, folder, about_date, basis, commitment_id, entry) values ($1, $2, $3, $4::date, $5, $6, $7) returning id`,
+        [said, topic, folder, about, env.basis, noteOn, entry]))[0];
+      return { outcome: 'filed', detail: `Filed under ${folder}: ${entry ?? `"${clip(said, 160)}"`}`, brief: `Filed: ${entry ? entry.replace(/\.$/, '') : topic}, under ${folder}.`, target: 'statements', targetId: row.id, data: { ref: shortId(row.id), folder, topic } };
     }
   },
   {
@@ -608,7 +610,8 @@ export const TOOLS: Tool[] = [
       ref: REF('the statement being corrected'),
       quote: QUOTE,
       stands_alone: { type: 'boolean', description: 'True when the quoted words state the whole fact by themselves. False when they only correct one part, as in I meant Thursday. With false, the server keeps the earlier words and adds the correction after them.' },
-      topic: { type: 'string', description: 'A new label, when the old one no longer fits.' }
+      topic: { type: 'string', description: 'A new label, when the old one no longer fits.' },
+      entry: { type: 'string', description: 'How the corrected entry reads in the File: one short plain sentence that states the whole fact as it now stands, written by you.' }
     }, ['ref', 'quote']),
     async run(env, a) {
       const id = await find(env, 'statement', a.ref);
@@ -616,14 +619,15 @@ export const TOOLS: Tool[] = [
       const old = (await env.q<any>(`select said, topic, folder, state, about_date::text as about_date from uc_pilot.statements where id = $1`, [id]))[0];
       if (old.state !== 'current') throw new Refusal('Not done. That statement was already replaced or withdrawn. Look up the current one.');
       const topic = text(a, 'topic', 80, false) ?? old.topic;
+      const entry = text(a, 'entry', 200, false) ?? null;
       // A correction that does not stand on its own, such as "I meant Thursday", is kept together with the words it corrects.
       // Both parts are the resident's own words. Nothing is rewritten.
       const alone = a.stands_alone === true || (a.stands_alone !== false && quoted.split(' ').length >= 5 && !/^(no|nope|actually|i meant|sorry|wait)\b/i.test(quoted));
       const earlier = String(old.said).split(' Corrected: ')[0];
       const said = alone ? quoted : clip(`${earlier}${/[.!?]$/.test(earlier) ? '' : '.'} Corrected: ${quoted}`, 1000);
       const row = (await env.q<{ id: string }>(
-        `insert into uc_pilot.statements (said, topic, folder, about_date, basis, supersedes) values ($1, $2, $3, $4::date, $5, $6) returning id`,
-        [said, topic, old.folder, old.about_date, env.basis, id]))[0];
+        `insert into uc_pilot.statements (said, topic, folder, about_date, basis, supersedes, entry) values ($1, $2, $3, $4::date, $5, $6, $7) returning id`,
+        [said, topic, old.folder, old.about_date, env.basis, id, entry]))[0];
       await env.q(`select set_config('uc.reason', 'The resident corrected it.', true)`);
       await env.q(`update uc_pilot.statements set state = 'superseded', ended_at = now(), ended_by_message_id = $2 where id = $1`, [id, env.messageId]);
       return {

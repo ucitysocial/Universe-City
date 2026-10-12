@@ -18,7 +18,7 @@ export const ACTION_NAME: Record<string, string> = {
   draft_plan: 'Prepare a Plan',
   prepare: 'Prepare an entry for your answer',
   resident_decision: 'File your answer',
-  propose_to_agent: 'Send a proposal to your agent',
+  propose_to_agent: 'Send a proposal to a person on the team',
   open_follow_up: 'Open a follow up',
   change_follow_up: 'Change a follow up',
   close_follow_up: 'Close a follow up',
@@ -35,7 +35,7 @@ export const OUTCOME_WORD: Record<string, { word: string; tone: string }> = {
   decided: { word: 'Decided', tone: 'filed' },
   unchanged: { word: 'No change', tone: 'unknown' },
   prepared: { word: 'Pending', tone: 'wait' },
-  proposed: { word: 'Sent to your agent', tone: 'agent' },
+  proposed: { word: 'Sent to a person', tone: 'agent' },
   refused: { word: 'Left off the File', tone: 'no' },
   failed: { word: 'Did not work', tone: 'no' },
   read: { word: 'Read', tone: 'unknown' }

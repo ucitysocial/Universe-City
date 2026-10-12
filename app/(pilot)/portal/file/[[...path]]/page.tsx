@@ -516,7 +516,7 @@ async function saidPane({ q, zone }: Ctx, base: string, folder: string, color?: 
           <span className="fi i-said" style={fc(color)} />
           <b>{s.topic}</b>
           <span className="right">{localNow(zone, new Date(s.created_at)).label.replace(/, \d{4},/, ',')}</span>
-          <span className="sub">{s.said}{s.state === 'superseded' ? ' (replaced)' : s.state === 'withdrawn' ? ' (withdrawn)' : ''}</span>
+          <span className="sub">{s.entry ?? s.said}{s.state === 'superseded' ? ' (replaced)' : s.state === 'withdrawn' ? ' (withdrawn)' : ''}</span>
         </Link>
       ))}
     </div>
@@ -536,8 +536,8 @@ async function statementPane({ q, zone }: Ctx, id: string, color?: string) {
         <div className="doc-bar" style={fc(color)}>
           <b>{s.topic}</b>
           <span className={`pt-chip ${state.tone}`}>{state.word}</span>
-          <span className={`pt-chip ${s.basis === 'agent_decision' ? 'agent' : ''}`}>{BASIS[s.basis] || 'On file'}</span>
         </div>
+        {s.entry && <p className="doc-lead">{s.entry}</p>}
         <Words label={s.basis === 'agent_decision' ? 'What is on file' : 'Your words'} quote={s.said} source={x.source} zone={zone} />
         <dl className="fields" style={{ borderTop: '2px solid var(--ink)' }}>
           <dt>Folder</dt><dd><Link href={folderPath(s.folder)}>{s.folder}</Link></dd>
@@ -549,14 +549,14 @@ async function statementPane({ q, zone }: Ctx, id: string, color?: string) {
           <p className="flab">History</p>
           {!x.later && x.earlier.length === 0 && <p className="meta" style={{ padding: '6px 0 8px' }}>No change since it was filed.</p>}
           <ol>
-            {x.later && <li><p className="meta">Replaced by</p><p><Link href={`${folderPath(x.later.folder)}/said/${x.later.id}`}>{x.later.said}</Link></p></li>}
+            {x.later && <li><p className="meta">Replaced by</p><p><Link href={`${folderPath(x.later.folder)}/said/${x.later.id}`}>{x.later.entry ?? x.later.said}</Link></p></li>}
             {x.endedBy && x.endedBy.speaker === 'resident' && (
               <li><p className="meta">It ended with your message, {localNow(zone, new Date(x.endedBy.at)).label}</p><p>{x.endedBy.body} <Link href={`/portal/home#m-${x.endedBy.id}`}>Open it</Link></p></li>
             )}
             {x.earlier.map(e => (
               <li key={e.id}>
                 <p className="meta">Earlier version, filed {localNow(zone, new Date(e.created_at)).label}</p>
-                <p><del>{e.said}</del> <Link href={`${folderPath(e.folder)}/said/${e.id}`}>Open it</Link></p>
+                <p><del>{e.entry ?? e.said}</del> <Link href={`${folderPath(e.folder)}/said/${e.id}`}>Open it</Link></p>
               </li>
             ))}
           </ol>

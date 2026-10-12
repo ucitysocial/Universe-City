@@ -535,23 +535,19 @@ a.pt-btn{text-decoration:none;display:inline-block}
 /* ---------------------------------------------------------------- the dashboard at the right of the frame */
 /* Home is the conversation. The dashboard sits in the right part of the frame on every page, and on a narrow screen
    home shows it folded into one line above the conversation. */
-@media (min-width:1280px){.os{grid-template-columns:264px minmax(0,1fr) 360px}}
-@media (min-width:1560px){.os{grid-template-columns:288px minmax(0,1fr) 420px}}
+@media (min-width:1280px){.os{grid-template-columns:256px minmax(0,1fr) 400px}}
+@media (min-width:1560px){.os{grid-template-columns:280px minmax(0,1fr) 460px}}
 .home-talk{display:flex;flex-direction:column;flex:1;min-height:0;min-width:0}
 .board{display:grid;gap:16px;align-content:start}
-.board-fold{display:none}
-@media (max-width:1279px){
-  .board-fold{display:block;flex:none;background:var(--paper2);border-bottom:3px solid var(--ink);max-height:62vh;overflow-y:auto}
-  .board-fold summary{cursor:pointer;font-weight:600;font-size:14px;padding:10px 16px}
-  .board-fold .board{padding:4px 16px 16px}
-}
-.dash-now{display:grid;gap:2px;background:#fff;border:3px solid var(--ink);border-left:10px solid var(--fc,var(--ink));box-shadow:4px 4px 0 var(--ink);padding:9px 12px 10px;color:var(--ink);text-decoration:none}
+.dash-now{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:10px;row-gap:1px;background:#fff;border:2px solid var(--ink);border-left:8px solid var(--fc,var(--ink));padding:7px 10px 8px;color:var(--ink);text-decoration:none}
+.dash-now>*{grid-column:1}
+.dash-now .dash-k{grid-column:2;grid-row:1;justify-self:end}
 .dash-now:hover{background:var(--paper)}
 .dash-now.none{font-size:14px;color:var(--ink2);margin:0;border-left-width:3px;box-shadow:none}
-.dash-now b{font-size:17px;line-height:1.25}
+.dash-now b{font-size:16px;line-height:1.25}
 .dash-k{font-family:'VT323',monospace;font-size:16px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
-.dash-now .pn-when{font-family:'VT323',monospace;font-size:19px}
-.dash-t,.dash-then{font-size:13px;color:var(--ink2)}
+.dash-now .pn-when{font-family:'VT323',monospace;font-size:17px}
+.dash-t,.dash-then{font-size:12.5px;color:var(--ink2)}
 .dash-tabs{display:flex;flex-wrap:wrap;gap:6px}
 .dash-tabs button{font:inherit;font-size:13px;font-weight:600;color:var(--ink);cursor:pointer;border:2px solid var(--ink);border-left:6px solid var(--fc,var(--ink));background:#fff;padding:4px 9px;border-radius:0}
 .dash-tabs button:hover{background:var(--paper)}
@@ -586,6 +582,74 @@ a.pt-btn{text-decoration:none;display:inline-block}
 .dash-st:hover{background:var(--paper)}
 .dash-pending{display:grid;gap:10px}
 .win-body .board{padding:12px 12px 14px}
-@media (max-width:1279px){.os-main:has(.board-fold) .home-talk .pt-wait{display:none}}
 .pop-line{font-size:14px;color:var(--ink2);margin:0}
 .pop-fields[hidden]{display:none}
+.dash-pick{display:grid;grid-template-columns:1fr;gap:5px;background:#fff;border:2px solid var(--ink);padding:8px 10px}
+.dash-pick label{display:flex;gap:6px;align-items:center;font-size:13px;cursor:pointer}
+.dash-pick label span{color:var(--dim);font-size:11.5px;margin-left:auto}
+.dash-pick input{width:16px;height:16px;accent-color:var(--ink);margin:0}
+.dash-cards{display:grid;gap:8px}
+.dash-card{background:#fff;border:2px solid var(--ink);border-left:6px solid var(--fc,var(--ink));padding:6px 9px 8px;display:grid;gap:4px}
+.dash-card-h{font-size:13.5px;font-weight:700;color:var(--ink);text-decoration:none}
+.dash-card-h:hover{text-decoration:underline}
+.dash-line{display:grid;gap:1px;color:var(--ink);text-decoration:none;border-top:1px solid var(--rule);padding-top:4px}
+.dash-line b{font-size:13px}
+.dash-line span{font-size:12.5px;color:var(--ink2);line-height:1.35}
+.dash-line:hover b{text-decoration:underline}
+button.dash-more{background:none;border:0;padding:0;cursor:pointer;font:inherit;font-size:12.5px;font-weight:600;text-decoration:underline}
+
+/* ---------------------------------------------------------------- the star and the dashboard sheet */
+.pt-star,.pt-sheet,.pt-sheet-back{display:none}
+@media (max-width:1279px){
+  .pt-star{display:flex;align-items:center;justify-content:center;position:fixed;top:calc(var(--pt-top,0px) + 8px);right:12px;z-index:70;width:40px;height:40px;background:var(--ink);border:2px solid var(--paper);cursor:pointer;padding:0}
+  .pt-star svg{width:24px;height:24px}
+  .pt-star svg path{fill:var(--II);stroke:var(--paper);stroke-width:1.2;stroke-linejoin:round}
+  .pt-star i{position:absolute;top:-7px;right:-7px;min-width:18px;height:18px;padding:0 4px;background:var(--I);color:#fff;border:2px solid var(--paper);font:700 11px/14px 'Montserrat',system-ui,sans-serif;font-style:normal;text-align:center}
+  .pt-sheet{display:flex;flex-direction:column;position:fixed;top:0;right:0;bottom:0;z-index:90;width:min(440px,94vw);background:var(--paper2);border-left:3px solid var(--ink);transform:translateX(105%);transition:transform .18s ease-out;visibility:hidden}
+  .pt-sheet.open{transform:none;visibility:visible}
+  .pt-sheet-back{display:block;position:fixed;inset:0;z-index:80;background:rgba(18,10,10,.35)}
+  .pt-sheet-bar{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--ink);color:var(--paper)}
+  .pt-sheet-bar b{font-family:'VT323',monospace;font-size:20px;letter-spacing:.06em;font-weight:400}
+  .pt-sheet-bar .pop-x{border-color:var(--paper);color:var(--paper)}
+  .pt-sheet-body{flex:1;min-height:0;overflow-y:auto;padding:14px 14px calc(18px + env(safe-area-inset-bottom,0px));display:grid;gap:16px;align-content:start}
+  .pt-sheet-out{justify-self:start;color:var(--ink)}
+}
+@media (prefers-reduced-motion:reduce){.pt-sheet{transition:none}}
+
+/* ---------------------------------------------------------------- phone: menu at the bottom */
+@media (max-width:860px){
+  .os-rail{display:contents}
+  .os-rail-head{order:0;flex:none;background:var(--ink);padding:12px 64px 12px 14px}
+  .os-main{order:1}
+  .os-places{order:2;background:var(--ink);display:grid;grid-template-columns:repeat(4,1fr);gap:0;padding:0 0 env(safe-area-inset-bottom,0px);border-top:3px solid var(--ink);width:auto}
+  .os-places a{text-align:center;padding:12px 4px 11px;font-size:13.5px;font-weight:600;border-bottom:0;border-top:3px solid transparent;opacity:.72}
+  .os-places a.current{opacity:1;border-top-color:var(--paper);border-bottom:0;background:rgba(244,239,233,.08)}
+  .os-rail-foot{display:none}
+  .pt-short .os-places{display:none}
+  .pt-star{top:calc(var(--pt-top,0px) + 6px)}
+}
+
+/* ---------------------------------------------------------------- activity */
+.act{display:grid;gap:12px;margin-top:10px}
+.act-tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.act-chips{display:flex;flex-wrap:wrap;gap:6px}
+.act-chips button{font:inherit;font-size:13px;font-weight:600;border:2px solid var(--ink);background:#fff;color:var(--ink);padding:4px 10px;cursor:pointer;border-radius:0}
+.act-chips button.on{background:var(--ink);color:var(--paper)}
+.act-find{flex:1;min-width:180px;border:2px solid var(--ink);border-radius:0;background:#fff;color:var(--ink);font:inherit;font-size:14px;padding:6px 9px}
+.act-dl{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline;font-size:13px;border-bottom:2px solid var(--ink);padding-bottom:8px}
+.act-dl span{font-family:'VT323',monospace;font-size:17px;color:var(--ink2)}
+.act-day h2{font-size:15px;margin:10px 0 4px;padding:0;border:0}
+.act-row{display:grid;grid-template-columns:62px auto minmax(0,1fr) auto;gap:10px;align-items:baseline;padding:5px 0;border-bottom:1px solid var(--rule)}
+.act-time{font-family:'VT323',monospace;font-size:16px;color:var(--ink2)}
+.act-line{font-size:14px;line-height:1.4}
+.act-by{font-size:12px;color:var(--dim)}
+.act-use{font-size:13px;color:var(--ink2);margin-top:22px}
+@media (max-width:860px){.act-row{grid-template-columns:auto minmax(0,1fr);row-gap:2px}.act-time{grid-column:1}.act-line{grid-column:1/-1}}
+.doc-lead{font-size:17px;font-weight:600;margin:0;padding:12px 14px;border-bottom:1px solid var(--rule)}
+
+.os-side{overflow-x:hidden}
+.os-side .win,.board,.board>*{min-width:0}
+.act-dl .pt-link,.act-dl button.pt-link{color:var(--ink)}
+.pt-page .act-day h2{font-size:15px;margin:14px 0 4px;padding:0;border:0}
+.act-dl{margin-bottom:0}
+.act section.act-day{padding:0;border:0;margin:0}

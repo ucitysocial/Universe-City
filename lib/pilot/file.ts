@@ -20,7 +20,7 @@ export async function loadAccess(q: Q): Promise<Access | null> {
 }
 
 export type StatementRow = {
-  id: string; said: string; topic: string; folder: string; state: string; basis: string; filed_by: string;
+  id: string; said: string; entry?: string | null; topic: string; folder: string; state: string; basis: string; filed_by: string;
   about_date: string | null; supersedes: string | null; created_at: string; ended_at: string | null;
 };
 export type ScheduleRow = { id: string; label: string; days: number[]; start_min: number | null; end_min: number | null; state: string; said: string | null; created_at: string; folder?: string | null };
@@ -52,7 +52,7 @@ export type FileView = {
   openedWith: string[];            // the first words of this sitting, when they are no longer in view
 };
 
-const STATEMENT_COLS = `id, said, topic, folder, state, basis, filed_by, about_date::text as about_date, supersedes,
+const STATEMENT_COLS = `id, said, entry, topic, folder, state, basis, filed_by, about_date::text as about_date, supersedes,
   ${TS('created_at')} as created_at, ${TS('ended_at')} as ended_at`;
 
 export async function loadFile(q: Q, zone: string, opts: { daysBack?: number; daysAhead?: number; statements?: number; inView?: number } = {}): Promise<FileView> {
@@ -150,7 +150,7 @@ export function fileForModel(v: FileView, name: string | null): string {
   if (v.statements.length === 0) L.push('  None.');
   for (const s of v.statements) {
     const basis = s.basis === 'agent_decision' ? ' (decided by a person)' : s.basis === 'resident_confirmation' ? ' (confirmed by the resident)' : '';
-    L.push(`  [${shortId(s.id)}] ${s.folder} / ${s.topic}: "${s.said}"${basis}, filed ${sayDate(localNow(n.zone, new Date(s.created_at)).date)}${s.about_date ? `, about ${s.about_date}` : ''}`);
+    L.push(`  [${shortId(s.id)}] ${s.folder} / ${s.topic}: ${s.entry ? `${s.entry} Words: ` : ''}"${s.said}"${basis}, filed ${sayDate(localNow(n.zone, new Date(s.created_at)).date)}${s.about_date ? `, about ${s.about_date}` : ''}`);
   }
   L.push('');
   L.push('WEEKLY SCHEDULE:');
@@ -206,7 +206,7 @@ export function fileForModel(v: FileView, name: string | null): string {
 
 export type PastStatement = StatementRow & { replaced_by: string | null };
 export type Change = { id: string; table_name: string; row_id: string; label: string; lines: string[]; actor: string; reason: string | null; at: string; message: string | null };
-export type ActionRow = { id: string; tool: string; outcome: string; detail: string | null; actor: string; at: string };
+export type ActionRow = { id: string; tool: string; outcome: string; detail: string | null; brief: string | null; actor: string; at: string };
 
 
 function sayValue(key: string, v: unknown): string {
@@ -258,7 +258,7 @@ export async function loadHistory(q: Q): Promise<{ past: PastStatement[]; change
 
 export async function loadActivity(q: Q, zone: string): Promise<{ actions: ActionRow[]; today: { replies: number; input: number; output: number; cost_micro: number } }> {
   const actions = await q<ActionRow>(
-    `select id, tool, outcome, detail, actor, ${TS('at')} as at from uc_pilot.actions order by seq desc limit 200`);
+    `select id, tool, outcome, detail, brief, actor, ${TS('at')} as at from uc_pilot.actions order by seq desc limit 500`);
   const today = (await q<any>(
     `select count(*)::int as replies, coalesce(sum(input_tokens + cache_read_tokens + cache_write_tokens), 0)::int as input,
             coalesce(sum(output_tokens), 0)::int as output, coalesce(sum(cost_micro), 0)::float8 as cost_micro

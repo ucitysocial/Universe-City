@@ -2,7 +2,7 @@ import type { Viewport } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import PilotBoard from '@/components/PilotBoard';
 import PilotCalPop from '@/components/PilotCalPop';
-import PilotFold from '@/components/PilotFold';
+import PilotStar from '@/components/PilotStar';
 import PilotRail from '@/components/PilotRail';
 import PilotSide from '@/components/PilotSide';
 import PilotSwitch from '@/components/PilotSwitch';
@@ -58,17 +58,12 @@ export default async function PilotLayout({ children }: { children: React.ReactN
     const index = await loadIndex(q, w.access.timezone);
     return { index, board: await loadBoard(q, w.access.timezone, index) };
   });
-  const cur = board.panel.now;
-  const waiting = board.panel.pending.length;
-  const fold = `${cur ? `${cur.live ? 'Now' : 'Coming up'}: ${cur.label}` : 'Dashboard'}${waiting ? `. ${waiting} pending` : ''}`;
   return (
     <div className="os">
       <PilotViewport />
       <PilotRail index={index} name={w.access.display_name} synthetic={w.access.synthetic} />
-      <main className="os-main">
-        <PilotFold summary={fold}><PilotBoard board={board} /></PilotFold>
-        {children}
-      </main>
+      <main className="os-main">{children}</main>
+      <PilotStar waiting={board.panel.pending.length}><PilotBoard board={board} /></PilotStar>
       <PilotSide board={board} />
       <PilotCalPop />
     </div>

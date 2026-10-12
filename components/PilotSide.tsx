@@ -9,7 +9,7 @@ import { sayDate } from '@/lib/pilot/time';
  */
 export default function PilotSide({ board }: { board: Board }) {
   return (
-    <aside className="os-side" aria-label="Dashboard">
+    <aside className="os-side" aria-label="Overview">
       <div className="win">
         <div className="win-bar">{sayDate(board.today).replace(/, \d{4}$/, '')}</div>
         <div className="win-body"><PilotBoard board={board} /></div>
