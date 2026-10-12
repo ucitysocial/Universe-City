@@ -587,3 +587,5 @@ a.pt-btn{text-decoration:none;display:inline-block}
 .dash-pending{display:grid;gap:10px}
 .win-body .board{padding:12px 12px 14px}
 @media (max-width:1279px){.os-main:has(.board-fold) .home-talk .pt-wait{display:none}}
+.pop-line{font-size:14px;color:var(--ink2);margin:0}
+.pop-fields[hidden]{display:none}

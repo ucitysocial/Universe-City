@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 type Brief = { id: string; weekly: boolean; label: string; time: string; belongs: string; href: string; kind: string; x: number; y: number; w: number; h: number };
@@ -29,6 +29,21 @@ export default function PilotCalPop() {
   const [said, setSaid] = useState<{ ok: boolean; text: string } | null>(null);
   const [clash, setClash] = useState(false);
   const box = useRef<HTMLDivElement>(null);
+  const [top, setTop] = useState<number | null>(null);
+  const [, setSize] = useState(0);
+
+  // The whole window stays on screen. After each change of its contents, its height is measured and its top is
+  // moved up as far as needed, so its lower edge sits inside the screen.
+  useLayoutEffect(() => {
+    if (!brief || !box.current || window.innerWidth <= 860) return;
+    const h = box.current.offsetHeight;
+    setTop(Math.max(12, Math.min(brief.y, window.innerHeight - h - 12)));
+  });
+  useEffect(() => {
+    const again = () => setSize(n => n + 1);
+    window.addEventListener('resize', again);
+    return () => window.removeEventListener('resize', again);
+  }, []);
 
   const load = useCallback(async (id: string, weekly = false) => {
     try {
@@ -102,8 +117,7 @@ export default function PilotCalPop() {
   const style = wide ? (() => {
     const right = brief.x + brief.w + 10;
     const left = right + W < window.innerWidth - 12 ? right : Math.max(12, brief.x - W - 10);
-    const top = Math.min(Math.max(12, brief.y), window.innerHeight - 380);
-    return { left, top, width: W };
+    return { left, top: top ?? Math.max(12, brief.y), width: W };
   })() : undefined;
   const label = full?.label ?? brief.label;
 
@@ -114,7 +128,8 @@ export default function PilotCalPop() {
         <button type="button" className="pop-x" onClick={() => setBrief(null)} aria-label="Close this window">×</button>
       </div>
       <div className="pop-body">
-        <dl className="pop-fields">
+        {mode !== 'view' && <p className="pop-line">{full?.day ?? ''}. {full ? full.time : brief.time}.</p>}
+        <dl className="pop-fields" hidden={mode !== 'view'}>
           <dt>Day</dt><dd>{full?.day ?? ''}</dd>
           <dt>Time</dt><dd>{full ? full.time : brief.time}</dd>
           <dt>Department</dt><dd><i className="dot" style={{ background: full?.color }} />{full?.dept ?? ''}</dd>
