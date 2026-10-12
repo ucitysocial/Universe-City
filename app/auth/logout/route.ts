@@ -46,10 +46,11 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // Supabase ends the session on its server. The same call clears the login cookies.
+  // Supabase ends this browser's session on its server. The same call clears the login cookies.
+  // The resident's other devices stay logged in.
   let cleared = false;
   try {
-    const { error } = await supabaseServer().auth.signOut();
+    const { error } = await supabaseServer().auth.signOut({ scope: 'local' });
     cleared = !error;
   } catch {
     cleared = false;
