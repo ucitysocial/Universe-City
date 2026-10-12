@@ -927,3 +927,17 @@ html.uc-nav::after{content:"";position:fixed;left:0;top:0;height:3px;width:100%;
 .about-app{font-size:14.5px;line-height:1.55;color:var(--ink2);margin:0}
 .about-sys{font-size:14px;margin:4px 0 0;display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline}
 .about-sys span{font-family:'VT323',monospace;font-size:16px;letter-spacing:.06em;color:var(--dim)}
+
+/* ---------------------------------------------------------------- the overview at the right: the day, clean */
+.board.side-clean{gap:18px}
+.side-clean .day-plain{border:0;background:transparent;gap:6px}
+.side-clean .day-item{background:#fff;border:1px solid var(--rule);border-left:4px solid var(--fc,var(--ink));padding:9px 12px 10px;position:relative;transition:box-shadow .2s}
+.side-clean .day-item:hover{background:#fff;box-shadow:0 0 0 1px var(--ink)}
+.day-flag{font-family:'VT323',monospace;font-size:15px;line-height:1;color:var(--fc,var(--ink));letter-spacing:.04em}
+/* The entry happening now glows in its department color. */
+.day-item.is-now{border:2px solid var(--fc,var(--ink));border-left-width:6px;box-shadow:0 0 0 3px color-mix(in srgb,var(--fc,var(--ink)) 18%,transparent),0 0 22px 4px color-mix(in srgb,var(--fc,var(--ink)) 32%,transparent);animation:uc-glow 3.2s ease-in-out infinite}
+.day-item.is-now b{font-size:16px}
+.day-item.is-next{border-color:color-mix(in srgb,var(--fc,var(--ink)) 45%,var(--rule))}
+@keyframes uc-glow{50%{box-shadow:0 0 0 3px color-mix(in srgb,var(--fc,var(--ink)) 26%,transparent),0 0 30px 7px color-mix(in srgb,var(--fc,var(--ink)) 42%,transparent)}}
+@media (prefers-reduced-motion:reduce){.day-item.is-now{animation:none}}
+.side-wait .dash-h h2{font-size:15px}

@@ -57,6 +57,22 @@ export default function PilotBoard({ board, wide = false }: { board: Board; wide
     folders: FOLDERS.filter(f => f.dept === d.key && f.name !== 'Time').map(f => ({ name: f.name, href: folderPath(f.name) }))
   }));
 
+  // The overview at the right holds the day and nothing more: the entry happening now glows in the list. What waits
+  // for the resident shows under it only when an item waits. The departments are in My File at the left.
+  if (!wide) {
+    return (
+      <div className="board side-clean">
+        <PilotBoardDay days={days} today={today} nowId={cur?.id ?? null} live={!!cur?.live} />
+        {waiting > 0 && (
+          <div className="dash-sec side-wait">
+            <div className="dash-h"><h2>Waiting for you</h2><span className="dash-count">{waiting}</span></div>
+            <div className="dash-pending"><PilotPending panel={panel} /></div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className={wide ? 'board wide' : 'board'}>
       {cur ? (
