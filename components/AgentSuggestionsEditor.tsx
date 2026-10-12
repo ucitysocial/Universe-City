@@ -15,7 +15,7 @@ const WHEN: { value: string; label: string }[] = [
 ];
 const PLACE = [
   { value: -3, label: 'At the beginning of the day' },
-  { value: -2, label: 'After wake-up' },
+  { value: -2, label: 'After waking' },
   { value: 360, label: 'Around 6 AM' },
   { value: 540, label: 'Around 9 AM' },
   { value: 720, label: 'Around noon' },
@@ -88,10 +88,10 @@ export default function AgentSuggestionsEditor({ initial, ready }: Props) {
 
   return (
     <div className="studio-edit">
-      {!ready && <p className="pt-err">Read-only for now. The additive Agent Studio database migration hasn't been applied. The six existing resident suggestions remain unchanged.</p>}
+      {!ready && <p className="pt-err">Viewing only. The Agent Studio database migration has not been applied. The six existing resident suggestions remain unchanged.</p>}
       <div className="studio-intro">
         <h1>Faded schedule suggestions</h1>
-        <p>These are ideas a resident can choose, not calendar commitments. Edit their labels, timing, and the question they open with the guide.</p>
+        <p>These are optional ideas for the resident's schedule. Edit the labels, placement, and questions that open with the guide.</p>
       </div>
       {notice && <p className="studio-notice" role="status">{notice}</p>}
       <div className="studio-list">
