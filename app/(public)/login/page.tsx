@@ -1,4 +1,5 @@
 'use client';
+import StarLoader from '@/components/StarLoader';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
@@ -100,10 +101,9 @@ export default function Login() {
             {opening ? 'Opening the Resident Portal' : busy ? 'Logging in' : 'Log in'}
           </button>
           {opening && (
-            <div className="opening" role="status">
-              <p className="kick">Universe City</p>
+            <div className="opening">
+              <StarLoader label="The Resident Portal is loading" />
               <p className="opening-line">You are logged in. The Resident Portal is loading.</p>
-              <span className="opening-bar" aria-hidden="true" />
             </div>
           )}
           {showSend && (

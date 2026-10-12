@@ -6,8 +6,10 @@
 import { FOLDERS } from '../domain/folders';
 import type { Q } from './db';
 import { isUuid, TS } from './db';
+import type { Belongs } from './dept';
+import { owedOn, type OwedFile } from './owed';
 import { folderPath } from './paths';
-import { localNow, sayClock, sayDate, sayDays, saySpan } from './time';
+import { addDays, localNow, sayClock, sayDate, sayDays, saySpan, weekdayOf } from './time';
 
 // ------------------------------------------------------------------ the index: what each folder holds
 
@@ -192,6 +194,31 @@ export async function loadCommitment(q: Q, id: string) {
   };
 }
 
+/**
+ * What the Pending field of one entry reads from the File: whether a statement is in Salary, and whether a statement
+ * in Finance is about this entry. The rest comes from the entry itself.
+ */
+export async function owedFile(q: Q, zone: string, commitmentId: string | null): Promise<OwedFile> {
+  const now = localNow(zone);
+  const r = (await q<{ salary: boolean; pay: boolean }>(
+    `select exists (select 1 from uc_pilot.statements where folder = 'Salary' and state = 'current') as salary,
+            exists (select 1 from uc_pilot.statements where folder = 'Finance' and state = 'current' and commitment_id = $1::uuid) as pay`,
+    [commitmentId]))[0];
+  return { today: now.date, nowMin: now.minutes, salaryOnFile: !!r?.salary, payOnFile: !!r?.pay };
+}
+
+/** The Pending field of one commitment. */
+export async function owedOnCommitment(q: Q, zone: string, c: CommitmentFull, b: Belongs) {
+  return owedOn({ on_date: c.on_date, start_min: c.start_min, end_min: c.end_min, execution: c.execution, actual_end_min: c.actual_end_min, withdrawn: !!c.withdrawn_at },
+    b, await owedFile(q, zone, c.id));
+}
+
+/** The Pending field of one item that repeats each week. */
+export async function owedOnWeekly(q: Q, zone: string, s: { start_min: number | null; end_min: number | null; state: string }, b: Belongs) {
+  return owedOn({ on_date: null, start_min: s.start_min, end_min: s.end_min, execution: 'planned', actual_end_min: null, withdrawn: s.state !== 'current' },
+    b, await owedFile(q, zone, null));
+}
+
 // ------------------------------------------------------------------ Time: the weekly schedule
 
 export type WeeklyFull = {
@@ -324,37 +351,88 @@ export async function loadTimeHistory(q: Q): Promise<Change[]> {
 export const spanWords = (start: number | null, end: number | null) =>
   saySpan(start, end).replace('time not established', 'Time unknown').replace('end not established', 'end unknown').replace('start not established', 'start unknown');
 
-// ------------------------------------------------------------------ the small window at the right of the frame
+// ------------------------------------------------------------------ the panel at the right of the frame
 
-export type SideView = {
-  work: { id: string; label: string; href: string }[];
-  unknown: string[];
-  waiting: { id: string; kind: string; summary: string }[];
-  filed: { id: string; brief: string | null; detail: string | null; outcome: string; at: string; target: string | null; target_id: string | null }[];
-  next: { id: string; label: string; on_date: string; start_min: number | null; end_min: number | null; folder: string | null }[];
+type Entry = { id: string; label: string; on_date: string; start_min: number | null; end_min: number | null; folder: string | null; execution: string };
+/**
+ * One item in Pending. Each item waits for the resident.
+ *   ask     a question the resident answers in words: an entry that has passed with its end or its outcome unknown
+ *   decide  an item that waits for a yes or a no. An entry that overlaps another is one of these
+ */
+export type PendingItem =
+  | { type: 'ask'; key: string; question: string; href: string }
+  | { type: 'decide'; key: string; id: string; kind: string; summary: string; overlap: boolean };
+export type PanelView = {
+  today: string;
+  now: (Entry & { live: boolean; minutesUntil: number; minutesLeft: number | null }) | null;
+  then: Entry | null;
+  week: { date: string; hours: number; count: number }[];
+  planned: number;
+  pending: PendingItem[];
+  more: number;                       // questions past the first three. The guide asks them in the conversation
 };
 
-/** What the File holds right now, in four short lists: open work, what waits, what was filed lately, what is next. */
-export async function loadSide(q: Q, zone: string): Promise<SideView> {
-  const today = localNow(zone).date;
-  const work = await q<{ id: string; label: string; folder: string }>(`select id, label, folder from uc_pilot.work where state = 'open' order by created_at limit 5`);
-  const waiting = await q<{ id: string; kind: string; summary: string }>(
-    `select id, kind, summary from uc_pilot.pending where state = 'open' and decider = 'resident' order by created_at limit 5`);
-  const filed = await q<SideView['filed'][number]>(
-    `select id, brief, detail, outcome, ${TS('at')} as at, target, target_id from uc_pilot.actions
-      where outcome in ('filed', 'decided') order by seq desc limit 6`);
-  const next = await q<SideView['next'][number]>(
-    `select id, label, on_date::text as on_date, start_min, end_min, folder from uc_pilot.commitments
-      where withdrawn_at is null and execution = 'planned' and on_date >= $1::date order by on_date, start_min nulls last limit 4`, [today]);
-  // The gaps the guide asks about next: a time that is missing on a day ahead.
-  const gaps = await q<{ label: string; on_date: string; start_min: number | null; end_min: number | null }>(
-    `select label, on_date::text as on_date, start_min, end_min from uc_pilot.commitments
-      where withdrawn_at is null and execution = 'planned' and on_date >= $1::date and (start_min is null or end_min is null)
-      order by on_date limit 4`, [today]);
+const dayWord = (date: string) => sayDate(date).replace(/, \d{4}$/, '');
+
+/**
+ * The panel at the right: what is happening now or next, how much of the week is planned, and what waits for the
+ * resident. Each line is read from the File. The panel keeps no entry.
+ */
+export async function loadPanel(q: Q, zone: string): Promise<PanelView> {
+  const n = localNow(zone);
+  const today = n.date;
+  const tomorrow = addDays(today, 1);
+  const soon = await q<Entry>(
+    `select id, label, on_date::text as on_date, start_min, end_min, folder, execution from uc_pilot.commitments
+      where withdrawn_at is null and on_date between $1::date and $2::date and start_min is not null
+      order by on_date, start_min`, [today, tomorrow]);
+  let now: PanelView['now'] = null;
+  let then: Entry | null = null;
+  for (const c of soon) {
+    const at = (c.on_date === today ? 0 : 1440) + (c.start_min as number);
+    const till = (c.on_date === today ? 0 : 1440) + (c.end_min ?? (c.start_min as number) + 60);
+    if (till <= n.minutes) continue;
+    if (!now) { now = { ...c, live: at <= n.minutes, minutesUntil: Math.max(0, at - n.minutes), minutesLeft: c.end_min !== null ? till - n.minutes : null }; continue; }
+    then = c; break;
+  }
+
+  // An entry that has passed with its end or its outcome unknown, in the last seven days.
+  const asks: PendingItem[] = [];
+  const passed = await q<Entry>(
+    `select id, label, on_date::text as on_date, start_min, end_min, folder, execution from uc_pilot.commitments
+      where withdrawn_at is null and execution = 'planned' and on_date between $1::date and $2::date
+      order by on_date desc, start_min nulls last`, [addDays(today, -7), today]);
+  for (const c of passed) {
+    const over = c.on_date < today || (c.start_min !== null && (c.end_min ?? c.start_min + 60) <= n.minutes);
+    if (!over) continue;
+    asks.push({
+      type: 'ask', key: `ended:${c.id}`, href: `${folderPath('Time')}/${c.on_date}/${c.id}`,
+      question: c.end_min === null ? `What time did ${c.label} on ${dayWord(c.on_date)} end?` : `Did ${c.label} on ${dayWord(c.on_date)} happen as planned?`
+    });
+  }
+  const open = await q<{ id: string; kind: string; summary: string; rests_on: string | null }>(
+    `select id, kind, summary, rests_on from uc_pilot.pending where state = 'open' and decider = 'resident' order by created_at`);
+  const decides: PendingItem[] = open.map(p => ({
+    type: 'decide', key: `wait:${p.id}`, id: p.id, kind: p.kind, summary: p.summary, overlap: (p.rests_on || '').startsWith('It overlaps')
+  }));
+
+  // The week the resident keeps planned: Monday to Sunday, the coming one on a Sunday.
+  const wd = weekdayOf(today);
+  const monday = wd === 0 ? tomorrow : addDays(today, 1 - wd);
+  const days = Array.from({ length: 7 }, (_, i) => addDays(monday, i));
+  const inWeek = await q<Entry>(
+    `select id, label, on_date::text as on_date, start_min, end_min, folder, execution from uc_pilot.commitments
+      where withdrawn_at is null and on_date between $1::date and $2::date`, [days[0], days[6]]);
+  const week = days.map(date => {
+    const mine = inWeek.filter(c => c.on_date === date);
+    const hours = mine.reduce((h, c) => h + (c.start_min !== null && c.end_min !== null ? (c.end_min - c.start_min) / 60 : 1), 0);
+    return { date, hours, count: mine.length };
+  });
   return {
-    work: work.map(w => ({ id: w.id, label: w.label, href: `${folderPath(w.folder)}/work/${w.id}` })),
-    unknown: gaps.map(g => `${g.start_min === null && g.end_min === null ? 'The time' : g.start_min === null ? 'The start' : 'The end'} of ${g.label} on ${sayDate(g.on_date).replace(/, \d{4}$/, '')}`),
-    waiting, filed, next
+    today, now, then,
+    week, planned: week.filter(d => d.count > 0).length,
+    pending: [...decides.filter(d => d.type === 'decide' && d.overlap), ...asks.slice(0, 3), ...decides.filter(d => d.type === 'decide' && !d.overlap)],
+    more: Math.max(0, asks.length - 3)
   };
 }
 

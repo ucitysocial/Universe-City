@@ -10,7 +10,7 @@ import { DEPARTMENTS, FOLDERS, type Folder } from '@/lib/domain/folders';
 import { who } from '@/lib/pilot/auth';
 import {
   entriesIn, loadCommitment, loadDay, loadFollowUps, loadIndex, loadSaid, loadStatement, loadTimeHistory, loadWaiting,
-  loadWeekly, loadWeeklyItem, loadWork, loadWorkItem, spanWords, waitingIn,
+  loadWeekly, loadWeeklyItem, loadWork, loadWorkItem, owedOnCommitment, owedOnWeekly, spanWords, waitingIn,
   type CommitmentFull, type FileIndex, type Revision, type Source, type WaitingRow
 } from '@/lib/pilot/browse';
 import { isUuid, withResident, type Q } from '@/lib/pilot/db';
@@ -19,7 +19,8 @@ import { deptBySlug, deptPath, FILE_ROOT, folderBySlug, folderPath, slugOf } fro
 import { isDate, localNow, sayClock, sayDate, sayDays } from '@/lib/pilot/time';
 import { dayLabel, totalEntries } from '@/lib/pilot/tree';
 import { DAY_FIT, loadCalendar, MONTH_FIT, WEEK_FIT, weekStart } from '@/lib/pilot/calendar';
-import { belongsTo, sayBelongs } from '@/lib/pilot/dept';
+import { belongsTo } from '@/lib/pilot/dept';
+import { folderOf, statusOf, type Owed } from '@/lib/pilot/owed';
 import { addDays } from '@/lib/pilot/time';
 import { CalendarBar, HourGrid, Legend, MonthGrid, monthRange, type CalView } from './calendar';
 
@@ -51,7 +52,7 @@ function outcomeOf(c: CommitmentFull): { word: string; tone: string } {
   if (c.execution === 'executed') return { word: 'Executed', tone: 'filed' };
   if (c.execution === 'partly_executed') return { word: 'Partly executed', tone: 'wait' };
   if (c.execution === 'did_not_happen') return { word: 'Did not happen', tone: 'no' };
-  return { word: 'No outcome reported', tone: 'unknown' };
+  return { word: 'Planned', tone: 'unknown' };
 }
 
 // ------------------------------------------------------------------ the frame of the browser
@@ -173,16 +174,35 @@ function WaitingList({ list, zone, decides }: { list: WaitingRow[]; zone: string
   );
 }
 
-/** The folder an entry in Time belongs to, and how that folder was chosen. The calendar colors the entry by it. */
-function Belongs({ b }: { b: ReturnType<typeof belongsTo> }) {
+/**
+ * The fixed fields of each entry in Time: Department, Folder, Status, and Pending. The small window over the calendar
+ * shows the same four. The calendar colors the entry by its department.
+ */
+function Fixed({ b, status, owed }: { b: ReturnType<typeof belongsTo>; status: string; owed: Owed[] }) {
   return (
     <>
-      <span className="dot" style={{ background: b.color }} /> {sayBelongs(b)}.{' '}
-      <span className="src">
-        {b.by === 'file' ? 'The guide chose the folder. Tell the guide to move the entry to a different folder.'
-          : b.by === 'name' ? 'No folder is on the entry yet. Software read this one from the name of the entry. Tell the guide to move the entry to a different folder.'
-            : 'No folder is on the entry yet, so it shows in the color of Time. Tell the guide which folder it belongs to.'}
-      </span>
+      <dt>Department</dt><dd><span className="dot" style={{ background: b.color }} /> {b.deptName}</dd>
+      <dt>Folder</dt>
+      <dd>
+        {folderOf(b)}
+        {b.by !== 'file' && (
+          <span className="src">
+            {' '}{b.by === 'name' ? 'Read from the name of the entry. Tell the guide to move it to a different folder.' : 'Tell the guide which folder it belongs to.'}
+          </span>
+        )}
+      </dd>
+      <dt>Status</dt><dd>{status}</dd>
+      <dt>Pending</dt>
+      <dd>
+        {owed.length === 0 ? 'None' : (
+          <ul className="owed">
+            {owed.map(o => {
+              const f = FOLDERS.find(x => x.name === o.folder);
+              return <li key={o.folder}>{f ? <Link href={folderPath(f.name)}>{o.folder}</Link> : o.folder}. <span className="src">{o.why}</span></li>;
+            })}
+          </ul>
+        )}
+      </dd>
     </>
   );
 }
@@ -365,6 +385,7 @@ async function commitmentPane({ q, zone, decides }: Ctx, base: string, id: strin
   const o = outcomeOf(c);
   const rough = c.time_is_estimate ? ', a rough time as you gave it' : '';
   const b = belongsTo(c.folder, c.label);
+  const owed = await owedOnCommitment(q, zone, c, b);
   // The form changes an entry that is still planned. An entry with an outcome is changed by a correction.
   const open = !c.withdrawn_at && c.execution === 'planned';
   return {
@@ -376,15 +397,13 @@ async function commitmentPane({ q, zone, decides }: Ctx, base: string, id: strin
           <div className="doc-bar" style={fc(b.color)}>
             <b>{c.label}</b>
             <span className={`pt-chip ${o.tone}`}>{o.word}</span>
-            <span className="pt-chip">{BASIS[c.basis] || 'On file'}</span>
           </div>
           <dl className="fields">
             <dt>Day</dt><dd><Link href={`${base}/${c.on_date}`}>{sayDate(c.on_date)}</Link></dd>
-            <dt>Belongs to</dt><dd><Belongs b={b} /></dd>
             <dt>Start</dt><dd>{c.start_min === null ? <Unknown /> : `${sayClock(c.start_min)}${rough}`}</dd>
             <dt>End</dt><dd>{c.end_min === null ? <Unknown /> : `${sayClock(c.end_min)}${rough}`}</dd>
+            <Fixed b={b} status={`${statusOf(c)}${c.timing ? `, time ${c.timing.replace(/_/g, ' ')}` : ''}`} owed={owed} />
             <dt>What counts as done</dt><dd>{c.completion || <Unknown />}</dd>
-            <dt>Outcome</dt><dd>{o.word}{c.timing ? `, time ${c.timing.replace(/_/g, ' ')}` : ''}</dd>
             {(c.actual_start_min !== null || c.actual_end_min !== null) && <><dt>Actual time</dt><dd>{spanWords(c.actual_start_min, c.actual_end_min)}</dd></>}
             {x.weekly && <><dt>Comes from</dt><dd><Link href={`${base}/weekly/${x.weekly.id}`}>{x.weekly.label}, {sayDays(x.weekly.days)}, in the weekly schedule</Link></dd></>}
             <dt>On file since</dt><dd>{localNow(zone, new Date(c.created_at)).label}</dd>
@@ -435,6 +454,7 @@ async function weeklyItemPane({ q, zone }: Ctx, id: string, color?: string) {
   if (!x) return null;
   const { s } = x;
   const b = belongsTo(s.folder, s.label);
+  const owed = await owedOnWeekly(q, zone, s, b);
   return {
     label: s.label,
     node: (
@@ -442,13 +462,12 @@ async function weeklyItemPane({ q, zone }: Ctx, id: string, color?: string) {
         <div className="doc-bar" style={fc(b.color)}>
           <b>{s.label}</b>
           <span className={`pt-chip ${s.state === 'current' ? 'filed' : 'unknown'}`}>{s.state === 'current' ? 'Repeats each week' : 'Ended'}</span>
-          <span className="pt-chip">{BASIS[s.basis] || 'On file'}</span>
         </div>
         <dl className="fields">
           <dt>Days</dt><dd>{sayDays(s.days)}</dd>
-          <dt>Belongs to</dt><dd><Belongs b={b} /></dd>
           <dt>Start</dt><dd>{s.start_min === null ? <Unknown /> : sayClock(s.start_min)}</dd>
           <dt>End</dt><dd>{s.end_min === null ? <Unknown /> : sayClock(s.end_min)}</dd>
+          <Fixed b={b} status={s.state === 'current' ? 'Repeats each week' : 'Ended'} owed={owed} />
           <dt>On file since</dt><dd>{localNow(zone, new Date(s.created_at)).label}</dd>
           {s.ended_at && <><dt>Ended</dt><dd>{localNow(zone, new Date(s.ended_at)).label}</dd></>}
         </dl>

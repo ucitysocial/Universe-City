@@ -1,33 +1,54 @@
 import { admit } from '@/lib/pilot/auth';
-import { loadCommitment, spanWords } from '@/lib/pilot/browse';
+import { loadCommitment, loadWeeklyItem, owedOnCommitment, owedOnWeekly, spanWords } from '@/lib/pilot/browse';
 import { isUuid, withResident } from '@/lib/pilot/db';
-import { belongsTo, sayBelongs } from '@/lib/pilot/dept';
+import { belongsTo } from '@/lib/pilot/dept';
 import { editCommitment, noteOnCommitment } from '@/lib/pilot/edit';
 import { removeNumbers } from '@/lib/pilot/guard';
+import { folderOf, statusOf } from '@/lib/pilot/owed';
+import { sayDate, sayDays } from '@/lib/pilot/time';
 import { Refusal } from '@/lib/pilot/tools';
 
 export const dynamic = 'force-dynamic';
 
-const OUTCOME: Record<string, string> = { executed: 'Executed', partly_executed: 'Partly executed', did_not_happen: 'Did not happen' };
-
-/** One commitment, for the small window that opens over the calendar. It reads and changes nothing. */
+/**
+ * One entry, for the small window that opens over the calendar: a commitment, or with weekly=1 an item that repeats
+ * each week. Each one carries the same fields: Day, Time, Department, Folder, Status, and Pending. It changes nothing.
+ */
 export async function GET(req: Request) {
   const a = await admit(req);
   if (a instanceof Response) return a;
-  const id = new URL(req.url).searchParams.get('id') || '';
+  const u = new URL(req.url);
+  const id = u.searchParams.get('id') || '';
+  const weekly = u.searchParams.get('weekly') === '1';
   if (!isUuid(id)) return Response.json({ error: 'The request named no entry.' }, { status: 400 });
+  const zone = a.access.timezone;
   try {
-    const x = await withResident({ userId: a.userId, actor: 'resident' }, q => loadCommitment(q, id));
-    if (!x) return Response.json({ error: 'That entry is not on file.' }, { status: 404 });
-    const { c } = x;
-    const b = belongsTo(c.folder, c.label);
-    return Response.json({
-      id: c.id, label: c.label, date: c.on_date, start: c.start_min, end: c.end_min, time: spanWords(c.start_min, c.end_min),
-      belongs: sayBelongs(b), color: b.color,
-      state: c.withdrawn_at ? 'Taken off' : OUTCOME[c.execution] || 'Planned',
-      editable: !c.withdrawn_at && c.execution === 'planned',
-      said: c.said, notes: x.notes.map(n => ({ id: n.id, said: n.said })), changes: x.history.length
-    }, { headers: { 'cache-control': 'no-store' } });
+    const body = await withResident({ userId: a.userId, actor: 'resident' }, async q => {
+      if (weekly) {
+        const x = await loadWeeklyItem(q, id);
+        if (!x) return null;
+        const { s } = x;
+        const b = belongsTo(s.folder, s.label);
+        return {
+          id: s.id, label: s.label, date: '', start: s.start_min, end: s.end_min, day: sayDays(s.days), time: spanWords(s.start_min, s.end_min),
+          dept: b.deptName, folder: folderOf(b), color: b.color, status: s.state === 'current' ? 'Repeats each week' : 'Ended',
+          pending: (await owedOnWeekly(q, zone, s, b)).map(o => o.folder), editable: false, notes: [], changes: x.history.length
+        };
+      }
+      const x = await loadCommitment(q, id);
+      if (!x) return null;
+      const { c } = x;
+      const b = belongsTo(c.folder, c.label);
+      return {
+        id: c.id, label: c.label, date: c.on_date, start: c.start_min, end: c.end_min, day: sayDate(c.on_date), time: spanWords(c.start_min, c.end_min),
+        dept: b.deptName, folder: folderOf(b), color: b.color, status: statusOf(c),
+        pending: (await owedOnCommitment(q, zone, c, b)).map(o => o.folder),
+        editable: !c.withdrawn_at && c.execution === 'planned',
+        notes: x.notes.map(n => ({ id: n.id, said: n.said })), changes: x.history.length
+      };
+    });
+    if (!body) return Response.json({ error: 'That entry is not on file.' }, { status: 404 });
+    return Response.json(body, { headers: { 'cache-control': 'no-store' } });
   } catch {
     return Response.json({ error: 'The entry was not loaded, because the database did not answer.' }, { status: 503 });
   }

@@ -172,7 +172,7 @@ async function pressesSince(q: Q, since: string | null): Promise<Press[]> {
  * Takes one message from the resident and returns the guide's reply.
  * requestKey comes from the browser. Sending the same key again returns the same result.
  */
-export async function receive(userId: string, rawText: string, requestKey: string, opts: { viewing?: string | null } = {}): Promise<TurnResult> {
+export async function receive(userId: string, rawText: string, requestKey: string, opts: { viewing?: string | null; answering?: string | null } = {}): Promise<TurnResult> {
   if (!isUuid(userId)) throw new NoAccess('No resident.');
   if (!isUuid(requestKey)) throw new Refusal('The message carried no valid key. Send it again from the screen.');
   const trimmed = (rawText || '').replace(/\r\n/g, '\n').trim();
@@ -275,7 +275,8 @@ export async function receive(userId: string, rawText: string, requestKey: strin
     const messages: Turn[] = historyFor(before.recent, access.timezone, before.presses);
     // The part of the File the resident wrote the message from is context for the message. It is no instruction.
     const viewing = opts.viewing ? clip(opts.viewing.replace(/[^\w ,.:'›\-]/g, ' ').replace(/\s+/g, ' ').trim(), 160) : '';
-    const mine = `(sent ${localNow(access.timezone, new Date(message.created_at)).label}${viewing ? `. The resident wrote this from this part of the File: ${viewing}` : ''})\n${message.body}`;
+    const answering = opts.answering ? clip(opts.answering.replace(/\s+/g, ' ').trim(), 300) : '';
+    const mine = `(sent ${localNow(access.timezone, new Date(message.created_at)).label}${viewing ? `. The resident wrote this from this part of the File: ${viewing}` : ''}${answering ? `. The resident wrote this as the answer to this question in the side panel: ${answering}` : ''})\n${message.body}`;
     const lastTurn = messages[messages.length - 1];
     if (lastTurn && lastTurn.role === 'user') lastTurn.content = `${lastTurn.content as string}\n\n${mine}`;
     else messages.push({ role: 'user', content: mine });

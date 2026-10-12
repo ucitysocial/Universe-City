@@ -5,8 +5,7 @@ import PilotSide from '@/components/PilotSide';
 import PilotSwitch from '@/components/PilotSwitch';
 import PilotViewport from '@/components/PilotViewport';
 import { who } from '@/lib/pilot/auth';
-import { loadIndex, loadSide } from '@/lib/pilot/browse';
-import { hrefsFor } from '@/lib/pilot/paths';
+import { loadIndex, loadPanel } from '@/lib/pilot/browse';
 import { withResident } from '@/lib/pilot/db';
 import './pilot.css';
 
@@ -51,16 +50,16 @@ export default async function PilotLayout({ children }: { children: React.ReactN
       </div>
     );
   }
-  const { index, side, hrefs } = await withResident({ userId: w.userId, actor: 'resident' }, async q => {
-    const side = await loadSide(q, w.access.timezone);
-    return { index: await loadIndex(q, w.access.timezone), side, hrefs: Object.fromEntries(await hrefsFor(q, side.filed)) };
-  });
+  const { index, panel } = await withResident({ userId: w.userId, actor: 'resident' }, async q => ({
+    index: await loadIndex(q, w.access.timezone),
+    panel: await loadPanel(q, w.access.timezone)
+  }));
   return (
     <div className="os">
       <PilotViewport />
       <PilotRail index={index} name={w.access.display_name} synthetic={w.access.synthetic} />
       <main className="os-main">{children}</main>
-      <PilotSide side={side} hrefs={hrefs} />
+      <PilotSide panel={panel} />
     </div>
   );
 }

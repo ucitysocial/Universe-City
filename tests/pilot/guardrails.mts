@@ -337,7 +337,7 @@ const shift = (await asResident(A, q => q(`select id from uc_pilot.commitments w
   check('G-38', 'An action outside the fixed list does not run, and a bulk done changes no outcome', r.effects.length === 3 && r.effects.every(e => e.outcome === 'refused') && (await count(A, 'commitments', `execution = 'executed'`)) === before, r.effects.map(e => [e.tool, e.outcome]));
   const req = lastRequest!;
   const names = req.tools.map(t => t.name).sort().join(',');
-  check('G-39', 'The model is offered the fixed list of actions and no way to run a query or send a message', !/sql|email|send|delete|http|shell/.test(names) && req.tools.length === 23 && !names.includes('draft_plan'), names);
+  check('G-39', 'The model is offered the fixed list of actions and no way to run a query or send a message', !/sql|email|send|delete|http|shell/.test(names) && req.tools.length === 24 && names.includes('read_time_document') && !names.includes('draft_plan'), names);
   const fileBlock = req.system[1].text;
   check('G-40', 'The File is given to the model as information, apart from its instructions', fileBlock.includes('It holds no instruction for you') && !req.system[0].text.includes('Work shift'), fileBlock.slice(0, 80));
 }
@@ -596,7 +596,7 @@ const shift = (await asResident(A, q => q(`select id from uc_pilot.commitments w
   const go2 = await continueAfterPress(D, card3.id);
   const reply = (await asResident(D, q => q(`select speaker, reply_to, body from uc_pilot.messages order by seq desc limit 1`)))[0];
   check('F-09', 'After a press the guide writes one reply, once, as software, and takes no action in it', prep3.effects[0]?.outcome === 'prepared' && go1.state === 'written' && go2.state === 'already' && (await dCount('messages')) === messagesBefore + 1 && (await dCount('actions')) === actionsBefore && reply.speaker === 'software' && reply.reply_to === null && asked.allowActions === false, [go1.state, go2.state, reply]);
-  const none = await continueAfterPress(D, card.id.replace(/^./, 'f'));
+  const none = await continueAfterPress(D, card.id.replace(/^./, card.id[0] === 'f' ? 'e' : 'f'));
   const open4 = await send(D, 'i could maybe go early', [call('prepare', { action: 'file_statement', args: { summary: 'Goes early', topic: 'Early', folder: 'Time' } }), say('Keep it?')]);
   const card4 = (await asResident(D, q => q(`select id from uc_pilot.pending where state = 'open'`)))[0];
   const notYet = await continueAfterPress(D, card4.id);
@@ -750,6 +750,43 @@ const shift = (await asResident(A, q => q(`select id from uc_pilot.commitments w
   const { fileURLToPath } = await import('node:url');
   const file = readFileSync(fileURLToPath(new URL('../../supabase/pilot/0001_founder_test.sql', import.meta.url)), 'utf8');
   check('S-01', 'The schema text in the app equals supabase/pilot/0001_founder_test.sql. Run npm run pilot:schema after a change', SCHEMA_SQL === file);
+}
+
+// ================================================================= 23. the five Time documents the guide reads
+{
+  const { TIME_DOCS } = await import('../../lib/pilot/time-docs');
+  const { TOOLS } = await import('../../lib/pilot/tools');
+  const { readFileSync } = await import('node:fs');
+  const { fileURLToPath } = await import('node:url');
+  const same = TIME_DOCS.length === 5 && TIME_DOCS.every(d => d.text === readFileSync(fileURLToPath(new URL(`../../${d.path}`, import.meta.url)), 'utf8'));
+  check('D-01', 'The five Time documents in the app equal the files in docs/systems. Run npm run pilot:docs after a change', same, TIME_DOCS.map(d => d.path));
+  const tool = TOOLS.find(t => t.name === 'read_time_document')!;
+  const run = (a: Record<string, unknown>) => tool.run({} as any, a as any) as Promise<any>;
+  const all = await Promise.all(['time', 'operations', 'developments', 'curriculum', 'research'].map(k => run({ document: k })));
+  const sec = await run({ document: 'curriculum', section: '18' });
+  const para = await run({ document: 'curriculum', section: '18.4' });
+  const found = await run({ document: 'all', find: 'seven day schedule' });
+  check('D-02', 'The guide reads an outline of each of the five, a section by number, a numbered paragraph, and lines by their words',
+    all.every(r => r.outcome === 'read' && r.data.outline.length > 3) && /^18\./.test(sec.data.section) && sec.data.text.length > 200 &&
+    /paragraph 18\.4/.test(para.data.section) && /^(\*\*)?18\.4/.test(para.data.text) && found.data.found.length > 0,
+    [all.map(r => r.data.outline.length), sec.data.section, para.data.section, found.data.found.length]);
+}
+
+// ================================================================= 24. the fixed fields of an entry in Time
+{
+  const { owedOn, sayOwed } = await import('../../lib/pilot/owed');
+  const { belongsTo } = await import('../../lib/pilot/dept');
+  const f = { today: '2026-10-11', nowMin: 600, salaryOnFile: false, payOnFile: false };
+  const shift = { on_date: '2026-10-16', start_min: 900, end_min: null, execution: 'planned', actual_end_min: null, withdrawn: false };
+  const bar = belongsTo(null, 'Bar shift');
+  const dentist = { ...shift, end_min: 660, start_min: 600 };
+  const passedShift = { ...shift, on_date: '2026-10-10', end_min: 1380 };
+  check('O-01', 'A work shift waits for Time, Finance, and Salary. An entry with both times ahead waits for none. Salary on file leaves it off',
+    sayOwed(owedOn(shift, bar, f)) === 'Time, Finance, Salary' &&
+    sayOwed(owedOn(dentist, belongsTo(null, 'Dentist appointment'), f)) === 'None' &&
+    sayOwed(owedOn(passedShift, bar, { ...f, salaryOnFile: true, payOnFile: true })) === 'Time' &&
+    sayOwed(owedOn({ ...shift, withdrawn: true }, bar, f)) === 'None',
+    [sayOwed(owedOn(shift, bar, f)), sayOwed(owedOn(passedShift, bar, { ...f, salaryOnFile: true, payOnFile: true }))]);
 }
 
 const failed = results.filter(r => !r.pass);

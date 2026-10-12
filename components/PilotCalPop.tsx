@@ -5,13 +5,17 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 type Brief = { id: string; weekly: boolean; label: string; time: string; belongs: string; href: string; kind: string; x: number; y: number; w: number; h: number };
-type Full = { label: string; date: string; start: number | null; end: number | null; time: string; belongs: string; color: string; state: string; editable: boolean; said: string | null; notes: { id: string; said: string }[]; changes: number };
+type Full = {
+  label: string; date: string; start: number | null; end: number | null; day: string; time: string;
+  dept: string; folder: string; color: string; status: string; pending: string[];
+  editable: boolean; notes: { id: string; said: string }[]; changes: number;
+};
 
 const clock24 = (min: number | null) => (min === null ? '' : `${String(Math.floor((min % 1440) / 60)).padStart(2, '0')}:${String(min % 60).padStart(2, '0')}`);
 
 /**
- * A small window over the calendar. Pressing an entry opens it beside the entry, with its time and folder, its notes,
- * and a way to change the time or add a note. The whole entry, with its history, opens from a link in the window.
+ * A small window over the calendar. Pressing an entry opens it beside the entry. Each entry shows the same fields:
+ * Day, Time, Department, Folder, Status, and Pending. Below them are its notes, and a way to change the time or add a note. The whole entry, with its history, opens from a link in the window.
  * On a narrow screen the window rises from the bottom of the screen. Escape and a press outside close it.
  */
 export default function PilotCalPop() {
@@ -26,9 +30,9 @@ export default function PilotCalPop() {
   const [clash, setClash] = useState(false);
   const box = useRef<HTMLDivElement>(null);
 
-  const load = useCallback(async (id: string) => {
+  const load = useCallback(async (id: string, weekly = false) => {
     try {
-      const res = await fetch(`/api/pilot/entry?id=${id}`, { cache: 'no-store' });
+      const res = await fetch(`/api/pilot/entry?id=${id}${weekly ? '&weekly=1' : ''}`, { cache: 'no-store' });
       if (!res.ok) return;
       const d = (await res.json()) as Full;
       setFull(d);
@@ -51,7 +55,7 @@ export default function PilotCalPop() {
       setClash(false);
       setBrief({ id: d.pop!, weekly: d.weekly === '1', label: d.label || '', time: d.time || '', belongs: d.belongs || '', href: d.href || '#', kind: d.kind || '', x: r.left, y: r.top, w: r.width, h: r.height });
       setFull(null); setMode('view'); setSaid(null); setNote('');
-      if (d.weekly !== '1') void load(d.pop!);
+      void load(d.pop!, d.weekly === '1');
     };
     document.addEventListener('click', open, true);
     document.addEventListener('keydown', open, true);
@@ -110,9 +114,14 @@ export default function PilotCalPop() {
         <button type="button" className="pop-x" onClick={() => setBrief(null)} aria-label="Close this window">×</button>
       </div>
       <div className="pop-body">
-        <p className="pop-time">{full ? full.time : brief.time}</p>
-        <p className="pop-meta">{full?.belongs ?? brief.belongs}. {full ? full.state : brief.kind}.</p>
-        {full?.said && <p className="pop-said">{full.said}</p>}
+        <dl className="pop-fields">
+          <dt>Day</dt><dd>{full?.day ?? ''}</dd>
+          <dt>Time</dt><dd>{full ? full.time : brief.time}</dd>
+          <dt>Department</dt><dd><i className="dot" style={{ background: full?.color }} />{full?.dept ?? ''}</dd>
+          <dt>Folder</dt><dd>{full?.folder ?? ''}</dd>
+          <dt>Status</dt><dd>{full ? full.status : brief.kind}</dd>
+          <dt>Pending</dt><dd>{full ? (full.pending.length ? full.pending.join(', ') : 'None') : ''}</dd>
+        </dl>
         {full && full.notes.length > 0 && (
           <div className="pop-notes">
             {full.notes.map(n => <p key={n.id}>{n.said}</p>)}
@@ -148,7 +157,7 @@ export default function PilotCalPop() {
           <div className="pop-acts">
             {full?.editable && <button type="button" className="pt-btn" onClick={() => setMode('time')}>Change the time</button>}
             {full?.editable && <button type="button" className="pt-btn ghost" onClick={() => setMode('note')}>Add a note</button>}
-            {brief.weekly && <p className="pop-meta">This repeats each week. Tell the guide to change it.</p>}
+            {brief.weekly && <p className="pop-meta">Tell the guide to change an item that repeats each week.</p>}
           </div>
         )}
         <Link className="pop-open" href={brief.href} onClick={() => setBrief(null)}>Open the whole entry{full && full.changes ? `, with ${full.changes} ${full.changes === 1 ? 'change' : 'changes'} in its history` : ''}</Link>

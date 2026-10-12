@@ -313,8 +313,9 @@ export default function PilotConversation({ initial }: { initial: Thread }) {
                   <div className="pt-msg">
                     <p className="pt-who">Universe City</p>
                     <div className="pt-bubble fail">
-                      No reply was written. Your message is kept. Each action that was carried out before the reply stopped is listed here.
-                      Send the message again to finish the reply. No action is carried out twice.
+                      {(m.turn?.effects || []).length
+                        ? 'The guide did not reply. Your message is kept. The actions below were carried out before it stopped, and sending again repeats none of them.'
+                        : 'The guide did not reply. Your message is kept.'}
                     </div>
                     <Effects list={m.turn?.effects || []} />
                     {m.key && (

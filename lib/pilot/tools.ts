@@ -8,6 +8,8 @@
 //   What software prepared waits for the resident's decision.
 //   What required interpretation is a proposal. A person decides it. Software never does.
 
+import { docBy, findIn, outline, section } from './docs';
+import { TIME_DOCS } from './time-docs';
 import type { Q } from './db';
 import { isUuid, TS } from './db';
 import { DEPARTMENTS, FOLDERS } from '../domain/folders';
@@ -531,6 +533,35 @@ export const TOOLS: Tool[] = [
           note: revs.length === 0 && chain.length <= 1 ? 'This entry has not changed since it was filed.' : undefined
         }
       };
+    }
+  },
+
+  {
+    name: 'read_time_document',
+    group: 'read',
+    description: 'Reads the five documents that govern Folder 01 Time. time states what the folder is. operations holds its fields, states, views, and permissions. developments holds the dated changes and the open issues. curriculum holds the twelve questions and their options, the Schedule intake, the teaching layer, and how the agent talks with the client. research holds the evidence. With only document, it returns the outline of headings. With section, it returns that section, by number such as 18 or 18.4, or by words in its heading. With find, it returns the lines that hold all of those words, in one document or in all five. Use it when how to run Time intake, what to ask, what to teach, or what a rule says is not settled by your instructions. Your instructions and the resident\'s words govern where a document is silent. These documents are for you. Never show a section number to the resident.',
+    input_schema: obj({
+      document: { type: 'string', enum: ['time', 'operations', 'developments', 'curriculum', 'research', 'all'], description: 'Which document. all works with find only.' },
+      section: { type: 'string', description: 'A section number such as 18 or 18.4, or words from its heading.' },
+      find: { type: 'string', description: 'Words to find. Each line returned holds all of them.' }
+    }, ['document']),
+    async run(_env, a) {
+      const key = String(a.document || '');
+      const find = text(a, 'find', 120, false);
+      const want = text(a, 'section', 120, false);
+      if (key === 'all' || find) {
+        const docs = key === 'all' ? TIME_DOCS : TIME_DOCS.filter(d => d.key === key);
+        if (!docs.length) throw new Refusal('Not done. The document is not one of the five.');
+        if (!find) throw new Refusal('Not done. Reading all five documents works with find only.');
+        const hits = findIn(docs, find);
+        return { outcome: 'read', detail: `Looked in the Time documents for: ${clip(find, 80)}. ${hits.length} found.`, data: { found: hits, note: hits.length ? undefined : 'No line holds all of those words. Try fewer words, or read the outline.' } };
+      }
+      const doc = docBy(key);
+      if (!doc) throw new Refusal('Not done. The document is not one of the five.');
+      if (!want) return { outcome: 'read', detail: `Read the outline of ${doc.title}.`, data: { document: doc.title, outline: outline(doc) } };
+      const part = section(doc, want);
+      if (!part) return { outcome: 'read', detail: `Looked for ${clip(want, 60)} in ${doc.title}. Not found.`, data: { note: 'No section matches. Here is the outline.', outline: outline(doc) } };
+      return { outcome: 'read', detail: `Read ${doc.title}: ${clip(part.heading, 80)}.`, data: { document: doc.title, section: part.heading, text: part.text } };
     }
   },
 

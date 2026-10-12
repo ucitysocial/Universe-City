@@ -8,9 +8,9 @@ Department I, Agency Assessment. Internal specification. Version 4.1, October 11
 
 1.2 The authoritative copy is `docs/systems/TIME.md` in the repository. A Word file of this document is an export of that copy.
 
-1.3 The other four. **Folder 01 Time Operations** holds the fields, states, views, queries, and action permissions. It is at `docs/systems/TIME_OPERATIONS.md`. **Folder 01 Time Developments** holds the dated log of changes, errors, open issues, and ideas held for later. It is at `docs/systems/TIME_DEVELOPMENTS.md`. **Folder 01 Time Curriculum** holds the twelve questions, their options, and the teaching layer. **Folder 01 Time Research** holds the evidence and the reasoning, as a running list.
+1.3 The other four. **Folder 01 Time Operations** holds the fields, states, views, queries, and action permissions. It is at `docs/systems/TIME_OPERATIONS.md`. **Folder 01 Time Developments** holds the dated log of changes, errors, open issues, and ideas held for later. It is at `docs/systems/TIME_DEVELOPMENTS.md`. **Folder 01 Time Curriculum** holds the twelve questions, their options, and the teaching layer. It is at `docs/systems/TIME_CURRICULUM.md`. **Folder 01 Time Research** holds the evidence and the reasoning, as a running list. It is at `docs/systems/TIME_RESEARCH.md`.
 
-1.4 The revised Curriculum Version 2 and the updated Research were located in Google Drive on October 11, 2026. Both address the Version 4 direction; neither is in this repository yet. Their references and remaining reconciliation are in items 15.1 and 15.2. Their existing client copy and evidence are not changed by this specification revision.
+1.4 The revised Curriculum Version 2 and the updated Research were located in Google Drive on October 11, 2026. Both address the Version 4 direction. Both were copied into this repository on October 11, 2026, and the repository copy governs. See Developments 2.22. Their references and remaining reconciliation are in items 15.1 and 15.2. Their existing client copy and evidence are not changed by this specification revision.
 
 1.5 This document is not loaded into the agent. The agent runs on the Language Standard and on operating instructions built from this document.
 

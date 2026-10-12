@@ -96,6 +96,8 @@ Department I, Agency Assessment. Log. Version 1.1, October 11, 2026. The dated l
 
 2.21 **Existing Curriculum and Research located in Google Drive, October 11, 2026.** The Google document titled `Folder 01 Time Curriculum (4)` contains **Curriculum Version 2**, dated October 11, 2026, with twelve revised questions and a Schedule intake in section 18. It says that Time intake begins after Orientation and assembles the first seven-day schedule through conversation. `Folder 01 Time Research (3)` contains updated dated entries, including October 11 research verification. Both remain outside the GitHub repository. This corrects the outdated repository status claim that neither was revised and both still covered Version 3. Their content and source evidence have not been replaced by this revision; their official integration and approval status remain to resolve.
 
+2.22 **Curriculum and Research added to the repository, October 11, 2026.** On the founder's instruction, the Drive copies `Folder 01 Time Curriculum (4)` (Curriculum Version 2) and `Folder 01 Time Research (3)` were copied once, word for word, into `docs/systems/TIME_CURRICULUM.md` and `docs/systems/TIME_RESEARCH.md`. GitHub now holds all five documents for this folder, and the repository copy governs. Drive is no longer read for them. The founder test guide reads the five documents through the `read_time_document` action, from a copy made by `scripts/pilot-docs.mjs`; a test fails when that copy and the files differ. The content of the Curriculum and the Research was not changed. Their own open items stay open, including Curriculum 22.10 on the repository, which this entry answers in part.
+
 ## 3. Errors found
 
 3.1 October 11, 2026. Version 3 listed five features as live that the repository does not hold: plain language collection, the day view by whole hours, the month view, direct editing by hand, and reminders. Corrected in `TIME.md` 14.3.
@@ -120,7 +122,7 @@ Department I, Agency Assessment. Log. Version 1.1, October 11, 2026. The dated l
 
 4.2 `TIME_OPERATIONS.md` marks each undecided mechanic as To define.
 
-4.3 The Curriculum and the Research are not in the repository. Both still describe Version 3. Neither has been revised.
+4.3 The Curriculum and the Research are not in the repository. Both still describe Version 3. Neither has been revised. Superseded October 11, 2026: see 2.21 and 2.22. Both are in `docs/systems`.
 
 4.4 Decisions D-010 to D-017 call the person a resident. `TIME.md` calls the person a client, as `LANGUAGE_STANDARD.md` requires for an agent document. The two words name one person.
 

@@ -21,8 +21,8 @@ export async function goOnAfterPress(next: string | null) {
  * The same item can be answered in the conversation. Whichever comes first is the decision, and the other changes nothing.
  */
 export default function PilotDecide({
-  id, kind, desk = false, onDecided
-}: { id: string; kind: string; desk?: boolean; onDecided?: (next: string | null) => void }) {
+  id, kind, desk = false, onDecided, yes: yesLabel, no: noLabel
+}: { id: string; kind: string; desk?: boolean; onDecided?: (next: string | null) => void; yes?: string; no?: string }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [said, setSaid] = useState<string | null>(null);
@@ -54,8 +54,8 @@ export default function PilotDecide({
 
   if (said) return <p className="pt-meta">{said}</p>;
   const plan = kind === 'confirm_plan';
-  const yes = desk ? 'Confirm this proposal' : plan ? 'Confirm this Plan' : 'Confirm this entry';
-  const no = desk ? 'Decline this proposal' : plan ? 'Decline this Plan' : 'Decline this entry';
+  const yes = yesLabel ?? (desk ? 'Confirm this proposal' : plan ? 'Confirm this Plan' : 'Confirm this entry');
+  const no = noLabel ?? (desk ? 'Decline this proposal' : plan ? 'Decline this Plan' : 'Decline this entry');
   return (
     <div>
       <div className="pt-btns">
