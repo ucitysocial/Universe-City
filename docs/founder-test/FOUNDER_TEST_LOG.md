@@ -35,6 +35,8 @@ No entry is a defect just because the prototype is unfinished. Do not report uns
 | FT-006 | File — working interface | Current File reads like a static report and differs markedly from the established Universe City Window OS-style Resident Portal | Founder-directed primary visual redesign | Main visual priority; #25 |
 | FT-007 | Conversation — mobile composer | Keep the approved conversation layout, with composer anchored to bottom on mobile as in a messaging app | Founder requirement; mobile behavior not yet verified | Implement and device-test; #26 |
 | FT-008 | Public website — account state | No visible Log out and homepage appears anonymous after returning via logo on www.ucitysocial.com | Founder-reported issues; missing UI confirmed by code | Fix and verify session handling; #27 |
+| FT-009 | Working shell — conversation location | Left File/conversation navigation, center active workspace, right decisions/context; not a permanent right-rail chat | New founder prototype direction; preview not yet verified | In progress with Claude; #30 |
+| FT-010 | Time — visual schedule | Daily, weekly, and monthly visual calendar with time-positioned blocks is the Time system, not merely stored entries | Founder core product requirement; partial existing spec, missing views | In progress with Claude; #29 |
 
 ---
 
@@ -292,17 +294,49 @@ These are suggested examples for design discussion, **not implemented UI copy**.
 
 ---
 
+## FT-009 — Conversation in the main workspace, contextual decisions on the right
+
+**Date reported:** October 11, 2026; additional screenshot shows Claude mid-build. **Status:** Founder clarification while a new preview is in development; final build not tested.
+
+**Founder direction:** The interface should take cues from the broader Claude layout: left panel for File and conversation navigation, large center working area for the selected conversation, Time calendar or File contents, and a separate right panel for decisions, pending confirmations, related follow ups and relevant context. The conversation must **not** remain a narrow pane off on the right. The right context area can be optional/collapsible. This does not mean adopting Claude's color palette or replacing Universe City branding.
+
+**Specification difference to reconcile:** `docs/product/RESIDENT_INTERFACE.md` still describes the Agent as persistent in the right rail and the center as selected Portal content. That earlier direction conflicts with the latest founder preference for full center Conversation. Build and visually review the new founder-test composition, then explicitly update the governing interface doc if approved; do not pretend the old spec already reflects this change.
+
+**Evidence:** The founder's screenshot captures Claude actively listing work to take the guide out of the right frame and make Conversation a full main pane. The screenshot reports intentions and in-progress tasks, not verified implementation or deployment.
+
+**Verification:** Open the Conversation in center without squeezing it; switch into File and Time; return to the same conversation state; show decisions on the right without a duplicate chat; collapse the context area; verify responsive navigation and brand styling.
+
+**Implementation tracker:** [#30](https://github.com/ucitysocial/Universe-City/issues/30). Existing YAPTAIN browser reference remains [#25](https://github.com/ucitysocial/Universe-City/issues/25).
+
+---
+
+## FT-010 — Time's system is a functional visual calendar
+
+**Date reported:** October 11, 2026; Claude reportedly implementing a Time calendar. **Status:** Founder core product requirement explicitly recorded; not yet verified in a preview.
+
+**Founder direction:** The Time folder must build and maintain the resident's actual **visual schedule**, with **day, week and month** views; the daily and weekly grids must show time slots and events physically placed at the right time. A month grid shows events on their actual dates. The product is not complete when only facts about a shift are filed or listed as text. Conversation creates or updates the schedule, and the schedule displays those changes. The resident must also be able to open and work with the calendar directly.
+
+**Existing specifications:** `docs/systems/TIME.md` defines the maintained schedule as Time's system, and its section 5.8 explicitly provides for dragging, resizing, adding, editing, and deleting blocks by hand. `docs/systems/TIME_OPERATIONS.md` 4.3 leaves day and month views to define; a previous week view was calculated as hour figures rather than a finished, visual time-block calendar. This test requirement clarifies expected UI completion without replacing those operating documents or changing permissions.
+
+**Verification requirements:** Create a dated commitment by chat and inspect the exact date/time placement in all three calendar views. Update it with proper approval, then verify all views reflect the same canonical Time record. Unknown end time stays unknown—show the known start without fabricating a duration. Test work crossing midnight, timezone, overlaps, empty slots, direct permitted manipulation, error states, and history/provenance. A separate pop-out or expanded calendar is an **optional design concept**, not an approved requirement or a replacement for the main Time workspace.
+
+**Evidence limit:** The screenshot shows Claude's in-progress checklist including a calendar, day/month design, and removing the chat side rail. No screenshot of a finished working calendar is provided.
+
+**Implementation tracker:** [#29](https://github.com/ucitysocial/Universe-City/issues/29). Related to [#22](https://github.com/ucitysocial/Universe-City/issues/22), [#23](https://github.com/ucitysocial/Universe-City/issues/23), [#25](https://github.com/ucitysocial/Universe-City/issues/25), [#30](https://github.com/ucitysocial/Universe-City/issues/30).
+
+---
+
 ## Findings and implementation tracking
 
 - **Confirmed duplicate-action issue:** FT-004-C and exported JSON: a screen action already confirmed and saved the new start; a later typed confirmation invoked an additional no-op action and was labeled Changed.
 - **Source of earlier inconsistency established:** FT-004-B: the first screen confirmation had already changed the stored start before the repeated chat confirmation. No premature write was established.
-- **Founder-requested improvements:** FT-004-A: concise inline filing and confirmation summaries; FT-005: continue the original schedule purpose and choose the next relevant question; FT-006: make File match the established Resident Portal working interface; FT-007: stable mobile conversation composer; FT-008: usable Log out and authenticated public navigation.
+- **Founder-requested improvements:** FT-004-A: concise inline filing and confirmation summaries; FT-005: agent-led next question; FT-006: YAPTAIN-inspired File; FT-007: stable mobile composer; FT-008: authentic public navigation and Log out; FT-009: full center Conversation and right decisions; FT-010: Time day/week/month visual calendar.
 - **Potential improvements / review questions:** FT-001-A, FT-001-C, FT-002-A, FT-002-D, FT-003-D; FT-003-C is partially retested (approval works; deferral untested).
 - **Observed positive behavior:** FT-003-A, founder-reported FT-003-B, and FT-004-D (conversation continues after confirmation).
 - **Unverified functional claims:** FT-001-B; FT-002-B and FT-002-C partially observed; FT-003-E and FT-004-B require File/Activity/history inspection.
 - **Approved direction for future improvement:** Shorten and clarify the feedback beneath guide responses (FT-004-A); final copy and implementation not yet approved.
 - **Code fixes deployed:** None through this founder-testing log. Session 01 paused for cleanup. Behavioral priorities #22 and #23; primary visual priority #25; public navigation #27; feedback #24; mobile composer #26.
-- **Pending retests:** FT-005 next question after a confirmation; FT-004 repeated confirmation by both screen and chat; FT-004 concise feedback; FT-003 deferred proposal; FT-006 File navigation/design; FT-007 mobile keyboard/composer; FT-008 public homepage auth state and sign-out.
+- **Pending retests:** FT-005 next purposeful question; FT-004 duplicate confirmation and concise feedback; FT-003 deferral; FT-006 File navigation; FT-007 mobile composer; FT-008 public auth; FT-009 center chat/right context shell; FT-010 Time calendar day/week/month, data synchronization and manual edits.
 
 ### Maintenance rules
 
