@@ -40,6 +40,7 @@ No entry is a defect just because the prototype is unfinished. Do not report uns
 | FT-011 | Resident Portal — visual review package | Updated three-panel File/Conversation, visual calendars, record editor and mobile screenshots supplied as a static walkthrough | Screenshot evidence only; functional claims unverified | Received; awaiting founder review and runnable preview |
 | FT-012 | Portal Home — global UI scale | Entire desktop portal appears miniature: narrow nav/context, undersized cards/type, large unused center | Founder-directed size and readability correction | P0 design fix requested; #32 |
 | FT-013 | Live conversation — flexible commitments and practical support | Open end time cannot be cleared; motivation triggers disengagement; genuine task preferences are refused as questions | Export-confirmed bugs and founder guidance | Draft PR #33; pending CI, preview test and approval; #34 |
+| FT-014 | Time intake — daily schedule anchors | Sleep/wake, meals and personal routines must become visible scheduling commitments, rather than waiting for unfilled dates or resident prompts | Founder-directed product priority; current curriculum discrepancy | Recorded for Time requirements, docs and conversation changes; #35 |
 
 ---
 
@@ -442,6 +443,22 @@ The validation layer rejected a plainly expressed task-support preference becaus
 ### Acceptance and rollout
 
 No founder private records should be used in public tests. Run synthetic test cases for open-ended planned commitment, repeated clear, task breakdown and declarative preference. Confirm typecheck, pilot regression and language checks; inspect a Netlify Deploy Preview if available. Only then ask the founder to approve merging [#33](https://github.com/ucitysocial/Universe-City/pull/33). Keep the live login and production data untouched until approval. Implementation tracker: [#34](https://github.com/ucitysocial/Universe-City/issues/34).
+
+---
+
+## FT-014 — Sleep, waking, meals and essential routines as the calendar foundation
+
+**Founder direction:** October 12, 2026. This is a new scheduling-priority requirement, not a report of a broken screen. The founder connects schedule building to establishing planned sleep and wake times, time for eating, and morning/night routines with resident-specific care tasks. These are central commitments in the resident's daily life.
+
+**Scheduling order:** The guide may establish work hours, appointments and other external obligations first when necessary, then should actively establish sleep and wake times and the daily essentials those commitments need to fit around. The founder has not required a rigid fixed sequence of questions. Every confirmed item belongs on the maintained visual calendar. Resident-described variable workdays and differences among days must be supported.
+
+**Gap confirmed in project files:** `TIME_RESEARCH.md` names sleep, eating and personal care among necessary time, and `TIME_OPERATIONS.md` identifies sleep and getting-ready block types. Yet `TIME_CURRICULUM.md` 18.7.3 asks about sleep only when an overlap is detected or a resident explicitly names it. The pilot guide's schedule sequence similarly prioritizes shifts, days and appointment times rather than deliberately constructing this baseline.
+
+**Needed:** Revise Time, Operations, Curriculum and Developments together; align the guide's question priorities with those documents. Plan the timing of personal routines from the resident's own chosen activities, not assumed frequencies. Differentiate intended bedtime, the period planned for sleep, wake time and reported actual outcomes. Show an overnight block across the correct dates. A grouped routine may contain its own resident-confirmed steps without generating unnecessary individual approvals. When a resident needs help with active work, finish that support before switching back to intake questions unless there is an immediate scheduling conflict.
+
+**Verification:** A synthetic resident asks for a schedule with a changing work week and 2 dated obligations. The guide builds a calendar with those constraints, then proactively works with the resident to establish sleep, waking and essential routines through natural questions. No mandatory generic hours or routines are invented, calendar changes preserve provenance, and the visual day/week/month views match the record.
+
+**Status:** Founder requirement captured; implementation/design to coordinate with the ongoing Time calendar work. [GitHub #35](https://github.com/ucitysocial/Universe-City/issues/35). No live change made by this log.
 
 ---
 
