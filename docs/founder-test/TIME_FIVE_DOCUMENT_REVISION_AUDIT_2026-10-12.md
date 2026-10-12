@@ -127,3 +127,36 @@ These are **unsettled choices**, not grounds for another round of abstract docum
 5. **What ends guided mode:** A resident may pause/end guidance while the calendar commitment remains open; decide how context should be resumed later.
 
 **Next document action:** After founder review, update `TIME.md` and `TIME_OPERATIONS.md` together, then `TIME_CURRICULUM.md`. Add corresponding dated entries to `TIME_DEVELOPMENTS.md`, and update `TIME_RESEARCH.md` only where supported. This audit belongs outside the five-document set and should be merged or filed only as a review artifact, not misrepresented as the new final specification.
+
+## 8. Proposed visual treatment — daily essentials and usable time (founder feedback, October 12)
+
+**Founder observation:** Sleep is a basic schedule anchor and should look distinct on the Time calendar, possibly black, an alternate restrained color, or a subtly slashed/hatched treatment. The goal is to see the day clearly: what time is already accounted for, and how much remains to be planned or protected. This is **a founder design direction and recommendation, not a finalized color/accessibility ruling**.
+
+### Proposed semantics for review
+
+- **Sleep / planned rest:** use Universe City's existing Ink `#140A0C` or secondary Ink `#241417` with readable paper-colored text and a small **Sleep** label/icon, independent of the department accent. It should read as a stable foundation on day and week grids. The existing palette is authoritative; **do not invent an unrelated brightly colored department** merely for sleep.
+- **Pattern is a second channel of information:** The founder is open to diagonal hatching. In the deployed calendar, tentative time already uses a `rough` class and unknown ends use `open-end`. Avoid silently making hatch simultaneously mean both *sleep* and *tentative*. Prefer **solid dark sleep** plus a minimal label/icon, reserving dashed/hatched/gradient cues for **estimated/unconfirmed timing**, or propose two independently distinguishable patterns if the founder chooses hatching for sleep.
+- **Routine / meals:** resident-selected blocks should be visibly separate from sleep (and from one another by label/icon when desired) but remain low-saturation, within the brand's paper/ink language. Do not use the four department colors as an invented universal fixed palette for sleep vs meals vs chores. A block's source-folder color still has a legitimate meaning, so distinguish *kind* from *department*.
+- **Other obligations:** retain the department color accents for source-folder ownership; the existing execution/pending and uncertainty states retain clear, separately encoded labels/borders. Never infer that a color says the resident completed something.
+- **Grid readability/accessibility:** treatment must work in day/week/month, high contrast and on mobile; meaningful text (Sleep, end unknown, planned, estimate) remains available when color/pattern are not perceived. Test low zoom, dark screen and print. Avoid dense patterns or heavy solid fills overwhelming a month view.
+- **Overnight blocks:** sleep from one evening to the following morning should visibly occupy its appropriate portion of **both calendar dates** with correct local date and timezone interpretation; no truncation at midnight or double-counting.
+- **Availability should be a derived view, not a new independently stored schedule:** First establish the resident's known sleep/wake anchors, essential routines and fixed obligations, then show remaining *unallocated* windows. Travel, preparation, transitions, other confirmed commitments and overlaps also matter. A blank hour is not automatically discretionary/free: use **Unscheduled / not yet accounted for** until the known constraints are sufficient. Don't infer freedom or mark an unconfirmed estimate as a firm unavailable block.
+- **Optional quiet summary:** where enough information exists, show a restrained daily/weekly summary like “Planned / Unallocated / Unknown” or a similar small indicator. Never claim an exact number of “free hours” when time, overlaps, sleep, work or commitments remain unknown. The legacy controlled-time figure in Time 2.4.5 is based on **observed** time and **must not** be silently redefined as the complement of planned obligations.
+
+### Acceptance for visual review
+
+1. In a hypothetical schedule with a confirmed overnight sleep interval, a morning routine, eating and work, the dark sleep span is instantly recognizable; other events retain their identity and the calendar is not visually noisy.
+2. Sleep respects true date/time crossings, daylight-saving behavior, edited exceptions, and recurring shifts.
+3. A visual comparison of a confirmed sleep entry and a tentative sleep entry communicates category, provenance and uncertainty separately.
+4. Time left over is described as **unallocated** unless enough data supports a stronger availability claim. Known overlapping blocks never produce negative or double-counted free time.
+5. The founder reviews the design treatment in the actual preview; this document records the proposal, not approval of final styling.
+
+### Five-document impact
+
+- `TIME.md`: affirm daily anchors and accurate interpretation of remaining *unallocated* time, without changing observed-only controlled-time rules.
+- `TIME_OPERATIONS.md`: block kind versus folder origin versus schedule status, accessible CSS/legend tokens, nightly cross-date rendering and a derived availability query/summary (if implemented).
+- `TIME_DEVELOPMENTS.md`: append the October 12 design rationale and what the founder eventually selects as the canonical treatment.
+- `TIME_CURRICULUM.md`: explain how the guide helps the resident see and plan around sleep/wake, meals and chosen routines before allocating remaining time; do not impose a universal daily schedule.
+- `TIME_RESEARCH.md`: no new evidence claim required to choose visual colors/patterns. If an availability or sleep-related behavioral claim is later proposed, separately verify the research.
+
+**Related:** [#35 — Sleep and daily routines](https://github.com/ucitysocial/Universe-City/issues/35), [#29 — Visual calendar](https://github.com/ucitysocial/Universe-City/issues/29), [#36 — In-block guided steps](https://github.com/ucitysocial/Universe-City/issues/36).
