@@ -463,7 +463,7 @@ async function commitmentPane({ q, zone, decides }: Ctx, base: string, id: strin
             <Fixed b={b} status={`${statusOf(c)}${c.timing ? `, time ${c.timing.replace(/_/g, ' ')}` : ''}`} owed={owed} />
             <dt>What counts as done</dt><dd>{c.completion || <Unknown />}</dd>
             {(c.actual_start_min !== null || c.actual_end_min !== null) && <><dt>Actual time</dt><dd>{spanWords(c.actual_start_min, c.actual_end_min)}</dd></>}
-            {x.weekly && <><dt>Comes from</dt><dd><Link href={`${base}/weekly/${x.weekly.id}`}>{x.weekly.label}, {sayDays(x.weekly.days)}, in the weekly schedule</Link></dd></>}
+            {x.weekly && <><dt>Comes from</dt><dd><Link href={`${base}/weekly/${x.weekly.id}`}>{x.weekly.label}, {sayDays(x.weekly.days)}, in your routines</Link></dd></>}
             <dt>On file since</dt><dd>{localNow(zone, new Date(c.created_at)).label}</dd>
           </dl>
           <Words label={c.basis === 'schedule' ? 'Your words for the weekly item' : 'Your words when it was filed'} quote={c.said} source={x.source} zone={zone} />
