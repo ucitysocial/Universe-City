@@ -43,6 +43,7 @@ No entry is a defect just because the prototype is unfinished. Do not report uns
 | FT-014 | Time intake — daily schedule anchors | Sleep/wake, meals and personal routines must become visible scheduling commitments, rather than waiting for unfilled dates or resident prompts | Founder-directed product priority; current curriculum discrepancy | Recorded for Time requirements, docs and conversation changes; #35 |
 | FT-015 | Time — task execution within any calendar block | Optional expandable, ordered steps and one-step-at-a-time support inside any scheduled block; show actual reported progress | Founder design/behavior decision | Documented; implementation awaiting design/code review; #36 |
 | FT-016 | Time calendar — sleep anchors and remaining time | Sleep should stand out using restrained Universe City ink/pattern treatment; remaining unallocated time should become legible without implying it is all free | Founder styling direction and design proposal | Section 8 in draft audit PR #37; issues #29 and #35 |
+| FT-017 | Conversation — long update and postponed-work awareness | Reschedule followed by duplicated verbose chat and unrelated sleep question; guide should recognize repeated actual postponements of the same commitment and offer optional step-focused support | Screenshot-confirmed reply issue + new founder direction | #24 concise status; #38 deferral awareness; not yet verified in code |
 
 ---
 
@@ -489,6 +490,26 @@ No founder private records should be used in public tests. Run synthetic test ca
 **Available-time behavior:** Establish fixed commitments, sleep/waking, meals/routines and relevant travel/transitions before interpreting gaps. A truly empty space in the rendered calendar is **unallocated / unaccounted-for** until enough is known; it is not automatically free for new obligations. Don't double count overlaps or silently change Time's controlled-hours calculation, which is based on observed blocks. If implemented, a quiet daily or weekly indicator may separate accounted-for, unallocated and unknown time where data supports it.
 
 **Status:** Added to [five-doc Time audit PR #37, section 8](https://github.com/ucitysocial/Universe-City/blob/docs/time-five-doc-audit-2026-10-12/docs/founder-test/TIME_FIVE_DOCUMENT_REVISION_AUDIT_2026-10-12.md#8-proposed-visual-treatment--daily-essentials-and-usable-time), [#35](https://github.com/ucitysocial/Universe-City/issues/35), and [#29](https://github.com/ucitysocial/Universe-City/issues/29). No live styling or behavior change made. Confirm founder preference using a real rendered preview.
+
+---
+
+## FT-017 — One-line rescheduling and awareness of repeated postponements
+
+**Reported October 12, 2026, from an actual Resident Portal conversation screenshot.** The resident moved a current office-cleanup commitment to 2:00 PM, left the end time unknown and had four steps referenced. The screen showed an `UPDATED` status explaining that change. The agent simultaneously produced an excessive multi-sentence reply repeating new and old times, re-explaining an earlier failed tool attempt and asking what time the resident wants to wake up. The founder describes that as overwhelming and wants the assistant to **track when the same commitment is repeatedly pushed back**.
+
+**Confirmed screenshot behavior:** Redundant freeform model response plus structured status. The update and unknown end appear correct in this screenshot. Its statement that the four steps remain cannot be independently confirmed as a structured checklist because the live pilot currently lacks the agreed persisted in-block step implementation.
+
+**Existing governing rules:** `TIME.md` 7.15 already identifies commitments whose timing differs from a Plan more than once as relevant for selective Daily Close follow-up; 7.14 counts repeated displacement of protected time. These rules are **not** the same as counting every forward rescheduling of one planned commitment. `TIME_DEVELOPMENTS.md` 5.2 and 5.7 contain historically held ideas about difficulty and patterns. `lib/pilot/tools.ts` `change_commitment` preserves the same ID and records earlier values in `uc_pilot.revisions`; existing source history can ground a change count without speculative client labeling.
+
+**Founder direction:** The model must keep ordinary reschedule acknowledgments extremely short, ideally using the on-screen update once instead of retelling the record. Past values stay reachable through File/Activity history. A standalone time-change request must **not automatically trigger an unrelated schedule intake question**, even if a larger schedule-building thread remains open.
+
+**Repeated postponements:** Detect multiple distinct *forward* moves of the **same** commitment from actual dated source-backed revisions, not from model sentiment. A one-time move, correction, no-op approval, cleared end, earlier move, or a change on a different commitment must not count as that same commitment repeatedly postponed. Repeated movement is not a missed outcome, dishonesty, laziness, a diagnosis, or a negative score. The exact threshold and cadence for prompting remain to decide.
+
+**Support:** When the resident expresses difficulty starting or the File supports a meaningful repeated-delay pattern, offer **one small grounded action** inside that actual scheduled commitment. If the resident already stated steps, use the first relevant one; otherwise offer a proposal. Do not impose minute estimates, force Guided Life, nag after every change, or silently rewrite the larger Plan. Respect genuine decisions to rest or move work. The goal is to keep the resident able to start, not to assign blame.
+
+**Acceptance:** A successful change shows one concise update, no before/after paragraph or unnecessary self-correction; a repeated forward deferral can be identified accurately from history and results in optional, specific step-level help at an appropriate point. No unrelated sleep question interrupts this active task. History and user consent remain intact.
+
+**Tracking:** [#24](https://github.com/ucitysocial/Universe-City/issues/24) for concise filing feedback; [#38](https://github.com/ucitysocial/Universe-City/issues/38) for repeated deferral detection and support; [#36](https://github.com/ucitysocial/Universe-City/issues/36) for the future expandable steps design. **Not yet implemented or deployed.**
 
 ---
 
