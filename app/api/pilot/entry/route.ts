@@ -85,7 +85,7 @@ export async function POST(req: Request) {
       return Response.json({ ok: true, detail: r.brief || r.detail, changed: r.outcome !== 'unchanged', commitment: r.commitment }, { headers: { 'cache-control': 'no-store' } });
     }
     if (body?.done === true) {
-      const r = await markDone(a.userId, a.access, id);
+      const r = await markDone(a.userId, a.access, id, body?.weekly === true ? { date: field('date') || '' } : undefined);
       return Response.json({ ok: true, detail: r.brief || r.detail, changed: r.outcome !== 'unchanged', href: null }, { headers: { 'cache-control': 'no-store' } });
     }
     const r = typeof body?.note === 'string'

@@ -70,11 +70,21 @@ export async function noteOnCommitment(userId: string, access: Access, id: strin
  * press is enough: the agent files nothing for it and says nothing about it, and it can refer to it later. A press
  * never reports partly done or did not happen. For those the resident tells the agent.
  */
-export async function markDone(userId: string, access: Access, id: string): Promise<Result> {
-  if (!isUuid(id)) throw new Refusal('Not marked. The request named no entry.');
+export async function markDone(userId: string, access: Access, entry: string, weekly?: { date: string }): Promise<Result> {
+  if (!isUuid(entry)) throw new Refusal('Not marked. The request named no entry.');
   return withResident({ userId, actor: 'resident' }, async q => {
     const now = localNow(access.timezone);
     const env: Env = { q, userId, messageId: null, messageText: '', now, basis: 'resident_confirmation', via: 'screen' };
+    // A routine on a day that does not hold it yet is placed on that day first, so the mark belongs to that day.
+    let id = entry;
+    if (weekly) {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(weekly.date)) throw new Refusal('Not marked. The request named no day.');
+      if (weekly.date > now.date) throw new Refusal('Not marked. That day is ahead.');
+      await placeSchedule(env, weekly.date);
+      const row = (await q<{ id: string }>(`select id from uc_pilot.commitments where schedule_item_id = $1 and on_date = $2::date`, [entry, weekly.date]))[0];
+      if (!row) throw new Refusal('Not marked. That routine does not fall on that day.');
+      id = row.id;
+    }
     const c = (await q<{ label: string; on_date: string; start_min: number | null; execution: string; withdrawn_at: string | null }>(
       `select label, on_date::text as on_date, start_min, execution, withdrawn_at::text as withdrawn_at from uc_pilot.commitments where id = $1`, [id]))[0];
     if (!c) throw new Refusal('Not marked. That entry is not on file.');

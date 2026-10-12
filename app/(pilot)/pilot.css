@@ -987,3 +987,15 @@ html.uc-nav::after{content:"";position:fixed;left:0;top:0;height:3px;width:100%;
 .carry-h em{font-style:normal;font-size:12.5px;color:var(--ink2)}
 .carry-q{margin:0 0 6px;font-size:13px;color:var(--ink2)}
 .pn-need.carry .carry-done{display:inline-block;width:auto;margin-top:6px;font-size:12.5px;padding:4px 10px}
+
+/* Checking an entry in the overview marks it done, and it leaves the list. */
+.sday-list .sday-row{display:grid;grid-template-columns:auto minmax(0,1fr);gap:0 11px;align-items:start}
+.sday-open{display:grid;gap:3px;color:var(--ink);text-decoration:none;cursor:pointer;justify-items:start}
+.sday-open b{font-size:14.5px;font-weight:600;line-height:1.3}
+.sday-check{width:20px;height:20px;margin:1px 0 0;accent-color:var(--fc,var(--ink));cursor:pointer}
+.sday-done{display:grid;gap:6px}
+.sday-done .dash-more{margin-left:0;justify-self:start;background:none;border:0;padding:0;cursor:pointer;font-family:inherit;text-decoration:underline}
+.sday-done ul{list-style:none;margin:0;padding:0;display:grid;gap:3px}
+.sday-done a{font-size:13.5px;color:var(--ink2);text-decoration:line-through}
+.sday-open .sub{grid-column:auto}
+.pn-need.carry .pt-btn.carry-done{display:inline-block;width:auto;justify-self:start}
