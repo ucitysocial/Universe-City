@@ -41,11 +41,14 @@ export function SearchBox({ text, setText, id }: { text: string; setText: (s: st
   return (
     <div className="os-search">
       <label htmlFor={id} className="vh">Search your File and your conversation</label>
-      <input
-        id={id} type="search" value={text} maxLength={120} autoComplete="off" spellCheck={false} enterKeyHint="search"
-        placeholder="Search your File" onChange={e => setText(e.target.value)}
-        onKeyDown={e => { if (e.key === 'Escape') setText(''); }}
-      />
+      <div className="os-search-field">
+        <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5" /><path d="M12.6 12.6L17 17" /></svg>
+        <input
+          id={id} type="search" value={text} maxLength={120} autoComplete="off" spellCheck={false} enterKeyHint="search"
+          placeholder="Search" onChange={e => setText(e.target.value)}
+          onKeyDown={e => { if (e.key === 'Escape') setText(''); }}
+        />
+      </div>
       {text && <button type="button" onClick={() => setText('')}>Clear the search</button>}
     </div>
   );

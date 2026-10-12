@@ -45,7 +45,6 @@ export default function PilotRail({ index, name, synthetic }: { index: FileIndex
     <aside className="os-rail">
       <div className="os-rail-head">
         <Link href="/portal/home" className="pt-mark">universe&#9733;city</Link>
-        <div style={{ marginTop: 8 }}><span className="pt-tag">Founder test</span></div>
       </div>
       <SearchBox text={search.text} setText={search.setText} id="os-search-box" />
       <nav className="os-places" aria-label="Places">

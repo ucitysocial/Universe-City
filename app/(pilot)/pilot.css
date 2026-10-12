@@ -712,3 +712,19 @@ button.dash-more{background:none;border:0;padding:0;cursor:pointer;font:inherit;
 .os-main>.topbar~* .fb-bar,.os-main>.topbar~* .pt-talk-head{display:none}
 .pt-stream-wrap{background:var(--paper)}
 @media (max-width:860px){.topbar{display:none}.os-main>.topbar~* .pt-talk-head{display:block}}
+
+/* ---------------------------------------------------------------- the head of the left part and the top bar share one line */
+@media (min-width:861px){
+  .os-rail-head{height:54px;box-sizing:border-box;display:flex;align-items:center;padding:0 18px}
+  .topbar{height:54px;box-sizing:border-box;align-items:center;padding-top:0;padding-bottom:0;border-bottom:0}
+  .pt-mark{font-size:18px;line-height:1}
+  .topbar-t{line-height:1}
+}
+.os-search{padding:2px 12px 12px}
+.os-search-field{position:relative;width:100%}
+.os-search-field svg{position:absolute;left:11px;top:50%;width:16px;height:16px;margin-top:-8px;pointer-events:none}
+.os-search-field svg circle,.os-search-field svg path{fill:none;stroke:var(--dim);stroke-width:1.8;stroke-linecap:round}
+.os-search .os-search-field input{border-radius:9px;padding:9px 12px 9px 35px;border-width:1px}
+.pt-search .os-search .os-search-field input{border-width:2px;padding-left:38px}
+.os-search-field input:focus{outline:2px solid var(--II);outline-offset:1px}
+@media (min-width:1280px){.os-side{padding-top:9px}.os-side .win-bar{height:34px;box-sizing:border-box;display:flex;align-items:center;padding-top:0;padding-bottom:0}.side-fold{top:13px}}
