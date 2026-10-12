@@ -2,6 +2,7 @@ import type { Viewport } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import PilotRail from '@/components/PilotRail';
 import PilotSide from '@/components/PilotSide';
+import PilotSwitch from '@/components/PilotSwitch';
 import PilotViewport from '@/components/PilotViewport';
 import { who } from '@/lib/pilot/auth';
 import { loadIndex, loadSide } from '@/lib/pilot/browse';
@@ -41,9 +42,10 @@ export default async function PilotLayout({ children }: { children: React.ReactN
             </h2>
             <p className="note">
               {w.why === 'not_in_test'
-                ? 'The founder test holds one resident. This login is a different account, so no part of the test is shown.'
+                ? `You are logged in as ${w.email || 'an account'}. The founder test holds one resident, under a different account, so no part of the test is shown. Log out, then log in with the account the test belongs to.`
                 : 'No part of the test was loaded and no entry changed. Load the page again in one minute.'}
             </p>
+            {w.why === 'not_in_test' && <PilotSwitch />}
           </div>
         </div>
       </div>

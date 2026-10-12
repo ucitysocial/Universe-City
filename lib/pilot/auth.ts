@@ -8,22 +8,24 @@ import { ensureLocal, LOCAL_USER, localMode } from './local';
 
 export type Who =
   | { ok: true; userId: string; access: Access }
-  | { ok: false; why: 'off' | 'logged_out' | 'not_in_test' | 'database'; detail?: string };
+  | { ok: false; why: 'off' | 'logged_out' | 'not_in_test' | 'database'; detail?: string; email?: string | null };
 
 export async function who(): Promise<Who> {
   if (!pilotEnabled()) return { ok: false, why: 'off' };
   let userId: string | null = null;
+  let email: string | null = null;
   if (localMode()) {
     await ensureLocal();
     userId = LOCAL_USER;
   } else {
     const { data: { user } } = await supabaseServer().auth.getUser();
     userId = user?.id ?? null;
+    email = user?.email ?? null;
   }
   if (!userId) return { ok: false, why: 'logged_out' };
   try {
     const access = await withResident({ userId, actor: 'resident' }, q => loadAccess(q));
-    if (!access) return { ok: false, why: 'not_in_test' };
+    if (!access) return { ok: false, why: 'not_in_test', email };
     return { ok: true, userId, access };
   } catch (e: any) {
     return { ok: false, why: 'database', detail: typeof e?.message === 'string' ? e.message : undefined };
