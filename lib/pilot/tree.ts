@@ -50,7 +50,6 @@ export function treeRows(ix: FileIndex, path: string): TreeRow[] {
         add({ href: `${fp}/schedule`, label: 'Schedule', depth: 3, icon: 'day', color: dept.color, count: ix.time.days.reduce((n, d) => n + d.count, 0) });
         add({ href: `${fp}/weekly`, label: 'Weekly routine', depth: 3, icon: 'clock', color: dept.color, count: ix.time.weekly });
       }
-      if (here.said || f.name === 'Time') add({ href: `${fp}/said`, label: 'Statements', depth: 3, icon: 'said', color: dept.color, count: here.said });
       if (here.waiting || f.name === 'Time') add({ href: `${fp}/waiting`, label: 'Pending', depth: 3, icon: 'wait', color: dept.color, count: here.waiting });
     }
   }

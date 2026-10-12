@@ -8,6 +8,7 @@ import PilotCalFocus from '@/components/PilotCalFocus';
 import PilotDecide from '@/components/PilotDecide';
 import PilotEntry from '@/components/PilotEntry';
 import { DEPARTMENTS, FOLDERS, type Folder } from '@/lib/domain/folders';
+import { FOLDER_TEXT } from '@/lib/domain/folder-text';
 import { who } from '@/lib/pilot/auth';
 import {
   entriesIn, loadBelonging, loadCommitment, loadDay, loadFollowUps, loadIndex, loadSaid, loadStatement, loadTimeHistory, loadWaiting,
@@ -208,6 +209,42 @@ function Fixed({ b, status, owed }: { b: ReturnType<typeof belongsTo>; status: s
   );
 }
 
+/**
+ * What is known in one folder: each fact the resident told the agent, as one clean line. The founder set it on October
+ * 12, 2026, in place of a separate Statements file. A line opens the fact with the words it came from.
+ */
+async function known(q: Q, base: string, folder: string) {
+  const list = (await loadSaid(q, folder)).filter(s => s.state === 'current');
+  if (!list.length) return null;
+  return (
+    <section className="known">
+      <h2 className="fb-h">What&apos;s known</h2>
+      <div className="known-list">
+        {list.map(s => (
+          <Link key={s.id} href={`${base}/said/${s.id}`} className="known-line">
+            <span>{s.entry ?? `${s.topic}: ${s.said}`}</span>
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/**
+ * What one folder is, as the public site defines it: the definition, how it applies in Universe City, and the system
+ * it helps the resident build, with the question that system answers.
+ */
+function About({ folder }: { folder: Folder }) {
+  const t = FOLDER_TEXT[folder.name];
+  return (
+    <section className="about">
+      {t && <p className="about-def">{t.definition}</p>}
+      {t && <p className="about-app">{t.application}</p>}
+      <p className="about-sys"><span>The system it builds</span>{folder.system}. {folder.question}?</p>
+    </section>
+  );
+}
+
 // ------------------------------------------------------------------ panes
 
 /**
@@ -253,9 +290,9 @@ async function folderPane(ctx: Ctx, folder: Folder | null, base: string, color?:
 
   if (name !== 'Time') {
     const items = [
-      here.said ? node('said', 'Statements', 'said', here.said, 'statement') : null,
       here.waiting ? node('waiting', 'Pending', 'wait', here.waiting, 'entry', 'entries', true) : null
     ].filter((x): x is TileItem => !!x);
+    const knownHere = await known(q, base, name);
     // Calendar entries sit in Time and belong to this folder too. They are listed here, and each opens in Time.
     const cal = here.cal ? await loadBelonging(q, name, ix.today) : null;
     const line = (c: { id: string; label: string; on_date: string; start_min: number | null; end_min: number | null }) => (
@@ -267,7 +304,7 @@ async function folderPane(ctx: Ctx, folder: Folder | null, base: string, color?:
     );
     return (
       <>
-        {folder && <p className="fb-note">{folder.system}. {folder.question}?</p>}
+        {folder && <About folder={folder} />}
         {cal && (
           <div className="sum">
             <section className="sum-box">
@@ -290,7 +327,8 @@ async function folderPane(ctx: Ctx, folder: Folder | null, base: string, color?:
             )}
           </div>
         )}
-        {items.length ? <Tiles items={items} /> : !cal && <p className="fb-empty">No entry is on file in {name} yet.</p>}
+        {knownHere}
+        {items.length ? <Tiles items={items} /> : !cal && !here.said && <p className="fb-empty">No entry is on file in {name} yet.</p>}
       </>
     );
   }
@@ -302,8 +340,10 @@ async function folderPane(ctx: Ctx, folder: Folder | null, base: string, color?:
     `select id, label, on_date::text as on_date, start_min, end_min, folder from uc_pilot.commitments
       where withdrawn_at is null and execution = 'planned' and on_date >= $1::date order by on_date, start_min nulls last limit 5`, [ix.today]);
   const days = ix.time.days.reduce((n, d) => n + d.count, 0);
+  const knownTime = await known(q, base, 'Time');
   return (
     <>
+      {folder && <About folder={folder} />}
       <div className="sum">
         <section className="sum-box">
           <h2>Coming up</h2>
@@ -334,11 +374,11 @@ async function folderPane(ctx: Ctx, folder: Folder | null, base: string, color?:
           {view.notEstablished.length > 4 && <p className="sum-none">{view.notEstablished.length - 4} more. The agent asks about them in the conversation.</p>}
         </section>
       </div>
+      {knownTime}
       <h2 className="fb-h">Files</h2>
       <Tiles items={[
         node('schedule', 'Schedule', 'day', days, 'entry', 'entries'),
         node('weekly', 'Weekly routine', 'clock', ix.time.weekly, 'item that repeats', 'items that repeat'),
-        node('said', 'Statements', 'said', here.said, 'statement'),
         node('waiting', 'Pending', 'wait', here.waiting, 'entry', 'entries', true)
       ]} />
     </>
@@ -498,7 +538,7 @@ async function weeklyItemPane({ q, zone }: Ctx, id: string, color?: string) {
 
 async function saidPane({ q, zone }: Ctx, base: string, folder: string, color?: string) {
   const list = await loadSaid(q, folder);
-  if (!list.length) return <p className="fb-empty">No statement is on file in {folder} yet.</p>;
+  if (!list.length) return <p className="fb-empty">Nothing is known in {folder} yet.</p>;
   return (
     <div className="ents" style={{ maxWidth: 820 }}>
       {list.map(s => (
@@ -663,7 +703,7 @@ async function historyPane({ q, zone }: Ctx, base: string) {
       )}
       {past.length > 0 && (
         <>
-          <h2 className="fb-h">Statements that were replaced or withdrawn</h2>
+          <h2 className="fb-h">Replaced or withdrawn</h2>
           <div className="ents" style={{ maxWidth: 820 }}>
             {past.map(s => (
               <Link key={s.id} href={`${base}/said/${s.id}`} className="ent off">
@@ -682,7 +722,7 @@ async function historyPane({ q, zone }: Ctx, base: string) {
 // ------------------------------------------------------------------ the page
 
 const NODES: Record<string, string> = {
-  weekly: 'Weekly routine', said: 'Statements', waiting: 'Pending', work: 'Ongoing work', schedule: 'Schedule',
+  weekly: 'Weekly routine', said: 'What\'s known', waiting: 'Pending', work: 'Ongoing work', schedule: 'Schedule',
   'follow-ups': 'Follow ups', unknown: 'Still unknown', history: 'History'
 };
 
