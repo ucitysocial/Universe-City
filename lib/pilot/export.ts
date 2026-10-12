@@ -58,7 +58,7 @@ export async function exportAll(q: Q, zone: string) {
   }
   const turnOf = new Map<string, any>(turns.map((t: any) => [t.message_id, t]));
 
-  // One entry for each exchange: what the resident wrote, what the guide answered, and everything in between.
+  // One entry for each exchange: what the resident wrote, what the agent answered, and everything in between.
   const exchanges = messages.filter((m: any) => m.speaker === 'resident').map((m: any) => {
     const t = turnOf.get(m.id);
     const reply = messages.find((x: any) => x.reply_to === m.id) || null;
@@ -79,7 +79,7 @@ export async function exportAll(q: Q, zone: string) {
     };
   });
 
-  // A reply the guide wrote after a press on the screen. No resident message came before it.
+  // A reply the agent wrote after a press on the screen. No resident message came before it.
   const afterPress = messages.filter((m: any) => m.speaker === 'software' && !m.reply_to).map((m: any) => {
     const t = turnOf.get(m.id);
     return {
@@ -137,11 +137,11 @@ export function exportText(x: Awaited<ReturnType<typeof exportAll>>): string {
       L.push(e.resident.said);
       if (e.resident.taken_out_before_keeping.length) L.push(`  (taken out before the message was kept: ${e.resident.taken_out_before_keeping.join(', ')})`);
     } else {
-      L.push('  (you pressed a button on the screen. The guide went on.)');
+      L.push('  (you pressed a button on the screen. The agent went on.)');
     }
     if (e.guide) {
       L.push('');
-      L.push(`[${when(e.guide.at)}] GUIDE, SOFTWARE`);
+      L.push(`[${when(e.guide.at)}] AGENT, SOFTWARE`);
       L.push(e.guide.said);
     } else {
       L.push('');

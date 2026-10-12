@@ -35,7 +35,7 @@ export async function GET(req: Request) {
     const say = (url.searchParams.get('say') || '').trim();
     const out: Record<string, unknown> = { ...extra };
     // A press on the oldest item that waits for the made up resident, as the button on the screen does it,
-    // followed by the guide's next reply.
+    // followed by the agent's next reply.
     const pressed = url.searchParams.get('press');
     if (pressed === 'confirm' || pressed === 'decline') {
       const waiting = await withResident({ userId, actor: 'resident' }, q => q<any>(

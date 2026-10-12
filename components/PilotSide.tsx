@@ -1,7 +1,7 @@
 import type { CSSProperties } from 'react';
 import Link from 'next/link';
-import PilotDecide from '@/components/PilotDecide';
-import { Answer, Countdown } from '@/components/PilotPanelBits';
+import { Countdown } from '@/components/PilotPanelBits';
+import PilotPending from '@/components/PilotPending';
 import { spanWords, type PanelView } from '@/lib/pilot/browse';
 import { belongsTo } from '@/lib/pilot/dept';
 import { TIME_PATH } from '@/lib/pilot/paths';
@@ -16,7 +16,7 @@ const short = (date: string) => sayDate(date).replace(/, \d{4}$/, '');
  *              coming week, because most planning happens on Sunday
  *   Pending    each item that waits for the resident: an overlap, an entry that passed with its end or its outcome
  *              unknown, and each item that waits for a yes or a no
- * The guide's job is to keep the resident planned seven days out. This panel shows how that stands.
+ * The agent's job is to keep the resident planned seven days out. This panel shows how that stands.
  */
 export default function PilotSide({ panel }: { panel: PanelView }) {
   const { now, then } = panel;
@@ -55,21 +55,7 @@ export default function PilotSide({ panel }: { panel: PanelView }) {
 
           <section>
             <h2>Pending</h2>
-            {panel.pending.length === 0 && <p className="win-none">No item waits for you.</p>}
-            {panel.pending.map(p => p.type === 'ask' ? (
-              <div key={p.key} className="pn-need">
-                <p><Link href={p.href}>{p.question}</Link></p>
-                <Answer question={p.question} />
-              </div>
-            ) : (
-              <div key={p.key} className="win-wait">
-                <p>{p.summary}</p>
-                {p.overlap
-                  ? <PilotDecide id={p.id} kind={p.kind} yes="Keep both entries" no="Leave this one off" />
-                  : <PilotDecide id={p.id} kind={p.kind} />}
-              </div>
-            ))}
-            {panel.more > 0 && <p className="win-none">{panel.more} more {panel.more === 1 ? 'question waits' : 'questions wait'}. The guide asks in the conversation.</p>}
+            <PilotPending panel={panel} />
           </section>
         </div>
       </div>

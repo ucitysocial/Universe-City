@@ -77,7 +77,7 @@ export default function PilotConversation({ initial }: { initial: Thread }) {
   }, []);
 
   // A press on a button elsewhere on the screen changes the conversation. It is loaded again, and the line that
-  // says a reply is being written shows while the guide goes on.
+  // says a reply is being written shows while the agent goes on.
   useEffect(() => {
     const again = () => { void load(); };
     const going = (e: Event) => { atEnd.current = true; setGoingOn((e as CustomEvent).detail === true); };
@@ -171,7 +171,7 @@ export default function PilotConversation({ initial }: { initial: Thread }) {
     sendText(text);
   }
 
-  // A message written in the box under a part of the File arrives here and is sent once. The guide is told which
+  // A message written in the box under a part of the File arrives here and is sent once. The agent is told which
   // part of the File it was written from, for that one message.
   useEffect(() => {
     try {
@@ -206,7 +206,7 @@ export default function PilotConversation({ initial }: { initial: Thread }) {
     setTimeout(() => box.current?.focus(), 50);
   }
 
-  // After a press on a waiting item, the guide goes on with its next reply.
+  // After a press on a waiting item, the agent goes on with its next reply.
   async function decided(next: string | null) {
     atEnd.current = true;
     await load();
@@ -242,7 +242,7 @@ export default function PilotConversation({ initial }: { initial: Thread }) {
               A payment card number, a government identification number, a bank account number, and a password are taken out of a message before it is kept, in the common ways each is written. A number written in an unusual way can get through, so leave those four out of your messages.
             </p>
             <p>It stays until you clear it. The Activity page holds the control that clears your test data, and two buttons that download all of it as a file.</p>
-            <p>You talk with the guide. The guide is Universe City software. Your agent is a person. No person reads this conversation unless you ask for one.</p>
+            <p>You talk with the agent. The agent is Universe City software. No person reads this conversation unless you ask for one.</p>
             <div className="pt-btns" style={{ marginTop: 14 }}>
               <button type="button" className="pt-btn" onClick={start}>Start the conversation</button>
             </div>
@@ -273,7 +273,7 @@ export default function PilotConversation({ initial }: { initial: Thread }) {
           )}
           {shown.length === 0 && (
             <p className="pt-empty">
-              No message is here yet. Write about any part of your day or your life. The guide answers, and each entry it files is listed under its reply.
+              No message is here yet. Write about any part of your day or your life. The agent answers, and each entry it files is listed under its reply.
             </p>
           )}
           {line.map(item => {
@@ -286,7 +286,7 @@ export default function PilotConversation({ initial }: { initial: Thread }) {
                 <div key={`p-${item.p.id}`} style={{ display: 'contents' }}>
                   {newDay && <p className="pt-kick" style={{ alignSelf: 'center' }}>{day}</p>}
                   <p className="pt-press">
-                    <span className="when">You, on the screen {clockOf(item.at)}</span>
+                    <span className="when">You {clockOf(item.at)}</span>
                     <span className={`pt-chip ${p.tone}`}>{p.word}</span>
                     {item.p.href ? <Link href={item.p.href}>{p.line}</Link> : <span>{p.line}</span>}
                   </p>
@@ -301,21 +301,21 @@ export default function PilotConversation({ initial }: { initial: Thread }) {
               <div key={m.id} style={{ display: 'contents' }}>
                 {newDay && <p className="pt-kick" style={{ alignSelf: 'center' }}>{day}</p>}
                 <div className={mine ? 'pt-msg me' : 'pt-msg'} id={`m-${m.id}`}>
-                  <p className="pt-who">{mine ? 'You' : m.speaker === 'agent' ? 'Your agent' : 'Guide, software'} {clockOf(m.created_at)}</p>
+                  <p className="pt-who">{mine ? 'You' : m.speaker === 'agent' ? 'A person on the team' : 'Agent, software'} {clockOf(m.created_at)}</p>
                   <div className="pt-bubble">{m.body}</div>
                   {mine && m.removed && m.removed.length > 0 && (
                     <p className="pt-meta">Taken out before the message was kept: {m.removed.join(', ')}.</p>
                   )}
                   {!mine && <Effects list={m.turn?.effects || []} />}
                 </div>
-                {running && <p className="pt-thinking">The guide is writing a reply.</p>}
+                {running && <p className="pt-thinking">The agent is writing a reply.</p>}
                 {failed && (
                   <div className="pt-msg">
                     <p className="pt-who">Universe City</p>
                     <div className="pt-bubble fail">
                       {(m.turn?.effects || []).length
-                        ? 'The guide did not reply. Your message is kept. The actions below were carried out before it stopped, and sending again repeats none of them.'
-                        : 'The guide did not reply. Your message is kept.'}
+                        ? 'The agent did not reply. Your message is kept. The actions below were carried out before it stopped, and sending again repeats none of them.'
+                        : 'The agent did not reply. Your message is kept.'}
                     </div>
                     <Effects list={m.turn?.effects || []} />
                     {m.key && (
@@ -330,7 +330,7 @@ export default function PilotConversation({ initial }: { initial: Thread }) {
               </div>
             );
           })}
-          {goingOn && <p className="pt-thinking">The guide is writing a reply.</p>}
+          {goingOn && <p className="pt-thinking">The agent is writing a reply.</p>}
           {err && <p className="pt-err">{err}</p>}
         </div>
         {fresh && <button type="button" className="pt-btn pt-new" onClick={toEnd}>Show the newest message</button>}
@@ -352,7 +352,7 @@ export default function PilotConversation({ initial }: { initial: Thread }) {
         <label htmlFor="pt-box" style={{ position: 'absolute', left: -9999 }}>Your message</label>
         <textarea
           id="pt-box" ref={box} value={draft} rows={1} maxLength={4000}
-          placeholder="Write to the guide" enterKeyHint="send"
+          placeholder="Write to the agent" enterKeyHint="send"
           onChange={e => setDraft(e.target.value)}
           onFocus={() => { if (atEnd.current) setTimeout(toEnd, 250); }}
           onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) { e.preventDefault(); send(); } }}

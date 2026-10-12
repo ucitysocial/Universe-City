@@ -24,8 +24,9 @@ export interface Model {
   create(req: ModelRequest): Promise<ModelReply>;
 }
 
-const G = globalThis as unknown as { __ucPilotModel?: { override: Model | null } };
-const state = (G.__ucPilotModel ||= { override: null });
+const G = globalThis as unknown as { __ucPilotModel?: { override: Model | null; noQuick: Set<string> } };
+const state = (G.__ucPilotModel ||= { override: null, noQuick: new Set<string>() });
+state.noQuick ||= new Set<string>();
 export function useModel(m: Model | null) { state.override = m; }
 
 // The site's own address. A request that reaches this site through the proxy at ucitysocial.com carries that host,
@@ -70,15 +71,30 @@ const anthropic: Model = {
       tool_choice: req.allowActions ? { type: 'auto' } : { type: 'none' },
       messages: req.messages
     };
+    // The reply is short, and the time a resident waits is most of the cost of a turn. The model is asked to answer
+    // without a separate thinking pass. A model that refuses that setting is asked again without it, and the setting
+    // stays off for that model from then on.
+    const quick = !state.noQuick.has(body.model);
+    const send = async (client: any) => {
+      try {
+        return await client.messages.create((quick ? { ...body, thinking: { type: 'disabled' } } : body) as any);
+      } catch (e: any) {
+        if (quick && e?.status === 400 && /thinking/i.test(String(e?.message || ''))) {
+          state.noQuick.add(body.model);
+          return await client.messages.create(body as any);
+        }
+        throw e;
+      }
+    };
     let res: any;
     try {
-      res = await make().messages.create(body as any);
+      res = await send(make());
     } catch (e: any) {
       const base = process.env.ANTHROPIC_BASE_URL;
       const retry = !own && /mismatched_site_id|Mismatched site ID/.test(String(e?.message || '')) ? gatewayOnOwnSite(base) : null;
       if (!retry) throw new Error(`${String(e?.message || e).slice(0, 300)} [address ${where(base)}]`);
       try {
-        res = await make(retry).messages.create(body as any);
+        res = await send(make(retry));
       } catch (e2: any) {
         throw new Error(`${String(e2?.message || e2).slice(0, 300)} [address ${where(base)}, then ${where(retry)}]`);
       }

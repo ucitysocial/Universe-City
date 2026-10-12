@@ -1,8 +1,8 @@
 // The department of an entry in Time. The calendar colors an entry by it.
 //
 // A commitment and a weekly schedule item sit in Time, and each one also belongs to one folder of the forty
-// eight: the folder its activity is about. A work shift belongs to Schedule in Career Development. The guide
-// sets that folder when it files the entry, and the resident can tell the guide to move it.
+// eight: the folder its activity is about. A work shift belongs to Schedule in Career Development. The agent
+// sets that folder when it files the entry, and the resident can tell the agent to move it.
 //
 // The founder set the colors on October 11, 2026: a work shift is purple, and housing work such as grocery
 // shopping, cleaning, and organizing is yellow. Those are the colors of Career Development and Housing Stability.
@@ -20,7 +20,7 @@ export type Belongs = {
 
 const TIME_DEPT: DeptKey = 'I';
 
-// An entry filed before entries carried a folder has none. Until the guide sets one, the name of the entry is read
+// An entry filed before entries carried a folder has none. Until the agent sets one, the name of the entry is read
 // for the four cases the founder named. Each other entry without a folder shows in the color of Time.
 const BY_NAME: [RegExp, string][] = [
   [/\b(shift|work)\b/i, 'Schedule'],

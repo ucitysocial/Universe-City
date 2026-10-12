@@ -6,7 +6,7 @@
 import { FOLDERS } from '../domain/folders';
 import type { Q } from './db';
 import { isUuid, TS } from './db';
-import type { Belongs } from './dept';
+import { belongsTo, type Belongs } from './dept';
 import { owedOn, type OwedFile } from './owed';
 import { folderPath } from './paths';
 import { addDays, localNow, sayClock, sayDate, sayDays, saySpan, weekdayOf } from './time';
@@ -16,7 +16,7 @@ import { addDays, localNow, sayClock, sayDate, sayDays, saySpan, weekdayOf } fro
 export type DayIndex = { date: string; count: number; off: number; plan: string | null };
 export type FileIndex = {
   today: string;
-  folders: Record<string, { said: number; waiting: number; work: number }>;   // by folder name. General holds what fits no folder
+  folders: Record<string, { said: number; waiting: number; work: number; cal: number }>;   // by folder name. General holds what fits no folder. cal: calendar entries that belong to the folder
   time: { weekly: number; days: DayIndex[]; followUps: number; history: number };
   proposals: number;                 // interpretations that wait for a person
   messages: number;
@@ -30,7 +30,7 @@ const folderKey = (name: string | null) => (name && FOLDER_SET.has(name) ? name 
 export async function loadIndex(q: Q, zone: string): Promise<FileIndex> {
   const today = localNow(zone).date;
   const folders: FileIndex['folders'] = {};
-  const at = (name: string | null) => (folders[folderKey(name)] ||= { said: 0, waiting: 0, work: 0 });
+  const at = (name: string | null) => (folders[folderKey(name)] ||= { said: 0, waiting: 0, work: 0, cal: 0 });
 
   for (const r of await q<{ folder: string; n: number }>(
     `select folder, count(*)::int as n from uc_pilot.statements where state = 'current' group by folder`)) at(r.folder).said += r.n;
@@ -43,6 +43,14 @@ export async function loadIndex(q: Q, zone: string): Promise<FileIndex> {
        from uc_pilot.pending where state = 'open' group by 1, 2, 3`)) {
     if (r.decider === 'agent') { proposals += r.n; at(r.folder).waiting += r.n; }
     else at(r.folder ?? 'Time').waiting += r.n;
+  }
+
+  // A calendar entry sits in Time and also belongs to the folder its activity is about. That folder counts it.
+  for (const r of await q<{ folder: string | null; label: string }>(
+    `select folder, label from uc_pilot.commitments where withdrawn_at is null
+     union all select folder, label from uc_pilot.schedule_items where state = 'current'`)) {
+    const b = belongsTo(r.folder, r.label);
+    if (b.folder && b.folder !== 'Time') at(b.folder).cal += 1;
   }
 
   const days = await q<DayIndex>(
@@ -70,9 +78,9 @@ export async function loadIndex(q: Q, zone: string): Promise<FileIndex> {
 
 /** How many entries a folder holds. The count beside the folder in the tree and on its tile. */
 export function entriesIn(ix: FileIndex, folder: string): number {
-  const f = ix.folders[folder] || { said: 0, waiting: 0, work: 0 };
+  const f = ix.folders[folder] || { said: 0, waiting: 0, work: 0, cal: 0 };
   const time = folder === 'Time' ? ix.time.weekly + ix.time.days.reduce((n, d) => n + d.count, 0) : 0;
-  return f.said + time;
+  return f.said + f.cal + time;
 }
 export const waitingIn = (ix: FileIndex, folder: string) => (ix.folders[folder]?.waiting ?? 0);
 
@@ -217,6 +225,21 @@ export async function owedOnCommitment(q: Q, zone: string, c: CommitmentFull, b:
 export async function owedOnWeekly(q: Q, zone: string, s: { start_min: number | null; end_min: number | null; state: string }, b: Belongs) {
   return owedOn({ on_date: null, start_min: s.start_min, end_min: s.end_min, execution: 'planned', actual_end_min: null, withdrawn: s.state !== 'current' },
     b, await owedFile(q, zone, null));
+}
+
+/** The calendar entries that belong to one folder: what is ahead first, then the most recent before today. */
+export async function loadBelonging(q: Q, folder: string, today: string) {
+  type Row = { id: string; label: string; on_date: string; start_min: number | null; end_min: number | null; folder: string | null; execution: string };
+  const rows = (await q<Row>(
+    `select id, label, on_date::text as on_date, start_min, end_min, folder, execution from uc_pilot.commitments
+      where withdrawn_at is null order by on_date, start_min nulls last limit 2000`)).filter(r => belongsTo(r.folder, r.label).folder === folder);
+  const weekly = (await q<{ id: string; label: string; days: number[]; start_min: number | null; end_min: number | null; folder: string | null }>(
+    `select id, label, days, start_min, end_min, folder from uc_pilot.schedule_items where state = 'current'`)).filter(r => belongsTo(r.folder, r.label).folder === folder);
+  return {
+    ahead: rows.filter(r => r.on_date >= today).slice(0, 12),
+    before: rows.filter(r => r.on_date < today).reverse().slice(0, 8),
+    weekly
+  };
 }
 
 // ------------------------------------------------------------------ Time: the weekly schedule
@@ -369,7 +392,7 @@ export type PanelView = {
   week: { date: string; hours: number; count: number }[];
   planned: number;
   pending: PendingItem[];
-  more: number;                       // questions past the first three. The guide asks them in the conversation
+  more: number;                       // questions past the first three. The agent asks them in the conversation
 };
 
 const dayWord = (date: string) => sayDate(date).replace(/, \d{4}$/, '');
@@ -475,7 +498,7 @@ export async function searchAll(q: Q, text: string): Promise<Found[]> {
   }
   for (const r of await q<any>(
     `select id, speaker, body, ${TS('created_at')} as at from uc_pilot.messages where lower(body) like all ($1::text[]) order by seq desc limit 25`, [like])) {
-    out.push({ key: r.id, href: `/portal/conversation#m-${r.id}`, title: r.speaker === 'resident' ? 'You' : r.speaker === 'agent' ? 'Your agent' : 'Guide, software', sub: excerpt(r.body), kind: 'message', at: r.at });
+    out.push({ key: r.id, href: `/portal/home#m-${r.id}`, title: r.speaker === 'resident' ? 'You' : r.speaker === 'agent' ? 'A person on the team' : 'Agent, software', sub: excerpt(r.body), kind: 'message', at: r.at });
   }
   return out;
 }

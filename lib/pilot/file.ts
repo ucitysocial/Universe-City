@@ -1,5 +1,5 @@
 // Reads the resident's File for two readers: the language model and the screen.
-// Both read the same rows, so what the guide knows and what the resident sees cannot differ.
+// Both read the same rows, so what the agent knows and what the resident sees cannot differ.
 
 import type { Q } from './db';
 import { TS } from './db';
@@ -166,6 +166,9 @@ export function fileForModel(v: FileView, name: string | null): string {
   }
   if (!v.days.some(d => d.commitments.length || d.plan)) L.push('  No commitment and no Plan is on file for the days in view.');
   if (v.emptyDays.length) L.push(`  Days ahead with no entry on file: ${v.emptyDays.map(d => `${['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][weekdayOf(d)]} ${d}`).join(', ')}.`);
+  // The order in which days are planned: the nearest day ahead first, one day at a time.
+  const ahead = v.days.filter(d => d.date > n.date);
+  if (ahead.length) L.push(`  Planning order, nearest first: ${ahead.map(d => `${['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][weekdayOf(d.date)]} ${d.date} (${d.commitments.length ? `${d.commitments.length} on file` : 'nothing on file'})`).join(', ')}.`);
   L.push('');
   L.push('ONGOING WORK. The resident asked for help with each of these. Each stays open until the resident says it is settled or drops it. You lead it:');
   if (v.work.length === 0) L.push('  None is open.');
@@ -185,13 +188,13 @@ export function fileForModel(v: FileView, name: string | null): string {
   L.push('WAITING FOR THE RESIDENT TO CONFIRM OR DECLINE:');
   if (v.waitingResident.length === 0) L.push('  Nothing.');
   for (const p of v.waitingResident) L.push(`  [${shortId(p.id)}] ${p.summary}`);
-  L.push('PROPOSALS WAITING FOR THE AGENT, A PERSON. These are not on file and are not facts:');
+  L.push('PROPOSALS WAITING FOR A PERSON ON THE TEAM. These are not on file and are not facts:');
   if (v.waitingAgent.length === 0) L.push('  None.');
   for (const p of v.waitingAgent) L.push(`  [${shortId(p.id)}] ${p.summary}`);
   L.push('');
   L.push('OPEN FOLLOW UPS:');
   if (v.followUps.length === 0) L.push('  None.');
-  for (const f of v.followUps) L.push(`  [${shortId(f.id)}] for ${f.owner === 'agent' ? 'the agent' : f.owner === 'resident' ? 'the resident' : 'software'}, ${f.kind}: ${f.what}${f.due_on ? `, needed by ${f.due_on}` : ''}`);
+  for (const f of v.followUps) L.push(`  [${shortId(f.id)}] for ${f.owner === 'agent' ? 'a person on the team' : f.owner === 'resident' ? 'the resident' : 'software'}, ${f.kind}: ${f.what}${f.due_on ? `, needed by ${f.due_on}` : ''}`);
   L.push('');
   L.push('NOT ESTABLISHED:');
   if (v.notEstablished.length === 0) L.push('  Nothing is listed.');

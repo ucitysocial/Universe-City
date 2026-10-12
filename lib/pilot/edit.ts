@@ -35,7 +35,7 @@ export async function editCommitment(userId: string, access: Access, id: string,
     if (!old) throw new Refusal('Not changed. That entry is not on file.');
     // The form cannot empty a time that is on file. That keeps an empty box from reading as a change.
     if ((old.start_min !== null && patch.start === '') || (old.end_min !== null && patch.end === '')) {
-      throw new Refusal('Not changed. A time that is on file stays until a new time replaces it. To take a time off this entry, tell the guide.');
+      throw new Refusal('Not changed. A time that is on file stays until a new time replaces it. To take a time off this entry, tell the agent.');
     }
     const args: Record<string, unknown> = { ref: id };
     for (const k of ['label', 'date', 'start', 'end'] as const) if (typeof patch[k] === 'string' && patch[k]!.trim()) args[k] = patch[k]!.trim();

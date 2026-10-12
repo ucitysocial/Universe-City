@@ -17,9 +17,12 @@ const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 
 export const dayLabel = (date: string) => `${MONTHS[Number(date.slice(5, 7)) - 1]} ${Number(date.slice(8, 10))}`;
 
 const count = (ix: FileIndex, folder: string) => {
-  const f = ix.folders[folder] || { said: 0, waiting: 0, work: 0 };
+  const f = ix.folders[folder] || { said: 0, waiting: 0, work: 0, cal: 0 };
   return f.said + (folder === 'Time' ? ix.time.weekly + ix.time.days.reduce((n, d) => n + d.count, 0) : 0);
 };
+// A folder also counts the calendar entries that belong to it. Each of those sits in Time too, so the total for the
+// whole File counts it once, in Time.
+const countHere = (ix: FileIndex, folder: string) => count(ix, folder) + (folder === 'Time' ? 0 : ix.folders[folder]?.cal || 0);
 
 export function totalEntries(ix: FileIndex): number {
   return [...FOLDERS.map(f => f.name), 'General'].reduce((n, name) => n + count(ix, name), 0);
@@ -34,12 +37,12 @@ export function treeRows(ix: FileIndex, path: string): TreeRow[] {
   for (const dept of DEPARTMENTS) {
     const dp = `${FILE_ROOT}/${DEPT_SLUG[dept.key]}`;
     const folders = FOLDERS.filter(f => f.dept === dept.key);
-    add({ href: dp, label: dept.name, num: dept.key, depth: 1, icon: 'folder', color: dept.color, count: folders.reduce((n, f) => n + count(ix, f.name), 0) });
+    add({ href: dp, label: dept.name, num: dept.key, depth: 1, icon: 'folder', color: dept.color, count: folders.reduce((n, f) => n + countHere(ix, f.name), 0) });
     if (!inside(dp)) continue;
     for (const f of folders) {
       const fp = `${dp}/${slugOf(f.name)}`;
-      const n = count(ix, f.name);
-      const here = ix.folders[f.name] || { said: 0, waiting: 0, work: 0 };
+      const n = countHere(ix, f.name);
+      const here = ix.folders[f.name] || { said: 0, waiting: 0, work: 0, cal: 0 };
       add({ href: fp, label: f.name, num: String(f.num).padStart(2, '0'), depth: 2, icon: n ? 'folder' : 'folder empty', color: dept.color, count: n });
       if (!inside(fp)) continue;
       if (f.name === 'Time') {

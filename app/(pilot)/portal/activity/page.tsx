@@ -35,11 +35,11 @@ export default async function ActivityPage() {
         <p className="pt-meta">
           {today.input.toLocaleString('en-US')} tokens read and {today.output.toLocaleString('en-US')} tokens written. Model: {modelName()}. Instructions version: {PROMPT_VERSION}.
         </p>
-        <p className="pt-meta">When the daily limit is reached, your messages are still kept and the guide stops replying until the next day.</p>
+        <p className="pt-meta">When the daily limit is reached, your messages are still kept and the agent stops replying until the next day.</p>
       </div>
 
       <h2>Actions</h2>
-      {actions.length === 0 && <p className="pt-empty">No action is listed yet. The server adds a line each time the guide reads your File or asks to change it.</p>}
+      {actions.length === 0 && <p className="pt-empty">No action is listed yet. The server adds a line each time the agent reads your File or asks to change it.</p>}
       {actions.map(a => {
         const o = OUTCOME_WORD[a.outcome] || { word: a.outcome, tone: 'unknown' };
         return (

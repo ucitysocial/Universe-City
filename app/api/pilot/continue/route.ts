@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 /**
- * After the resident answers a waiting item with the button, the guide writes one short reply and goes on with
+ * After the resident answers a waiting item with the button, the agent writes one short reply and goes on with
  * the open work. The reply is written once for each press and takes no action.
  */
 export async function POST(req: Request) {
@@ -21,7 +21,7 @@ export async function POST(req: Request) {
     return Response.json({ ok: true, state: out.state }, { headers: { 'cache-control': 'no-store' } });
   } catch (e: any) {
     if (e instanceof NoAccess) return Response.json({ error: 'This account is not part of the founder test.' }, { status: 403 });
-    // The decision is on file either way. The guide's next reply is written when the resident writes again.
+    // The decision is on file either way. The agent's next reply is written when the resident writes again.
     return Response.json({ ok: true, state: 'skipped' }, { headers: { 'cache-control': 'no-store' } });
   }
 }

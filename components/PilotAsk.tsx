@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 export const DRAFT_KEY = 'uc:draft';
 
 /**
- * The message box under a place in the File and on the home screen. The resident writes to the guide from
+ * The message box under a place in the File and on the home screen. The resident writes to the agent from
  * where the resident is. The message is sent in the conversation, which takes the center of the frame.
  */
 export default function PilotAsk({ place, path }: { place?: string; path?: string }) {
@@ -23,15 +23,15 @@ export default function PilotAsk({ place, path }: { place?: string; path?: strin
     if (!text || going.current) return;
     going.current = true;
     try { sessionStorage.setItem(DRAFT_KEY, JSON.stringify({ text, place: path || null })); } catch { /* the conversation opens with an empty box */ }
-    router.push('/portal/conversation');
+    router.push('/portal/home');
   }
 
   return (
     <div className="pt-compose pt-ask">
-      <label htmlFor="pt-ask" className="vh">Your message to the guide</label>
+      <label htmlFor="pt-ask" className="vh">Your message to the agent</label>
       <textarea
         id="pt-ask" value={draft} rows={1} maxLength={4000} enterKeyHint="send"
-        placeholder={place && wide ? `Write to the guide about ${place}` : 'Write to the guide'}
+        placeholder={place && wide ? `Write to the agent about ${place}` : 'Write to the agent'}
         onChange={e => setDraft(e.target.value)}
         onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) { e.preventDefault(); send(); } }}
       />

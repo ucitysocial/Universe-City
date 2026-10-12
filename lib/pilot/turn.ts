@@ -1,4 +1,4 @@
-// One reply, from the resident's message to the guide's answer.
+// One reply, from the resident's message to the agent's answer.
 //
 // 1. The message is kept, as the resident wrote it, before the language model reads a word.
 // 2. The model reads the conversation in view and the File, and answers or asks for actions.
@@ -169,7 +169,7 @@ async function pressesSince(q: Q, since: string | null): Promise<Press[]> {
 }
 
 /**
- * Takes one message from the resident and returns the guide's reply.
+ * Takes one message from the resident and returns the agent's reply.
  * requestKey comes from the browser. Sending the same key again returns the same result.
  */
 export async function receive(userId: string, rawText: string, requestKey: string, opts: { viewing?: string | null; answering?: string | null } = {}): Promise<TurnResult> {
@@ -409,7 +409,7 @@ export async function thread(userId: string, opts: { before?: string | null; lim
 
 
 /**
- * After the resident answers a waiting item with the button, the guide goes on with one short reply: what is now on
+ * After the resident answers a waiting item with the button, the agent goes on with one short reply: what is now on
  * file, then the next question of the open work. The reply takes no action. It is written once for each press.
  */
 export async function continueAfterPress(userId: string, pendingId: string): Promise<{ state: 'written' | 'already' | 'skipped'; reply: MessageView | null }> {
@@ -445,7 +445,7 @@ export async function continueAfterPress(userId: string, pendingId: string): Pro
   ];
   const tools = TOOLS.filter(t => !RETIRED.has(t.name)).map(t => ({ name: t.name, description: t.description, input_schema: t.input_schema }));
   const messages = historyFor(start.recent, start.access.timezone, start.presses);
-  const ask = '(The server asks, after the press above: write the guide\'s next reply now. Say in a few words what is on file after this press. Then go on with the open work and ask its next question. When no work is open and nothing is missing, say only what is on file. Take no action.)';
+  const ask = '(The server asks, after the press above: write the agent\'s next reply now. Say in a few words what is on file after this press. Then go on with the open work and ask its next question. When no work is open and nothing is missing, say only what is on file. Take no action.)';
   const lastTurn = messages[messages.length - 1];
   if (lastTurn && lastTurn.role === 'user') lastTurn.content = `${lastTurn.content as string}\n\n${ask}`;
   else messages.push({ role: 'user', content: ask });

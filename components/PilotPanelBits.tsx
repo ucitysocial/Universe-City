@@ -26,8 +26,8 @@ export function Countdown({ until, left, live }: { until: number; left: number |
 }
 
 /**
- * One question the guide needs answered. The answer is sent to the guide as a message, with the question, and
- * the guide's reply is in the conversation.
+ * One question the agent needs answered. The answer is sent to the agent as a message, with the question, and
+ * the agent's reply is in the conversation.
  */
 export function Answer({ question }: { question: string }) {
   const router = useRouter();
@@ -48,7 +48,7 @@ export function Answer({ question }: { question: string }) {
       if (!res.ok) setDone(d.error || 'The answer was not sent. Send it again.');
       else {
         setText('');
-        setDone('Sent to the guide. Its reply is in the conversation.');
+        setDone('Sent to the agent. Its reply is in the conversation.');
         window.dispatchEvent(new Event('uc:thread'));
         router.refresh();
       }
@@ -63,8 +63,8 @@ export function Answer({ question }: { question: string }) {
       <label className="vh" htmlFor={`a-${question.length}-${question.slice(0, 12)}`}>Your answer</label>
       <input id={`a-${question.length}-${question.slice(0, 12)}`} value={text} maxLength={1000} placeholder="Your answer" onChange={e => setText(e.target.value)} />
       <button type="submit" className="pt-btn" disabled={busy || !text.trim()}>{busy ? 'Sending' : 'Send the answer'}</button>
-      {busy && <p className="pn-note">The guide is writing a reply.</p>}
-      {done && <p className="pn-note">{done} <Link href="/portal/conversation">Open the conversation</Link></p>}
+      {busy && <p className="pn-note">The agent is writing a reply.</p>}
+      {done && <p className="pn-note">{done} <Link href="/portal/home">Open the conversation</Link></p>}
     </form>
   );
 }

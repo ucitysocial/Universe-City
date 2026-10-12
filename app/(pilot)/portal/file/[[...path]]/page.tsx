@@ -9,13 +9,13 @@ import PilotEntry from '@/components/PilotEntry';
 import { DEPARTMENTS, FOLDERS, type Folder } from '@/lib/domain/folders';
 import { who } from '@/lib/pilot/auth';
 import {
-  entriesIn, loadCommitment, loadDay, loadFollowUps, loadIndex, loadSaid, loadStatement, loadTimeHistory, loadWaiting,
+  entriesIn, loadBelonging, loadCommitment, loadDay, loadFollowUps, loadIndex, loadSaid, loadStatement, loadTimeHistory, loadWaiting,
   loadWeekly, loadWeeklyItem, loadWork, loadWorkItem, owedOnCommitment, owedOnWeekly, spanWords, waitingIn,
   type CommitmentFull, type FileIndex, type Revision, type Source, type WaitingRow
 } from '@/lib/pilot/browse';
 import { isUuid, withResident, type Q } from '@/lib/pilot/db';
 import { loadFile } from '@/lib/pilot/file';
-import { deptBySlug, deptPath, FILE_ROOT, folderBySlug, folderPath, slugOf } from '@/lib/pilot/paths';
+import { deptBySlug, deptPath, FILE_ROOT, folderBySlug, folderPath, slugOf, TIME_PATH } from '@/lib/pilot/paths';
 import { isDate, localNow, sayClock, sayDate, sayDays } from '@/lib/pilot/time';
 import { dayLabel, totalEntries } from '@/lib/pilot/tree';
 import { DAY_FIT, loadCalendar, MONTH_FIT, WEEK_FIT, weekStart } from '@/lib/pilot/calendar';
@@ -84,7 +84,7 @@ function Browser({ crumbs, color, ix, zone, children }: { crumbs: Crumb[]; color
         <span>{waiting === 0 ? 'No entry waits' : `${count(waiting, 'entry waits', 'entries wait')}`}</span>
         {ix.lastFiledAt && <span>Last filed {localNow(zone, new Date(ix.lastFiledAt)).label}</span>}
       </div>
-      {/* The guide is reached from each place in the File. The message is sent in the conversation. */}
+      {/* The agent is reached from each place in the File. The message is sent in the conversation. */}
       <PilotAsk place={last.label} path={crumbs.map(c => c.label).join(' › ')} />
     </div>
   );
@@ -115,7 +115,7 @@ function Words({ label, quote, source, zone }: { label: string; quote?: string |
       {whole && <><p className="flab" style={{ marginTop: 8 }}>The whole message</p><p className="fq" style={{ borderLeftColor: 'var(--rule)' }}>{whole}</p></>}
       {source && (
         <p className="src">
-          Sent {localNow(zone, new Date(source.at)).label}. <Link href={`/portal/conversation#m-${source.id}`}>Open the conversation at this message</Link>
+          Sent {localNow(zone, new Date(source.at)).label}. <Link href={`/portal/home#m-${source.id}`}>Open the conversation at this message</Link>
         </p>
       )}
     </div>
@@ -138,7 +138,7 @@ function History({ list, zone }: { list: Revision[]; zone: string }) {
               {r.via === 'conversation' && <p className="src">You confirmed it in the conversation.</p>}
               {r.via === 'edit' && <p className="src">You changed it in the form on this entry.</p>}
               {r.message && r.message.speaker === 'resident' && (
-                <p className="src">Your message: {r.message.body} <Link href={`/portal/conversation#m-${r.message.id}`}>Open it</Link></p>
+                <p className="src">Your message: {r.message.body} <Link href={`/portal/home#m-${r.message.id}`}>Open it</Link></p>
               )}
             </li>
           ))}
@@ -160,7 +160,7 @@ function WaitingList({ list, zone, decides }: { list: WaitingRow[]; zone: string
           <div className="sub">
             {p.rests_on && <p>Why it waits: {p.rests_on}</p>}
             {p.source && p.source.speaker === 'resident' && (
-              <p>Your message, {localNow(zone, new Date(p.source.at)).label}: {p.source.body} <Link href={`/portal/conversation#m-${p.source.id}`}>Open it</Link></p>
+              <p>Your message, {localNow(zone, new Date(p.source.at)).label}: {p.source.body} <Link href={`/portal/home#m-${p.source.id}`}>Open it</Link></p>
             )}
             {p.decider === 'agent'
               ? (decides
@@ -187,7 +187,7 @@ function Fixed({ b, status, owed }: { b: ReturnType<typeof belongsTo>; status: s
         {folderOf(b)}
         {b.by !== 'file' && (
           <span className="src">
-            {' '}{b.by === 'name' ? 'Read from the name of the entry. Tell the guide to move it to a different folder.' : 'Tell the guide which folder it belongs to.'}
+            {' '}{b.by === 'name' ? 'Read from the name of the entry. Tell the agent to move it to a different folder.' : 'Tell the agent which folder it belongs to.'}
           </span>
         )}
       </dd>
@@ -255,7 +255,7 @@ function deptPane({ ix }: Ctx, dept: (typeof DEPARTMENTS)[number]) {
 async function folderPane(ctx: Ctx, folder: Folder | null, base: string, color?: string) {
   const { ix, q, zone } = ctx;
   const name = folder?.name ?? 'General';
-  const here = ix.folders[name] || { said: 0, waiting: 0, work: 0 };
+  const here = ix.folders[name] || { said: 0, waiting: 0, work: 0, cal: 0 };
   const node = (slug: string, label: string, icon: string, n: number, word: string, many?: string, needs = false): TileItem =>
     ({ href: `${base}/${slug}`, icon, color, name: label, meta: n ? count(n, word, many) : 'none', quiet: !n, needs: needs && n > 0 });
 
@@ -264,10 +264,41 @@ async function folderPane(ctx: Ctx, folder: Folder | null, base: string, color?:
       here.said ? node('said', 'Statements', 'said', here.said, 'statement') : null,
       here.waiting ? node('waiting', 'Pending', 'wait', here.waiting, 'entry', 'entries', true) : null
     ].filter((x): x is TileItem => !!x);
+    // Calendar entries sit in Time and belong to this folder too. They are listed here, and each opens in Time.
+    const cal = here.cal ? await loadBelonging(q, name, ix.today) : null;
+    const line = (c: { id: string; label: string; on_date: string; start_min: number | null; end_min: number | null }) => (
+      <Link key={c.id} href={`${TIME_PATH}/${c.on_date}/${c.id}`} className="sum-line">
+        <span className="sw" style={{ background: color }} />
+        <b>{c.label}</b>
+        <span>{dayLabel(c.on_date)}{c.on_date === ix.today ? ', today' : ''}. {spanWords(c.start_min, c.end_min)}</span>
+      </Link>
+    );
     return (
       <>
         {folder && <p className="fb-note">{folder.system}. {folder.question}?</p>}
-        {items.length ? <Tiles items={items} /> : <p className="fb-empty">No entry is on file in {name} yet.</p>}
+        {cal && (
+          <div className="sum">
+            <section className="sum-box">
+              <h2>On the calendar</h2>
+              {cal.ahead.length === 0 && <p className="sum-none">Nothing ahead is on the calendar.</p>}
+              {cal.ahead.map(line)}
+              {cal.weekly.map(s => (
+                <Link key={s.id} href={`${TIME_PATH}/weekly/${s.id}`} className="sum-line">
+                  <span className="sw" style={{ background: color }} />
+                  <b>{s.label}</b>
+                  <span>{sayDays(s.days)}. {spanWords(s.start_min, s.end_min)}</span>
+                </Link>
+              ))}
+            </section>
+            {cal.before.length > 0 && (
+              <section className="sum-box">
+                <h2>Before today</h2>
+                {cal.before.map(line)}
+              </section>
+            )}
+          </div>
+        )}
+        {items.length ? <Tiles items={items} /> : !cal && <p className="fb-empty">No entry is on file in {name} yet.</p>}
       </>
     );
   }
@@ -308,7 +339,7 @@ async function folderPane(ctx: Ctx, folder: Folder | null, base: string, color?:
           <h2>Missing details</h2>
           {view.notEstablished.length === 0 && <p className="sum-none">No detail is missing.</p>}
           {view.notEstablished.slice(0, 4).map((u, i) => <p key={i} className="sum-gap">{u}</p>)}
-          {view.notEstablished.length > 4 && <p className="sum-none">{view.notEstablished.length - 4} more. The guide asks about them in the conversation.</p>}
+          {view.notEstablished.length > 4 && <p className="sum-none">{view.notEstablished.length - 4} more. The agent asks about them in the conversation.</p>}
         </section>
       </div>
       <h2 className="fb-h">Files</h2>
@@ -423,7 +454,7 @@ async function commitmentPane({ q, zone, decides }: Ctx, base: string, id: strin
             </div>
           )}
           {open && <PilotEntry key={`${c.label} ${c.on_date} ${c.start_min} ${c.end_min}`} id={c.id} label={c.label} date={c.on_date} start={clock24(c.start_min)} end={clock24(c.end_min)} />}
-          {!open && <p className="fb-note" style={{ padding: '10px 12px 0', margin: 0 }}>{c.withdrawn_at ? 'This entry was taken off its day, so its day and time stay as they are.' : 'This entry has an outcome on file, so its day and time stay as they are. Tell the guide to correct the outcome.'}</p>}
+          {!open && <p className="fb-note" style={{ padding: '10px 12px 0', margin: 0 }}>{c.withdrawn_at ? 'This entry was taken off its day, so its day and time stay as they are.' : 'This entry has an outcome on file, so its day and time stay as they are. Tell the agent to correct the outcome.'}</p>}
           <History list={x.history} zone={zone} />
         </div>
         <WaitingList list={x.waiting} zone={zone} decides={decides} />
@@ -523,7 +554,7 @@ async function statementPane({ q, zone }: Ctx, id: string, color?: string) {
           <ol>
             {x.later && <li><p className="meta">Replaced by</p><p><Link href={`${folderPath(x.later.folder)}/said/${x.later.id}`}>{x.later.said}</Link></p></li>}
             {x.endedBy && x.endedBy.speaker === 'resident' && (
-              <li><p className="meta">It ended with your message, {localNow(zone, new Date(x.endedBy.at)).label}</p><p>{x.endedBy.body} <Link href={`/portal/conversation#m-${x.endedBy.id}`}>Open it</Link></p></li>
+              <li><p className="meta">It ended with your message, {localNow(zone, new Date(x.endedBy.at)).label}</p><p>{x.endedBy.body} <Link href={`/portal/home#m-${x.endedBy.id}`}>Open it</Link></p></li>
             )}
             {x.earlier.map(e => (
               <li key={e.id}>
@@ -555,7 +586,7 @@ async function followUpsPane({ q, zone }: Ctx) {
             <span className="fi i-wait" />
             <b>{f.what}</b>
             <span className={`pt-chip ${f.state !== 'open' ? 'unknown' : f.owner === 'agent' ? 'agent' : 'wait'}`}>
-              {f.state !== 'open' ? (f.state === 'done' ? 'Done' : 'Dropped') : f.owner === 'agent' ? 'For your agent' : f.owner === 'resident' ? 'For you' : 'For software'}
+              {f.state !== 'open' ? (f.state === 'done' ? 'Done' : 'Dropped') : f.owner === 'agent' ? 'For a person on the team' : f.owner === 'resident' ? 'For you' : 'For software'}
             </span>
             <span className="sub">
               Opened {localNow(zone, new Date(f.created_at)).label}.{f.due_on ? ` Needed by ${sayDate(f.due_on)}.` : ''}
@@ -565,7 +596,7 @@ async function followUpsPane({ q, zone }: Ctx) {
         ))}
       </div>
       {list.some(f => f.owner === 'agent' && f.state === 'open') && (
-        <p className="fb-note" style={{ marginTop: 12 }}>A follow up for your agent is on file. No person has been told yet. The step that tells a person is still to be built.</p>
+        <p className="fb-note" style={{ marginTop: 12 }}>A follow up for a person on the team is on file. No person has been told yet. The step that tells a person is still to be built.</p>
       )}
     </>
   );
@@ -600,7 +631,7 @@ async function workItemPane({ q, zone }: Ctx, id: string, color?: string) {
           <b>{w.label}</b>
           <span className={`pt-chip ${w.state === 'open' ? 'wait' : 'unknown'}`}>{w.state === 'open' ? 'Open' : w.state === 'done' ? 'Settled' : 'Dropped'}</span>
         </div>
-        <p className="fb-note" style={{ padding: '10px 12px 0', margin: 0 }}>You asked the guide for help with this. The guide keeps it open and asks the next question until you say it is settled.</p>
+        <p className="fb-note" style={{ padding: '10px 12px 0', margin: 0 }}>You asked the agent for help with this. The agent keeps it open and asks the next question until you say it is settled.</p>
         <Words label="Your words when you asked" quote={w.said} source={x.source} zone={zone} />
         <dl className="fields" style={{ borderTop: '2px solid var(--ink)' }}>
           <dt>Opened</dt><dd>{localNow(zone, new Date(w.created_at)).label}</dd>

@@ -1,7 +1,7 @@
-// The guide's reading of the five Time documents.
+// The agent's reading of the five Time documents.
 //
 // The five documents govern Folder 01 Time: Folder 01 Time, Operations, Developments, Curriculum, and Research. GitHub
-// holds the copy that governs, in docs/systems. scripts/pilot-docs.mjs copies them into the app as text. The guide reads
+// holds the copy that governs, in docs/systems. scripts/pilot-docs.mjs copies them into the app as text. The agent reads
 // them through the read_time_document action: an outline, one section, or the lines that hold given words.
 // Reading changes nothing and is not shown to the resident.
 

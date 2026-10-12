@@ -531,3 +531,70 @@ a.pt-btn{text-decoration:none;display:inline-block}
 .pn-day:hover i{outline:2px solid var(--ink);outline-offset:1px}
 .pn-count{font-family:'VT323',monospace;font-size:18px;margin:8px 0 0;color:var(--ink)}
 .pt-loading{display:flex;align-items:center;justify-content:center;min-height:60vh;padding:24px}
+
+/* ---------------------------------------------------------------- home: the conversation and the dashboard */
+/* Home holds the conversation in the center and the dashboard beside it. The side panel holds the same lists, so it
+   is hidden on home and the home screen takes its width. */
+.os:has(.pt-dash) .os-side{display:none}
+@media (min-width:1280px){.os:has(.pt-dash){grid-template-columns:264px minmax(0,1fr)}}
+@media (min-width:1560px){.os:has(.pt-dash){grid-template-columns:288px minmax(0,1fr)}}
+.os-main:has(.home-split){overflow:hidden}
+.home-split{display:flex;flex-direction:column;flex:1;min-height:0}
+.home-talk{display:flex;flex-direction:column;flex:1;min-height:0;min-width:0}
+.home-talk .pt-talk-head,.home-talk .pt-wait{display:none}
+.home-dash{flex:none;max-height:min(52vh,470px);overflow-y:auto;background:var(--paper2);border-bottom:3px solid var(--ink)}
+.home-dash-in{display:grid;grid-template-columns:minmax(240px,300px) minmax(0,1fr);grid-template-areas:"now tabs" "now view" "pend view";grid-template-rows:auto auto 1fr;gap:12px 20px;align-items:start;padding:14px clamp(16px,2.4vw,30px) 16px}
+.a-now{grid-area:now}.a-tabs{grid-area:tabs}.a-view{grid-area:view}.a-pend{grid-area:pend}
+.home-dash-phone{display:none}
+.home-dash-in .dash-sec,.home-dash-in nav{padding:0;margin:0;border:0}
+.dash-now{display:grid;gap:2px;background:#fff;border:3px solid var(--ink);border-left:10px solid var(--fc,var(--ink));box-shadow:5px 5px 0 var(--ink);padding:10px 13px 11px;color:var(--ink);text-decoration:none}
+.dash-now:hover{background:var(--paper)}
+.dash-now.none{font-size:14px;color:var(--ink2);margin:0;border-left-width:3px;box-shadow:none}
+.dash-now b{font-size:18px;line-height:1.25}
+.dash-k{font-family:'VT323',monospace;font-size:16px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.dash-now .pn-when{font-family:'VT323',monospace;font-size:19px}
+.dash-t,.dash-then{font-size:13px;color:var(--ink2)}
+.dash-tabs{display:flex;flex-wrap:wrap;gap:6px}
+.dash-tabs a{font-size:13px;font-weight:600;color:var(--ink);text-decoration:none;border:2px solid var(--ink);border-left:6px solid var(--fc,var(--ink));background:#fff;padding:5px 10px}
+.dash-tabs a:hover{background:var(--paper)}
+.dash-tabs a.on{background:var(--ink);color:var(--paper)}
+.dash-sec{display:grid;gap:8px;min-width:0}
+.dash-h{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--ink);padding-bottom:5px}
+.dash-h h2{font-size:15px;font-weight:700;margin:0}
+.dash-count{font-family:'VT323',monospace;font-size:17px;color:var(--ink2)}
+.dash-more{margin-left:auto;font-size:13px;font-weight:600;color:var(--ink)}
+.dash-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border:2px solid var(--ink);background:#fff}
+.dash-row{display:flex;flex-direction:column;border-right:1px solid var(--rule);min-width:0;min-height:120px}
+.dash-row:last-child{border-right:0}
+.dash-row.today{background:var(--paper)}
+.dash-dname{display:flex;align-items:baseline;gap:6px;color:var(--ink);text-decoration:none;padding:6px 8px 5px;border-bottom:1px solid var(--rule)}
+.dash-dname span{font-family:'VT323',monospace;font-size:15px;text-transform:uppercase;letter-spacing:.06em}
+.dash-dname b{font-size:16px;line-height:1}
+.dash-row.today .dash-dname{background:var(--ink);color:var(--paper)}
+.dash-dname:hover b{text-decoration:underline}
+.dash-items{display:flex;flex-direction:column;gap:5px;padding:6px;min-width:0}
+.dash-empty{font-size:12px;color:var(--dim);margin:2px}
+.dash-item{display:grid;gap:1px;background:var(--fc);color:var(--ft);border:2px solid var(--ink);padding:3px 6px 4px;text-decoration:none;cursor:pointer;min-width:0}
+.dash-item:hover,.dash-item:focus-visible{outline:2px solid var(--ink);outline-offset:1px}
+.dash-item.executed{background:repeating-linear-gradient(135deg,var(--fc) 0 6px,color-mix(in srgb,var(--fc) 80%,#fff) 6px 12px)}
+.dash-item.weekly{background:#fff;color:var(--ink);border-style:dashed;border-left:6px solid var(--fc)}
+.dash-it{font-family:'VT323',monospace;font-size:14px;line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dash-il{font-size:12.5px;font-weight:600;line-height:1.25;overflow-wrap:break-word;min-width:0}
+.dash-said{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px}
+.dash-st{display:grid;gap:2px;background:#fff;border:2px solid var(--ink);padding:7px 10px;color:var(--ink);text-decoration:none}
+.dash-st b{font-size:13.5px}
+.dash-st span{font-size:13px;color:var(--ink2);line-height:1.4}
+.dash-st:hover{background:var(--paper)}
+.dash-pending{display:grid;gap:10px}
+.a-pend .win-wait p,.a-pend .pn-need p{font-size:13.5px}
+@media (max-width:1000px){
+  .home-dash{display:none}
+  .home-dash-phone{display:block;order:-1;flex:none;background:var(--paper2);border-bottom:3px solid var(--ink);max-height:62vh;overflow-y:auto}
+  .home-dash-phone summary{cursor:pointer;font-weight:600;font-size:14px;padding:10px 16px}
+  .home-dash-in{grid-template-columns:1fr;grid-template-areas:"now" "tabs" "view" "pend";padding:4px 16px 16px}
+  .dash-days{grid-template-columns:1fr}
+  .dash-row{flex-direction:row;border-right:0;border-bottom:1px solid var(--rule);min-height:0}
+  .dash-row:last-child{border-bottom:0}
+  .dash-dname{flex-direction:column;align-items:center;width:56px;flex:none;border-bottom:0;border-right:1px solid var(--rule)}
+  .dash-items{flex-direction:row;flex-wrap:wrap;flex:1}
+}

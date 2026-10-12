@@ -69,7 +69,7 @@ async function overlapsOn(env: Pick<Env, 'q'>, date: string, start: number | nul
 
 /**
  * In the conversation an entry that overlaps another is not filed. It waits for the resident, with the overlap named,
- * and the guide tells the resident. Confirming it keeps both. On the screen the form names the overlap at once.
+ * and the agent tells the resident. Confirming it keeps both. On the screen the form names the overlap at once.
  */
 async function holdOverlap(env: Env, action: 'add_commitment' | 'change_commitment', a: Args, hits: string[]): Promise<Result> {
   const args = { ...a, despite_overlap: true } as Args;
@@ -920,7 +920,7 @@ export const TOOLS: Tool[] = [
       if (old.folder === folder) {
         return { outcome: 'unchanged', detail: `Nothing changed. ${old.label} ${where} already belongs to ${folder}.`, brief: `No change: ${old.label} ${where} belongs to ${folder}, in ${dept}.`, target: table, targetId: id, data: { nothing_changed: true } };
       }
-      await env.q(`select set_config('uc.reason', 'The guide set the folder.', true)`);
+      await env.q(`select set_config('uc.reason', 'The agent set the folder.', true)`);
       await env.q(`update uc_pilot.${table} set folder = $2 where id = $1`, [id, folder]);
       // The days ahead that were placed from a weekly item follow it.
       if (weekly) await env.q(`update uc_pilot.commitments set folder = $2 where schedule_item_id = $1 and on_date >= $3::date and execution = 'planned' and withdrawn_at is null`, [id, folder, env.now.date]);
@@ -1097,7 +1097,7 @@ export const TOOLS: Tool[] = [
   {
     name: 'propose_to_agent',
     group: 'propose',
-    description: 'Sends one interpretation to the resident\'s agent as a proposal. Use it for a reading that goes beyond what the resident said: a pattern across days, a likely cause, a conclusion about the resident. A proposal is no entry on file. A person decides it. You never decide it, and you never state it to the resident as a fact.',
+    description: 'Sends one interpretation to a person on the team as a proposal. Use it for a reading that goes beyond what the resident said: a pattern across days, a likely cause, a conclusion about the resident. A proposal is no entry on file. A person decides it. You never decide it, and you never state it to the resident as a fact.',
     input_schema: obj({
       summary: { type: 'string', description: 'The interpretation, in one or two plain sentences.' },
       rests_on: { type: 'string', description: 'The dated entries or messages it is based on.' },
@@ -1110,11 +1110,11 @@ export const TOOLS: Tool[] = [
       const folder = folderArg(a);
       const topic = text(a, 'topic', 80, false) ?? 'interpretation';
       const open = await env.q<{ id: string }>(`select id from uc_pilot.pending where state = 'open' and decider = 'agent' and lower(summary) = lower($1) limit 1`, [summary]);
-      if (open.length) return { outcome: 'unchanged', detail: `Nothing changed. Already waiting for your agent: ${summary}`, brief: 'No change: that proposal already waits for your agent.', target: 'pending', targetId: open[0].id, data: { nothing_changed: true } };
+      if (open.length) return { outcome: 'unchanged', detail: `Nothing changed. Already waiting for a person on the team: ${summary}`, brief: 'No change: that proposal already waits for your agent.', target: 'pending', targetId: open[0].id, data: { nothing_changed: true } };
       const p = (await env.q<{ id: string }>(
         `insert into uc_pilot.pending (decider, kind, summary, payload, rests_on) values ('agent', 'file_interpretation', $1, $2::jsonb, $3) returning id`,
         [summary, JSON.stringify({ folder, topic }), restsOn]))[0];
-      return { outcome: 'proposed', detail: `Sent to your agent as a proposal: ${summary}`, brief: `For your agent: a proposal about ${topic}. A person decides it.`, target: 'pending', targetId: p.id, data: { note: 'This is no entry on file. Do not state it to the resident as a fact.' } };
+      return { outcome: 'proposed', detail: `Sent to a person on the team as a proposal: ${summary}`, brief: `For a person on the team: a proposal about ${topic}. A person decides it.`, target: 'pending', targetId: p.id, data: { note: 'This is no entry on file. Do not state it to the resident as a fact.' } };
     }
   },
 
@@ -1182,7 +1182,7 @@ export const TOOLS: Tool[] = [
   {
     name: 'open_follow_up',
     group: 'follow_up',
-    description: 'Opens one follow up so unfinished work is kept outside the conversation: a piece of information still missing, a decision that belongs to the resident, a permission, an action only the resident can do, or a request for a person. Set owner to agent when the resident asks for a person or when the matter needs one. Opening a follow up for the agent tells no person yet. Say only that the request is on file for the agent.',
+    description: 'Opens one follow up so unfinished work is kept outside the conversation: a piece of information still missing, a decision that belongs to the resident, a permission, an action only the resident can do, or a request for a person. Set owner to agent, which means a person on the team, when the resident asks for a person or when the matter needs one. Opening a follow up for the agent tells no person yet. Say only that the request is on file for the agent.',
     input_schema: obj({
       owner: { type: 'string', enum: ['resident', 'agent', 'software'], description: 'Who has to act next.' },
       kind: { type: 'string', enum: ['information', 'decision', 'permission', 'action', 'person'] },
@@ -1203,7 +1203,7 @@ export const TOOLS: Tool[] = [
       const whose = owner === 'agent' ? 'your agent' : owner === 'resident' ? 'you' : 'software';
       return {
         outcome: 'filed', detail: `Follow up opened for ${whose}: ${what}`, brief: `Filed: a follow up for ${whose}. ${clip(what, 110)}`, target: 'follow_ups', targetId: row.id,
-        data: { ref: shortId(row.id), note: owner === 'agent' ? 'No person has seen this yet. Say that the request is on file for the agent. Do not say a person will reply by a set time.' : undefined }
+        data: { ref: shortId(row.id), note: owner === 'agent' ? 'No person has seen this yet. Say that the request is on file for a person on the team. Do not say a person will reply by a set time.' : undefined }
       };
     }
   },
@@ -1254,7 +1254,7 @@ export const TOOLS: Tool[] = [
       }
       const old = (await env.q<any>(`select what, state, owner from uc_pilot.follow_ups where id = $1`, [id]))[0];
       if (old.state !== 'open') return { outcome: 'unchanged', detail: `Nothing changed. Already closed: ${old.what}`, brief: 'No change: that follow up was already closed.', target: 'follow_ups', targetId: id, data: { nothing_changed: true } };
-      if (old.owner === 'agent' && how === 'done') throw new Refusal('Not done. A follow up that belongs to the agent is finished by the agent. The resident can drop it.');
+      if (old.owner === 'agent' && how === 'done') throw new Refusal('Not done. A follow up that belongs to the team is finished by a person on the team. The resident can drop it.');
       await env.q(`update uc_pilot.follow_ups set state = $2, closed_said = $3, closed_message_id = $4 where id = $1`, [id, how, said, env.messageId]);
       return { outcome: 'filed', detail: `Follow up closed as ${how}: ${old.what}${inWords(said)}`, brief: `Closed: a follow up. ${clip(old.what, 110)}`, target: 'follow_ups', targetId: id };
     }

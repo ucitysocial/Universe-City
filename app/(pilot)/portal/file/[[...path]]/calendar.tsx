@@ -81,7 +81,7 @@ function timeParts(time: string, more: string[]): string[] {
 }
 
 /** What the small window over the calendar shows at once, before it loads the rest of the entry. */
-const popData = (i: CalItem) => ({
+export const popData = (i: CalItem) => ({
   'data-pop': i.key.split(':')[0], 'data-weekly': i.kind === 'weekly' ? '1' : undefined,
   'data-label': i.label, 'data-time': i.timeText, 'data-belongs': i.belongs, 'data-href': i.href, 'data-kind': WORD[i.kind]
 });

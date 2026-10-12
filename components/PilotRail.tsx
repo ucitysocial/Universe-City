@@ -12,7 +12,6 @@ import { supabaseBrowser } from '@/lib/supabase/client';
 
 const PLACES = [
   { href: '/portal/home', name: 'Home' },
-  { href: '/portal/conversation', name: 'Conversation' },
   { href: FILE_ROOT, name: 'File', narrow: true },
   { href: '/portal/search', name: 'Search', narrow: true },
   { href: '/portal/activity', name: 'Activity' }

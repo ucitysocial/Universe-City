@@ -26,7 +26,7 @@ export async function POST(req: Request) {
     const result = await press(a.userId, a.access, id, decision, desk);
     return Response.json({
       ok: true, detail: result.brief || result.detail, changed: result.outcome !== 'unchanged',
-      // The guide goes on after the resident's own press. The screen asks for that reply next.
+      // The agent goes on after the resident's own press. The screen asks for that reply next.
       next: !desk && result.outcome !== 'unchanged' ? id : null
     }, { headers: { 'cache-control': 'no-store' } });
   } catch (e: any) {
