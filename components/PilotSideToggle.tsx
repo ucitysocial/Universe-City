@@ -34,7 +34,6 @@ export default function PilotSideToggle({ waiting }: { waiting: number }) {
       <button type="button" className="side-strip" onClick={() => set(false)} aria-label={waiting ? `Open the overview. ${waiting} pending` : 'Open the overview'}>
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1.6l3.1 6.6 7.2.9-5.3 5 1.4 7.1L12 17.7l-6.4 3.5 1.4-7.1-5.3-5 7.2-.9z" /></svg>
         {waiting > 0 && <i>{waiting}</i>}
-        <span>Overview</span>
       </button>
     </>
   );

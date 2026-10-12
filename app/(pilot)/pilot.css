@@ -673,3 +673,21 @@ button.dash-more{background:none;border:0;padding:0;cursor:pointer;font:inherit;
   .side-strip:hover span{text-decoration:underline}
 }
 @media (min-width:1560px){.uc-side-off .os{grid-template-columns:280px minmax(0,1fr) 52px}}
+
+/* ---------------------------------------------------------------- My File holds the overview */
+/* Inside My File the overview is the main screen at its root, so the right part of the frame and the star close. */
+.os:has(.fb) .os-side,.os:has(.fb) .pt-star{display:none}
+@media (min-width:1280px){.os:has(.fb),.uc-side-off .os:has(.fb){grid-template-columns:256px minmax(0,1fr)}}
+@media (min-width:1560px){.os:has(.fb),.uc-side-off .os:has(.fb){grid-template-columns:280px minmax(0,1fr)}}
+.board.wide{max-width:1180px;gap:18px}
+.board.wide .dash-now{max-width:560px}
+.board.wide .dash-h h2{font-size:16px}
+@media (min-width:1000px){
+  .board.wide .dash-days{grid-template-columns:repeat(7,minmax(0,1fr))}
+  .board.wide .dash-row{display:flex;flex-direction:column;border-bottom:0;border-right:1px solid var(--rule);min-height:150px}
+  .board.wide .dash-row:last-child{border-right:0}
+  .board.wide .dash-dname{flex-direction:row;align-items:baseline;gap:6px;justify-content:flex-start;padding:7px 8px 6px;border-right:0;border-bottom:1px solid var(--rule)}
+  .board.wide .dash-items{flex-direction:column;flex-wrap:nowrap}
+  .board.wide .dash-cards{grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+  .board.wide .dash-pick{grid-template-columns:repeat(3,1fr)}
+}

@@ -2,6 +2,8 @@ import type { CSSProperties, ReactNode } from 'react';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import PilotAsk from '@/components/PilotAsk';
+import PilotBoard from '@/components/PilotBoard';
+import { loadBoard } from '@/lib/pilot/board';
 import PilotCalFocus from '@/components/PilotCalFocus';
 import PilotDecide from '@/components/PilotDecide';
 import PilotEntry from '@/components/PilotEntry';
@@ -208,25 +210,16 @@ function Fixed({ b, status, owed }: { b: ReturnType<typeof belongsTo>; status: s
 
 // ------------------------------------------------------------------ panes
 
-function rootPane({ ix }: Ctx) {
+/**
+ * My File opens on the overview: now or coming up, the calendar and the four departments, and Pending. The founder set
+ * it on October 12, 2026. Inside My File the overview is here, so the right part of the frame is closed.
+ */
+async function rootPane({ q, zone, ix }: Ctx) {
   const general = ix.folders.General;
+  const board = await loadBoard(q, zone, ix);
   return (
     <>
-      <div className="doors">
-        {DEPARTMENTS.map(d => {
-          const folders = FOLDERS.filter(f => f.dept === d.key);
-          const n = folders.reduce((sum, f) => sum + entriesIn(ix, f.name), 0);
-          const w = folders.reduce((sum, f) => sum + waitingIn(ix, f.name), 0);
-          return (
-            <Link key={d.key} href={deptPath(d.key)} className="door" style={fc(d.color)}>
-              <span className="fi i-folder i-big" style={fc(d.color)} />
-              <b><i>{d.key}</i>{d.name}</b>
-              <span className="meta">12 folders / {count(n, 'entry', 'entries')}{w ? ` / ${w} waiting` : ''}</span>
-              <span className="list">{folders.map(f => f.name).join(', ')}</span>
-            </Link>
-          );
-        })}
-      </div>
+      <PilotBoard board={board} wide />
       {general && (general.said > 0 || general.work > 0 || general.waiting > 0) && (
         <>
           <h2 className="fb-h">Outside the forty eight folders</h2>
@@ -711,7 +704,7 @@ export default async function FilePage({ params, searchParams }: { params: { pat
       on: typeof searchParams?.on === 'string' && isDate(searchParams.on) ? searchParams.on : null
     };
     const crumbs: Crumb[] = [{ label: 'My File', href: FILE_ROOT }];
-    if (seg.length === 0) return { ix, crumbs, color: undefined, body: rootPane(ctx) };
+    if (seg.length === 0) return { ix, crumbs, color: undefined, body: await rootPane(ctx) };
 
     // General sits beside the departments. It has no department, so its folder is the first part of the address.
     const general = seg[0] === 'general';

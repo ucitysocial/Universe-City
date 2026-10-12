@@ -17,7 +17,7 @@ const short = (date: string) => sayDate(date).replace(/, \d{4}$/, '');
  * The dashboard: now or coming up, one view the resident picks, and Pending. The views are the calendar and the four
  * departments. It sits at the right of every page.
  */
-export default function PilotBoard({ board }: { board: Board }) {
+export default function PilotBoard({ board, wide = false }: { board: Board; wide?: boolean }) {
   const { panel, today, days, folders } = board;
   const { now: cur, then } = panel;
   const waiting = panel.pending.length;
@@ -56,7 +56,7 @@ export default function PilotBoard({ board }: { board: Board }) {
   }));
 
   return (
-    <div className="board">
+    <div className={wide ? 'board wide' : 'board'}>
       {cur ? (
         <Link href={`${TIME_PATH}/${cur.on_date}/${cur.id}`} className="dash-now" style={{ '--fc': belongsTo(cur.folder, cur.label).color } as CSSProperties}>
           <span className="dash-k">{cur.live ? 'Now' : 'Coming up'}</span>
