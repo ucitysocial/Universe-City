@@ -19,7 +19,7 @@ const short = (date: string) => sayDate(date).replace(/, \d{4}$/, '');
  * The dashboard: now or coming up, one view the resident picks, and Pending. The views are the calendar and the four
  * departments. It sits at the right of every page.
  */
-export default function PilotBoard({ board, wide = false }: { board: Board; wide?: boolean }) {
+export default function PilotBoard({ board, wide = false, hidePending = false }: { board: Board; wide?: boolean; hidePending?: boolean }) {
   const { panel, today, days, folders } = board;
   const { now: cur, then } = panel;
   const waiting = panel.pending.length;
@@ -62,13 +62,13 @@ export default function PilotBoard({ board, wide = false }: { board: Board; wide
   if (!wide) {
     return (
       <div className="board side-clean">
-        <PilotBoardDay days={days} today={today} nowId={cur?.id ?? null} live={!!cur?.live} ghosts={ghostsOf(board.intake)} />
-        {waiting > 0 && (
+        {!hidePending && waiting > 0 && (
           <div className="dash-sec side-wait">
             <div className="dash-h"><h2>Waiting for you</h2><span className="dash-count">{waiting}</span></div>
             <div className="dash-pending"><PilotPending panel={panel} /></div>
           </div>
         )}
+        <PilotBoardDay days={days} today={today} nowId={cur?.id ?? null} live={!!cur?.live} ghosts={ghostsOf(board.intake)} />
       </div>
     );
   }
@@ -86,11 +86,17 @@ export default function PilotBoard({ board, wide = false }: { board: Board; wide
       ) : (
         <p className="dash-now none">Nothing is on file for the rest of today or tomorrow.</p>
       )}
-      <PilotBoardTabs calendar={wide ? calendar : <PilotBoardDay days={days} today={today} />} depts={depts} filled={folders} />
-      <div className="dash-sec">
-        <div className="dash-h"><h2>Pending</h2>{waiting > 0 && <span className="dash-count">{waiting}</span>}</div>
-        <div className="dash-pending"><PilotPending panel={panel} /></div>
-      </div>
+      <PilotBoardTabs calendar={
+        <>
+          {wide ? calendar : <PilotBoardDay days={days} today={today} />}
+          {waiting > 0 && (
+            <section className="dash-sec dash-schedule-pending" aria-label="Pending for you">
+              <div className="dash-h"><h2>Pending</h2><span className="dash-count">{waiting}</span></div>
+              <div className="dash-pending"><PilotPending panel={panel} /></div>
+            </section>
+          )}
+        </>
+      } depts={depts} filled={folders} />
     </div>
   );
 }
