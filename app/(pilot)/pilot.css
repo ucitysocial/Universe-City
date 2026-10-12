@@ -971,24 +971,25 @@ html.uc-nav::after{content:"";position:fixed;left:0;top:0;height:3px;width:100%;
 .ent.ghost .sub{grid-column:2;font-size:12.5px}
 .ghost-plus{grid-row:span 2;width:18px;height:18px;display:grid;place-items:center;border:1.5px dashed var(--ink2);font-size:14px;line-height:1;color:var(--ink2)}
 
-/* Founder FT-019: attention stays at the top of Overview, not under a long day. */
-.dash-schedule-pending{margin-top:18px}
-.side-attention{display:none}
+
+/* Founder FT-019: decisions remain one click from the top of Overview or Schedule. */
+.side-attention{display:none;min-width:0}
+.side-attention.inline{display:block;margin:0 0 18px;border:2px solid var(--ink);background:var(--paper2)}
+.side-alert{display:flex;align-items:center;gap:12px;width:100%;min-height:70px;border:0;background:var(--paper2);color:var(--ink);padding:11px 14px;text-align:left;cursor:pointer;font:inherit}
+.side-alert:hover,.side-alert:focus-visible{background:var(--paper)}
+.side-alert:focus-visible{outline:3px solid var(--III);outline-offset:-3px}
+.side-alert-icon{position:relative;width:30px;height:30px;flex:0 0 30px;display:flex;align-items:center;justify-content:center}
+.side-alert-icon svg{width:27px;height:27px}
+.side-alert-icon svg path{fill:var(--II);stroke:var(--ink);stroke-width:1.2;stroke-linejoin:round}
+.side-alert-icon i{position:absolute;top:-1px;right:-3px;width:10px;height:10px;border:2px solid var(--paper2);border-radius:50%;background:#c62834}
+.side-alert-copy{display:grid;gap:3px;min-width:0;flex:1}
+.side-alert-copy strong{font-size:14.5px;font-weight:700;line-height:1.1}
+.side-alert-copy>span{font-size:12.5px;line-height:1.35;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.side-alert-number{min-width:23px;height:23px;display:flex;align-items:center;justify-content:center;background:var(--ink);color:var(--paper);font-size:12px;font-weight:700;padding:0 5px}
+.side-alert-chevron{font-size:20px;line-height:1;font-weight:600;flex:none}
+.side-alert-list{padding:12px 15px 16px;background:#fff;max-height:min(48vh,460px);overflow-y:auto;overscroll-behavior:contain;display:grid;gap:12px;border-top:1px solid var(--rule)}
+.side-alert-list[hidden]{display:none}
 @media (min-width:1280px){
-  .side-attention{display:block;flex:none;background:var(--paper2);border-bottom:2px solid var(--ink);min-width:0}
-  .side-alert{display:flex;align-items:center;gap:12px;width:100%;min-height:70px;border:0;background:var(--paper2);color:var(--ink);padding:11px 14px 11px 18px;text-align:left;cursor:pointer;font:inherit}
-  .side-alert:hover,.side-alert:focus-visible{background:var(--paper)}
-  .side-alert:focus-visible{outline:3px solid var(--III);outline-offset:-3px}
-  .side-alert-icon{position:relative;width:30px;height:30px;flex:0 0 30px;display:flex;align-items:center;justify-content:center}
-  .side-alert-icon svg{width:27px;height:27px}
-  .side-alert-icon svg path{fill:var(--II);stroke:var(--ink);stroke-width:1.2;stroke-linejoin:round}
-  .side-alert-icon i{position:absolute;top:-1px;right:-3px;width:10px;height:10px;border:2px solid var(--paper2);border-radius:50%;background:#c62834}
-  .side-alert-copy{display:grid;gap:3px;min-width:0;flex:1}
-  .side-alert-copy strong{font-size:14.5px;font-weight:700;line-height:1.1}
-  .side-alert-copy>span{font-size:12.5px;line-height:1.35;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .side-alert-number{min-width:23px;height:23px;display:flex;align-items:center;justify-content:center;background:var(--ink);color:var(--paper);font-size:12px;font-weight:700;padding:0 5px}
-  .side-alert-chevron{font-size:20px;line-height:1;font-weight:600;flex:none}
-  .side-alert-list{padding:12px 15px 16px;background:#fff;max-height:min(48vh,460px);overflow-y:auto;overscroll-behavior:contain;display:grid;gap:12px;border-top:1px solid var(--rule)}
-  .side-alert-list[hidden]{display:none}
+  .side-attention:not(.inline){display:block;flex:none;background:var(--paper2);border-bottom:2px solid var(--ink)}
   .uc-side-off .side-attention{display:none}
 }
