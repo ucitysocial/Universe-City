@@ -41,6 +41,7 @@ No entry is a defect just because the prototype is unfinished. Do not report uns
 | FT-012 | Portal Home — global UI scale | Entire desktop portal appears miniature: narrow nav/context, undersized cards/type, large unused center | Founder-directed size and readability correction | P0 design fix requested; #32 |
 | FT-013 | Live conversation — flexible commitments and practical support | Open end time cannot be cleared; motivation triggers disengagement; genuine task preferences are refused as questions | Export-confirmed bugs and founder guidance | Draft PR #33; pending CI, preview test and approval; #34 |
 | FT-014 | Time intake — daily schedule anchors | Sleep/wake, meals and personal routines must become visible scheduling commitments, rather than waiting for unfilled dates or resident prompts | Founder-directed product priority; current curriculum discrepancy | Recorded for Time requirements, docs and conversation changes; #35 |
+| FT-015 | Time — task execution within any calendar block | Optional expandable, ordered steps and one-step-at-a-time support inside any scheduled block; show actual reported progress | Founder design/behavior decision | Documented; implementation awaiting design/code review; #36 |
 
 ---
 
@@ -462,6 +463,22 @@ No founder private records should be used in public tests. Run synthetic test ca
 
 ---
 
+## FT-015 — Calendar blocks with optional steps and guided progress
+
+**Founder direction, October 12, 2026:** The same expandable step-by-step design proposed for morning/night routines should be available inside **any** schedule block. The founder described an overwhelming broad cleanup commitment becoming manageable when presented as concrete first steps, with **Start**, **Next** and visible progress. A long work shift could likewise contain its practical activities. This capability is optional for residents who don't need or want it, but should be offered more helpfully when a resident asks for a breakdown or repeatedly reports difficulty starting or postponing a scheduled task.
+
+**Product distinction:** A calendar block is the time reserved for a commitment. An optional **task plan inside that block** is how to carry it out. Individual checklist steps are **not automatically separate calendar commitments**. Where a component itself has a specific time, a separate actionable commitment, dependency or follow-up, the resident may explicitly establish a linked schedulable commitment. A parent commitment, ongoing work containing multiple commitments, and an execution checklist are distinguishable in the governing Time model.
+
+**Interaction direction:** Open a block and optionally see an ordered list of resident-authored or approved guide-proposed steps. Choose **Start**, mark one step done and continue with **Next**, pause/resume, skip/edit and see progress such as 2 of 4. A running timer and completed steps are separate signals: neither a timer reaching zero nor a checklist reaching 100% automatically files the commitment's completion outcome or consequences. A user can resume the same task without losing prior step progress. Changes are source-linked, permission-aware and synchronized with Time/File/Conversation/Activity. The guide can keep the resident focused on one concrete next action without introducing compulsory minute estimates for steps.
+
+**Examples for acceptance (synthetic only):** A one-hour cleaning block becomes removing rubbish, sorting a desk, putting supplies away and cleaning surfaces. An eight-hour office work shift holds tasks such as processing company mail and preparing the kitchen. A morning or night routine contains only the personal-care steps the resident actually wants.
+
+**Existing specification review:** `TIME.md` 3.3 defines commitment and completion, 3.5 defines ongoing work with multiple separately schedulable commitments, and 5.5 covers follow-through. `TIME_CURRICULUM.md` 4.15 references help when a resident cannot start, but also says to put the whole Plan aside; this needs deliberate reconciliation with optional assistance *inside* the active commitment. The Curriculum also references Time clauses 5.11–5.13 that are absent in the current Time specification. No new database child-step model or routine checkbox behavior is defined in Operations. Clarify the data and authorization contracts before changing the live app.
+
+**Status:** Founder-approved capability direction, **not yet implemented or demonstrated**. Implementer issue [#36](https://github.com/ucitysocial/Universe-City/issues/36), linked to [#35](https://github.com/ucitysocial/Universe-City/issues/35), [#29](https://github.com/ucitysocial/Universe-City/issues/29) and behavior fix [PR #33](https://github.com/ucitysocial/Universe-City/pull/33). No production changes in this documentation entry.
+
+---
+
 ## Findings and implementation tracking
 
 - **Confirmed duplicate-action issue:** FT-004-C and exported JSON: a screen action already confirmed and saved the new start; a later typed confirmation invoked an additional no-op action and was labeled Changed.
@@ -472,7 +489,7 @@ No founder private records should be used in public tests. Run synthetic test ca
 - **Unverified functional claims:** FT-001-B; FT-002-B and FT-002-C partially observed; FT-003-E and FT-004-B require File/Activity/history inspection.
 - **Approved direction for future improvement:** Shorten and clarify the feedback beneath guide responses (FT-004-A); final copy and implementation not yet approved.
 - **Code fixes deployed:** None through this founder-testing log. Session 01 paused for cleanup. Behavioral priorities #22 and #23; primary visual priority #25; public navigation #27; feedback #24; mobile composer #26.
-- **Pending retests:** FT-005 purposeful follow-up; FT-004 duplicate confirmation and concise feedback; FT-003 deferred proposal; FT-006 File navigation; FT-007 mobile composer; FT-008 public auth; FT-009 center/right shell; FT-010 Time calendar views and data; FT-011 live preview; FT-012 scaling; FT-013 end clearing, step-support conversation and source validation.
+- **Pending retests:** FT-005 purposeful follow-up; FT-004 duplicate confirmation and concise feedback; FT-003 deferred proposal; FT-006 File navigation; FT-007 mobile composer; FT-008 public auth; FT-009 center/right shell; FT-010 Time calendar views and data; FT-011 live preview; FT-012 scaling; FT-013 end clearing and source validation; FT-014 daily anchors; FT-015 expandable step progress and resumed work.
 
 ### Maintenance rules
 
