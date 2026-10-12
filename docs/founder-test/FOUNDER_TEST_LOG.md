@@ -39,6 +39,7 @@ No entry is a defect just because the prototype is unfinished. Do not report uns
 | FT-010 | Time — visual schedule | Daily, weekly, and monthly visual calendar with time-positioned blocks is the Time system, not merely stored entries | Founder core product requirement; partial existing spec, missing views | In progress with Claude; #29 |
 | FT-011 | Resident Portal — visual review package | Updated three-panel File/Conversation, visual calendars, record editor and mobile screenshots supplied as a static walkthrough | Screenshot evidence only; functional claims unverified | Received; awaiting founder review and runnable preview |
 | FT-012 | Portal Home — global UI scale | Entire desktop portal appears miniature: narrow nav/context, undersized cards/type, large unused center | Founder-directed size and readability correction | P0 design fix requested; #32 |
+| FT-013 | Live conversation — flexible commitments and practical support | Open end time cannot be cleared; motivation triggers disengagement; genuine task preferences are refused as questions | Export-confirmed bugs and founder guidance | Draft PR #33; pending CI, preview test and approval; #34 |
 
 ---
 
@@ -402,6 +403,48 @@ The founder rejects the miniature appearance and wants the actual portal sized l
 
 ---
 
+## FT-013 — Live conversation and Time behavior after deployment
+
+**Evidence received:** New founder-only test text/JSON exports captured October 11, 2026, 11:46 PM America/Denver. **Privacy:** Source exports are in the founder's conversation and are not copied into this public repository. They contain private personal content.
+
+**Context:** Founder reports Netlify and GitHub production `main` now contain the single-login resident portal, and wants separate coding help for conversation/Time behavior while Claude continues interface changes.
+
+### Confirmed backend defect — clearing an existing planned end
+
+A known-start commitment was stored with a planned 2 AM end. The founder repeatedly requested **no planned end** so the actual finish could be reported afterward. The `change_commitment` call supplied `end: ''`; server argument logic interpreted that as omitted and retained the existing end. The guide then presented a no-op decision and even proposed removing/recreating the commitment. This would be unnecessary and could disrupt record identity and provenance.
+
+**Required:** Clearing a field is distinct from omitting a field. Support `clear_end: true` explicitly and the existing empty-string request safely, update `end_min` to null on the same record, preserve its other fields and revisions, represent start known/end unknown correctly, and report no change for repeated clear attempts. Direct and pending actions should agree.
+
+**Status:** Implementation prepared in [draft PR #33](https://github.com/ucitysocial/Universe-City/pull/33), with regression checks. Live `main` remains unchanged.
+
+### Guide behavior — keep supporting difficult scheduled work
+
+When the resident said they lacked motivation to begin a scheduled task, the guide treated it as a reason to move on. The founder explicitly requested the agent instead **zoom in on the existing calendar block and help make an ordered task breakdown**, without the resident needing to design the session. The guide later produced and filed a breakdown after confirmation.
+
+**Required:** Respect any explicit cancellation or pause, but where none is requested, support the already-chosen work: identify an actionable first step, use known tasks, ask one purposeful next question. When a resident says an activity's duration is uncertain, avoid repeatedly requesting time budgets; planned starting time and later observed finish remain separate. Proposed task completion criteria must retain the proper approval and source.
+
+**Status:** Prompt guidance prepared in PR #33; effectiveness must be verified with live conversation, not just code review.
+
+### Quote validation — declarative preference mistaken for a question
+
+The validation layer rejected a plainly expressed task-support preference because its words began with **"what helps me is"**, causing the guard to treat it as interrogative despite the statement form.
+
+**Required:** Permit a declarative preference, retain the exact user quote and the existing hedge/negation/source checks; still refuse real questions as File facts.
+
+**Status:** Quote-guard correction and tests are in PR #33; CI pending.
+
+### Other observations to investigate (not changed by this PR)
+
+- The exported transcript includes a brief response that appears truncated mid-sentence after an on-screen confirmation. Investigate model streaming, message persistence and client rendering to establish root cause.
+- An earlier message failed with model service `401 mismatched_site_id`. This may be a temporary deploy configuration problem. Check whether it recurs; do not confuse it with a successful model reply.
+- The guide sometimes returns to schedule intake rather than fully supporting active tasks. Its multi-work priority and resumption behavior need a follow-up test.
+
+### Acceptance and rollout
+
+No founder private records should be used in public tests. Run synthetic test cases for open-ended planned commitment, repeated clear, task breakdown and declarative preference. Confirm typecheck, pilot regression and language checks; inspect a Netlify Deploy Preview if available. Only then ask the founder to approve merging [#33](https://github.com/ucitysocial/Universe-City/pull/33). Keep the live login and production data untouched until approval. Implementation tracker: [#34](https://github.com/ucitysocial/Universe-City/issues/34).
+
+---
+
 ## Findings and implementation tracking
 
 - **Confirmed duplicate-action issue:** FT-004-C and exported JSON: a screen action already confirmed and saved the new start; a later typed confirmation invoked an additional no-op action and was labeled Changed.
@@ -412,7 +455,7 @@ The founder rejects the miniature appearance and wants the actual portal sized l
 - **Unverified functional claims:** FT-001-B; FT-002-B and FT-002-C partially observed; FT-003-E and FT-004-B require File/Activity/history inspection.
 - **Approved direction for future improvement:** Shorten and clarify the feedback beneath guide responses (FT-004-A); final copy and implementation not yet approved.
 - **Code fixes deployed:** None through this founder-testing log. Session 01 paused for cleanup. Behavioral priorities #22 and #23; primary visual priority #25; public navigation #27; feedback #24; mobile composer #26.
-- **Pending retests:** FT-005 next purposeful question; FT-004 duplicate confirmation and concise feedback; FT-003 deferral; FT-006 File navigation; FT-007 mobile composer; FT-008 public auth; FT-009 center chat/right context shell; FT-010 Time calendar day/week/month, data synchronization and manual edits; FT-011 screenshots versus actual running preview; FT-012 100%-zoom full-size responsive sizing in the real preview.
+- **Pending retests:** FT-005 purposeful follow-up; FT-004 duplicate confirmation and concise feedback; FT-003 deferred proposal; FT-006 File navigation; FT-007 mobile composer; FT-008 public auth; FT-009 center/right shell; FT-010 Time calendar views and data; FT-011 live preview; FT-012 scaling; FT-013 end clearing, step-support conversation and source validation.
 
 ### Maintenance rules
 
