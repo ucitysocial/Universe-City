@@ -445,7 +445,7 @@ export async function continueAfterPress(userId: string, pendingId: string): Pro
   ];
   const tools = TOOLS.filter(t => !RETIRED.has(t.name)).map(t => ({ name: t.name, description: t.description, input_schema: t.input_schema }));
   const messages = historyFor(start.recent, start.access.timezone, start.presses);
-  const ask = '(The server asks, after the press above: write the agent\'s next reply now. Say in a few words what is on file after this press. Then go on with the open work and ask its next question. When no work is open and nothing is missing, say only what is on file. Take no action.)';
+  const ask = '(The server asks, after the press above: write the agent\'s next reply now. The on-screen action line already states the updated facts; do not repeat the dates, before/after, or tool history. If the press requires a missing answer or a closely related next question, ask one briefly. Do not automatically switch to unrelated ongoing schedule intake after a simple confirmation. Otherwise acknowledge briefly. Take no action.)';
   const lastTurn = messages[messages.length - 1];
   if (lastTurn && lastTurn.role === 'user') lastTurn.content = `${lastTurn.content as string}\n\n${ask}`;
   else messages.push({ role: 'user', content: ask });

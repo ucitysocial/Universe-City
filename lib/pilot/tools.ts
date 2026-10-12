@@ -953,16 +953,12 @@ export const TOOLS: Tool[] = [
       await refreshPlanCard(env, old.on_date);
       if (date !== old.on_date) await refreshPlanCard(env, date);
       const now = (await env.q<CommitmentRow>(`select ${COMMITMENT_COLS} from uc_pilot.commitments where id = $1`, [id]))[0];
-      // One value that replaced an earlier one is named, so the line says what it was before.
-      const was: string[] = [];
-      if (start !== old.start_min && old.start_min !== null) was.push(`start ${sayClock(old.start_min)}`);
-      if (end !== old.end_min && old.end_min !== null) was.push(`end ${sayClock(old.end_min)}`);
-      if (date !== old.on_date) was.push(dayBrief(old.on_date));
-      if (label !== old.label) was.push(old.label);
+      // The resident sees the new state in one short action line; old values remain
+      // in the source-linked revision history and full action detail, not the chat status.
       return {
         outcome: 'filed',
         detail: `Changed: ${sayCommitment(now)}, on ${sayDate(date)}. Before: ${old.label}, ${saySpan(old.start_min, old.end_min)}, on ${sayDate(old.on_date)}.${inWords(said)}`,
-        brief: `Updated: ${entryBrief(label, date, start, end)}${was.length ? ` Before: ${was.join(', ')}.` : ''}`,
+        brief: `Updated: ${entryBrief(label, date, start, end)}`,
         target: 'commitments', targetId: id, data: { ref: shortId(id) }
       };
     }

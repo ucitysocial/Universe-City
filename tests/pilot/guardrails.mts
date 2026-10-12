@@ -578,7 +578,7 @@ const shift = (await asResident(A, q => q(`select id from uc_pilot.commitments w
   // A start that is different is a change, with what it was before.
   const moved = await send(D, 'actually I start at 4PM that day', [call('change_commitment', { ref: shift.slice(0, 8), start: '16:00', quote: 'I start at 4PM that day' }), say('The start is now 4:00 PM.')]);
   const rev = (await asResident(D, q => q(`select before ->> 'start_min' as b, after ->> 'start_min' as a, message_id is not null as has_message from uc_pilot.revisions where table_name = 'commitments' order by seq desc limit 1`)))[0];
-  check('F-08', 'A start that is different is a change: the line names the earlier time, and the history keeps both with the message', moved.effects[0]?.outcome === 'filed' && /^Updated: Bar shift on .* 4:00 PM to 11:00 PM\. Before: start 3:00 PM\.$/.test(moved.effects[0]?.brief || '') && rev?.b === '900' && rev?.a === '960' && rev?.has_message === true, [moved.effects[0]?.brief, rev]);
+  check('F-08', 'A changed start shows only the current time on-screen; the history keeps the earlier value with its message', moved.effects[0]?.outcome === 'filed' && /^Updated: Bar shift on .* 4:00 PM to 11:00 PM\.$/.test(moved.effects[0]?.brief || '') && !/Before:/.test(moved.effects[0]?.brief || '') && rev?.b === '900' && rev?.a === '960' && rev?.has_message === true, [moved.effects[0]?.brief, rev]);
 
   // The guide goes on after a press, once.
   const prep3 = await send(D, 'i might bring a jacket', [call('prepare', { action: 'file_statement', args: { summary: 'Brings a jacket to the bar shift', topic: 'Jacket', folder: 'Time' } }), say('Should I keep that?')]);
