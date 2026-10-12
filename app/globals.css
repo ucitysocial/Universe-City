@@ -33,6 +33,9 @@ button,input,textarea,select{font:inherit;color:inherit;border-radius:0}
 .public-actions{margin-left:auto;display:flex;align-items:center;gap:clamp(11px,1.5vw,23px)}
 .public-signin{color:var(--paper);font-size:13.5px;font-weight:600;text-decoration:none;white-space:nowrap;opacity:.78}
 .public-signin:hover{opacity:1}
+/* Log out is a form button. It looks like the Resident Portal link beside it. */
+.public-logout{display:contents}
+button.public-signin{background:none;border:0;cursor:pointer}
 .public-apply{background:var(--paper);color:var(--ink);padding:9px 16px;font-size:13.5px;font-weight:600;text-decoration:none;white-space:nowrap}
 .public-apply:hover{background:#fff}
 .public-menu-button{font-family:Montserrat,system-ui,-apple-system,sans-serif;font-size:20px;line-height:1;background:none;border:2px solid rgba(244,239,233,.5);color:var(--paper);width:42px;height:38px;cursor:pointer;transition:background .2s,border-color .2s}
@@ -472,6 +475,9 @@ h3{font-size:19px;font-weight:600}
 .file-person span{color:var(--dim);font-family:'VT323',monospace;font-size:16px}
 .file-foot>a{color:var(--dim);text-decoration:none}
 .file-foot>a:hover{color:var(--ink);text-decoration:underline}
+/* Log out is a form button. It looks like the Account link above it. */
+.file-foot>form>button{background:none;border:0;cursor:pointer;color:var(--dim)}
+.file-foot>form>button:hover{color:var(--ink);text-decoration:underline}
 
 .resident-main{min-width:0;padding:34px 34px 90px;background:var(--paper)}
 .agent-rail{
@@ -623,7 +629,7 @@ h3{font-size:19px;font-weight:600}
   .file-tree{display:none}
   .file-primary{margin-top:12px}
   .file-home{display:inline-block}
-  .file-foot{margin-top:12px;display:grid;grid-template-columns:1fr auto auto;align-items:center}
+  .file-foot{margin-top:12px;display:grid;grid-template-columns:1fr auto auto auto;align-items:center}
   .file-person{margin:0}
   .resident-main{order:2;padding:24px 18px 80px}
   .agent-rail{order:3;position:static;height:auto;border-left:0;border-top:3px solid var(--ink)}
@@ -729,4 +735,15 @@ h3{font-size:19px;font-weight:600}
 .public-menu-groups a.public-menu-login{display:none}
 @media (max-width:372px){
   .public-menu-groups a.public-menu-login{display:block}
+}
+/* Log out is short. It stays in the header when Resident Portal moves to the star menu. */
+@media (max-width:372px){
+  button.public-signin{display:inline-block}
+}
+/* Log out in the star menu. It follows the Resident Portal link and shows on the same narrow screens. */
+.public-menu-logout{display:none}
+.public-menu-logout button{display:block;width:100%;text-align:left;background:none;border:0;cursor:pointer;color:var(--paper);font-size:15.5px;font-weight:500;letter-spacing:-.005em;padding:5px 0;opacity:.82}
+.public-menu-logout button:hover{opacity:1;color:#fff}
+@media (max-width:372px){
+  .public-menu-logout{display:block}
 }

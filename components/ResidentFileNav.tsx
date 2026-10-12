@@ -89,6 +89,9 @@ export default function ResidentFileNav({
         </div>
         <Link href="/portal/account">Account</Link>
         <Link href="/portal/orientation?replay=1">Replay orientation</Link>
+        <form method="post" action="/auth/logout">
+          <button type="submit">Log out</button>
+        </form>
       </div>
     </aside>
   );
