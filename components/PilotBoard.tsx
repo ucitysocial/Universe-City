@@ -88,9 +88,9 @@ export default function PilotBoard({ board, wide = false }: { board: Board; wide
       )}
       {!wide && <PilotIntake intake={board.intake} short />}
       <PilotBoardTabs calendar={wide ? calendar : <PilotBoardDay days={days} today={today} />} depts={depts} filled={folders} />
-      {wide && (
+      {wide && board.intake.done < board.intake.of && (
         <div className="dash-sec">
-          <div className="dash-h"><h2>Progress</h2></div>
+          <div className="dash-h"><h2>Missing pieces</h2></div>
           <PilotIntake intake={board.intake} />
         </div>
       )}

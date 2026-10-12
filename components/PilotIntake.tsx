@@ -39,23 +39,18 @@ export default function PilotIntake({ intake, short = false }: { intake: Intake;
     );
   }
 
+  // The founder set on October 12, 2026 that My File shows only the pieces still missing, with no bar.
+  if (!open.length) return null;
   return (
     <div className="intake">
-      <div className="intake-top">
-        <span className="intake-t">What the agent needs to plan your days</span>
-        {bar}
-        <span className="intake-n">{intake.done} of {intake.of} on file</span>
-      </div>
       <ul className="intake-list">
-        {intake.items.map(i => (
-          <li key={i.key} className={i.done ? 'done' : undefined}>
-            {i.done
-              ? <><span className="intake-mark" aria-hidden="true">&#10003;</span><span>{i.label}</span><em>On file</em></>
-              : <button type="button" className="intake-ask" onClick={() => ask(i.ask)}>Add {i.label.toLowerCase()}</button>}
+        {open.map(i => (
+          <li key={i.key}>
+            <button type="button" className="intake-ask" onClick={() => ask(i.ask)}>Add {i.label.toLowerCase()}</button>
           </li>
         ))}
       </ul>
-      {open.length > 0 && <p className="intake-note">Each button sends one message. The agent asks one question at a time.</p>}
+      <p className="intake-note">Each button sends one message. The agent asks one question at a time.</p>
     </div>
   );
 }
