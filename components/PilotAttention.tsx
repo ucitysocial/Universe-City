@@ -1,6 +1,6 @@
 'use client';
 
-import { useId, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import PilotPending from '@/components/PilotPending';
 import type { PanelView } from '@/lib/pilot/browse';
 
@@ -12,6 +12,12 @@ import type { PanelView } from '@/lib/pilot/browse';
 export default function PilotAttention({ panel, inline = false }: { panel: PanelView; inline?: boolean }) {
   const [open, setOpen] = useState(false);
   const id = useId();
+  useEffect(() => {
+    if (!open) return;
+    const dismiss = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
+    document.addEventListener('keydown', dismiss);
+    return () => document.removeEventListener('keydown', dismiss);
+  }, [open]);
   const count = panel.pending.length;
   if (!count) return null;
 
