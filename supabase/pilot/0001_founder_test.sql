@@ -265,6 +265,27 @@ create table if not exists uc_pilot.follow_ups (
   check ((state = 'open') = (closed_at is null))
 );
 
+-- A piece of work the resident asked for help with, in the resident's own words. It stays open across messages
+-- and days, so the guide keeps the purpose of the conversation and the resident never has to state it twice.
+-- docs/systems/TIME.md 3.5 names this ongoing work.
+create table if not exists uc_pilot.work (
+  id                uuid primary key default gen_random_uuid(),
+  user_id           uuid not null default uc_pilot.uid(),
+  label             text not null check (length(label) between 1 and 120),   -- a short name for finding it
+  said              text not null check (length(said) between 1 and 1000),   -- the resident's own words
+  folder            text not null default 'General',
+  state             text not null default 'open' check (state in ('open','done','dropped')),
+  source_message_id uuid references uc_pilot.messages(id),
+  created_by        text not null default 'software',
+  created_at        timestamptz not null default now(),
+  closed_at         timestamptz,
+  closed_said       text,
+  closed_message_id uuid references uc_pilot.messages(id),
+  closed_by         text,
+  check ((state = 'open') = (closed_at is null))
+);
+create index if not exists work_user_state on uc_pilot.work (user_id, state, created_at desc);
+
 -- ---------------------------------------------------------------- what software did, and what changed
 
 create table if not exists uc_pilot.actions (
@@ -276,7 +297,8 @@ create table if not exists uc_pilot.actions (
   tool       text not null,
   args       jsonb not null default '{}'::jsonb,
   outcome    text not null check (outcome in ('filed','unchanged','prepared','proposed','refused','failed','read','decided')),
-  detail     text,
+  detail     text,                                   -- the full account: the words it rests on, and what the entry said before
+  brief      text,                                   -- one short line for the conversation
   target     text,
   target_id  uuid,
   idem_key   text not null,
@@ -285,6 +307,7 @@ create table if not exists uc_pilot.actions (
   unique (user_id, idem_key)
 );
 create index if not exists actions_user_seq on uc_pilot.actions (user_id, seq desc);
+alter table uc_pilot.actions add column if not exists brief text;
 
 create table if not exists uc_pilot.revisions (
   id         uuid primary key default gen_random_uuid(),
@@ -318,7 +341,7 @@ begin
   elsif tg_table_name in ('statements','schedule_items','commitments','plans') then
     new.filed_by := uc_pilot.actor();
     if new.source_message_id is null then new.source_message_id := uc_pilot.msg(); end if;
-  elsif tg_table_name in ('pending','follow_ups') then
+  elsif tg_table_name in ('pending','follow_ups','work') then
     new.created_by := uc_pilot.actor();
     if new.source_message_id is null then new.source_message_id := uc_pilot.msg(); end if;
   elsif tg_table_name = 'actions' then
@@ -466,10 +489,24 @@ begin
   return new;
 end $$;
 
+-- Who closed a piece of work comes from the server's context. It is closed once.
+create or replace function uc_pilot.work_guard() returns trigger
+language plpgsql as $$
+begin
+  if old.state <> 'open' then
+    raise exception 'A piece of work is closed once.';
+  end if;
+  if new.state <> 'open' then
+    new.closed_by := uc_pilot.actor();
+    new.closed_at := now();
+  end if;
+  return new;
+end $$;
+
 do $$
 declare t text;
 begin
-  foreach t in array array['sessions','turns','messages','statements','schedule_items','commitments','plans','pending','follow_ups','actions'] loop
+  foreach t in array array['sessions','turns','messages','statements','schedule_items','commitments','plans','pending','follow_ups','work','actions'] loop
     execute format('drop trigger if exists %I on uc_pilot.%I', t || '_10_stamp', t);
     execute format('create trigger %I before insert on uc_pilot.%I for each row execute function uc_pilot.stamp()', t || '_10_stamp', t);
   end loop;
@@ -477,7 +514,7 @@ begin
     execute format('drop trigger if exists %I on uc_pilot.%I', t || '_20_rests', t);
     execute format('create trigger %I before insert on uc_pilot.%I for each row execute function uc_pilot.rests_on_resident()', t || '_20_rests', t);
   end loop;
-  foreach t in array array['statements','schedule_items','commitments','plans','pending','follow_ups'] loop
+  foreach t in array array['statements','schedule_items','commitments','plans','pending','follow_ups','work'] loop
     execute format('drop trigger if exists %I on uc_pilot.%I', t || '_10_fixed', t);
     execute format('create trigger %I before update on uc_pilot.%I for each row execute function uc_pilot.fixed_columns()', t || '_10_fixed', t);
     execute format('drop trigger if exists %I on uc_pilot.%I', t || '_90_revision', t);
@@ -488,7 +525,7 @@ end $$;
 do $$
 declare t text;
 begin
-  foreach t in array array['turns','messages','statements','schedule_items','commitments','plans','pending','follow_ups','actions'] loop
+  foreach t in array array['turns','messages','statements','schedule_items','commitments','plans','pending','follow_ups','work','actions'] loop
     execute format('drop trigger if exists %I on uc_pilot.%I', t || '_15_refs', t);
     execute format('create trigger %I before insert or update on uc_pilot.%I for each row execute function uc_pilot.refs_guard()', t || '_15_refs', t);
   end loop;
@@ -501,6 +538,10 @@ drop trigger if exists follow_ups_40_guard on uc_pilot.follow_ups;
 create trigger follow_ups_40_guard before update on uc_pilot.follow_ups
   for each row execute function uc_pilot.follow_up_guard();
 
+drop trigger if exists work_40_guard on uc_pilot.work;
+create trigger work_40_guard before update on uc_pilot.work
+  for each row execute function uc_pilot.work_guard();
+
 drop trigger if exists commitments_30_outcome on uc_pilot.commitments;
 create trigger commitments_30_outcome before insert or update on uc_pilot.commitments
   for each row execute function uc_pilot.outcome_guard();
@@ -510,7 +551,7 @@ create trigger commitments_30_outcome before insert or update on uc_pilot.commit
 do $$
 declare t text;
 begin
-  foreach t in array array['access','sessions','messages','turns','statements','schedule_items','plans','commitments','pending','follow_ups','actions','revisions'] loop
+  foreach t in array array['access','sessions','messages','turns','statements','schedule_items','plans','commitments','pending','follow_ups','work','actions','revisions'] loop
     execute format('alter table uc_pilot.%I enable row level security', t);
     execute format('alter table uc_pilot.%I force row level security', t);
     execute format('revoke all on uc_pilot.%I from public', t);
@@ -548,6 +589,9 @@ grant update (summary, payload, state, decided_via, decided_message_id, result)
 grant select, insert         on uc_pilot.follow_ups     to uc_pilot_resident;
 grant update (what, due_on, state, closed_said, closed_message_id)
                              on uc_pilot.follow_ups     to uc_pilot_resident;
+grant select, insert         on uc_pilot.work           to uc_pilot_resident;
+grant update (label, state, closed_said, closed_message_id)
+                             on uc_pilot.work           to uc_pilot_resident;
 grant select, insert         on uc_pilot.actions        to uc_pilot_resident;
 grant select                 on uc_pilot.revisions      to uc_pilot_resident;
 
@@ -555,7 +599,7 @@ grant select                 on uc_pilot.revisions      to uc_pilot_resident;
 do $$
 declare f text;
 begin
-  foreach f in array array['uid','actor','msg','turn','stamp','rests_on_resident','outcome_guard','fixed_columns','refs_guard','pending_guard','follow_up_guard'] loop
+  foreach f in array array['uid','actor','msg','turn','stamp','rests_on_resident','outcome_guard','fixed_columns','refs_guard','pending_guard','follow_up_guard','work_guard'] loop
     execute format('alter function uc_pilot.%I() set search_path = uc_pilot, pg_temp', f);
   end loop;
 end $$;
@@ -582,7 +626,7 @@ begin
     raise exception 'No resident is set.';
   end if;
   update uc_pilot.turns set reply_id = null where user_id = u;
-  foreach t in array array['revisions','actions','follow_ups','pending','commitments','plans','schedule_items','statements','turns','messages','sessions'] loop
+  foreach t in array array['revisions','actions','work','follow_ups','pending','commitments','plans','schedule_items','statements','turns','messages','sessions'] loop
     execute format('delete from uc_pilot.%I where user_id = $1', t) using u;
     get diagnostics c = row_count;
     n := n || jsonb_build_object(t, c);

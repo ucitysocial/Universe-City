@@ -32,6 +32,8 @@ export type CommitmentView = {
 export type PlanRow = { id: string; plan_date: string; state: string; confirmed_at: string | null; confirmed_via: string | null; realism: string | null; confirmed_items: any };
 export type PendingRow = { id: string; decider: string; kind: string; summary: string; rests_on: string | null; state: string; created_at: string; payload: any; decided_at: string | null; decided_via: string | null };
 export type FollowUpRow = { id: string; owner: string; kind: string; what: string; due_on: string | null; state: string; created_at: string };
+export type WorkRow = { id: string; label: string; said: string; folder: string; state: string; created_at: string; closed_at: string | null; closed_said: string | null };
+export type DecisionRow = { id: string; summary: string; state: string; decided_via: string | null; decided_at: string | null; entry: string | null };
 
 export type FileView = {
   now: LocalNow;
@@ -43,12 +45,16 @@ export type FileView = {
   waitingAgent: PendingRow[];
   followUps: FollowUpRow[];
   notEstablished: string[];
+  work: WorkRow[];                 // what the resident asked for help with, still open
+  decided: DecisionRow[];          // items the resident decided in the last day, by the button or in the conversation
+  emptyDays: string[];             // the days ahead in view that hold no entry
+  openedWith: string[];            // the first words of this sitting, when they are no longer in view
 };
 
 const STATEMENT_COLS = `id, said, topic, folder, state, basis, filed_by, about_date::text as about_date, supersedes,
   ${TS('created_at')} as created_at, ${TS('ended_at')} as ended_at`;
 
-export async function loadFile(q: Q, zone: string, opts: { daysBack?: number; daysAhead?: number; statements?: number } = {}): Promise<FileView> {
+export async function loadFile(q: Q, zone: string, opts: { daysBack?: number; daysAhead?: number; statements?: number; inView?: number } = {}): Promise<FileView> {
   const now = localNow(zone);
   const from = addDays(now.date, -(opts.daysBack ?? 2));
   const to = addDays(now.date, opts.daysAhead ?? 7);
@@ -76,6 +82,21 @@ export async function loadFile(q: Q, zone: string, opts: { daysBack?: number; da
   const followUps = await q<FollowUpRow>(
     `select id, owner, kind, what, due_on::text as due_on, state, ${TS('created_at')} as created_at
        from uc_pilot.follow_ups where state = 'open' order by due_on nulls last, created_at`);
+  const work = await q<WorkRow>(
+    `select id, label, said, folder, state, ${TS('created_at')} as created_at, ${TS('closed_at')} as closed_at, closed_said
+       from uc_pilot.work where state = 'open' order by created_at`);
+  const decided = await q<DecisionRow>(
+    `select id, summary, state, decided_via, ${TS('decided_at')} as decided_at, result ->> 'entry' as entry
+       from uc_pilot.pending
+      where decider = 'resident' and state in ('confirmed', 'declined') and decided_at > now() - interval '24 hours'
+      order by decided_at desc limit 6`);
+  // The first words of this sitting. They are shown to the model when they have left the messages in view.
+  const opened = await q<{ body: string }>(
+    `select m.body from uc_pilot.messages m
+      where m.speaker = 'resident'
+        and m.session_id = (select session_id from uc_pilot.messages order by seq desc limit 1)
+        and m.seq <= (select max(seq) - $1 from uc_pilot.messages)
+      order by m.seq limit 3`, [opts.inView ?? 20]);
 
   const days: FileView['days'] = [];
   for (let d = from; d <= to; d = addDays(d, 1)) {
@@ -102,7 +123,10 @@ export async function loadFile(q: Q, zone: string, opts: { daysBack?: number; da
     statements, schedule, days,
     waitingResident: pending.filter(p => p.decider === 'resident'),
     waitingAgent: pending.filter(p => p.decider === 'agent'),
-    followUps, notEstablished
+    followUps, notEstablished,
+    work, decided,
+    emptyDays: days.filter(d => d.date >= now.date && d.commitments.filter(c => !c.withdrawn_at).length === 0).map(d => d.date),
+    openedWith: opened.map(o => o.body)
   };
 }
 
@@ -140,6 +164,22 @@ export function fileForModel(v: FileView, name: string | null): string {
     for (const c of d.commitments) L.push(`    [${shortId(c.id)}] ${sayCommitment(c as any)}${c.schedule_item_id ? ' (from the weekly schedule)' : ''}`);
   }
   if (!v.days.some(d => d.commitments.length || d.plan)) L.push('  No commitment and no Plan is on file for the days in view.');
+  if (v.emptyDays.length) L.push(`  Days ahead with no entry on file: ${v.emptyDays.map(d => `${['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][weekdayOf(d)]} ${d}`).join(', ')}.`);
+  L.push('');
+  L.push('ONGOING WORK. The resident asked for help with each of these. Each stays open until the resident says it is settled or drops it. You lead it:');
+  if (v.work.length === 0) L.push('  None is open.');
+  for (const w of v.work) L.push(`  [${shortId(w.id)}] ${w.label} (${w.folder}), opened ${sayDate(localNow(n.zone, new Date(w.created_at)).date)}. The resident's words: "${w.said}"`);
+  if (v.openedWith.length) {
+    L.push('  This sitting began with these words from the resident, which are no longer among the messages in view:');
+    for (const o of v.openedWith) L.push(`    "${o.length > 300 ? `${o.slice(0, 300)} (cut here)` : o}"`);
+  }
+  L.push('');
+  L.push('DECIDED BY THE RESIDENT IN THE LAST DAY. Each is finished. None waits. Never file one again and never ask for one again:');
+  if (v.decided.length === 0) L.push('  None.');
+  for (const d of v.decided) {
+    const how = d.decided_via === 'screen' ? 'with the button on the screen' : 'in the conversation';
+    L.push(`  ${d.state === 'confirmed' ? 'Confirmed' : 'Declined'} ${how}${d.decided_at ? `, ${localNow(n.zone, new Date(d.decided_at)).label}` : ''}: ${d.entry || d.summary}`);
+  }
   L.push('');
   L.push('WAITING FOR THE RESIDENT TO CONFIRM OR DECLINE:');
   if (v.waitingResident.length === 0) L.push('  Nothing.');

@@ -30,13 +30,19 @@ export async function POST(req: Request) {
         basis: 'resident_confirmation', via: 'screen'
       };
       const r = desk ? await decideProposal(env, id, decision) : await decide(env, id, decision);
+      // A second press on an item that is already decided changes nothing, and the list keeps the first press alone.
       await q(
-        `insert into uc_pilot.actions (tool, args, outcome, detail, target, target_id, idem_key)
-         values ($1, $2::jsonb, 'decided', $3, $4, $5, $6) on conflict (user_id, idem_key) do nothing`,
-        [desk ? 'desk_decision' : 'screen_decision', JSON.stringify({ id, decision }), clip(r.detail, 900), r.target || null, r.targetId || null, `screen:${id}`]);
+        `insert into uc_pilot.actions (tool, args, outcome, detail, brief, target, target_id, idem_key)
+         values ($1, $2::jsonb, $3, $4, $5, $6, $7, $8) on conflict (user_id, idem_key) do nothing`,
+        [desk ? 'desk_decision' : 'screen_decision', JSON.stringify({ id, decision }), r.outcome === 'unchanged' ? 'unchanged' : 'decided',
+          clip(r.detail, 900), r.brief ? clip(r.brief, 300) : null, r.target || null, r.targetId || null, `screen:${id}`]);
       return r;
     });
-    return Response.json({ ok: true, detail: result.detail }, { headers: { 'cache-control': 'no-store' } });
+    return Response.json({
+      ok: true, detail: result.brief || result.detail, changed: result.outcome !== 'unchanged',
+      // The guide goes on after the resident's own press. The screen asks for that reply next.
+      next: !desk && result.outcome !== 'unchanged' ? id : null
+    }, { headers: { 'cache-control': 'no-store' } });
   } catch (e: any) {
     if (e instanceof Refusal) return Response.json({ error: e.message }, { status: 400 });
     const rule = typeof e?.message === 'string' && e?.code === 'P0001' ? e.message : null;

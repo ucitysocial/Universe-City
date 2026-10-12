@@ -21,8 +21,11 @@ export async function exportAll(q: Q, zone: string) {
             ${TS('t.started_at')} as started_at, ${TS('t.finished_at')} as finished_at, t.transcript
        from uc_pilot.turns t order by t.started_at`);
   const actions = await q<any>(
-    `select a.id, a.turn_id, a.message_id, a.tool, a.args, a.outcome, a.detail, a.target, a.target_id, a.actor, ${TS('a.at')} as at
+    `select a.id, a.turn_id, a.message_id, a.tool, a.args, a.outcome, a.detail, a.brief, a.target, a.target_id, a.actor, ${TS('a.at')} as at
        from uc_pilot.actions a order by a.seq`);
+  const work = await q<any>(
+    `select id, label, said, folder, state, source_message_id, created_by, ${TS('created_at')} as created_at,
+            ${TS('closed_at')} as closed_at, closed_said, closed_message_id, closed_by from uc_pilot.work order by created_at`);
   const statements = await q<any>(
     `select id, said, topic, folder, about_date::text as about_date, state, supersedes, source_message_id, basis, filed_by,
             ${TS('created_at')} as created_at, ${TS('ended_at')} as ended_at, ended_by_message_id
@@ -70,11 +73,28 @@ export async function exportAll(q: Q, zone: string) {
       tokens: t ? { read: t.input_tokens, written: t.output_tokens, read_from_cache: t.cache_read_tokens, written_to_cache: t.cache_write_tokens } : null,
       cost_usd: t ? Math.round(t.cost_micro) / 1_000_000 : 0,
       seconds: t?.started_at && t?.finished_at ? Math.round((Date.parse(t.finished_at) - Date.parse(t.started_at)) / 100) / 10 : null,
-      actions: (t ? byTurn.get(t.id) || [] : []).map((a: any) => ({ action: a.tool, asked_with: a.args, outcome: a.outcome, what_happened: a.detail, entry: a.target ? { table: a.target, id: a.target_id } : null, at: a.at })),
+      actions: (t ? byTurn.get(t.id) || [] : []).map((a: any) => ({ action: a.tool, asked_with: a.args, outcome: a.outcome, shown_in_the_conversation: a.brief ?? null, what_happened: a.detail, entry: a.target ? { table: a.target, id: a.target_id } : null, at: a.at })),
       // What the model asked for and what the server answered, in order. This is the part to study when a reply went wrong.
       model_steps: Array.isArray(t?.transcript) ? t.transcript : []
     };
   });
+
+  // A reply the guide wrote after a press on the screen. No resident message came before it.
+  const afterPress = messages.filter((m: any) => m.speaker === 'software' && !m.reply_to).map((m: any) => {
+    const t = turnOf.get(m.id);
+    return {
+      resident: null as null,
+      started_by: 'a press on the screen',
+      guide: { id: m.id, at: m.created_at, said: m.body },
+      reply_state: 'done', reply_error: null as string | null,
+      model: t?.model ?? null, instructions_version: t?.prompt_version ?? null, model_calls: t?.steps ?? 0,
+      tokens: t ? { read: t.input_tokens, written: t.output_tokens, read_from_cache: t.cache_read_tokens, written_to_cache: t.cache_write_tokens } : null,
+      cost_usd: t ? Math.round(t.cost_micro) / 1_000_000 : 0,
+      seconds: null as number | null, actions: [] as any[], model_steps: [] as any[]
+    };
+  });
+  const inOrder = [...exchanges.map((e: any) => ({ ...e, started_by: 'the resident' })), ...afterPress]
+    .sort((a: any, b: any) => ((a.resident?.at ?? a.guide.at) < (b.resident?.at ?? b.guide.at) ? -1 : 1));
 
   const now = localNow(zone);
   return {
@@ -84,13 +104,13 @@ export async function exportAll(q: Q, zone: string) {
     zone,
     instructions_version_now: PROMPT_VERSION,
     counts: {
-      messages: messages.length, exchanges: exchanges.length, actions: actions.length, statements: statements.length,
+      messages: messages.length, exchanges: inOrder.length, actions: actions.length, statements: statements.length, ongoing_work: work.length,
       weekly_schedule_items: schedule.length, commitments: commitments.length, plans: plans.length,
       waiting_items: waiting.length, follow_ups: followUps.length, changes: revisions.length
     },
     total_cost_usd: Math.round(turns.reduce((n: number, t: any) => n + (t.cost_micro || 0), 0)) / 1_000_000,
-    exchanges,
-    file: { statements, weekly_schedule: schedule, commitments, plans, waiting_items: waiting, follow_ups: followUps },
+    exchanges: inOrder,
+    file: { statements, weekly_schedule: schedule, commitments, plans, waiting_items: waiting, follow_ups: followUps, ongoing_work: work },
     changes: revisions,
     actions_from_the_screen: actions.filter((a: any) => !a.turn_id)
   };
@@ -112,9 +132,13 @@ export function exportText(x: Awaited<ReturnType<typeof exportAll>>): string {
   L.push('==================== CONVERSATION ====================');
   for (const e of x.exchanges) {
     L.push('');
-    L.push(`[${when(e.resident.at)}] YOU`);
-    L.push(e.resident.said);
-    if (e.resident.taken_out_before_keeping.length) L.push(`  (taken out before the message was kept: ${e.resident.taken_out_before_keeping.join(', ')})`);
+    if (e.resident) {
+      L.push(`[${when(e.resident.at)}] YOU`);
+      L.push(e.resident.said);
+      if (e.resident.taken_out_before_keeping.length) L.push(`  (taken out before the message was kept: ${e.resident.taken_out_before_keeping.join(', ')})`);
+    } else {
+      L.push('  (you pressed a button on the screen. The guide went on.)');
+    }
     if (e.guide) {
       L.push('');
       L.push(`[${when(e.guide.at)}] GUIDE, SOFTWARE`);
@@ -123,7 +147,10 @@ export function exportText(x: Awaited<ReturnType<typeof exportAll>>): string {
       L.push('');
       L.push(`  (no reply was written. State: ${e.reply_state}${e.reply_error ? `. ${e.reply_error}` : ''})`);
     }
-    for (const a of e.actions) L.push(`  ${OUTCOME[a.outcome] || a.outcome} | ${a.action} | ${a.what_happened ?? ''}`);
+    for (const a of e.actions) {
+      if (a.shown_in_the_conversation) L.push(`  SHOWN: ${a.shown_in_the_conversation}`);
+      L.push(`  ${OUTCOME[a.outcome] || a.outcome} | ${a.action} | ${a.what_happened ?? ''}`);
+    }
     L.push(`  (${e.model ?? 'no model'}, instructions ${e.instructions_version ?? 'unknown'}, ${e.model_calls} model ${e.model_calls === 1 ? 'call' : 'calls'}, ${e.seconds ?? '?'} seconds, $${e.cost_usd.toFixed(4)})`);
   }
   L.push('');
@@ -154,7 +181,8 @@ export function exportText(x: Awaited<ReturnType<typeof exportAll>>): string {
   L.push('==================== WAITING ITEMS AND FOLLOW UPS ====================');
   for (const p of x.file.waiting_items) L.push(`- [${p.state}] for ${p.decider === 'agent' ? 'a person' : 'you'}: ${p.summary}`);
   for (const f of x.file.follow_ups) L.push(`- [${f.state}] follow up for ${f.owner}: ${f.what}${f.due_on ? `, needed by ${sayDate(f.due_on)}` : ''}`);
-  if (!x.file.waiting_items.length && !x.file.follow_ups.length) L.push('None.');
+  for (const w of x.file.ongoing_work) L.push(`- [${w.state}] ongoing work, ${w.folder}: ${w.label}. Your words: ${w.said}`);
+  if (!x.file.waiting_items.length && !x.file.follow_ups.length && !x.file.ongoing_work.length) L.push('None.');
   L.push('');
   L.push('==================== CHANGES ====================');
   for (const r of x.changes) {

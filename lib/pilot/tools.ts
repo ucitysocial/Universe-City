@@ -13,14 +13,15 @@ import { isUuid, TS } from './db';
 import { FOLDERS } from '../domain/folders';
 import { checkAnswer, checkQuote, clip, hasNegation, isRough, plain, quotePresent, shortId, type QuoteRules } from './guard';
 import {
-  addDays, isDate, parseClock, sayDate, sayDays, saySpan, weekdayOf, type LocalNow
+  addDays, isDate, parseClock, sayClock, sayDate, sayDays, saySpan, weekdayOf, type LocalNow
 } from './time';
 
 export type Outcome = 'filed' | 'unchanged' | 'prepared' | 'proposed' | 'refused' | 'failed' | 'read' | 'decided';
 
 export type Result = {
   outcome: Outcome;
-  detail: string;          // plain words. Shown to the resident in the list of what happened
+  detail: string;          // the full account, for the model, the File, and the activity list
+  brief?: string;          // one short line for the conversation. It starts with a word such as Filed or Confirmed
   target?: string;
   targetId?: string;
   data?: unknown;          // returned to the language model
@@ -123,7 +124,7 @@ function folderArg(a: Args, key = 'folder'): string {
 
 const TABLES = {
   statement: 'statements', schedule_item: 'schedule_items', commitment: 'commitments',
-  plan: 'plans', pending: 'pending', follow_up: 'follow_ups'
+  plan: 'plans', pending: 'pending', follow_up: 'follow_ups', work: 'work'
 } as const;
 type Kind = keyof typeof TABLES;
 
@@ -168,6 +169,37 @@ function words(env: Env, a: Args, rules: QuoteRules = {}): string | null {
 }
 
 const inWords = (said: string | null) => (said ? ` Your words: "${clip(said, 200)}"` : '');
+
+// ------------------------------------------------------------------ one short line for the conversation
+//
+// The conversation shows one short line for each action. The full account, with the resident's words and the
+// earlier values, stays in the File and in the activity list.
+
+/** Friday, October 16 */
+export const dayBrief = (date: string) => sayDate(date).replace(/, \d{4}$/, '');
+
+/** 8:30 AM to 5:00 PM. Starts at 3:00 PM, end time unknown. Time unknown. */
+export function spanBrief(start: number | null | undefined, end: number | null | undefined): string {
+  if (start != null && end != null) return `${sayClock(start)} to ${sayClock(end)}`;
+  if (start != null) return `starts at ${sayClock(start)}, end time unknown`;
+  if (end != null) return `ends at ${sayClock(end)}, start time unknown`;
+  return 'time unknown';
+}
+
+/** Bar shift on Friday, October 16 starts at 3:00 PM. End time unknown. */
+export function entryBrief(label: string, date: string, start: number | null, end: number | null): string {
+  const on = `${label} on ${dayBrief(date)}`;
+  if (start !== null && end !== null) return `${on}, ${sayClock(start)} to ${sayClock(end)}.`;
+  if (start !== null) return `${on} starts at ${sayClock(start)}. End time unknown.`;
+  if (end !== null) return `${on} ends at ${sayClock(end)}. Start time unknown.`;
+  return `${on}. Time unknown.`;
+}
+
+const weeklyBrief = (label: string, days: number[], start: number | null, end: number | null) =>
+  `${label}, ${sayDays(days)}, ${spanBrief(start, end)}.`;
+
+/** The entry a short line names, with its leading word taken off. Confirmed: X becomes X. */
+const afterWord = (brief: string | undefined) => (brief || '').replace(/^[A-Z][a-z ]{2,24}: /, '');
 
 // ------------------------------------------------------------------ small reads used by several actions
 
@@ -444,15 +476,19 @@ export const TOOLS: Tool[] = [
       const topic = text(a, 'topic', 80)!;
       const folder = folderArg(a);
       const about = dateArg(a, 'about_date', false);
-      const same = await env.q<{ id: string }>(
-        `select id from uc_pilot.statements where state = 'current' and lower(said) = lower($1) limit 1`, [said]);
+      const same = await env.q<{ id: string; topic: string; folder: string }>(
+        `select id, topic, folder from uc_pilot.statements where state = 'current' and lower(said) = lower($1) limit 1`, [said]);
       if (same.length) {
-        return { outcome: 'unchanged', detail: `Already on file under ${folder}: "${clip(said, 160)}"`, target: 'statements', targetId: same[0].id, data: { ref: shortId(same[0].id), already_on_file: true } };
+        return {
+          outcome: 'unchanged', detail: `Nothing changed. Already on file under ${same[0].folder}: "${clip(said, 160)}"`,
+          brief: `No change: ${same[0].topic} is already on file under ${same[0].folder}.`,
+          target: 'statements', targetId: same[0].id, data: { ref: shortId(same[0].id), already_on_file: true, nothing_changed: true }
+        };
       }
       const row = (await env.q<{ id: string }>(
         `insert into uc_pilot.statements (said, topic, folder, about_date, basis) values ($1, $2, $3, $4::date, $5) returning id`,
         [said, topic, folder, about, env.basis]))[0];
-      return { outcome: 'filed', detail: `Filed under ${folder}: "${clip(said, 160)}"`, target: 'statements', targetId: row.id, data: { ref: shortId(row.id), folder, topic } };
+      return { outcome: 'filed', detail: `Filed under ${folder}: "${clip(said, 160)}"`, brief: `Filed: ${topic}, under ${folder}.`, target: 'statements', targetId: row.id, data: { ref: shortId(row.id), folder, topic } };
     }
   },
   {
@@ -484,6 +520,7 @@ export const TOOLS: Tool[] = [
       return {
         outcome: 'filed',
         detail: `Corrected under ${old.folder}. Now on file: "${clip(said, 140)}". Kept as the earlier statement: "${clip(old.said, 140)}"`,
+        brief: `Updated: ${topic}, under ${old.folder}. The earlier words are kept.`,
         target: 'statements', targetId: row.id, data: { ref: shortId(row.id), replaced: shortId(id) }
       };
     }
@@ -496,11 +533,11 @@ export const TOOLS: Tool[] = [
     async run(env, a) {
       const id = await find(env, 'statement', a.ref);
       const said = words(env, a);
-      const old = (await env.q<any>(`select said, folder, state from uc_pilot.statements where id = $1`, [id]))[0];
+      const old = (await env.q<any>(`select said, topic, folder, state from uc_pilot.statements where id = $1`, [id]))[0];
       if (old.state !== 'current') throw new Refusal('Not done. That statement is already replaced or withdrawn.');
       await env.q(`select set_config('uc.reason', 'The resident withdrew it.', true)`);
       await env.q(`update uc_pilot.statements set state = 'withdrawn', ended_at = now(), ended_by_message_id = $2 where id = $1`, [id, env.messageId]);
-      return { outcome: 'filed', detail: `Withdrawn from ${old.folder}: "${clip(old.said, 160)}". The entry is kept in its history.${inWords(said)}`, target: 'statements', targetId: id };
+      return { outcome: 'filed', detail: `Withdrawn from ${old.folder}: "${clip(old.said, 160)}". The entry is kept in its history.${inWords(said)}`, brief: `Taken off: ${old.topic}, under ${old.folder}. It is kept in the history.`, target: 'statements', targetId: id };
     }
   },
 
@@ -526,7 +563,7 @@ export const TOOLS: Tool[] = [
       const row = (await env.q<{ id: string }>(
         `insert into uc_pilot.schedule_items (label, days, start_min, end_min, said, basis) values ($1, $2::smallint[], $3, $4, $5, $6) returning id`,
         [label, `{${days.join(',')}}`, start, end, said, env.basis]))[0];
-      return { outcome: 'filed', detail: `Filed in the weekly schedule: ${label}, ${sayDays(days)}, ${saySpan(start, end)}.${inWords(said)}`, target: 'schedule_items', targetId: row.id, data: { ref: shortId(row.id) } };
+      return { outcome: 'filed', detail: `Filed in the weekly schedule: ${label}, ${sayDays(days)}, ${saySpan(start, end)}.${inWords(said)}`, brief: `Filed: ${weeklyBrief(label, days, start, end)} Weekly schedule.`, target: 'schedule_items', targetId: row.id, data: { ref: shortId(row.id) } };
     }
   },
   {
@@ -549,6 +586,14 @@ export const TOOLS: Tool[] = [
       const { start, end } = span(
         given(a, 'start') ? clockArg(a, 'start') : old.start_min,
         given(a, 'end') ? clockArg(a, 'end') : (old.end_min !== null ? old.end_min % 1440 : null));
+      if (label === old.label && days.join(',') === (old.days as number[]).join(',') && start === old.start_min && end === old.end_min) {
+        return {
+          outcome: 'unchanged',
+          detail: `Nothing changed. The weekly schedule already holds: ${label}, ${sayDays(days)}, ${saySpan(start, end)}. It was on file before this message.`,
+          brief: `No change: ${weeklyBrief(label, days, start, end)}`,
+          target: 'schedule_items', targetId: id, data: { ref: shortId(id), nothing_changed: true }
+        };
+      }
       await env.q(`select set_config('uc.reason', 'The resident changed the weekly schedule.', true)`);
       await env.q(`update uc_pilot.schedule_items set label = $2, days = $3::smallint[], start_min = $4, end_min = $5, said = coalesce($6, said) where id = $1`,
         [id, label, `{${days.join(',')}}`, start, end, said]);
@@ -574,6 +619,7 @@ export const TOOLS: Tool[] = [
       return {
         outcome: 'filed',
         detail: `Changed in the weekly schedule: ${label}, ${sayDays(days)}, ${saySpan(start, end)}. Before: ${old.label}, ${sayDays(old.days)}, ${saySpan(old.start_min, old.end_min)}.${inWords(said)}`,
+        brief: `Updated: ${weeklyBrief(label, days, start, end)} Weekly schedule.`,
         target: 'schedule_items', targetId: id,
         data: {
           days_ahead_updated: moved.map(m => m.on_date),
@@ -602,7 +648,7 @@ export const TOOLS: Tool[] = [
             and not exists (select 1 from uc_pilot.plans p where p.plan_date = c.on_date and p.state = 'confirmed')
         returning c.on_date::text as on_date`, [id, env.now.date, env.messageId]);
       for (const d of off) await refreshPlanCard(env, d.on_date);
-      return { outcome: 'filed', detail: `Ended in the weekly schedule: ${old.label}, ${sayDays(old.days)}. Days already past keep it.${inWords(said)}`, target: 'schedule_items', targetId: id, data: { days_ahead_taken_off: off.map(o => o.on_date) } };
+      return { outcome: 'filed', detail: `Ended in the weekly schedule: ${old.label}, ${sayDays(old.days)}. Days already past keep it.${inWords(said)}`, brief: `Updated: ${old.label} is ended in the weekly schedule.`, target: 'schedule_items', targetId: id, data: { days_ahead_taken_off: off.map(o => o.on_date) } };
     }
   },
 
@@ -631,7 +677,8 @@ export const TOOLS: Tool[] = [
       if (same.length) {
         return {
           outcome: 'unchanged',
-          detail: `Already on file for ${sayDate(date)}, and left as it is: ${sayCommitment(same[0])}.`,
+          detail: `Nothing changed. Already on file for ${sayDate(date)}, and left as it is: ${sayCommitment(same[0])}.`,
+          brief: `No change: ${entryBrief(same[0].label, date, same[0].start_min, same[0].end_min)}`,
           target: 'commitments', targetId: same[0].id,
           data: { ref: shortId(same[0].id), already_on_file: true, nothing_changed: true, hint: 'The entry on file was left as it is. Use change_commitment to change its time or name.' }
         };
@@ -645,6 +692,7 @@ export const TOOLS: Tool[] = [
       return {
         outcome: 'filed',
         detail: `Filed for ${sayDate(date)}: ${label}, ${saySpan(start, end)}${rough ? ', as a rough time' : ''}.${inWords(said)}`,
+        brief: `Filed: ${entryBrief(label, date, start, end)}`,
         target: 'commitments', targetId: row.id,
         data: {
           ref: shortId(row.id),
@@ -684,6 +732,15 @@ export const TOOLS: Tool[] = [
         given(a, 'end') ? clockArg(a, 'end') : (old.end_min !== null ? old.end_min % 1440 : null));
       const completion = text(a, 'done_means', 300, false) ?? old.completion;
       const rough = said && (given(a, 'start') || given(a, 'end')) ? isRough(said) : old.time_is_estimate;
+      // The entry already holds every value asked for. Nothing is written, and nothing is reported as changed.
+      if (date === old.on_date && label === old.label && start === old.start_min && end === old.end_min && completion === old.completion) {
+        return {
+          outcome: 'unchanged',
+          detail: `Nothing changed. ${sayCommitment(old)}, on ${sayDate(old.on_date)}, was already on file with these values before this message.`,
+          brief: `No change: ${entryBrief(old.label, old.on_date, old.start_min, old.end_min)}`,
+          target: 'commitments', targetId: id, data: { ref: shortId(id), nothing_changed: true, already_on_file: true }
+        };
+      }
       await env.q(`select set_config('uc.reason', 'The resident changed it.', true)`);
       await env.q(
         `update uc_pilot.commitments set on_date = $2::date, label = $3, start_min = $4, end_min = $5, completion = $6, time_is_estimate = $7,
@@ -699,9 +756,16 @@ export const TOOLS: Tool[] = [
       await refreshPlanCard(env, old.on_date);
       if (date !== old.on_date) await refreshPlanCard(env, date);
       const now = (await env.q<CommitmentRow>(`select ${COMMITMENT_COLS} from uc_pilot.commitments where id = $1`, [id]))[0];
+      // One value that replaced an earlier one is named, so the line says what it was before.
+      const was: string[] = [];
+      if (start !== old.start_min && old.start_min !== null) was.push(`start ${sayClock(old.start_min)}`);
+      if (end !== old.end_min && old.end_min !== null) was.push(`end ${sayClock(old.end_min)}`);
+      if (date !== old.on_date) was.push(dayBrief(old.on_date));
+      if (label !== old.label) was.push(old.label);
       return {
         outcome: 'filed',
         detail: `Changed: ${sayCommitment(now)}, on ${sayDate(date)}. Before: ${old.label}, ${saySpan(old.start_min, old.end_min)}, on ${sayDate(old.on_date)}.${inWords(said)}`,
+        brief: `Updated: ${entryBrief(label, date, start, end)}${was.length ? ` Before: ${was.join(', ')}.` : ''}`,
         target: 'commitments', targetId: id, data: { ref: shortId(id) }
       };
     }
@@ -715,12 +779,12 @@ export const TOOLS: Tool[] = [
       const id = await find(env, 'commitment', a.ref);
       const said = words(env, a);
       const old = (await env.q<CommitmentRow>(`select ${COMMITMENT_COLS} from uc_pilot.commitments where id = $1`, [id]))[0];
-      if (old.withdrawn_at) return { outcome: 'unchanged', detail: `Already taken off: ${old.label} on ${sayDate(old.on_date)}.`, target: 'commitments', targetId: id };
+      if (old.withdrawn_at) return { outcome: 'unchanged', detail: `Nothing changed. Already taken off: ${old.label} on ${sayDate(old.on_date)}.`, brief: `No change: ${old.label} on ${dayBrief(old.on_date)} was already taken off.`, target: 'commitments', targetId: id, data: { nothing_changed: true } };
       if (old.execution !== 'planned') throw new Refusal('Not done. That commitment already has an outcome on file.');
       await env.q(`select set_config('uc.reason', 'The resident took it off.', true)`);
       await env.q(`update uc_pilot.commitments set withdrawn_at = now(), withdrawn_said = $2, withdrawn_message_id = $3 where id = $1`, [id, said, env.messageId]);
       await refreshPlanCard(env, old.on_date);
-      return { outcome: 'filed', detail: `Taken off ${sayDate(old.on_date)}: ${old.label}. It is on file as a change. No outcome is on file for it.${inWords(said)}`, target: 'commitments', targetId: id };
+      return { outcome: 'filed', detail: `Taken off ${sayDate(old.on_date)}: ${old.label}. It is on file as a change. No outcome is on file for it.${inWords(said)}`, brief: `Taken off: ${old.label} on ${dayBrief(old.on_date)}.`, target: 'commitments', targetId: id };
     }
   },
   {
@@ -769,6 +833,7 @@ export const TOOLS: Tool[] = [
       return {
         outcome: 'filed',
         detail: `Outcome filed for ${sayDate(old.on_date)}: ${sayCommitment(now)}.${old.execution !== 'planned' ? ` The earlier report, ${old.execution.replace(/_/g, ' ')}, is kept in its history.` : ''}${inWords(said)}`,
+        brief: `${old.execution === 'planned' ? 'Filed' : 'Updated'}: ${old.label} on ${dayBrief(old.on_date)}, reported ${String(execution).replace(/_/g, ' ')}${aStart !== null || aEnd !== null ? `, ${spanBrief(aStart, aEnd)}` : ''}.`,
         target: 'commitments', targetId: id,
         data: { ref: shortId(id), timing: timing ?? 'not established', consequences: 'not established' }
       };
@@ -805,10 +870,11 @@ export const TOOLS: Tool[] = [
         }
       }
       return {
-        outcome: 'prepared',
+        outcome: plan.state === 'confirmed' ? 'read' : 'prepared',
         detail: plan.state === 'confirmed'
           ? `Read the confirmed Plan for ${sayDate(date)}.`
           : `Prepared a draft Plan for ${sayDate(date)} with ${items.length} ${items.length === 1 ? 'commitment' : 'commitments'}. It waits for your confirmation.`,
+        brief: plan.state === 'confirmed' ? undefined : `Waiting for you: Plan for ${dayBrief(date)}, ${items.length} ${items.length === 1 ? 'commitment' : 'commitments'}.`,
         target: 'plans', targetId: plan.id,
         data: {
           day: sayDate(date), plan_state: plan.state, placed_from_weekly_schedule: placed, commitments: planList(rows),
@@ -836,11 +902,11 @@ export const TOOLS: Tool[] = [
       const summary = await describe(env, action, args);
       const payload = JSON.stringify({ action, args });
       const open = await env.q<{ id: string }>(`select id from uc_pilot.pending where state = 'open' and kind = $1 and payload = $2::jsonb limit 1`, [action, payload]);
-      if (open.length) return { outcome: 'unchanged', detail: `Already waiting for your answer: ${summary}`, target: 'pending', targetId: open[0].id, data: { waiting_ref: shortId(open[0].id) } };
+      if (open.length) return { outcome: 'unchanged', detail: `Nothing changed. Already waiting for your answer: ${summary}`, brief: `Waiting for you: ${summary}`, target: 'pending', targetId: open[0].id, data: { waiting_ref: shortId(open[0].id), nothing_changed: true } };
       const p = (await env.q<{ id: string }>(
         `insert into uc_pilot.pending (decider, kind, summary, payload, rests_on) values ('resident', $1, $2, $3::jsonb, $4) returning id`,
         [action, summary, payload, restsOn]))[0];
-      return { outcome: 'prepared', detail: `Prepared for your answer: ${summary}`, target: 'pending', targetId: p.id, data: { waiting_ref: shortId(p.id), the_resident_will_read: summary, note: 'Nothing is filed yet. Ask the resident. Use resident_decision when the resident answers in a later message.' } };
+      return { outcome: 'prepared', detail: `Prepared for your answer: ${summary}`, brief: `Waiting for you: ${summary}`, target: 'pending', targetId: p.id, data: { waiting_ref: shortId(p.id), the_resident_will_read: summary, note: 'Nothing is filed yet. Ask the resident. Use resident_decision when the resident answers in a later message.' } };
     }
   },
   {
@@ -887,11 +953,71 @@ export const TOOLS: Tool[] = [
       const folder = folderArg(a);
       const topic = text(a, 'topic', 80, false) ?? 'interpretation';
       const open = await env.q<{ id: string }>(`select id from uc_pilot.pending where state = 'open' and decider = 'agent' and lower(summary) = lower($1) limit 1`, [summary]);
-      if (open.length) return { outcome: 'unchanged', detail: `Already waiting for your agent: ${summary}`, target: 'pending', targetId: open[0].id };
+      if (open.length) return { outcome: 'unchanged', detail: `Nothing changed. Already waiting for your agent: ${summary}`, brief: 'No change: that proposal already waits for your agent.', target: 'pending', targetId: open[0].id, data: { nothing_changed: true } };
       const p = (await env.q<{ id: string }>(
         `insert into uc_pilot.pending (decider, kind, summary, payload, rests_on) values ('agent', 'file_interpretation', $1, $2::jsonb, $3) returning id`,
         [summary, JSON.stringify({ folder, topic }), restsOn]))[0];
-      return { outcome: 'proposed', detail: `Sent to your agent as a proposal: ${summary}`, target: 'pending', targetId: p.id, data: { note: 'This is no entry on file. Do not state it to the resident as a fact.' } };
+      return { outcome: 'proposed', detail: `Sent to your agent as a proposal: ${summary}`, brief: `For your agent: a proposal about ${topic}. A person decides it.`, target: 'pending', targetId: p.id, data: { note: 'This is no entry on file. Do not state it to the resident as a fact.' } };
+    }
+  },
+
+  // ---------------------------------------------------------------- the work the resident asked for
+  {
+    name: 'open_work',
+    group: 'follow_up',
+    description: 'Keeps one piece of work the resident asked for help with, in the resident\'s own words, so it stays open across messages and days and you keep leading it. Use it when the resident asks for help with a matter that takes more than one message, as in I need to get my schedule in line. Look at ONGOING WORK first. One piece of work is opened once.',
+    input_schema: obj({
+      label: { type: 'string', description: 'A short plain name for the work, in two to five words. Weekly schedule is a name of the right size.' },
+      folder: { type: 'string', description: 'The one folder name the work belongs to, or General.' },
+      quote: { type: 'string', description: 'The exact words from the resident\'s latest message that ask for this work, at least three words.' }
+    }, ['label', 'quote']),
+    async run(env, a) {
+      const label = text(a, 'label', 120)!;
+      const folder = folderArg(a);
+      const quote = clip(typeof a.quote === 'string' ? a.quote.replace(/\s+/g, ' ').trim() : '', 1000);
+      if (quote.split(' ').length < 3 || (env.basis === 'resident_statement' && !quotePresent(quote, env.messageText))) {
+        throw new Refusal('Not kept. The quote has to be at least three words from the resident\'s latest message that ask for this work.');
+      }
+      const open = await env.q<{ id: string; label: string }>(
+        `select id, label from uc_pilot.work where state = 'open' and (lower(label) = lower($1) or lower(said) = lower($2)) limit 1`, [label, quote]);
+      if (open.length) {
+        return { outcome: 'unchanged', detail: `Nothing changed. That work is already open: ${open[0].label}.`, brief: `No change: ${open[0].label} is already open as ongoing work.`, target: 'work', targetId: open[0].id, data: { ref: shortId(open[0].id), nothing_changed: true } };
+      }
+      const row = (await env.q<{ id: string }>(
+        `insert into uc_pilot.work (label, said, folder) values ($1, $2, $3) returning id`, [label, quote, folder]))[0];
+      return {
+        outcome: 'filed', detail: `Kept as ongoing work under ${folder}: ${label}.${inWords(quote)}`, brief: `Filed: ongoing work, ${label}.`,
+        target: 'work', targetId: row.id,
+        data: { ref: shortId(row.id), note: 'You lead this work. End each reply with one question about its next missing piece, until the resident says it is settled or drops it.' }
+      };
+    }
+  },
+  {
+    name: 'close_work',
+    group: 'follow_up',
+    description: 'Closes one piece of ongoing work because the resident\'s latest message says it is settled, or drops it.',
+    input_schema: obj({
+      ref: REF('the ongoing work'),
+      how: { type: 'string', enum: ['done', 'dropped'] },
+      quote: { type: 'string', description: 'The resident\'s words from the latest message that settle it or drop it.' }
+    }, ['ref', 'how', 'quote']),
+    async run(env, a) {
+      const id = await find(env, 'work', a.ref);
+      const how = a.how === 'dropped' ? 'dropped' : 'done';
+      const quote = clip(typeof a.quote === 'string' ? a.quote.replace(/\s+/g, ' ').trim() : '', 1000);
+      if (env.basis === 'resident_statement') {
+        if (how === 'dropped') {
+          const ans = checkAnswer(quote, env.messageText, 'drop');
+          if (!ans.ok) throw new Refusal(`Not done. ${ans.why}`);
+        } else if (!quote || !quotePresent(quote, env.messageText)) {
+          throw new Refusal('Not done. The quote is not in the resident\'s latest message.');
+        }
+      }
+      const old = (await env.q<any>(`select label, state from uc_pilot.work where id = $1`, [id]))[0];
+      if (old.state !== 'open') return { outcome: 'unchanged', detail: `Nothing changed. Already closed: ${old.label}.`, brief: `No change: ${old.label} was already closed.`, target: 'work', targetId: id, data: { nothing_changed: true } };
+      await env.q(`select set_config('uc.reason', $1, true)`, [how === 'done' ? 'The resident said it is settled.' : 'The resident dropped it.']);
+      await env.q(`update uc_pilot.work set state = $2, closed_said = $3, closed_message_id = $4 where id = $1`, [id, how, quote || null, env.messageId]);
+      return { outcome: 'filed', detail: `Ongoing work closed as ${how}: ${old.label}.${inWords(quote)}`, brief: `Closed: ongoing work, ${old.label}.`, target: 'work', targetId: id };
     }
   },
 
@@ -914,12 +1040,12 @@ export const TOOLS: Tool[] = [
       const what = text(a, 'what', 400)!;
       const due = dateArg(a, 'due_on', false);
       const same = await env.q<{ id: string }>(`select id from uc_pilot.follow_ups where state = 'open' and lower(what) = lower($1) limit 1`, [what]);
-      if (same.length) return { outcome: 'unchanged', detail: `Already open as a follow up: ${what}`, target: 'follow_ups', targetId: same[0].id, data: { ref: shortId(same[0].id) } };
+      if (same.length) return { outcome: 'unchanged', detail: `Nothing changed. Already open as a follow up: ${what}`, brief: `No change: that follow up is already open.`, target: 'follow_ups', targetId: same[0].id, data: { ref: shortId(same[0].id), nothing_changed: true } };
       const row = (await env.q<{ id: string }>(
         `insert into uc_pilot.follow_ups (owner, kind, what, due_on) values ($1, $2, $3, $4::date) returning id`, [owner, kind, what, due]))[0];
       const whose = owner === 'agent' ? 'your agent' : owner === 'resident' ? 'you' : 'software';
       return {
-        outcome: 'filed', detail: `Follow up opened for ${whose}: ${what}`, target: 'follow_ups', targetId: row.id,
+        outcome: 'filed', detail: `Follow up opened for ${whose}: ${what}`, brief: `Filed: a follow up for ${whose}. ${clip(what, 110)}`, target: 'follow_ups', targetId: row.id,
         data: { ref: shortId(row.id), note: owner === 'agent' ? 'No person has seen this yet. Say that the request is on file for the agent. Do not say a person will reply by a set time.' : undefined }
       };
     }
@@ -941,9 +1067,12 @@ export const TOOLS: Tool[] = [
       if (old.state !== 'open') throw new Refusal('Not done. That follow up is closed.');
       const what = text(a, 'what', 400, false) ?? old.what;
       const due = dateArg(a, 'due_on', false) ?? old.due_on;
+      if (what === old.what && due === old.due_on) {
+        return { outcome: 'unchanged', detail: `Nothing changed. The follow up already reads: ${what}`, brief: 'No change: the follow up already reads that way.', target: 'follow_ups', targetId: id, data: { nothing_changed: true } };
+      }
       await env.q(`select set_config('uc.reason', 'The resident changed it.', true)`);
       await env.q(`update uc_pilot.follow_ups set what = $2, due_on = $3::date where id = $1`, [id, what, due]);
-      return { outcome: 'filed', detail: `Follow up changed: ${what}${due ? `, needed by ${sayDate(due)}` : ''}. Before: ${old.what}${old.due_on ? `, needed by ${sayDate(old.due_on)}` : ''}.${inWords(said)}`, target: 'follow_ups', targetId: id };
+      return { outcome: 'filed', detail: `Follow up changed: ${what}${due ? `, needed by ${sayDate(due)}` : ''}. Before: ${old.what}${old.due_on ? `, needed by ${sayDate(old.due_on)}` : ''}.${inWords(said)}`, brief: `Updated: a follow up. ${clip(what, 110)}`, target: 'follow_ups', targetId: id };
     }
   },
   {
@@ -967,10 +1096,10 @@ export const TOOLS: Tool[] = [
         said = words(env, a, { minWords: 2 });
       }
       const old = (await env.q<any>(`select what, state, owner from uc_pilot.follow_ups where id = $1`, [id]))[0];
-      if (old.state !== 'open') return { outcome: 'unchanged', detail: `Already closed: ${old.what}`, target: 'follow_ups', targetId: id };
+      if (old.state !== 'open') return { outcome: 'unchanged', detail: `Nothing changed. Already closed: ${old.what}`, brief: 'No change: that follow up was already closed.', target: 'follow_ups', targetId: id, data: { nothing_changed: true } };
       if (old.owner === 'agent' && how === 'done') throw new Refusal('Not done. A follow up that belongs to the agent is finished by the agent. The resident can drop it.');
       await env.q(`update uc_pilot.follow_ups set state = $2, closed_said = $3, closed_message_id = $4 where id = $1`, [id, how, said, env.messageId]);
-      return { outcome: 'filed', detail: `Follow up closed as ${how}: ${old.what}${inWords(said)}`, target: 'follow_ups', targetId: id };
+      return { outcome: 'filed', detail: `Follow up closed as ${how}: ${old.what}${inWords(said)}`, brief: `Closed: a follow up. ${clip(old.what, 110)}`, target: 'follow_ups', targetId: id };
     }
   }
 ];
@@ -998,34 +1127,42 @@ async function describe(env: Env, action: string, args: Args): Promise<string> {
   }
   if (action === 'set_schedule_item') {
     const { start, end } = span(clockArg(args, 'start'), clockArg(args, 'end'));
-    return clip(`Add to the weekly schedule: ${text(args, 'label', 120)}, ${sayDays(daysArg(args, 'days')!)}, ${saySpan(start, end)}.`, 600);
+    return clip(`Add to the weekly schedule: ${text(args, 'label', 120)}, ${sayDays(daysArg(args, 'days')!)}, ${spanBrief(start, end)}.`, 600);
   }
   if (action === 'add_commitment') {
     const { start, end } = span(clockArg(args, 'start'), clockArg(args, 'end'));
     const done = text(args, 'done_means', 300, false);
-    return clip(`Add for ${sayDate(dateArg(args, 'date')!)}: ${text(args, 'label', 120)}, ${saySpan(start, end)}.${done ? ` Done means: ${done}.` : ''}`, 600);
+    return clip(`Add ${text(args, 'label', 120)} on ${dayBrief(dateArg(args, 'date')!)}, ${spanBrief(start, end)}.${done ? ` Done means: ${done}.` : ''}`, 600);
   }
   if (action === 'change_schedule_item' || action === 'end_schedule_item') {
     const id = await find(env, 'schedule_item', args.ref);
     const old = (await env.q<any>(`select label, days, start_min, end_min from uc_pilot.schedule_items where id = $1`, [id]))[0];
-    const was = `${old.label}, ${sayDays(old.days)}, ${saySpan(old.start_min, old.end_min)}`;
-    if (action === 'end_schedule_item') return clip(`End this weekly item from now on: ${was}.`, 600);
+    if (action === 'end_schedule_item') return clip(`End ${old.label}, ${sayDays(old.days)}, in the weekly schedule from now on.`, 600);
     const { start, end } = span(
       given(args, 'start') ? clockArg(args, 'start') : old.start_min,
       given(args, 'end') ? clockArg(args, 'end') : (old.end_min !== null ? old.end_min % 1440 : null));
     const days = daysArg(args, 'days', false) ?? old.days;
-    return clip(`Change the weekly schedule to: ${text(args, 'label', 120, false) ?? old.label}, ${sayDays(days)}, ${saySpan(start, end)}. It is now: ${was}.`, 600);
+    const label = text(args, 'label', 120, false) ?? old.label;
+    return clip(`Change ${old.label} in the weekly schedule to ${label === old.label ? '' : `${label}, `}${sayDays(days)}, ${spanBrief(start, end)}. On file now: ${sayDays(old.days)}, ${spanBrief(old.start_min, old.end_min)}.`, 600);
   }
   if (action === 'change_commitment' || action === 'withdraw_commitment') {
     const id = await find(env, 'commitment', args.ref);
     const old = (await env.q<CommitmentRow>(`select ${COMMITMENT_COLS} from uc_pilot.commitments where id = $1`, [id]))[0];
-    const was = `${old.label}, ${saySpan(old.start_min, old.end_min)}, on ${sayDate(old.on_date)}`;
-    if (action === 'withdraw_commitment') return clip(`Take off: ${was}.`, 600);
+    if (action === 'withdraw_commitment') return clip(`Take ${old.label} off ${dayBrief(old.on_date)}.`, 600);
     const { start, end } = span(
       given(args, 'start') ? clockArg(args, 'start') : old.start_min,
       given(args, 'end') ? clockArg(args, 'end') : (old.end_min !== null ? old.end_min % 1440 : null));
     const date = dateArg(args, 'date', false) ?? old.on_date;
-    return clip(`Change to: ${text(args, 'label', 120, false) ?? old.label}, ${saySpan(start, end)}, on ${sayDate(date)}. It is now: ${was}.`, 600);
+    const label = text(args, 'label', 120, false) ?? old.label;
+    const done = text(args, 'done_means', 300, false);
+    const also = done ? ` Done means: ${done}.` : '';
+    // The usual case names one time on an entry that keeps its name and its day.
+    if (label === old.label && date === old.on_date) {
+      const to = start !== null && end !== null ? `${sayClock(start)} to ${sayClock(end)}`
+        : start !== null ? `start at ${sayClock(start)}` : end !== null ? `end at ${sayClock(end)}` : 'no set time';
+      return clip(`Set ${old.label} on ${dayBrief(date)} to ${to}.${also} On file now: ${spanBrief(old.start_min, old.end_min)}.`, 600);
+    }
+    return clip(`Change ${old.label} on ${dayBrief(old.on_date)} to ${entryBrief(label, date, start, end)}${also}`, 600);
   }
   throw new Refusal('Not done. That action cannot be prepared.');
 }
@@ -1036,11 +1173,21 @@ async function describe(env: Env, action: string, args: Args): Promise<string> {
  */
 export async function decide(env: Env, pendingId: string, decision: 'confirm' | 'decline', extra: { realism?: string | null } = {}): Promise<Result> {
   const p = (await env.q<any>(
-    `select id, decider, kind, summary, payload, state, source_message_id from uc_pilot.pending where id = $1 for update`, [pendingId]))[0];
+    `select id, decider, kind, summary, payload, state, source_message_id, decided_via, result from uc_pilot.pending where id = $1 for update`, [pendingId]))[0];
   if (!p) throw new Refusal('Not done. That item is not on file for this resident.');
   if (p.decider !== 'resident') throw new Refusal('Not done. That item is a proposal. A person decides it. The resident and software do not.');
+  // One item is decided once, by the button or in the conversation. A second answer changes nothing and says so.
   if (p.state !== 'open') {
-    return { outcome: 'unchanged', detail: `Already ${p.state}: ${p.summary}`, target: 'pending', targetId: p.id, data: { already: p.state } };
+    const how = p.decided_via === 'screen' ? ' with the button on the screen' : p.decided_via === 'conversation' ? ' in the conversation' : '';
+    const entry = typeof p.result?.entry === 'string' ? p.result.entry : '';
+    return {
+      outcome: 'unchanged',
+      detail: `Nothing changed. The resident already ${p.state === 'confirmed' ? 'confirmed' : p.state === 'declined' ? 'declined' : 'closed'} this item${how}.${entry ? ` On file: ${entry}` : ''}`,
+      brief: p.state === 'confirmed' ? `No change: already confirmed.${entry ? ` ${entry}` : ''}` : p.state === 'declined' ? 'No change: already declined. Nothing was filed.' : 'No change: that item was already closed.',
+      target: typeof p.result?.target === 'string' ? p.result.target : 'pending',
+      targetId: typeof p.result?.target_id === 'string' ? p.result.target_id : p.id,
+      data: { already: p.state, nothing_changed: true }
+    };
   }
   if (env.via === 'conversation' && env.messageId && (p.source_message_id === env.messageId || p.payload?.listed_in === env.messageId)) {
     throw new Refusal('Not done. This item was prepared or changed in this same reply. The resident has not seen it yet. Say what it holds, ask, and decide it when the resident answers.');
@@ -1052,7 +1199,7 @@ export async function decide(env: Env, pendingId: string, decision: 'confirm' | 
   };
   if (decision === 'decline') {
     await stamp('declined', {});
-    return { outcome: 'decided', detail: `Declined. Nothing was filed: ${p.summary}`, target: 'pending', targetId: p.id };
+    return { outcome: 'decided', detail: `Declined. Nothing was filed: ${p.summary}`, brief: 'Declined: nothing was filed.', target: 'pending', targetId: p.id };
   }
 
   const confirmEnv: Env = { ...env, basis: 'resident_confirmation' };
@@ -1061,7 +1208,7 @@ export async function decide(env: Env, pendingId: string, decision: 'confirm' | 
     if (!isDate(date)) throw new Refusal('Not done. The Plan this item names has no day.');
     if (date < env.now.date) {
       await stamp('withdrawn', { reason: 'the day passed' });
-      return { outcome: 'decided', detail: `That day has passed. The draft Plan for ${sayDate(date)} was closed. No Plan was confirmed.`, target: 'pending', targetId: p.id };
+      return { outcome: 'decided', detail: `That day has passed. The draft Plan for ${sayDate(date)} was closed. No Plan was confirmed.`, brief: `Closed: the draft Plan for ${dayBrief(date)}. That day has passed.`, target: 'pending', targetId: p.id };
     }
     await placeSchedule(confirmEnv, date);
     const rows = (await commitmentsOn(confirmEnv, date)).filter(r => !r.withdrawn_at);
@@ -1073,6 +1220,7 @@ export async function decide(env: Env, pendingId: string, decision: 'confirm' | 
       return {
         outcome: 'unchanged',
         detail: `The day changed after the Plan was shown, so no Plan was confirmed. The Plan now reads: ${items.length ? items.map(i => `${i.label} (${saySpan(i.start_min, i.end_min)})`).join('; ') : 'no commitment'}. It waits for your answer again.`,
+        brief: `Waiting for you: the Plan for ${dayBrief(date)} changed after it was shown, so it waits for your answer again.`,
         target: 'pending', targetId: p.id, data: { commitments: planList(rows), note: 'Tell the resident what the day holds now and ask again.' }
       };
     }
@@ -1084,10 +1232,12 @@ export async function decide(env: Env, pendingId: string, decision: 'confirm' | 
          confirmed_message_id = excluded.confirmed_message_id, confirmed_items = excluded.confirmed_items,
          realism = coalesce(excluded.realism, uc_pilot.plans.realism)
        returning id`, [date, env.via, env.messageId, JSON.stringify(items), extra.realism ?? null]))[0];
-    await stamp('confirmed', { plan_id: plan.id, count: items.length });
+    const planEntry = `Plan for ${dayBrief(date)}, ${items.length} ${items.length === 1 ? 'commitment' : 'commitments'}.`;
+    await stamp('confirmed', { plan_id: plan.id, count: items.length, entry: planEntry, target: 'plans', target_id: plan.id });
     return {
       outcome: 'decided',
       detail: `Plan confirmed for ${sayDate(date)}: ${items.length ? items.map(i => `${i.label} (${saySpan(i.start_min, i.end_min)})`).join('; ') : 'no commitment on it'}.`,
+      brief: `Confirmed: ${planEntry}`,
       target: 'plans', targetId: plan.id,
       data: { day: sayDate(date), commitments: planList(rows), realism: extra.realism ?? 'not asked' }
     };
@@ -1098,8 +1248,9 @@ export async function decide(env: Env, pendingId: string, decision: 'confirm' | 
   if (!tool || !PREPARABLE.has(action)) throw new Refusal('Not done. The prepared item names an action that cannot be filed.');
   const args = { ...(p.payload?.args || {}) } as Args;
   const done = await tool.run(confirmEnv, args);
-  await stamp('confirmed', { detail: done.detail, target: done.target, target_id: done.targetId });
-  return { outcome: 'decided', detail: `Confirmed. ${done.detail}`, target: done.target, targetId: done.targetId, data: done.data };
+  const entry = afterWord(done.brief);
+  await stamp('confirmed', { detail: done.detail, entry, target: done.target, target_id: done.targetId });
+  return { outcome: 'decided', detail: `Confirmed. ${done.detail}`, brief: `Confirmed: ${entry}`, target: done.target, targetId: done.targetId, data: done.data };
 }
 
 /**
@@ -1111,7 +1262,7 @@ export async function decideProposal(env: Env, pendingId: string, decision: 'con
   const p = (await env.q<any>(`select id, decider, kind, summary, payload, state from uc_pilot.pending where id = $1 for update`, [pendingId]))[0];
   if (!p) throw new Refusal('Not done. That proposal is not on file for this resident.');
   if (p.decider !== 'agent') throw new Refusal('Not done. That item waits for the resident.');
-  if (p.state !== 'open') return { outcome: 'unchanged', detail: `Already ${p.state}: ${p.summary}`, target: 'pending', targetId: p.id };
+  if (p.state !== 'open') return { outcome: 'unchanged', detail: `Nothing changed. Already ${p.state}: ${p.summary}`, brief: `No change: a person already ${p.state === 'confirmed' ? 'confirmed' : 'declined'} that proposal.`, target: 'pending', targetId: p.id };
   let result: Record<string, unknown> = {};
   if (decision === 'confirm') {
     const row = (await env.q<{ id: string }>(
@@ -1125,6 +1276,7 @@ export async function decideProposal(env: Env, pendingId: string, decision: 'con
   return {
     outcome: 'decided',
     detail: decision === 'confirm' ? `A person confirmed the proposal. It is on file as an agent decision: ${p.summary}` : `A person declined the proposal. Nothing was filed: ${p.summary}`,
+    brief: decision === 'confirm' ? 'Confirmed: a person filed the proposal as an agent decision.' : 'Declined: a person declined the proposal. Nothing was filed.',
     target: 'pending', targetId: p.id
   };
 }

@@ -11,7 +11,7 @@ import { loadFile, loadHistory } from '../../lib/pilot/file';
 import { useModel, type Block, type Model, type ModelRequest } from '../../lib/pilot/model';
 import { localNow, addDays } from '../../lib/pilot/time';
 import { decide, decideProposal, type Env } from '../../lib/pilot/tools';
-import { NoAccess, receive, thread } from '../../lib/pilot/turn';
+import { continueAfterPress, NoAccess, receive, thread } from '../../lib/pilot/turn';
 import { addResident, localDriver } from './local.mts';
 
 const { driver, db } = await localDriver();
@@ -205,13 +205,13 @@ const shift = (await asResident(A, q => q(`select id from uc_pilot.commitments w
   check('G-19', 'The resident confirms the Plan in words, and the Plan keeps the list as it read', plan?.state === 'confirmed' && plan.confirmed_via === 'conversation' && plan.has_message === true && yes.effects[0]?.outcome === 'decided', plan);
 
   const again = await send(A, 'Yes, confirm it again.', [call('resident_decision', { waiting_ref: pend.id.slice(0, 8), decision: 'confirm', quote: 'Yes, confirm it again' }), say('It was already confirmed.')]);
-  check('G-20', 'Confirming twice leaves one Plan and one decision', (await count(A, 'plans', `plan_date = '${planDay}'`)) === 1 && (await count(A, 'revisions', `table_name = 'plans' and after ->> 'state' = 'confirmed'`)) === 1 && /Already/.test(again.effects[0]?.detail || ''), again.effects);
+  check('G-20', 'Confirming twice leaves one Plan and one decision', (await count(A, 'plans', `plan_date = '${planDay}'`)) === 1 && (await count(A, 'revisions', `table_name = 'plans' and after ->> 'state' = 'confirmed'`)) === 1 && again.effects[0]?.outcome === 'unchanged' && /^Nothing changed/.test(again.effects[0]?.detail || '') && /^No change: already confirmed/.test(again.effects[0]?.brief || ''), again.effects);
 
   // The screen path: a press confirms the second Plan once, however many times it is pressed.
   const press = () => withResident({ userId: A, actor: 'resident' }, async q => decide({ q, userId: A, messageId: null, messageText: '', now: localNow(zone), basis: 'resident_confirmation', via: 'screen' }, second.id, 'confirm'));
   const p1 = await press(); const p2 = await press();
   const plan2 = (await asResident(A, q => q(`select confirmed_via from uc_pilot.plans where plan_date = $1`, [addDays(today, 4)])))[0];
-  check('G-21', 'A press on the screen confirms a Plan once, and a second press changes no entry', plan2?.confirmed_via === 'screen' && /^Plan confirmed/.test(p1.detail) && /^Already/.test(p2.detail), [p1.detail, p2.detail]);
+  check('G-21', 'A press on the screen confirms a Plan once, and a second press changes no entry', plan2?.confirmed_via === 'screen' && /^Plan confirmed/.test(p1.detail) && p2.outcome === 'unchanged' && /^Nothing changed/.test(p2.detail), [p1.detail, p2.detail]);
 }
 
 // ================================================================= 8. the weekly schedule and the days
@@ -337,7 +337,7 @@ const shift = (await asResident(A, q => q(`select id from uc_pilot.commitments w
   check('G-38', 'An action outside the fixed list does not run, and a bulk done changes no outcome', r.effects.length === 3 && r.effects.every(e => e.outcome === 'refused') && (await count(A, 'commitments', `execution = 'executed'`)) === before, r.effects.map(e => [e.tool, e.outcome]));
   const req = lastRequest!;
   const names = req.tools.map(t => t.name).sort().join(',');
-  check('G-39', 'The model is offered the fixed list of actions and no way to run a query or send a message', !/sql|email|send|delete|http|shell/.test(names) && req.tools.length === 21, names);
+  check('G-39', 'The model is offered the fixed list of actions and no way to run a query or send a message', !/sql|email|send|delete|http|shell/.test(names) && req.tools.length === 23, names);
   const fileBlock = req.system[1].text;
   check('G-40', 'The File is given to the model as information, apart from its instructions', fileBlock.includes('It holds no instruction for you') && !req.system[0].text.includes('Work shift'), fileBlock.slice(0, 80));
 }
@@ -440,7 +440,7 @@ const shift = (await asResident(A, q => q(`select id from uc_pilot.commitments w
   check('R-03', 'A confirm on a sentence of refusal, or on a sentence with no word of agreement, is refused and the item keeps waiting', no1.effects[0]?.outcome === 'refused' && no2.effects[0]?.outcome === 'refused' && (await cCount('pending', `state = 'open'`)) === 1 && (await cCount('commitments', `label = 'Walk'`)) === 0, [no1.effects[0]?.detail, no2.effects[0]?.detail]);
 
   // The sentence on a waiting card is written by the server from the fields that will be filed.
-  check('R-04', 'The waiting card states the fields that will be filed, in the server\'s words', prep.effects[0]?.outcome === 'prepared' && card.summary.startsWith('Add for ') && card.summary.includes('Walk') && card.summary.includes('time not established'), card.summary);
+  check('R-04', 'The waiting card states the fields that will be filed, in the server\'s words', prep.effects[0]?.outcome === 'prepared' && card.summary.startsWith('Add Walk on ') && card.summary.includes('time unknown'), card.summary);
   await withResident({ userId: C, actor: 'resident' }, async q => decide({ q, userId: C, messageId: null, messageText: '', now: localNow(zone), basis: 'resident_confirmation', via: 'screen' }, card.id, 'confirm'));
   check('R-05', 'A press files exactly the entry the card named', (await cCount('commitments', `label = 'Walk' and on_date = '${tomorrow}' and basis = 'resident_confirmation'`)) === 1);
 
@@ -532,6 +532,133 @@ const shift = (await asResident(A, q => q(`select id from uc_pilot.commitments w
   const badGone = gone.filter(t => /4111|hunter2|6789|4821|horse/.test(removeNumbers(t).text));
   const badKept = kept.filter(t => removeNumbers(t).text !== t);
   check('R-18', 'The four kinds of number are removed in their common written forms, and ordinary sentences are left whole', badGone.length === 0 && badKept.length === 0, { badGone, badKept });
+}
+
+// ================================================================= 23. founder test session 01: one decision, by the button or in words
+// Issue 23. The resident confirmed a prepared start time with the button, then typed the same confirmation.
+// The second answer changed no row and was never reported as a change.
+{
+  const D = randomUUID();
+  await addResident(db, D, 'made up resident D', { name: 'Dee' });
+  const dCount = (table: string, where = 'true') => count(D, table, where);
+  const shiftDay = addDays(today, 5);
+  await send(D, `just one day: ${shiftDay}`, [call('add_commitment', { date: shiftDay, label: 'Bar shift', quote: `just one day: ${shiftDay}` }), say('The shift is on file.')]);
+  const shift = (await asResident(D, q => q(`select id from uc_pilot.commitments where label = 'Bar shift'`)))[0].id as string;
+  const prep = await send(D, 'i will probably get there at 3PM', [call('prepare', { action: 'change_commitment', args: { ref: shift.slice(0, 8), start: '15:00' }, rests_on: 'The resident said probably 3 PM.' }), say('Should I set the start to 3:00 PM?')]);
+  const card = (await asResident(D, q => q(`select id, summary from uc_pilot.pending where kind = 'change_commitment'`)))[0];
+  check('F-01', 'A tentative time files no time. It waits for the resident, on a card that reads in one short sentence', prep.effects[0]?.outcome === 'prepared' && card.summary.startsWith('Set Bar shift on ') && card.summary.includes('start at 3:00 PM') && card.summary.includes('On file now: time unknown') && card.summary.length < 110, card.summary);
+  check('F-02', 'The line under the reply is short and holds no quote and no list of fields', /^Waiting for you: Set Bar shift/.test(prep.effects[0]?.brief || '') && !/Your words|It is now|Before:/.test(prep.effects[0]?.brief || ''), prep.effects[0]?.brief);
+
+  // The button first.
+  const press = await withResident({ userId: D, actor: 'resident' }, async q => {
+    const r = await decide({ q, userId: D, messageId: null, messageText: '', now: localNow(zone), basis: 'resident_confirmation', via: 'screen' }, card.id, 'confirm');
+    await q(`insert into uc_pilot.actions (tool, args, outcome, detail, brief, target, target_id, idem_key) values ('screen_decision', '{}'::jsonb, 'decided', $1, $2, $3, $4, $5)`, [r.detail, r.brief ?? null, r.target ?? null, r.targetId ?? null, `screen:${card.id}`]);
+    return r;
+  });
+  const revsAfterPress = await dCount('revisions', `table_name = 'commitments'`);
+  check('F-03', 'The button files the time once, and the line says Confirmed with the entry as it now reads', press.outcome === 'decided' && /^Confirmed: Bar shift on .* starts at 3:00 PM\. End time unknown\.$/.test(press.brief || '') && revsAfterPress === 1, press.brief);
+
+  // Then the same confirmation in words. The model, as in the session, asks to change the entry again.
+  const typed = await send(D, 'just confirm 3PM', [call('change_commitment', { ref: shift.slice(0, 8), start: '15:00', quote: 'just confirm 3PM' }), say('That was already on file.')]);
+  check('F-04', 'The same confirmation typed afterward changes no row and is never called a change', typed.effects[0]?.outcome === 'unchanged' && /^Nothing changed/.test(typed.effects[0]?.detail || '') && /^No change: Bar shift/.test(typed.effects[0]?.brief || '') && !/Changed|Updated/.test(`${typed.effects[0]?.detail} ${typed.effects[0]?.brief}`) && (await dCount('revisions', `table_name = 'commitments'`)) === 1, typed.effects[0]);
+  const viaWords = await send(D, 'yes confirm it', [call('resident_decision', { waiting_ref: card.id.slice(0, 8), decision: 'confirm', quote: 'yes confirm it' }), say('Already confirmed.')]);
+  check('F-05', 'A typed answer to an item the button already decided changes nothing and says it was already confirmed', viaWords.effects[0]?.outcome === 'unchanged' && /already confirmed/.test(viaWords.effects[0]?.brief || '') && (await dCount('revisions', `table_name = 'pending' and after ->> 'state' = 'confirmed'`)) === 1, viaWords.effects[0]);
+
+  // What the model is shown after a press.
+  const seen = JSON.stringify(lastRequest!.messages) + lastRequest!.system[1].text;
+  check('F-06', 'The model is shown the press where it happened, and the File lists the item as decided', seen.includes('A press on the screen') && seen.includes('DECIDED BY THE RESIDENT IN THE LAST DAY') && /Confirmed with the button on the screen/.test(lastRequest!.system[1].text), seen.slice(0, 120));
+
+  // The other order: words first, then the button.
+  const prep2 = await send(D, 'maybe the shift ends at 11PM', [call('prepare', { action: 'change_commitment', args: { ref: shift.slice(0, 8), end: '23:00' } }), say('Should I set the end to 11:00 PM?')]);
+  const card2 = (await asResident(D, q => q(`select id from uc_pilot.pending where state = 'open' and kind = 'change_commitment'`)))[0];
+  const words = await send(D, 'yes set it', [call('resident_decision', { waiting_ref: card2.id.slice(0, 8), decision: 'confirm', quote: 'yes set it' }), say('The end is 11:00 PM.')]);
+  const press2 = await withResident({ userId: D, actor: 'resident' }, async q => decide({ q, userId: D, messageId: null, messageText: '', now: localNow(zone), basis: 'resident_confirmation', via: 'screen' }, card2.id, 'confirm'));
+  check('F-07', 'Words first, then the button: one change, and the button reports no change', prep2.effects[0]?.outcome === 'prepared' && words.effects[0]?.outcome === 'decided' && /^Confirmed: Bar shift on .*3:00 PM to 11:00 PM\.$/.test(words.effects[0]?.brief || '') && press2.outcome === 'unchanged' && /^No change: already confirmed/.test(press2.brief || '') && (await dCount('revisions', `table_name = 'commitments'`)) === 2, [words.effects[0]?.brief, press2.brief]);
+
+  // A start that is different is a change, with what it was before.
+  const moved = await send(D, 'actually I start at 4PM that day', [call('change_commitment', { ref: shift.slice(0, 8), start: '16:00', quote: 'I start at 4PM that day' }), say('The start is now 4:00 PM.')]);
+  const rev = (await asResident(D, q => q(`select before ->> 'start_min' as b, after ->> 'start_min' as a, message_id is not null as has_message from uc_pilot.revisions where table_name = 'commitments' order by seq desc limit 1`)))[0];
+  check('F-08', 'A start that is different is a change: the line names the earlier time, and the history keeps both with the message', moved.effects[0]?.outcome === 'filed' && /^Updated: Bar shift on .* 4:00 PM to 11:00 PM\. Before: start 3:00 PM\.$/.test(moved.effects[0]?.brief || '') && rev?.b === '900' && rev?.a === '960' && rev?.has_message === true, [moved.effects[0]?.brief, rev]);
+
+  // The guide goes on after a press, once.
+  const prep3 = await send(D, 'i might bring a jacket', [call('prepare', { action: 'file_statement', args: { summary: 'Brings a jacket to the bar shift', topic: 'Jacket', folder: 'Time' } }), say('Should I keep that?')]);
+  const card3 = (await asResident(D, q => q(`select id from uc_pilot.pending where state = 'open' and kind = 'file_statement'`)))[0];
+  await withResident({ userId: D, actor: 'resident' }, async q => {
+    const r = await decide({ q, userId: D, messageId: null, messageText: '', now: localNow(zone), basis: 'resident_confirmation', via: 'screen' }, card3.id, 'decline');
+    await q(`insert into uc_pilot.actions (tool, args, outcome, detail, brief, idem_key) values ('screen_decision', '{}'::jsonb, 'decided', $1, $2, $3)`, [r.detail, r.brief ?? null, `screen:${card3.id}`]);
+  });
+  const messagesBefore = await dCount('messages');
+  const actionsBefore = await dCount('actions');
+  queue = [say('Nothing was filed about the jacket. What else already has to happen that week?')];
+  const go1 = await continueAfterPress(D, card3.id);
+  const asked = lastRequest!;
+  queue = [say('This reply is never written.')];
+  const go2 = await continueAfterPress(D, card3.id);
+  const reply = (await asResident(D, q => q(`select speaker, reply_to, body from uc_pilot.messages order by seq desc limit 1`)))[0];
+  check('F-09', 'After a press the guide writes one reply, once, as software, and takes no action in it', prep3.effects[0]?.outcome === 'prepared' && go1.state === 'written' && go2.state === 'already' && (await dCount('messages')) === messagesBefore + 1 && (await dCount('actions')) === actionsBefore && reply.speaker === 'software' && reply.reply_to === null && asked.allowActions === false, [go1.state, go2.state, reply]);
+  const none = await continueAfterPress(D, card.id.replace(/^./, 'f'));
+  const open4 = await send(D, 'i could maybe go early', [call('prepare', { action: 'file_statement', args: { summary: 'Goes early', topic: 'Early', folder: 'Time' } }), say('Keep it?')]);
+  const card4 = (await asResident(D, q => q(`select id from uc_pilot.pending where state = 'open'`)))[0];
+  const notYet = await continueAfterPress(D, card4.id);
+  check('F-10', 'The guide writes no reply for an item that is still waiting or that does not exist', none.state === 'skipped' && notYet.state === 'skipped' && open4.effects[0]?.outcome === 'prepared', [none.state, notYet.state]);
+
+  // The conversation screen gets each press and the address of each entry.
+  const t = await thread(D);
+  const firstEffect = t.messages.find(m => m.turn?.effects?.length)?.turn?.effects?.[0];
+  check('F-11', 'The conversation lists each press where it happened, and each line carries the address of its entry in the File', t.presses.length === 2 && /^Confirmed: Bar shift/.test(t.presses[0].brief) && /\/portal\/file\/agency-assessment\/time\/\d{4}-\d\d-\d\d\/[0-9a-f-]{36}$/.test(String(firstEffect?.href)), [t.presses.map(p => p.brief), firstEffect?.href]);
+}
+
+// ================================================================= 24. founder test session 01: the guide keeps the purpose
+// Issue 22. The resident opened with a request. It is kept as ongoing work, shown to the model in every reply,
+// and stays in view after the first messages have left the conversation in view.
+{
+  const E = randomUUID();
+  await addResident(db, E, 'made up resident E', { name: 'Eve' });
+  const eCount = (table: string, where = 'true') => count(E, table, where);
+  const bad = await send(E, 'i need to get my schedule in line its a mess', [call('open_work', { label: 'Weekly schedule', folder: 'Time', quote: 'the resident wants a schedule' }), say('Okay.')]);
+  check('F-12', 'Ongoing work rests on words the resident wrote. Words the resident did not write keep nothing', bad.effects[0]?.outcome === 'refused' && (await eCount('work')) === 0, bad.effects[0]);
+  const open = await send(E, 'i need to get my schedule in line its a mess', [call('open_work', { label: 'Weekly schedule', folder: 'Time', quote: 'i need to get my schedule in line' }), say('What repeats in your week?')]);
+  const row = (await asResident(E, q => q(`select id, said, state, created_by, source_message_id is not null as has_message from uc_pilot.work`)))[0];
+  check('F-13', 'What the resident asked for is kept as ongoing work, in the resident words, with the message it rests on', open.effects[0]?.outcome === 'filed' && open.effects[0]?.brief === 'Filed: ongoing work, Weekly schedule.' && row?.said === 'i need to get my schedule in line' && row?.state === 'open' && row?.created_by === 'software' && row?.has_message === true, row);
+  const twice = await send(E, 'like i said i need to get my schedule in line', [call('open_work', { label: 'Weekly schedule', folder: 'Time', quote: 'i need to get my schedule in line' }), say('It is open.')]);
+  check('F-14', 'One piece of work is opened once', twice.effects[0]?.outcome === 'unchanged' && (await eCount('work')) === 1, twice.effects[0]);
+  for (let i = 0; i < 12; i++) await send(E, `Filler message number ${i}.`, [say('Understood.')]);
+  await send(E, 'ok what now', [say('Which days do you work this coming week?')]);
+  const sys = lastRequest!.system[1].text;
+  const inView = JSON.stringify(lastRequest!.messages);
+  check('F-15', 'The work is shown to the model in every reply, with the days ahead that hold no entry, after the first messages left the view', sys.includes('ONGOING WORK') && sys.includes('Weekly schedule (Time)') && sys.includes('i need to get my schedule in line') && sys.includes('Days ahead with no entry on file') && sys.includes('This sitting began with these words') && !inView.includes('its a mess'), sys.slice(sys.indexOf('ONGOING WORK'), sys.indexOf('ONGOING WORK') + 200));
+  const rules = lastRequest!.system[0].text;
+  check('F-16', 'The instructions tell the guide to lead the open work with one question that names a missing piece, and never to ask what to do next', rules.includes('While a piece of work is open, you lead it') && rules.includes('Never ask what the resident wants to do next') && rules.includes('A question that names no missing piece is not asked'));
+  const softClose = await tryAs(E, 'software', `update uc_pilot.work set closed_by = 'resident', closed_at = now() - interval '1 day', state = 'done' where id = $1 returning closed_by, closed_at > now() - interval '1 minute' as fresh`, [row.id]);
+  check('F-17', 'Who closed a piece of work, and when, come from the server. A row cannot name another closer', !softClose.ok || (softClose.rows[0]?.closed_by === 'software' && softClose.rows[0]?.fresh === true), softClose);
+  const other = await tryAs(B, 'resident', `select count(*)::int as n from uc_pilot.work`);
+  check('F-18', 'Another resident reads no ongoing work of this resident', other.ok && other.rows[0].n === 0, other);
+}
+
+// ================================================================= 25. founder test session 01: short lines under a reply
+// Issue 24. Each action carries one short line. The full account stays on the action for the File and the activity list.
+{
+  const F = randomUUID();
+  await addResident(db, F, 'made up resident F', { name: 'Fay' });
+  const r = await send(F, 'bar opens thursday and friday at 5pm , and saturday and sunday at 4pm , sometimes i come in 1-2 hours early', [
+    [...call('file_statement', { quote: 'bar opens thursday and friday at 5pm , and saturday and sunday at 4pm', topic: 'Bar opening hours', folder: 'Time' }),
+      ...call('file_statement', { quote: 'sometimes i come in 1-2 hours early', topic: 'Arrival before opening', folder: 'Time' })],
+    say('Both are on file.')
+  ]);
+  const briefs = r.effects.map(e => e.brief);
+  const stored = await asResident(F, q => q(`select brief, detail from uc_pilot.actions order by seq`));
+  check('F-19', 'A filed statement shows one short line with its label and folder. The resident words stay in the full account', briefs[0] === 'Filed: Bar opening hours, under Time.' && briefs[1] === 'Filed: Arrival before opening, under Time.' && stored.every((a: any) => a.brief.length < 60 && a.detail.includes('"')) && briefs.every(b => !b.includes('"')), briefs);
+  const again = await send(F, 'sometimes i come in 1-2 hours early', [call('file_statement', { quote: 'sometimes i come in 1-2 hours early', topic: 'Early', folder: 'Time' }), say('Already on file.')]);
+  check('F-20', 'A statement that is already on file is reported as no change', again.effects[0]?.outcome === 'unchanged' && again.effects[0]?.brief === 'No change: Arrival before opening is already on file under Time.', again.effects[0]);
+  const { briefOf } = await import('../../lib/pilot/turn');
+  const old = briefOf('filed', null, 'Changed: Bar shift, starts 3:00 PM, end not established, on Friday, October 16, 2026. Before: Bar shift, starts 3:00 PM, end not established, on Friday, October 16, 2026. Your words: "just confirm 3PM"');
+  const old2 = briefOf('filed', null, 'Filed under Time: "i work at a bar , so sometimes i work thursday, friday, saturday, sunday"');
+  const old3 = briefOf('prepared', null, 'Prepared for your answer: Change to: Bar shift, starts 3:00 PM, end not established, on Friday, October 16, 2026. It is now: Bar shift, time not established, on Friday, October 16, 2026.');
+  const old4 = briefOf('decided', null, 'Confirmed. Changed: Bar shift, starts 3:00 PM, end not established, on Friday, October 16, 2026. Before: Bar shift, time not established, on Friday, October 16, 2026.');
+  check('F-21', 'An action from before the short line existed is shown without its quote and its earlier values, and a change whose two sides read the same is shown as no change',
+    old === 'No change: Bar shift, starts 3:00 PM, end not established, on Friday, October 16, 2026.' && old2 === 'Filed: a statement, under Time.'
+    && old3 === 'Waiting for you: Change to: Bar shift, starts 3:00 PM, end not established, on Friday, October 16, 2026.'
+    && old4 === 'Confirmed: Bar shift, starts 3:00 PM, end not established, on Friday, October 16, 2026.', [old, old2, old3, old4]);
 }
 
 // ================================================================= 21b. the test can be taken out and studied

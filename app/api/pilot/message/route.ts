@@ -12,7 +12,8 @@ export async function POST(req: Request) {
   let body: any = null;
   try { body = await req.json(); } catch { /* no body */ }
   try {
-    const out = await receive(a.userId, String(body?.text ?? ''), String(body?.key ?? ''));
+    const viewing = typeof body?.viewing === 'string' ? body.viewing.slice(0, 200) : null;
+    const out = await receive(a.userId, String(body?.text ?? ''), String(body?.key ?? ''), { viewing });
     return Response.json(out, { headers: { 'cache-control': 'no-store' } });
   } catch (e: any) {
     if (e instanceof Refusal) return Response.json({ error: e.message }, { status: 400 });

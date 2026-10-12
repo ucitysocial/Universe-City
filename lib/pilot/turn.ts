@@ -15,11 +15,47 @@ import { isUuid, TS, withResident, type Q } from './db';
 import { fileForModel, loadAccess, loadFile, type Access } from './file';
 import { cleanReply, clip, removeNumbers } from './guard';
 import { getModel, modelAvailable, type Block, type Turn } from './model';
+import { hrefsFor } from './paths';
 import { PROMPT_VERSION, SYSTEM } from './prompt';
 import { addDays, localNow, sayWhen } from './time';
 import { placeSchedule, Refusal, TOOL_BY_NAME, TOOLS, type Env, type Result } from './tools';
 
-export type Effect = { tool: string; outcome: string; detail: string; target: string | null; target_id: string | null };
+export type Effect = {
+  tool: string; outcome: string; detail: string; target: string | null; target_id: string | null;
+  brief: string;          // one short line for the conversation
+  href?: string | null;   // where the entry sits in the File
+};
+
+// Words that mark where the long account begins. An action filed before the short line existed is cut there.
+const LONG_PART = /\s(?:Your words:|Before:|It is now:|Kept as the earlier statement:|Now on file:)/;
+const WORD: Record<string, string> = {
+  filed: 'Filed', decided: 'Confirmed', unchanged: 'No change', prepared: 'Waiting for you',
+  proposed: 'For your agent', refused: 'Left off the File', failed: 'Did not work'
+};
+
+/**
+ * The short line for one action. A row written before the column existed gets one worked out from its full account:
+ * the quote and the earlier values are left off, and a change whose two sides read the same is shown as no change.
+ */
+export function briefOf(outcome: string, brief: string | null | undefined, detail: string | null | undefined): string {
+  if (brief && brief.trim()) return brief.trim();
+  const full = String(detail || '').trim();
+  const confirmed = /^Confirmed\. /.test(full);
+  const d = full.replace(/^Confirmed\. /, '');
+  const word = confirmed ? 'Confirmed' : WORD[outcome] || 'Done';
+  let m: RegExpMatchArray | null;
+  if ((m = d.match(/^Changed: (.+?)\. Before: (.+?)\.(?: Your words:.*)?$/))) {
+    return m[1] === m[2] ? `No change: ${clip(m[1], 150)}.` : `${confirmed ? 'Confirmed' : 'Updated'}: ${clip(m[1], 150)}.`;
+  }
+  if ((m = d.match(/^Filed under ([^:]{1,40}): "/))) return `${word}: a statement, under ${m[1]}.`;
+  if ((m = d.match(/^Filed for ([^:]{1,40}): (.+?)\.(?: Your words:.*)?$/))) return `${word}: ${clip(m[2], 110)}, on ${m[1]}.`;
+  const rest = d.replace(/^(?:Prepared for your answer: |Not (?:done|filed)\. )/, '');
+  const cut = rest.search(LONG_PART);
+  return `${word}: ${clip((cut > 0 ? rest.slice(0, cut) : rest).trim(), 150)}`;
+}
+
+// What a reply did, apart from reading. The screen leaves a refused action to the activity list.
+const SHOWN = `outcome <> 'read'`;
 
 export type MessageView = {
   id: string; speaker: 'resident' | 'software' | 'agent'; body: string; created_at: string;
@@ -45,9 +81,11 @@ function stable(v: unknown): string {
 }
 
 export async function effectsOf(q: Q, turnId: string): Promise<Effect[]> {
-  return q<Effect>(
-    `select tool, outcome, detail, target, target_id from uc_pilot.actions
-      where turn_id = $1 and outcome <> 'read' order by seq`, [turnId]);
+  const rows = await q<Effect>(
+    `select tool, outcome, detail, brief, target, target_id from uc_pilot.actions
+      where turn_id = $1 and ${SHOWN} order by seq`, [turnId]);
+  const hrefs = await hrefsFor(q, rows);
+  return rows.map(r => ({ ...r, brief: briefOf(r.outcome, r.brief, r.detail), href: r.target_id ? hrefs.get(r.target_id) ?? null : null }));
 }
 
 type Soft = { userId: string; messageId: string; turnId: string; messageText: string; zone: string };
@@ -73,9 +111,9 @@ async function act(ctx: Soft, name: string, input: Record<string, unknown>): Pro
       };
       const r = await tool.run(env, input || {});
       await q(
-        `insert into uc_pilot.actions (turn_id, message_id, tool, args, outcome, detail, target, target_id, idem_key)
-         values ($1, $2, $3, $4::jsonb, $5, $6, $7, $8, $9)`,
-        [ctx.turnId, ctx.messageId, name, JSON.stringify(input || {}), r.outcome, clip(r.detail, 900), r.target || null, r.targetId || null, key]);
+        `insert into uc_pilot.actions (turn_id, message_id, tool, args, outcome, detail, brief, target, target_id, idem_key)
+         values ($1, $2, $3, $4::jsonb, $5, $6, $7, $8, $9, $10)`,
+        [ctx.turnId, ctx.messageId, name, JSON.stringify(input || {}), r.outcome, clip(r.detail, 900), r.brief ? clip(r.brief, 300) : null, r.target || null, r.targetId || null, key]);
       return r;
     });
     return { text: JSON.stringify({ ok: true, result: result.detail, ...(result.data && typeof result.data === 'object' ? (result.data as object) : {}) }), isError: false };
@@ -93,27 +131,48 @@ async function act(ctx: Soft, name: string, input: Record<string, unknown>): Pro
   }
 }
 
-function historyFor(rows: MessageView[], zone: string): Turn[] {
+export type Press = { id: string; at: string; brief: string | null; detail: string | null; outcome: string };
+
+/**
+ * The conversation as the model reads it. A press on the screen sits in it at the moment it happened, so the model
+ * knows the resident already answered a waiting item with the button.
+ */
+function historyFor(rows: MessageView[], zone: string, presses: Press[] = []): Turn[] {
   const out: Turn[] = [];
+  const push = (role: Turn['role'], textOf: string) => {
+    const last = out[out.length - 1];
+    if (last && last.role === role) last.content = `${last.content as string}\n\n${textOf}`;
+    else out.push({ role, content: textOf });
+  };
+  const line = (p: Press) => `(A press on the screen, ${sayWhen(p.at, zone)}. This line is written by the server. The resident typed no words.) ${briefOf(p.outcome, p.brief, p.detail)}`;
+  let i = 0;
+  const sorted = [...presses].sort((a, b) => (a.at < b.at ? -1 : 1));
   for (const m of rows) {
-    const role: Turn['role'] = m.speaker === 'software' ? 'assistant' : 'user';
+    while (i < sorted.length && sorted[i].at <= m.created_at) push('user', line(sorted[i++]));
     const body = clip(m.body, LIMITS.messageClip);
     const textOf = m.speaker === 'software' ? body
       : m.speaker === 'agent' ? `(a message from the agent, a person, sent ${sayWhen(m.created_at, zone)})\n${body}`
         : `(sent ${sayWhen(m.created_at, zone)})\n${body}`;
-    const last = out[out.length - 1];
-    if (last && last.role === role) last.content = `${last.content as string}\n\n${textOf}`;
-    else out.push({ role, content: textOf });
+    push(m.speaker === 'software' ? 'assistant' : 'user', textOf);
   }
+  while (i < sorted.length) push('user', line(sorted[i++]));
   while (out.length && out[0].role !== 'user') out.shift();
   return out;
+}
+
+/** Each press on the screen since the first message in view. */
+async function pressesSince(q: Q, since: string | null): Promise<Press[]> {
+  return q<Press>(
+    `select id, ${TS('at')} as at, brief, detail, outcome from uc_pilot.actions
+      where turn_id is null and tool = 'screen_decision' and ($1::timestamptz is null or at >= $1::timestamptz)
+      order by seq desc limit 12`, [since]);
 }
 
 /**
  * Takes one message from the resident and returns the guide's reply.
  * requestKey comes from the browser. Sending the same key again returns the same result.
  */
-export async function receive(userId: string, rawText: string, requestKey: string): Promise<TurnResult> {
+export async function receive(userId: string, rawText: string, requestKey: string, opts: { viewing?: string | null } = {}): Promise<TurnResult> {
   if (!isUuid(userId)) throw new NoAccess('No resident.');
   if (!isUuid(requestKey)) throw new Refusal('The message carried no valid key. Send it again from the screen.');
   const trimmed = (rawText || '').replace(/\r\n/g, '\n').trim();
@@ -204,7 +263,8 @@ export async function receive(userId: string, rawText: string, requestKey: strin
       const recent = await q<MessageView>(
         `select * from (select ${MESSAGE_COLS}, seq from uc_pilot.messages where id <> $1 and seq < (select seq from uc_pilot.messages where id = $1)
                          order by seq desc limit $2) t order by seq`, [message.id, LIMITS.recentMessages]);
-      return { view, recent };
+      const presses = await pressesSince(q, recent[0]?.created_at ?? null);
+      return { view, recent, presses };
     });
 
     const system = [
@@ -212,8 +272,10 @@ export async function receive(userId: string, rawText: string, requestKey: strin
       { type: 'text' as const, text: fileForModel(before.view, access.display_name) }
     ];
     const tools = TOOLS.map(t => ({ name: t.name, description: t.description, input_schema: t.input_schema }));
-    const messages: Turn[] = historyFor(before.recent, access.timezone);
-    const mine = `(sent ${localNow(access.timezone, new Date(message.created_at)).label})\n${message.body}`;
+    const messages: Turn[] = historyFor(before.recent, access.timezone, before.presses);
+    // What the resident has open on the screen is context for the message. It is no instruction.
+    const viewing = opts.viewing ? clip(opts.viewing.replace(/[^\w ,.:'›\-]/g, ' ').replace(/\s+/g, ' ').trim(), 160) : '';
+    const mine = `(sent ${localNow(access.timezone, new Date(message.created_at)).label}${viewing ? `. The resident has this open on the screen: ${viewing}` : ''})\n${message.body}`;
     const lastTurn = messages[messages.length - 1];
     if (lastTurn && lastTurn.role === 'user') lastTurn.content = `${lastTurn.content as string}\n\n${mine}`;
     else messages.push({ role: 'user', content: mine });
@@ -312,15 +374,28 @@ export async function thread(userId: string, opts: { before?: string | null; lim
       `select t.id, t.message_id, t.state, t.started_at < now() - ($2 || ' milliseconds')::interval as stale
          from uc_pilot.turns t where t.message_id = any ($1::uuid[])`, [`{${asked.join(',')}}`, String(LIMITS.runningStaleMs)]) : [];
     const effects = turns.length ? await q<Effect & { turn_id: string }>(
-      `select turn_id, tool, outcome, detail, target, target_id from uc_pilot.actions
-        where turn_id = any ($1::uuid[]) and outcome <> 'read' order by seq`, [`{${turns.map((t: any) => t.id).join(',')}}`]) : [];
+      `select turn_id, tool, outcome, detail, brief, target, target_id from uc_pilot.actions
+        where turn_id = any ($1::uuid[]) and ${SHOWN} order by seq`, [`{${turns.map((t: any) => t.id).join(',')}}`]) : [];
+    // Each press on the screen in the span of this page, so the conversation shows the decision where it happened.
+    const presses = page.length ? await q<Press & { target: string | null; target_id: string | null }>(
+      `select id, ${TS('at')} as at, brief, detail, outcome, target, target_id from uc_pilot.actions
+        where turn_id is null and tool = 'screen_decision' and at >= $1::timestamptz
+          and ($2::timestamptz is null or at < $2::timestamptz)
+        order by seq`, [page[0].created_at, opts.before && isUuid(opts.before) ? page[page.length - 1].created_at : null]) : [];
+    const hrefs = await hrefsFor(q, [...effects, ...presses]);
     const turnFor = (messageId: string | null) => {
       const t = messageId ? turns.find((x: any) => x.message_id === messageId) : null;
-      return t ? { state: (t.state === 'running' && t.stale ? 'failed' : t.state) as string, effects: effects.filter(e => e.turn_id === t.id).map(({ turn_id, ...e }) => e) } : null;
+      return t ? {
+        state: (t.state === 'running' && t.stale ? 'failed' : t.state) as string,
+        effects: effects.filter(e => e.turn_id === t.id).map(({ turn_id, detail, ...e }) => ({
+          ...e, brief: briefOf(e.outcome, e.brief, detail), href: e.target_id ? hrefs.get(e.target_id) ?? null : null
+        }))
+      } : null;
     };
     return {
       access,
       more,
+      presses: presses.map(p => ({ id: p.id, at: p.at, brief: briefOf(p.outcome, p.brief, p.detail), href: p.target_id ? hrefs.get(p.target_id) ?? null : null })),
       messages: page.map(m => ({
         id: m.id, speaker: m.speaker, body: m.body, created_at: m.created_at, removed: m.removed, reply_to: m.reply_to,
         key: m.speaker === 'resident' ? m.request_key ?? null : null,
@@ -328,5 +403,76 @@ export async function thread(userId: string, opts: { before?: string | null; lim
         turn: turnFor(m.speaker === 'resident' ? m.id : m.reply_to)
       }))
     };
+  });
+}
+
+
+/**
+ * After the resident answers a waiting item with the button, the guide goes on with one short reply: what is now on
+ * file, then the next question of the open work. The reply takes no action. It is written once for each press.
+ */
+export async function continueAfterPress(userId: string, pendingId: string): Promise<{ state: 'written' | 'already' | 'skipped'; reply: MessageView | null }> {
+  const skipped = { state: 'skipped' as const, reply: null };
+  if (!isUuid(userId) || !isUuid(pendingId)) return skipped;
+  const run = { userId, actor: 'software' as const };
+  const start = await withResident(run, async q => {
+    const access = await loadAccess(q);
+    if (!access) throw new NoAccess('This account is not part of the founder test.');
+    const p = (await q<any>(`select id, decider, state, decided_via from uc_pilot.pending where id = $1`, [pendingId]))[0];
+    if (!p || p.decider !== 'resident' || p.state === 'open' || p.decided_via !== 'screen') return null;
+    const existing = (await q<MessageView>(`select ${MESSAGE_COLS} from uc_pilot.messages where request_key = $1`, [pendingId]))[0];
+    if (existing) return { existing };
+    const last = (await q<any>(`select session_id from uc_pilot.messages order by seq desc limit 1`))[0];
+    if (!last) return null;
+    const spent = (await q<any>(
+      `select coalesce(sum(cost_micro), 0)::float8 as c from uc_pilot.turns where (started_at at time zone $1)::date = (now() at time zone $1)::date`, [access.timezone]))[0].c as number;
+    const today = localNow(access.timezone).date;
+    for (let i = 0; i <= LIMITS.placeDaysAhead; i++) await placeSchedule({ q }, addDays(today, i));
+    const view = await loadFile(q, access.timezone);
+    const recent = await q<MessageView>(
+      `select * from (select ${MESSAGE_COLS}, seq from uc_pilot.messages order by seq desc limit $1) t order by seq`, [LIMITS.recentMessages]);
+    const presses = await pressesSince(q, recent[0]?.created_at ?? null);
+    return { access, view, recent, presses, sessionId: last.session_id as string, spent };
+  });
+  if (!start) return skipped;
+  if ('existing' in start) return { state: 'already', reply: start.existing ?? null };
+  if (start.spent >= dailyCapMicro() || !modelAvailable()) return skipped;
+
+  const system = [
+    { type: 'text' as const, text: SYSTEM, cache_control: { type: 'ephemeral' as const } },
+    { type: 'text' as const, text: fileForModel(start.view, start.access.display_name) }
+  ];
+  const tools = TOOLS.map(t => ({ name: t.name, description: t.description, input_schema: t.input_schema }));
+  const messages = historyFor(start.recent, start.access.timezone, start.presses);
+  const ask = '(The server asks, after the press above: write the guide\'s next reply now. Say in a few words what is on file after this press. Then go on with the open work and ask its next question. When no work is open and nothing is missing, say only what is on file. Take no action.)';
+  const lastTurn = messages[messages.length - 1];
+  if (lastTurn && lastTurn.role === 'user') lastTurn.content = `${lastTurn.content as string}\n\n${ask}`;
+  else messages.push({ role: 'user', content: ask });
+
+  let body = '';
+  let usage = { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 };
+  let model = getModel().name();
+  try {
+    const res = await getModel().create({ system, tools, messages, maxTokens: 500, allowActions: false });
+    usage = res.usage;
+    model = res.model || model;
+    body = cleanReply(res.content.filter((b): b is Extract<Block, { type: 'text' }> => b.type === 'text').map(b => b.text).join('\n').trim());
+  } catch { return skipped; }
+  if (!body) return skipped;
+
+  return withResident(run, async q => {
+    const reply = (await q<MessageView>(
+      `insert into uc_pilot.messages (session_id, body, request_key) values ($1, $2, $3)
+       on conflict (user_id, request_key) do nothing returning ${MESSAGE_COLS}`, [start.sessionId, body, pendingId]))[0];
+    if (!reply) {
+      const existing = (await q<MessageView>(`select ${MESSAGE_COLS} from uc_pilot.messages where request_key = $1`, [pendingId]))[0] || null;
+      return { state: 'already' as const, reply: existing };
+    }
+    // The cost of this reply counts toward the day's limit, in the same table as every other reply.
+    await q(
+      `insert into uc_pilot.turns (message_id, prompt_version, state, finished_at, model, steps, input_tokens, output_tokens, cache_read_tokens, cache_write_tokens, cost_micro, reply_id)
+       values ($1, $2, 'done', now(), $3, 1, $4, $5, $6, $7, $8, $1)`,
+      [reply.id, PROMPT_VERSION, model, usage.input, usage.output, usage.cacheRead, usage.cacheWrite, costMicro(model, usage)]);
+    return { state: 'written' as const, reply };
   });
 }
