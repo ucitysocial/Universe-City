@@ -859,3 +859,31 @@ html.uc-nav::after{content:"";position:fixed;left:0;top:0;height:3px;width:100%;
 .day-block .day-l{font-size:13.5px}
 .day-item{border-left:4px solid var(--fc,var(--ink))}
 .day-extra .ent{border-left:4px solid var(--fc,var(--ink))}
+
+/* ---------------------------------------------------------------- the left side as a drawer on a phone */
+.rail-open,.rail-back{display:none}
+.rail-body{display:contents}
+@media (max-width:860px){
+  .os-rail-head{gap:12px;padding-left:10px}
+  .rail-open{display:flex;align-items:center;justify-content:center;width:40px;height:40px;flex:none;background:none;border:2px solid rgba(244,239,233,.55);cursor:pointer;padding:0}
+  .rail-open svg{width:20px;height:20px}
+  .rail-open svg path{stroke:var(--paper);stroke-width:2;stroke-linecap:round}
+  .rail-body{display:none}
+  .os-rail.open .rail-body{display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;width:min(330px,86vw);z-index:95;background:var(--ink);overflow:hidden;padding-top:14px;border-right:3px solid var(--ink);box-shadow:6px 0 0 rgba(22,12,12,.25)}
+  .os-rail.open .rail-back{display:block;position:fixed;inset:0;z-index:94;background:rgba(18,10,10,.35)}
+  .os-rail.open .os-search{display:flex;padding:0 12px 12px}
+  .os-rail.open .os-places{display:flex!important;flex-direction:column;width:auto;padding:0 10px 10px;background:none;border:0}
+  .os-rail.open .os-places a{text-align:left;padding:10px 12px;font-size:15px;border-top:0;border-left:3px solid transparent;opacity:.8}
+  .os-rail.open .os-places a.current{border-left-color:var(--paper);opacity:1}
+  .os-rail.open .os-places a.only-narrow{display:none}
+  .os-rail.open .os-tree{display:block;flex:1;min-height:0;overflow-y:auto}
+  .os-rail.open .os-rail-foot{display:flex;flex-direction:column;align-items:flex-start;padding:12px 18px calc(14px + env(safe-area-inset-bottom,0px))}
+  .os-rail.open .os-rail-foot .pt-who-name{display:block}
+}
+@media (prefers-reduced-motion:no-preference) and (max-width:860px){.os-rail.open .rail-body{animation:railin .18s ease-out}}
+@keyframes railin{from{transform:translateX(-100%)}to{transform:none}}
+.topbar-back{align-self:center;display:flex;align-items:center;justify-content:center;width:30px;height:30px;margin-left:-6px;margin-right:-6px;background:none;border:1px solid rgba(244,239,233,.45);cursor:pointer;padding:0}
+.topbar-back svg{width:15px;height:15px}
+.topbar-back svg path{fill:none;stroke:var(--paper);stroke-width:2}
+.topbar-back:hover{background:rgba(244,239,233,.12)}
+@media (max-width:860px){.os-rail.open .rail-body>*{order:0}}

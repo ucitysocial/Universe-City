@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 const TITLE: [RegExp, string][] = [
   [/^\/portal\/home/, 'Conversation'],
@@ -25,6 +25,14 @@ const stamp = (zone: string) => {
  */
 export default function PilotTopBar({ zone, waiting }: { zone: string; waiting: number }) {
   const path = usePathname() || '';
+  const router = useRouter();
+  // Back goes to the page before, inside the Resident Portal. With no page before it, it goes to the parent place.
+  const back = () => {
+    const ref = typeof document !== 'undefined' ? document.referrer : '';
+    if (window.history.length > 1 && ref.startsWith(location.origin)) { router.back(); return; }
+    const parts = path.split('/').filter(Boolean);
+    router.push(parts.length > 2 ? `/${parts.slice(0, -1).join('/')}` : '/portal/home');
+  };
   const title = TITLE.find(([r]) => r.test(path))?.[1] ?? 'Resident Portal';
   const [now, setNow] = useState('');
   // While the overview is folded, its star sits at the end of this bar, and the center reaches the right edge.
@@ -39,6 +47,11 @@ export default function PilotTopBar({ zone, waiting }: { zone: string; waiting: 
   }, [zone]);
   return (
     <div className="topbar">
+      {path !== '/portal/home' && (
+        <button type="button" className="topbar-back" onClick={back} aria-label="Back">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3L5 8l5 5" /></svg>
+        </button>
+      )}
       <span className="topbar-t">{title}</span>
       <span className="topbar-n" suppressHydrationWarning>{now}</span>
       <button type="button" className="topbar-star" onClick={openSide} aria-label={waiting ? `Open the overview. ${waiting} pending` : 'Open the overview'}>

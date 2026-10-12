@@ -2,7 +2,7 @@
 
 import type { CSSProperties } from 'react';
 import Link from 'next/link';
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import type { FileIndex } from '@/lib/pilot/browse';
 import { SearchBox, SearchResults, useSearch } from '@/components/PilotSearch';
@@ -21,6 +21,8 @@ const PLACES = [
  * The left side of the frame. It stays in place on every screen: the search, the places, and the File as one tree.
  * A row is open when the address on screen is inside it, so the tree shows where the resident is.
  * While the search box holds words, the results take the place of the tree.
+ * On a phone the left side folds into the bar at the top. The button at its left opens it as a drawer over the page,
+ * with the search, Home, the File as one tree, Settings, and Log out. It closes when the page changes.
  */
 export default function PilotRail({ index, name, synthetic }: { index: FileIndex; name: string | null; synthetic: boolean }) {
   const path = usePathname();
@@ -28,6 +30,14 @@ export default function PilotRail({ index, name, synthetic }: { index: FileIndex
   const rows = useMemo(() => treeRows(index, path), [index, path]);
   const tree = useRef<HTMLDivElement>(null);
   const search = useSearch();
+  const [open, setOpen] = useState(false);
+  useEffect(() => { setOpen(false); }, [path]);
+  useEffect(() => {
+    if (!open) return;
+    const key = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
+    document.addEventListener('keydown', key);
+    return () => document.removeEventListener('keydown', key);
+  }, [open]);
 
   // The selected row is kept in view when the address changes from outside the tree.
   useEffect(() => {
@@ -42,10 +52,15 @@ export default function PilotRail({ index, name, synthetic }: { index: FileIndex
   }
 
   return (
-    <aside className="os-rail">
+    <aside className={open ? 'os-rail open' : 'os-rail'}>
       <div className="os-rail-head">
+        <button type="button" className="rail-open" onClick={() => setOpen(o => !o)} aria-expanded={open} aria-label={open ? 'Close My File' : 'Open My File'}>
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14M3 10h14M3 15h14" /></svg>
+        </button>
         <Link href="/portal/home" className="pt-mark">universe&#9733;city</Link>
       </div>
+      {open && <div className="rail-back" onClick={() => setOpen(false)} />}
+      <div className="rail-body">
       <SearchBox text={search.text} setText={search.setText} id="os-search-box" />
       <nav className="os-places" aria-label="Places">
         {PLACES.map(p => (
@@ -73,6 +88,7 @@ export default function PilotRail({ index, name, synthetic }: { index: FileIndex
         <span className="pt-who-name"><strong>{name || 'Resident'}</strong>{synthetic ? ' (made up resident)' : ''}</span>
         <Link href="/portal/settings" className={path.startsWith('/portal/settings') ? 'pt-link current' : 'pt-link'}>Settings</Link>
         <button type="button" className="pt-link" onClick={logOut}>Log out of the test</button>
+      </div>
       </div>
     </aside>
   );
