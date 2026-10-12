@@ -900,9 +900,12 @@ const shift = (await asResident(A, q => q(`select id from uc_pilot.commitments w
   check('AG-02', 'Agent-authored and edited suggestions display without creating actual commitments',
     custom.some(g => g.key === 'custom-demo') && custom.some(g => g.label === 'Plan food breaks') && !custom.some(g => g.key === 'custom-hidden'), custom);
 
+  const priorFlag = process.env.PILOT_GHOST_CATALOGUE;
+  delete process.env.PILOT_GHOST_CATALOGUE;
   const catalogue = await loadGhostCatalogue(async <T = Record<string, any>>() => [] as T[]);
-  check('AG-03', 'The original six defaults are available when a resident has no customizations',
-    catalogue.ready && catalogue.templates.length === 6 && catalogue.templates[0].key === 'wake', catalogue.templates);
+  if (priorFlag === undefined) delete process.env.PILOT_GHOST_CATALOGUE; else process.env.PILOT_GHOST_CATALOGUE = priorFlag;
+  check('AG-03', 'Without an opt-in migration flag the six defaults remain usable without issuing a database query',
+    !catalogue.ready && catalogue.templates.length === 6 && catalogue.templates[0].key === 'wake', catalogue.templates);
 }
 
 const failed = results.filter(r => !r.pass);
