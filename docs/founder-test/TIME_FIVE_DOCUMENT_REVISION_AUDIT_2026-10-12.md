@@ -175,3 +175,29 @@ These are **unsettled choices**, not grounds for another round of abstract docum
 **Resident-facing acceptance:** One short, trustworthy UPDATE line is enough after an uncomplicated time change. A guide may give one relevant human response, but should not echo the same before/after, self-correct at length, or jump to an unrelated sleep/wake intake question. When repeated postponements of the **same** commitment have been objectively established, consider an optional small first step already on file; do not infer psychological cause or nag. Do not claim the four referenced office-cleaning steps have a persisted `uc_pilot` checklist until step storage is actually verified.
 
 **Five-document revisions:** Time (selective agent follow-up for repeated postponements), Operations (derivation from revisions and threshold/eligibility/permission contract), Developments (dated founder observation, correction and tests), Curriculum (how support and task decomposition help without blame, while not lowering ability assessment), Research (do not assert a study validates rescheduling count thresholds or the specific UI). This belongs with [FT-017](https://github.com/ucitysocial/Universe-City/blob/main/docs/founder-test/FOUNDER_TEST_LOG.md#ft-017--one-line-rescheduling-and-awareness-of-repeated-postponements) and [issue #38](https://github.com/ucitysocial/Universe-City/issues/38); **no behavior shipped in this audit**.
+
+## 10. Founder approval: unfinished work carried into the next day (FT-018)
+
+**Founder decision, October 12:** Open, still-actionable commitments that have not been confirmed complete should not vanish when their scheduled date passes. Show their **open work obligation** on tomorrow's calendar (and following days) until resolved, maintaining the original dated record and its provenance. This should surface scheduling pressure honestly: conflicts motivate a resident decision, not an automatic change to another commitment.
+
+**Do not equate silence with nonexecution:** A previous calendar block with no reported outcome stays historically *unreported*. Its associated open work can be carried forward as a planning obligation. Do not manufacture `did_not_happen` or rewrite yesterday's reported actual time merely to draw today's card. Carry-forward should have one current representation per active parent, a linked historical origin, and an idempotent local-date transition, not a second independent task per day.
+
+**Timing:** Without a new resident-confirmed start, show “Needs scheduling” on the new date, not yesterday's start moved over as though it were approved. If a time is later assigned and overlaps sleep/work/other commitments, show the conflict and ask the resident to resolve it; do not displace a third party's appointment. Preserve partial steps, completed checkbox state, and current step if guided execution is enabled.
+
+**Exemptions require honest semantics:** A past externally controlled appointment/shift/deadline is fixed to the date it actually had. Carry its **open outcome/reporting/rescheduling/follow-through obligation**, not a fictional appointment tomorrow. Each recurring daily routine occurrence needs its own historical state; don't accumulate a daily chain of supposed “unfinished sleep” alongside the new sleep instance. The rule applies to actionable work that can still happen.
+
+**Related founder approval:** After **two distinct resident-initiated forward postponements of the same commitment**, the guide gently offers an optional smaller step, with no need for the resident to say they are struggling. System-generated carry-forward does **not** count toward the two moves. Never infer motivation, diagnosis or failed execution from a postponed start. See [#38](https://github.com/ucitysocial/Universe-City/issues/38) and [#40](https://github.com/ucitysocial/Universe-City/issues/40).
+
+**Changes needed across five Time documents:**
+
+| File | New specific reconciliation |
+| --- | --- |
+| `TIME.md` | Distinguish planned historical block, unreported outcome and active unfinished responsibility; establish automatic carry visibility and resident resolution, while preserving 7.4/8.9. |
+| `TIME_OPERATIONS.md` | Define rollover eligibility, same-parent identity, calendar read contract, local-midnight transitions, recurrence/appointments, approval and conflict semantics, no duplicate mutations, and interaction with guided child steps. |
+| `TIME_DEVELOPMENTS.md` | Add founder-approved October 12 decision, versions, tests, open questions and status. Don't erase the previous wait-for-resident rules; mark superseded where precisely necessary. |
+| `TIME_CURRICULUM.md` | Adjust 4.* examples, 12/13 change/review, and section 18 intake to teach “unfinished stays in tomorrow's Plan,” short status messaging, resident choice and second-postponement support without assigning failure. |
+| `TIME_RESEARCH.md` | No automatic new study claim. Product policy may be documented as a program decision with cautions about overload/nagging, research appended only after verification. |
+
+**Verification:** Synthetic office cleanup appears exactly once in tomorrow's actionable section, keeps its original record/history/progress, survives days and reloads, vanishes from active carry when completed, and never falsely files a miss. An expired external appointment remains dated with a follow-up only. A recurring daily routine does not duplicate indefinitely. A resident's *second actual postponement* triggers exactly one optional step suggestion; two automatic carries do not.
+
+**Status:** Founder decision documented; no database, calendar code or live scheduling automation created in this audit PR.
