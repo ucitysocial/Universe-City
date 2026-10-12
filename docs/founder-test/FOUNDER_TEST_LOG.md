@@ -42,6 +42,7 @@ No entry is a defect just because the prototype is unfinished. Do not report uns
 | FT-013 | Live conversation — flexible commitments and practical support | Open end time cannot be cleared; motivation triggers disengagement; genuine task preferences are refused as questions | Export-confirmed bugs and founder guidance | Draft PR #33; pending CI, preview test and approval; #34 |
 | FT-014 | Time intake — daily schedule anchors | Sleep/wake, meals and personal routines must become visible scheduling commitments, rather than waiting for unfilled dates or resident prompts | Founder-directed product priority; current curriculum discrepancy | Recorded for Time requirements, docs and conversation changes; #35 |
 | FT-015 | Time — task execution within any calendar block | Optional expandable, ordered steps and one-step-at-a-time support inside any scheduled block; show actual reported progress | Founder design/behavior decision | Documented; implementation awaiting design/code review; #36 |
+| FT-016 | Time calendar — sleep anchors and remaining time | Sleep should stand out using restrained Universe City ink/pattern treatment; remaining unallocated time should become legible without implying it is all free | Founder styling direction and design proposal | Section 8 in draft audit PR #37; issues #29 and #35 |
 
 ---
 
@@ -476,6 +477,18 @@ No founder private records should be used in public tests. Run synthetic test ca
 **Existing specification review:** `TIME.md` 3.3 defines commitment and completion, 3.5 defines ongoing work with multiple separately schedulable commitments, and 5.5 covers follow-through. `TIME_CURRICULUM.md` 4.15 references help when a resident cannot start, but also says to put the whole Plan aside; this needs deliberate reconciliation with optional assistance *inside* the active commitment. The Curriculum also references Time clauses 5.11–5.13 that are absent in the current Time specification. No new database child-step model or routine checkbox behavior is defined in Operations. Clarify the data and authorization contracts before changing the live app.
 
 **Status:** Founder-approved capability direction, **not yet implemented or demonstrated**. Implementer issue [#36](https://github.com/ucitysocial/Universe-City/issues/36), linked to [#35](https://github.com/ucitysocial/Universe-City/issues/35), [#29](https://github.com/ucitysocial/Universe-City/issues/29) and behavior fix [PR #33](https://github.com/ucitysocial/Universe-City/pull/33). No production changes in this documentation entry.
+
+---
+
+## FT-016 — Sleep blocks and trustworthy availability on the calendar
+
+**Founder feedback, October 12, 2026:** Planned sleep should be visually distinct, perhaps black, a restrained alternate color, or a slashed/hatched fill, without overwhelming the calendar. The purpose is to recognize the stable daily foundation and identify what time remains after necessary obligations. This is a **design preference requiring visual review**, not a settled CSS rule.
+
+**Design proposal:** Use existing Universe City Ink `#140A0C` or Ink 2 `#241417` for sleep blocks, with legible light text and a Sleep label/icon. Daily essentials such as selected meals and morning/night routines remain relatively quiet in the approved palette; department color still identifies the subject folder. The existing calendar uses distinct `rough` and `open-end` states, so don't make the same hatch mean both sleep and uncertainty. Treat category, origin and confidence as separate attributes. Support overnight sleep crossing date boundaries and consistent day/week/month/mobile display.
+
+**Available-time behavior:** Establish fixed commitments, sleep/waking, meals/routines and relevant travel/transitions before interpreting gaps. A truly empty space in the rendered calendar is **unallocated / unaccounted-for** until enough is known; it is not automatically free for new obligations. Don't double count overlaps or silently change Time's controlled-hours calculation, which is based on observed blocks. If implemented, a quiet daily or weekly indicator may separate accounted-for, unallocated and unknown time where data supports it.
+
+**Status:** Added to [five-doc Time audit PR #37, section 8](https://github.com/ucitysocial/Universe-City/blob/docs/time-five-doc-audit-2026-10-12/docs/founder-test/TIME_FIVE_DOCUMENT_REVISION_AUDIT_2026-10-12.md#8-proposed-visual-treatment--daily-essentials-and-usable-time), [#35](https://github.com/ucitysocial/Universe-City/issues/35), and [#29](https://github.com/ucitysocial/Universe-City/issues/29). No live styling or behavior change made. Confirm founder preference using a real rendered preview.
 
 ---
 
