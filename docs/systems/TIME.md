@@ -1,6 +1,6 @@
 # Folder 01: Time
 
-Department I, Agency Assessment. Internal specification. Version 4, October 11, 2026. What the folder is, what goes on file, and how the agent runs it.
+Department I, Agency Assessment. Internal specification. Version 4.1, October 11, 2026. What the folder is, what goes on file, and how the agent runs it.
 
 ## 1. About this document
 
@@ -10,13 +10,15 @@ Department I, Agency Assessment. Internal specification. Version 4, October 11, 
 
 1.3 The other four. **Folder 01 Time Operations** holds the fields, states, views, queries, and action permissions. It is at `docs/systems/TIME_OPERATIONS.md`. **Folder 01 Time Developments** holds the dated log of changes, errors, open issues, and ideas held for later. It is at `docs/systems/TIME_DEVELOPMENTS.md`. **Folder 01 Time Curriculum** holds the twelve questions, their options, and the teaching layer. **Folder 01 Time Research** holds the evidence and the reasoning, as a running list.
 
-1.4 Curriculum and Research still describe Version 3. Neither is in the repository yet. Items 15.1 and 15.2 state what each one needs.
+1.4 The revised Curriculum Version 2 and the updated Research were located in Google Drive on October 11, 2026. Both address the Version 4 direction; neither is in this repository yet. Their references and remaining reconciliation are in items 15.1 and 15.2. Their existing client copy and evidence are not changed by this specification revision.
 
 1.5 This document is not loaded into the agent. The agent runs on the Language Standard and on operating instructions built from this document.
 
 1.6 Client facing copy appears here as a marked block, in the exact words the client sees. Those blocks exist nowhere else.
 
 1.7 Version 4 is dated October 11, 2026. It revises Version 3 of August 28, 2026. Version 3 defined Time as building a schedule from conversation and measured how much of a client's time was accounted for. Version 4 defines Time as planning, execution, review, and follow through. The schedule stays. It is the system the folder runs on.
+
+1.8 Version 4.1, October 11, 2026, clarifies the resident-facing calendar that the schedule must provide. It does not change the definition of Time, the Enrollment-to-Orientation-to-Time order, the authority for File changes, or the conditions for a commitment.
 
 ## 2. What it is
 
@@ -28,7 +30,7 @@ Department I, Agency Assessment. Internal specification. Version 4, October 11, 
 
 2.4 The folder delivers five results, in this order.
 
-2.4.1 A schedule the client did not have to build. The agent assembles it from what the client says in conversation. A client can answer what time they got up. A client is never asked to fill an empty grid.
+2.4.1 A schedule the client did not have to build. The agent assembles it from what the client says in conversation. A client can answer what time they got up. A client is never asked to fill an empty grid. The resident can view the calendar as intake begins and see established commitments take their places as the schedule is assembled.
 
 2.4.2 A Plan for each day. The Plan lists the commitments the client intends to execute that day.
 
@@ -47,6 +49,10 @@ Department I, Agency Assessment. Internal specification. Version 4, October 11, 
 2.8 Time works with two questions. Did today go as planned is the question of Daily Close. How many hours a week are mine, and where do they sit is the question the schedule answers. The folder list keeps the second one as the question for Time.
 
 2.9 Conversation is how the schedule gets built from nothing. The client can also edit the schedule by hand at any point. A client who adds and moves blocks by hand is never routed through the agent to do it.
+
+2.9.1 The schedule is visible as a calendar in day, week, and month views. The day and week views place known timed blocks at their actual times. The month view places dated entries on their dates. These views read and change the same maintained schedule; they are not separate calendars or copies of commitments.
+
+2.9.2 A calendar may display incomplete information without treating it as complete. A dated commitment whose start or end is not established remains identifiable, with its missing time visible; the software does not invent a start, end, or duration to fill a slot. A proposed or tentative time remains distinct from confirmed time under the approval rules.
 
 2.10 A block typed in by hand and a block built from a client's statement are the same once filed.
 
@@ -490,6 +496,8 @@ Department I, Agency Assessment. Internal specification. Version 4, October 11, 
 
 9.3 **One, intake.** The agent establishes what already has the client's time, assembles the first seven day schedule, and makes the first Plan with the client. The first Plan includes the realism check in 5.3.3 and the time of Daily Close in 5.3.4. The Resident Portal home opens when the first seven day schedule is on file and the client has confirmed the first Plan. A completed week of activity is not required.
 
+9.3.1 At the start of Time intake, after Orientation, the calendar is available even if the schedule is not yet established. The agent fills it from existing File information and new conversation as timing becomes established and authorized. An unfilled portion does not prevent the client from seeing or using the calendar. The conditions in 9.3 and section 10 still govern when the initial system is operational; calendar visibility does not certify that those conditions have been met.
+
 9.4 **Two, analyze and adapt.** The client carries out the Plan. Outcomes are checked at Daily Close, follow through is carried out under 5.5, and the agent compares each Plan with what happened. Where the same outcome repeats, the agent proposes a change to the next Plan or to the schedule. The client decides.
 
 9.5 **Three, system maintenance.** The agent asks fewer questions as commitments become established. Contact follows the client's preferences in 5.4. The agent asks about what is missing, what changed, and the commitments named in 7.15. The schedule receives commitments from every folder. The Review between the client and the agent uses the outcomes on file.
@@ -532,6 +540,10 @@ Department I, Agency Assessment. Internal specification. Version 4, October 11, 
 11.3 One commitment can produce more than one follow up. One piece of ongoing work can hold more than one commitment. One action can affect more than one folder. Each link is kept on file, and each change of state is kept on file.
 
 11.4 The schedule is also the client's calendar. Appointments, reminders, and dates from every other folder are placed in it. Time owns the calendar for the whole program.
+
+11.4.1 The calendar is the visible working surface of the schedule. Its day and week views show timed commitments and blocks in time slots. Its month view shows them on their dates. The client can open an entry to see the maintained information, what remains unknown, and its history.
+
+11.4.2 A change established through conversation appears in the calendar. A permitted direct change in the calendar updates the same File entry. The views do not independently own or duplicate the record. They must respect the resident's decisions, authorization, original statements, earlier versions, and links to other folders.
 
 11.5 The schedule produces two figures once a week of observed time is on file: the hours the client controls, and the longest unbroken block.
 
@@ -637,7 +649,7 @@ Department I, Agency Assessment. Internal specification. Version 4, October 11, 
 
 14.2.2 Every correction to a block is kept with the earlier version. That history cannot be edited or deleted.
 
-14.2.3 The week view in the Resident Portal. One row for each day, with four figures: observed hours, estimated hours, unaccounted hours, and the hours that were the client's.
+14.2.3 The existing numerical week summary in the Resident Portal. One row for each day, with four figures: observed hours, estimated hours, unaccounted hours, and the hours that were the client's. This summary is not the required time-positioned weekly calendar.
 
 14.2.4 The hours that were the client's are calculated from observed blocks only, as 3.6.3 requires.
 
@@ -648,6 +660,8 @@ Department I, Agency Assessment. Internal specification. Version 4, October 11, 
 ### 14.3 Listed as live in Version 3 and absent from the repository
 
 14.3.1 Plain language collection, the day view by whole hours, the month view, direct editing by hand, and reminders. Each of the five is to build.
+
+14.3.2 A true weekly time-grid calendar, with dated and timed entries positioned in the hours where they belong, is also to build. The numerical summary in 14.2.3 is not evidence that this visual weekly calendar is built. Day, week, and month must be checked together against the underlying Time records before any is marked operational.
 
 ### 14.4 To build
 
@@ -673,9 +687,9 @@ Department I, Agency Assessment. Internal specification. Version 4, October 11, 
 
 ## 15. Open items
 
-15.1 Curriculum. The twelve questions in Folder 01 Time Curriculum measure how well each kind of time is accounted for. Version 4 measures planning, execution, and review. What are the twelve new questions and their ten options? Which of the twelve older categories move into schedule intake?
+15.1 Curriculum. A revised **Folder 01 Time Curriculum Version 2**, dated October 11, 2026, has been located in Google Drive (document titled `Folder 01 Time Curriculum (4)`). It contains twelve questions about commitments, planning, execution, changes, review, follow through, and support; section 18 moves the earlier time-use subjects into Schedule intake. The document is not yet an approved repository copy. Its existing client copy is preserved. Reconcile its section 18 with the calendar presentation in 2.9.1, 9.3.1, and 11.4.1 without changing the approved sequence or treating lessons as a condition for using the schedule.
 
-15.2 Research. Folder 01 Time Research holds the evidence behind Version 3. Which evidence supports planning, execution, and follow through, and what dated entry does Research need? Research is revised after the Curriculum.
+15.2 Research. An updated **Folder 01 Time Research**, with entries dated October 11, 2026, has been located in Google Drive (document titled `Folder 01 Time Research (3)`). It includes newer analysis supporting and qualifying the planning and monitoring approach. It is not yet in the repository. The visual calendar requirement is a product/implementation decision; do not claim the research independently validates this exact interface. Preserve the dated evidence and qualifications when reconciling the Research with this specification.
 
 15.3 Every other item that Version 4 first listed as open is resolved in this document or assigned to Folder 01 Time Operations. Folder 01 Time Developments holds the list, dated October 11, 2026.
 
