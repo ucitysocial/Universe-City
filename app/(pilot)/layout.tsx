@@ -63,7 +63,7 @@ export default async function PilotLayout({ children }: { children: React.ReactN
     <div className="os">
       <PilotViewport />
       <PilotRail index={index} name={w.access.display_name} synthetic={w.access.synthetic} />
-      <main className="os-main"><PilotTopBar zone={w.access.timezone} />{children}</main>
+      <main className="os-main"><PilotTopBar zone={w.access.timezone} waiting={board.panel.pending.length} />{children}</main>
       <PilotStar waiting={board.panel.pending.length}><PilotBoard board={board} /></PilotStar>
       <PilotSide board={board} />
       <PilotCalPop />

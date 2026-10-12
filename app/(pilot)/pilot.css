@@ -745,3 +745,16 @@ button.dash-more{background:none;border:0;padding:0;cursor:pointer;font:inherit;
   .uc-side-off .side-strip i{top:-6px;right:-10px}
   .os-side{border-left:3px solid var(--ink)}
 }
+
+/* ---------------------------------------------------------------- folded overview: the center reaches the right edge */
+.topbar-star{display:none}
+@media (min-width:1280px){
+  .uc-side-off .os,.uc-side-off .os:has(.fb){grid-template-columns:256px minmax(0,1fr) 0}
+  .uc-side-off .os-side{display:none}
+  .uc-side-off .topbar-star{display:flex;align-items:center;justify-content:center;position:relative;margin-left:4px;margin-right:-6px;width:34px;height:34px;background:none;border:0;cursor:pointer;padding:0}
+  .topbar-star svg{width:24px;height:24px}
+  .topbar-star svg path{fill:var(--II);stroke:var(--paper);stroke-width:1.2;stroke-linejoin:round}
+  .topbar-star i{position:absolute;top:0;right:-2px;min-width:16px;height:16px;padding:0 3px;background:var(--I);color:#fff;font:700 10px/16px 'Montserrat',system-ui,sans-serif;font-style:normal;text-align:center}
+  .os:has(.fb) .topbar-star{display:none}
+}
+@media (min-width:1560px){.uc-side-off .os,.uc-side-off .os:has(.fb){grid-template-columns:280px minmax(0,1fr) 0}}
