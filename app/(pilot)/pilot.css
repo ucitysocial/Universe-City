@@ -653,3 +653,23 @@ button.dash-more{background:none;border:0;padding:0;cursor:pointer;font:inherit;
 .pt-page .act-day h2{font-size:15px;margin:14px 0 4px;padding:0;border:0}
 .act-dl{margin-bottom:0}
 .act section.act-day{padding:0;border:0;margin:0}
+
+/* ---------------------------------------------------------------- folding the overview */
+.os-side{position:relative}
+.side-fold{position:absolute;top:20px;right:22px;z-index:2;width:28px;height:26px;display:flex;align-items:center;justify-content:center;background:var(--ink);border:1px solid var(--paper);cursor:pointer;padding:0}
+.side-fold svg{width:14px;height:14px}
+.side-fold svg path{fill:none;stroke:var(--paper);stroke-width:2}
+.side-fold:hover{background:var(--I)}
+.side-strip{display:none}
+@media (min-width:1280px){
+  .uc-side-off .os{grid-template-columns:256px minmax(0,1fr) 52px}
+  .uc-side-off .os-side{padding:12px 0;overflow:hidden}
+  .uc-side-off .os-side .win,.uc-side-off .side-fold{display:none}
+  .uc-side-off .side-strip{display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;height:100%;background:none;border:0;cursor:pointer;padding:6px 0;position:relative}
+  .side-strip svg{width:28px;height:28px}
+  .side-strip svg path{fill:var(--II);stroke:var(--ink);stroke-width:1.4;stroke-linejoin:round}
+  .side-strip i{position:absolute;top:0;right:6px;min-width:18px;height:18px;padding:0 4px;background:var(--I);color:#fff;font:700 11px/18px 'Montserrat',system-ui,sans-serif;font-style:normal}
+  .side-strip span{writing-mode:vertical-rl;font-family:'VT323',monospace;font-size:18px;letter-spacing:.14em;color:var(--ink)}
+  .side-strip:hover span{text-decoration:underline}
+}
+@media (min-width:1560px){.uc-side-off .os{grid-template-columns:280px minmax(0,1fr) 52px}}

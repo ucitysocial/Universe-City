@@ -1,4 +1,5 @@
 import PilotBoard from '@/components/PilotBoard';
+import PilotSideToggle from '@/components/PilotSideToggle';
 import type { Board } from '@/lib/pilot/board';
 import { sayDate } from '@/lib/pilot/time';
 
@@ -10,6 +11,7 @@ import { sayDate } from '@/lib/pilot/time';
 export default function PilotSide({ board }: { board: Board }) {
   return (
     <aside className="os-side" aria-label="Overview">
+      <PilotSideToggle waiting={board.panel.pending.length} />
       <div className="win">
         <div className="win-bar">{sayDate(board.today).replace(/, \d{4}$/, '')}</div>
         <div className="win-body"><PilotBoard board={board} /></div>

@@ -8,7 +8,7 @@ import { spanWords } from '@/lib/pilot/browse';
 import type { Board } from '@/lib/pilot/board';
 import { belongsTo } from '@/lib/pilot/dept';
 import { DEPARTMENTS, FOLDERS } from '@/lib/domain/folders';
-import { folderPath, SCHEDULE_PATH, TIME_PATH } from '@/lib/pilot/paths';
+import { folderPath, SCHEDULE_PATH, slugOf, TIME_PATH } from '@/lib/pilot/paths';
 import { sayDate, weekdayName, weekdayOf } from '@/lib/pilot/time';
 
 const short = (date: string) => sayDate(date).replace(/, \d{4}$/, '');
@@ -51,7 +51,7 @@ export default function PilotBoard({ board }: { board: Board }) {
   );
 
   const depts = DEPARTMENTS.map(d => ({
-    key: d.key, name: d.name, color: d.color,
+    key: d.key, name: d.name, slug: slugOf(d.name), color: d.color,
     folders: FOLDERS.filter(f => f.dept === d.key && f.name !== 'Time').map(f => ({ name: f.name, href: folderPath(f.name) }))
   }));
 

@@ -2,12 +2,13 @@
 
 import Link from 'next/link';
 import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
+import { usePathname } from 'next/navigation';
 import type { BoardFolder } from '@/lib/pilot/board';
 
 const VIEW = 'uc:board';
 const SHOWN = 'uc:board:folders';
 
-type Dept = { key: string; name: string; color: string; folders: { name: string; href: string }[] };
+type Dept = { key: string; name: string; slug: string; color: string; folders: { name: string; href: string }[] };
 
 const read = <T,>(key: string, fallback: T): T => {
   try { const v = localStorage.getItem(key); return v ? (JSON.parse(v) as T) : fallback; } catch { return fallback; }
@@ -22,11 +23,17 @@ export default function PilotBoardTabs({ calendar, depts, filled }: { calendar: 
   const [on, setOn] = useState('calendar');
   const [shown, setShown] = useState<Record<string, boolean>>({});
   const [choosing, setChoosing] = useState(false);
+  const path = usePathname();
+  useEffect(() => { setShown(read<Record<string, boolean>>(SHOWN, {})); }, []);
+  // Inside My File the overview follows the place on screen: a department or one of its folders opens that
+  // department, and Time opens the calendar. Elsewhere it shows the view the resident picked last.
   useEffect(() => {
+    const m = /^\/portal\/file\/([^/]+)(?:\/([^/]+))?/.exec(path || '');
+    const here = m ? depts.find(d => d.slug === m[1]) : null;
+    if (here) { setOn(m![2] === 'time' ? 'calendar' : here.key); setChoosing(false); return; }
     const v = read<string>(VIEW, 'calendar');
-    if (v === 'calendar' || depts.some(d => d.key === v)) setOn(v);
-    setShown(read<Record<string, boolean>>(SHOWN, {}));
-  }, [depts]);
+    setOn(v === 'calendar' || depts.some(d => d.key === v) ? v : 'calendar');
+  }, [path, depts]);
 
   const pick = (k: string) => { setOn(k); setChoosing(false); write(VIEW, k); };
   const isShown = (name: string) => shown[name] ?? filled.some(f => f.name === name);
