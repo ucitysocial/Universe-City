@@ -45,6 +45,7 @@ No entry is a defect just because the prototype is unfinished. Do not report uns
 | FT-016 | Time calendar — sleep anchors and remaining time | Sleep should stand out using restrained Universe City ink/pattern treatment; remaining unallocated time should become legible without implying it is all free | Founder styling direction and design proposal | Section 8 in draft audit PR #37; issues #29 and #35 |
 | FT-017 | Conversation — long update and postponed-work awareness | Reschedule followed by duplicated verbose chat and unrelated sleep question; guide should recognize repeated actual postponements of the same commitment and offer optional step-focused support | Screenshot-confirmed reply issue + new founder direction | #24 concise status; #38 deferral awareness; not yet verified in code |
 | FT-018 | Time — unfinished work follows into tomorrow | Still-actionable commitments without confirmed completion continue appearing on subsequent days with original history, visible conflicts and no invented outcomes | Explicit founder product decision | Approved direction; implementation pending #40; second resident-initiated postponement trigger confirmed in #38 |
+| FT-019 | Resident Portal — card alignment and waiting decisions | Short department card content stretches vertically; Pending repeats beneath department tabs; right-side Waiting for you is buried below the day | Founder screenshot-confirmed UI defects | Draft PR #45; preview verification required; #44 |
 
 ---
 
@@ -531,6 +532,24 @@ No founder private records should be used in public tests. Run synthetic test ca
 **Issue:** [#40 — Automatic carry-forward](https://github.com/ucitysocial/Universe-City/issues/40). Related: [#38 — Second-postponement support](https://github.com/ucitysocial/Universe-City/issues/38), [#36 — Expandable steps](https://github.com/ucitysocial/Universe-City/issues/36), [#29 — Calendar](https://github.com/ucitysocial/Universe-City/issues/29), and five-document review [draft PR #37](https://github.com/ucitysocial/Universe-City/pull/37).
 
 **Status:** Founder-approved direction, not implemented or deployed by this log. Synthetic end-to-end tests and founder preview required.
+
+---
+
+## FT-019 — Department cards and starred pending notifications
+
+**Founder evidence:** Three October 12, 2026 screenshots of the live Resident Portal. The images show private resident File data, so **do not add screenshots or copy their contents into this public repository**.
+
+**What the screenshots show:** In Agency Assessment, a short Regulation folder card stretches to match much longer neighboring folder cards and leaves its content at the bottom instead of the top. In the wide My File dashboard, the global Pending section appears beneath Housing Stability and other department tabs even though it is not scoped to that department. The right Overview displays the daily list first; its Waiting for you section appears only after a long scroll.
+
+**Founder direction:** Folder card headers and entries always align at the top. Global Pending belongs in Schedule, not repeated after all department tabs. Pending questions, answers, and approvals should be immediately noticeable—ideally a star notification with a red dot and count—and accessible without scrolling through the entire day or week.
+
+**Source-confirmed cause:** `components/PilotBoard.tsx` rendered wide Pending after `PilotBoardTabs` (outside all views) and narrow Waiting for you below `PilotBoardDay`. `components/PilotSide.tsx` put all content in one right scroll area. `pilot.css` allowed short grid cards to stretch alongside tall ones. A mobile and folded-Overview star already exists in `PilotStar.tsx`/`PilotSideToggle.tsx`; the expanded desktop Overview lacked a pinned pending shortcut.
+
+**Proposed code fix:** [draft PR #45](https://github.com/ucitysocial/Universe-City/pull/45) gives the cards top-aligned contents; locates a compact expandable Pending star at the top of the *Schedule* tab only; adds a star-with-red-dot alert directly under the desktop Overview header with its own pending-action scroller; and places Waiting for you before the day list in smaller star sheets. All surfaces reuse existing `board.panel.pending`, `PilotPending` and `PilotDecide`. The actual approval/response permission rules are not modified.
+
+**Acceptance:** Check a short and tall folder card side by side, all five wide tabs, no pending state, a nonzero notification count, activation via keyboard, on-screen answer and approval, count refresh, expanded/folded Overview and mobile sheet. Confirm private data does not leak to a public URL or a different resident.
+
+**Status:** Founder-directed fix prepared in draft [PR #45](https://github.com/ucitysocial/Universe-City/pull/45). **Not merged or deployed** by this log. Implementation issue [#44](https://github.com/ucitysocial/Universe-City/issues/44).
 
 ---
 
