@@ -789,6 +789,49 @@ const shift = (await asResident(A, q => q(`select id from uc_pilot.commitments w
     [sayOwed(owedOn(shift, bar, f)), sayOwed(owedOn(passedShift, bar, { ...f, salaryOnFile: true, payOnFile: true }))]);
 }
 
+// ================================================================= 25. clearing a planned end retains the same commitment
+{
+  const day = addDays(today, 14);
+  const words = 'Two weeks from now I will tidy my desk from 1 AM to 2 AM.';
+  const added = await send(A, words, [
+    call('add_commitment', {
+      date: day, label: 'Tidy my desk', start: '01:00', end: '02:00',
+      quote: words
+    }), say('Desk cleanup is on file.')
+  ]);
+  const row = (await asResident(A, q => q(
+    `select id, start_min, end_min from uc_pilot.commitments where on_date = $1::date and label = 'Tidy my desk' order by created_at desc limit 1`, [day])))[0];
+  check('C-01', 'A dated commitment with both planned times is initially filed', added.effects.some(e => e.outcome === 'filed') && row?.start_min === 60 && row?.end_min === 120, row);
+
+  const cleared = await send(A, 'Leave the end time open.', [
+    call('change_commitment', { ref: row.id.slice(0, 8), clear_end: true, quote: 'Leave the end time open' }),
+    say('The start remains 1 AM, and the end is now open.')
+  ]);
+  const after = (await asResident(A, q => q(
+    `select id, start_min, end_min from uc_pilot.commitments where id = $1`, [row.id])))[0];
+  const changes = await asResident(A, q => q(
+    `select before ->> 'end_min' as was, after ->> 'end_min' as became from uc_pilot.revisions where row_id = $1 and before ->> 'end_min' is distinct from after ->> 'end_min' order by seq`, [row.id]));
+  check('C-02', 'A request to leave an end open clears only the end, preserving the same entry and its start', cleared.effects.some(e => e.outcome === 'filed') && after?.id === row.id && after?.start_min === 60 && after?.end_min === null && changes.some(x => x.was === '120' && x.became === null), { after, changes });
+
+  const repeated = await send(A, 'Keep the end time open.', [
+    call('change_commitment', { ref: row.id.slice(0, 8), clear_end: true, quote: 'Keep the end time open' }),
+    say('The end is already open.')
+  ]);
+  check('C-03', 'Repeating the clear action makes no false change', repeated.effects[0]?.outcome === 'unchanged', repeated.effects);
+
+  await send(A, 'Set the desk end time to 2 AM again.', [
+    call('change_commitment', { ref: row.id.slice(0, 8), end: '02:00', quote: 'Set the desk end time to 2 AM again' }),
+    say('The end is 2 AM again.')
+  ]);
+  const legacy = await send(A, 'Remove the end time again.', [
+    call('change_commitment', { ref: row.id.slice(0, 8), end: '', quote: 'Remove the end time again' }),
+    say('The end is open again.')
+  ]);
+  const last = (await asResident(A, q => q(
+    `select start_min, end_min from uc_pilot.commitments where id = $1`, [row.id])))[0];
+  check('C-04', 'The earlier end empty-string instruction still clears the end', legacy.effects[0]?.outcome === 'filed' && last?.start_min === 60 && last?.end_min === null, { last, result: legacy.effects });
+}
+
 const failed = results.filter(r => !r.pass);
 console.log(`\n${results.length - failed.length} of ${results.length} passed`);
 if (failed.length) process.exit(1);
