@@ -81,11 +81,17 @@ function timeParts(time: string, more: string[]): string[] {
   return parts;
 }
 
+/** What the small window over the calendar shows at once, before it loads the rest of the entry. */
+const popData = (i: CalItem) => ({
+  'data-pop': i.key.split(':')[0], 'data-weekly': i.kind === 'weekly' ? '1' : undefined,
+  'data-label': i.label, 'data-time': i.timeText, 'data-belongs': i.belongs, 'data-href': i.href, 'data-kind': WORD[i.kind]
+});
+
 function Block({ t, firstMin, single }: { t: Placed; firstMin: number; single: boolean }) {
   const word = KIND_WORD[t.kind];
   const cls = ['cal-block', `d-${t.dept}`, t.kind, t.split ? 'split' : 'step', t.rough ? 'rough' : '', t.openEnd ? 'open-end' : '', t.openStart ? 'open-start' : ''].filter(Boolean).join(' ');
   return (
-    <Link href={t.href} className={cls} data-name={t.label} title={`${t.label}. ${t.timeText}. ${WORD[t.kind]}. ${t.belongs}.`}
+    <Link href={t.href} className={cls} data-name={t.label} {...popData(t)} title={`${t.label}. ${t.timeText}. ${WORD[t.kind]}. ${t.belongs}.`}
       style={{ '--top': t.from - firstMin, '--len': t.len, '--lane': t.lane, '--lanes': t.lanes, '--clear': t.clear, '--z': t.order } as CSSProperties}>
       <span className="cal-text">
         <b key={t.label}>{t.label}</b>
@@ -99,7 +105,7 @@ function Untimed({ list }: { list: CalItem[] }) {
   return (
     <>
       {list.map(i => (
-        <Link key={i.key} href={i.href} className={`cal-chip d-${i.dept} ${i.kind}`} title={`${i.label}. Time unknown. ${WORD[i.kind]}. ${i.belongs}.`}>{i.label}</Link>
+        <Link key={i.key} href={i.href} className={`cal-chip d-${i.dept} ${i.kind}`} {...popData(i)} title={`${i.label}. Time unknown. ${WORD[i.kind]}. ${i.belongs}.`}>{i.label}</Link>
       ))}
     </>
   );
@@ -165,7 +171,7 @@ export function MonthGrid({ cal, on, today }: { cal: Calendar; on: string; today
               </span>
             )}
             {all.map(i => (
-              <span key={i.key} className={`mon-item d-${i.dept} ${i.kind}`}>
+              <span key={i.key} className={`mon-item d-${i.dept} ${i.kind}`} role="button" tabIndex={0} {...popData(i)}>
                 {i.start !== null ? <em>{hourShort(i.start)}</em> : null}{i.label}
               </span>
             ))}

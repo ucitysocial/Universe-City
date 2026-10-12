@@ -439,3 +439,26 @@ a.pt-btn{text-decoration:none;display:inline-block}
   .mon-count{display:block;font-family:'VT323',monospace;font-size:15px;color:var(--ink2);line-height:1}
   .mon-num i{display:none}
 }
+
+/* ---------------------------------------------------------------- the small window over the calendar */
+.pop{position:fixed;z-index:60;background:#fff;border:3px solid var(--ink);box-shadow:6px 6px 0 var(--ink);max-height:calc(100vh - 24px);overflow-y:auto;outline:none}
+.pop.sheet{left:0;right:0;bottom:0;top:auto;max-height:72vh;border-width:3px 0 0;box-shadow:0 -4px 0 var(--ink);padding-bottom:env(safe-area-inset-bottom,0px)}
+.pop-bar{display:flex;align-items:flex-start;gap:10px;padding:10px 10px 9px 14px;background:var(--paper);border-bottom:2px solid var(--ink);border-left:8px solid var(--ink)}
+.pop-bar b{font-size:17px;font-weight:700;line-height:1.3;flex:1;min-width:0;overflow-wrap:break-word}
+.pop-x{background:none;border:2px solid var(--ink);width:32px;height:32px;font-size:20px;line-height:1;cursor:pointer;color:var(--ink);flex:none}
+.pop-x:hover{background:var(--ink);color:var(--paper)}
+.pop-body{padding:12px 14px 14px;display:grid;gap:9px}
+.pop-time{font-family:'VT323',monospace;font-size:21px;line-height:1.1;margin:0}
+.pop-meta{font-size:13.5px;color:var(--ink2);margin:0}
+.pop-said{font-size:14.5px;line-height:1.45;border-left:4px solid var(--rule);padding-left:9px;margin:0;color:var(--ink2)}
+.pop-notes{display:grid;gap:5px;border-top:1px solid var(--rule);padding-top:8px}
+.pop-notes p{font-size:14.5px;line-height:1.45;border-left:4px solid var(--ink);padding-left:9px;margin:0}
+.pop-ok{font-size:13.5px;color:var(--IV);margin:0;font-weight:600}
+.pop-acts{display:flex;flex-wrap:wrap;gap:8px}
+.pop-form{display:grid;gap:9px}
+.pop-form label{display:grid;gap:3px;font-family:'VT323',monospace;font-size:17px;color:var(--ink2)}
+.pop-form input,.pop-form textarea{border:2px solid var(--ink);border-radius:0;background:#fff;color:var(--ink);font-family:'Montserrat',system-ui,sans-serif;font-size:15px;padding:7px 9px;min-height:40px;width:100%;box-sizing:border-box}
+.pop-two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pop-open{font-size:13.5px;font-weight:600;color:var(--ink)}
+.mon-item{cursor:pointer}
+.mon-item:hover{outline:2px solid var(--ink);outline-offset:1px}
