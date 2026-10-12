@@ -44,6 +44,7 @@ No entry is a defect just because the prototype is unfinished. Do not report uns
 | FT-015 | Time — task execution within any calendar block | Optional expandable, ordered steps and one-step-at-a-time support inside any scheduled block; show actual reported progress | Founder design/behavior decision | Documented; implementation awaiting design/code review; #36 |
 | FT-016 | Time calendar — sleep anchors and remaining time | Sleep should stand out using restrained Universe City ink/pattern treatment; remaining unallocated time should become legible without implying it is all free | Founder styling direction and design proposal | Section 8 in draft audit PR #37; issues #29 and #35 |
 | FT-017 | Conversation — long update and postponed-work awareness | Reschedule followed by duplicated verbose chat and unrelated sleep question; guide should recognize repeated actual postponements of the same commitment and offer optional step-focused support | Screenshot-confirmed reply issue + new founder direction | #24 concise status; #38 deferral awareness; not yet verified in code |
+| FT-018 | Time — unfinished work follows into tomorrow | Still-actionable commitments without confirmed completion continue appearing on subsequent days with original history, visible conflicts and no invented outcomes | Explicit founder product decision | Approved direction; implementation pending #40; second resident-initiated postponement trigger confirmed in #38 |
 
 ---
 
@@ -510,6 +511,26 @@ No founder private records should be used in public tests. Run synthetic test ca
 **Acceptance:** A successful change shows one concise update, no before/after paragraph or unnecessary self-correction; a repeated forward deferral can be identified accurately from history and results in optional, specific step-level help at an appropriate point. No unrelated sleep question interrupts this active task. History and user consent remain intact.
 
 **Tracking:** [#24](https://github.com/ucitysocial/Universe-City/issues/24) for concise filing feedback; [#38](https://github.com/ucitysocial/Universe-City/issues/38) for repeated deferral detection and support; [#36](https://github.com/ucitysocial/Universe-City/issues/36) for the future expandable steps design. **Not yet implemented or deployed.**
+
+---
+
+## FT-018 — Open commitments carry into the following day
+
+**Founder ruling, October 12, 2026:** Work that has not been updated as completed should remain visible by moving **forward in the planning calendar** to the next day, repeatedly, until finished or otherwise resolved. Example: office cleanup not confirmed complete today appears on tomorrow's calendar. Potential conflicts are intentional evidence that the resident needs to address an overloaded or neglected Plan; the system must expose them, not silently displace another commitment.
+
+**Meaning and historical accuracy:** Carry-forward means the *open obligation* continues to be planned, not that the action actually happened or that the original scheduled date can be rewritten. Keep the same source-linked parent and its earlier scheduled date, existing approved task steps/progress, edits and outcomes. Show one active carried-forward item on the current day without manufacturing another independent commitment each midnight. Until a new start is set, place the item in an appropriately labeled **Needs scheduling / carried forward** area; do not recycle a clock time that has not been confirmed for tomorrow.
+
+**Fact-sensitive exceptions:** Past appointments, attended/unattended shifts, externally controlled times and expired deadlines must retain their real historical date. Carry a relevant open report/reschedule/follow-up into tomorrow instead of falsely booking the actual outside event on a new date. Daily recurring templates should not spawn infinite duplicates of a past routine; each day's instance and its actual outcome remain independent. If only an outcome report is missing, the original remains **unreported**, not “did not happen.” Completion/withdrawal closes the open work according to the resident's actions/established authority.
+
+**Interaction:** If tomorrow already contains sleep, work or other fixed commitments, show a conflict when an actual time is proposed for carried work, with options for the resident to resolve it. Carry-forward itself should not change other entries or an external person's booking. Give a compact visible status; do not prompt the resident to approve an identical daily rollover each day once the system rule is established, subject to the final permissions design. Support local midnight, late shift/overnight windows, and repeat visits without duplicating entries.
+
+**Second postponement approved:** Founder explicitly confirms that after the **second genuine resident-initiated forward postponement** of the same commitment, the guide offers optional, practical step-by-step help even if the resident hasn't said they're overwhelmed. Automatic daily carry-forward is *not* an intentional postponement and **does not** count toward that threshold; earlier moves, accidental corrections, cleared end times and declined proposals don't either. The guide must not make character judgments or nag after a declined suggestion.
+
+**Documents affected:** `TIME.md` (what is carried vs historical outcome), `TIME_OPERATIONS.md` (eligibility, data/permissions, job/idempotency, conflict and recurring rules), `TIME_DEVELOPMENTS.md` (dated founder ruling and version), `TIME_CURRICULUM.md` (Daily Close, next-day planning and nonjudgmental step support), `TIME_RESEARCH.md` (no invented evidence that rolling over improves outcomes). Adjust pilot implementation only after the governing model is reconciled with legacy `public.blocks` and `uc_pilot` records.
+
+**Issue:** [#40 — Automatic carry-forward](https://github.com/ucitysocial/Universe-City/issues/40). Related: [#38 — Second-postponement support](https://github.com/ucitysocial/Universe-City/issues/38), [#36 — Expandable steps](https://github.com/ucitysocial/Universe-City/issues/36), [#29 — Calendar](https://github.com/ucitysocial/Universe-City/issues/29), and five-document review [draft PR #37](https://github.com/ucitysocial/Universe-City/pull/37).
+
+**Status:** Founder-approved direction, not implemented or deployed by this log. Synthetic end-to-end tests and founder preview required.
 
 ---
 
