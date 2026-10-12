@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { useMemo, useState } from 'react';
 
 export type ActivityLine = { id: string; day: string; time: string; group: Group; word: string; tone: string; line: string; by: string };
@@ -60,8 +59,6 @@ export default function PilotActivity({ lines }: { lines: ActivityLine[] }) {
       <div className="act-dl">
         <span>{shown.length} {shown.length === 1 ? 'line' : 'lines'}</span>
         <button type="button" className="pt-link" onClick={download}>Download these lines as a spreadsheet</button>
-        <Link className="pt-link" href="/api/pilot/export?format=text" prefetch={false}>Download the conversation</Link>
-        <Link className="pt-link" href="/api/pilot/export" prefetch={false}>Download every entry as data</Link>
       </div>
       {days.length === 0 && <p className="pt-empty">No line matches.</p>}
       {days.map(d => (

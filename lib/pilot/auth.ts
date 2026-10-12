@@ -7,7 +7,7 @@ import { loadAccess, type Access } from './file';
 import { ensureLocal, LOCAL_USER, localMode } from './local';
 
 export type Who =
-  | { ok: true; userId: string; access: Access }
+  | { ok: true; userId: string; access: Access; email: string | null }
   | { ok: false; why: 'off' | 'logged_out' | 'not_in_test' | 'database'; detail?: string; email?: string | null };
 
 export async function who(): Promise<Who> {
@@ -26,7 +26,7 @@ export async function who(): Promise<Who> {
   try {
     const access = await withResident({ userId, actor: 'resident' }, q => loadAccess(q));
     if (!access) return { ok: false, why: 'not_in_test', email };
-    return { ok: true, userId, access };
+    return { ok: true, userId, access, email };
   } catch (e: any) {
     return { ok: false, why: 'database', detail: typeof e?.message === 'string' ? e.message : undefined };
   }

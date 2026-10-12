@@ -535,8 +535,8 @@ a.pt-btn{text-decoration:none;display:inline-block}
 /* ---------------------------------------------------------------- the dashboard at the right of the frame */
 /* Home is the conversation. The dashboard sits in the right part of the frame on every page, and on a narrow screen
    home shows it folded into one line above the conversation. */
-@media (min-width:1280px){.os{grid-template-columns:256px minmax(0,1fr) 400px}}
-@media (min-width:1560px){.os{grid-template-columns:280px minmax(0,1fr) 460px}}
+@media (min-width:1280px){.os{grid-template-columns:256px minmax(0,1fr) var(--side-w,400px)}}
+@media (min-width:1560px){.os{grid-template-columns:280px minmax(0,1fr) var(--side-w,460px)}}
 .home-talk{display:flex;flex-direction:column;flex:1;min-height:0;min-width:0}
 .board{display:grid;gap:16px;align-content:start}
 .dash-now{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:10px;row-gap:1px;background:#fff;border:2px solid var(--ink);border-left:8px solid var(--fc,var(--ink));padding:7px 10px 8px;color:var(--ink);text-decoration:none}
@@ -690,4 +690,16 @@ button.dash-more{background:none;border:0;padding:0;cursor:pointer;font:inherit;
   .board.wide .dash-items{flex-direction:column;flex-wrap:nowrap}
   .board.wide .dash-cards{grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
   .board.wide .dash-pick{grid-template-columns:repeat(3,1fr)}
+}
+.os-rail-foot a.pt-link.current{color:var(--paper);font-weight:700}
+
+/* ---------------------------------------------------------------- the width of the overview */
+.side-grip{display:none}
+@media (min-width:1280px){
+  .side-grip{display:block;position:absolute;left:0;top:0;bottom:0;width:12px;cursor:col-resize;z-index:3;touch-action:none}
+  .side-grip::after{content:"";position:absolute;left:3px;top:50%;width:3px;height:44px;margin-top:-22px;background:var(--ink);opacity:.25}
+  .side-grip:hover::after,.side-grip:focus-visible::after,.uc-resizing .side-grip::after{opacity:1}
+  .side-grip:focus-visible{outline:2px solid var(--ink)}
+  .uc-side-off .side-grip{display:none}
+  .uc-resizing,.uc-resizing *{cursor:col-resize!important;user-select:none}
 }

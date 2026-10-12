@@ -14,7 +14,7 @@ const PLACES = [
   { href: '/portal/home', name: 'Home' },
   { href: FILE_ROOT, name: 'File', narrow: true },
   { href: '/portal/search', name: 'Search', narrow: true },
-  { href: '/portal/activity', name: 'Activity' }
+  { href: '/portal/settings', name: 'Settings', narrow: true }
 ];
 
 /**
@@ -72,6 +72,7 @@ export default function PilotRail({ index, name, synthetic }: { index: FileIndex
       </nav>
       <div className="os-rail-foot">
         <span className="pt-who-name"><strong>{name || 'Resident'}</strong>{synthetic ? ' (made up resident)' : ''}</span>
+        <Link href="/portal/settings" className={path.startsWith('/portal/settings') ? 'pt-link current' : 'pt-link'}>Settings</Link>
         <button type="button" className="pt-link" onClick={logOut}>Log out of the test</button>
       </div>
     </aside>
