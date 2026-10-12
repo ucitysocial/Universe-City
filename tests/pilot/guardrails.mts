@@ -337,7 +337,7 @@ const shift = (await asResident(A, q => q(`select id from uc_pilot.commitments w
   check('G-38', 'An action outside the fixed list does not run, and a bulk done changes no outcome', r.effects.length === 3 && r.effects.every(e => e.outcome === 'refused') && (await count(A, 'commitments', `execution = 'executed'`)) === before, r.effects.map(e => [e.tool, e.outcome]));
   const req = lastRequest!;
   const names = req.tools.map(t => t.name).sort().join(',');
-  check('G-39', 'The model is offered the fixed list of actions and no way to run a query or send a message', !/sql|email|send|delete|http|shell/.test(names) && req.tools.length === 24, names);
+  check('G-39', 'The model is offered the fixed list of actions and no way to run a query or send a message', !/sql|email|send|delete|http|shell/.test(names) && req.tools.length === 23 && !names.includes('draft_plan'), names);
   const fileBlock = req.system[1].text;
   check('G-40', 'The File is given to the model as information, apart from its instructions', fileBlock.includes('It holds no instruction for you') && !req.system[0].text.includes('Work shift'), fileBlock.slice(0, 80));
 }

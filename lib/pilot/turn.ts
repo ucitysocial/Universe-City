@@ -18,7 +18,7 @@ import { getModel, modelAvailable, type Block, type Turn } from './model';
 import { hrefsFor } from './paths';
 import { PROMPT_VERSION, SYSTEM } from './prompt';
 import { addDays, localNow, sayWhen } from './time';
-import { placeSchedule, Refusal, TOOL_BY_NAME, TOOLS, type Env, type Result } from './tools';
+import { placeSchedule, Refusal, TOOL_BY_NAME, TOOLS, type Env, type Result, RETIRED } from './tools';
 
 export type Effect = {
   tool: string; outcome: string; detail: string; target: string | null; target_id: string | null;
@@ -271,7 +271,7 @@ export async function receive(userId: string, rawText: string, requestKey: strin
       { type: 'text' as const, text: SYSTEM, cache_control: { type: 'ephemeral' as const } },
       { type: 'text' as const, text: fileForModel(before.view, access.display_name) }
     ];
-    const tools = TOOLS.map(t => ({ name: t.name, description: t.description, input_schema: t.input_schema }));
+    const tools = TOOLS.filter(t => !RETIRED.has(t.name)).map(t => ({ name: t.name, description: t.description, input_schema: t.input_schema }));
     const messages: Turn[] = historyFor(before.recent, access.timezone, before.presses);
     // The part of the File the resident wrote the message from is context for the message. It is no instruction.
     const viewing = opts.viewing ? clip(opts.viewing.replace(/[^\w ,.:'›\-]/g, ' ').replace(/\s+/g, ' ').trim(), 160) : '';
@@ -442,7 +442,7 @@ export async function continueAfterPress(userId: string, pendingId: string): Pro
     { type: 'text' as const, text: SYSTEM, cache_control: { type: 'ephemeral' as const } },
     { type: 'text' as const, text: fileForModel(start.view, start.access.display_name) }
   ];
-  const tools = TOOLS.map(t => ({ name: t.name, description: t.description, input_schema: t.input_schema }));
+  const tools = TOOLS.filter(t => !RETIRED.has(t.name)).map(t => ({ name: t.name, description: t.description, input_schema: t.input_schema }));
   const messages = historyFor(start.recent, start.access.timezone, start.presses);
   const ask = '(The server asks, after the press above: write the guide\'s next reply now. Say in a few words what is on file after this press. Then go on with the open work and ask its next question. When no work is open and nothing is missing, say only what is on file. Take no action.)';
   const lastTurn = messages[messages.length - 1];

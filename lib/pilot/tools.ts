@@ -309,6 +309,13 @@ const REF = (what: string) => ({ type: 'string', description: `The reference of 
 const obj = (properties: Record<string, unknown>, required: string[]) =>
   ({ type: 'object', properties, required, additionalProperties: false });
 
+/**
+ * Actions the model is no longer offered. The founder set on October 11, 2026 that a day's plan is the sequence of its
+ * commitments, decided ahead of the day, with no separate Plan to confirm. The code stays so entries filed before then
+ * keep working.
+ */
+export const RETIRED = new Set(['draft_plan']);
+
 export const TOOLS: Tool[] = [
   // ---------------------------------------------------------------- reads
   {
