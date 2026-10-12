@@ -854,14 +854,15 @@ const shift = (await asResident(A, q => q(`select id from uc_pilot.commitments w
   ]);
   const now = (await asResident(A, q => q(`select id, said, folder, entry, topic, source_message_id, basis, supersedes from uc_pilot.statements where state = 'current' and said = $1`, [words])))[0];
   const old = (await asResident(A, q => q(`select state from uc_pilot.statements where id = $1`, [first?.id])))[0];
-  check('T-01', 'Tidying moves a fact and writes its entry line. The words, the message, and the basis stay. The earlier version is kept',
-    tidied.effects[0]?.outcome === 'filed' && now?.folder === 'Employment' && now?.entry === 'Works at the bar on Friday nights.' &&
+  check('T-01', 'Tidying moves a fact and writes its entry line, out of the conversation. The words, the message, and the basis stay. The earlier version is kept',
+    tidied.effects.length === 0 && now?.folder === 'Employment' && now?.entry === 'Works at the bar on Friday nights.' &&
     now?.said === words && now?.source_message_id === first?.source_message_id && now?.basis === first?.basis && now?.supersedes === first?.id && old?.state === 'superseded',
     { now, old, effects: tidied.effects });
   const again = await send(A, 'ok', [
     call('tidy_statement', { ref: String(now?.id || '').slice(0, 8), folder: 'Employment' }), say('Already tidy.')
   ]);
-  check('T-02', 'Tidying an entry that is already tidy changes nothing', again.effects[0]?.outcome === 'unchanged', again.effects);
+  const last = (await asResident(A, q => q(`select outcome from uc_pilot.actions where tool = 'tidy_statement' order by seq desc limit 1`)))[0];
+  check('T-02', 'Tidying an entry that is already tidy changes nothing', again.effects.length === 0 && last?.outcome === 'unchanged', { last, effects: again.effects });
 }
 
 // ================================================================= 28. what the agent still needs for Time

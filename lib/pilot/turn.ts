@@ -55,7 +55,8 @@ export function briefOf(outcome: string, brief: string | null | undefined, detai
 }
 
 // What a reply did, apart from reading. The screen leaves a refused action to the activity list.
-const SHOWN = `outcome <> 'read'`;
+// Tidying stays out of the conversation. The founder set on October 12, 2026 that it shows in Activity only.
+const SHOWN = `outcome <> 'read' and tool <> 'tidy_statement'`;
 
 export type MessageView = {
   id: string; speaker: 'resident' | 'software' | 'agent'; body: string; created_at: string;
