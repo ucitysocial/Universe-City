@@ -1,6 +1,6 @@
 # Folder 01 Time Developments
 
-Department I, Agency Assessment. Log. Version 1, October 11, 2026. The dated log of changes, errors found, open issues, and ideas held for later.
+Department I, Agency Assessment. Log. Version 1.1, October 11, 2026. The dated log of changes, errors found, open issues, and ideas held for later.
 
 ## 1. About this document
 
@@ -90,6 +90,12 @@ Department I, Agency Assessment. Log. Version 1, October 11, 2026. The dated log
 
 2.18 `LANGUAGE_STANDARD.md` 3.20 was changed to match `TIME.md` 5.9. Position now informs the assessment and identifies where work exists. Clauses 3.20.1 to 3.20.3 were added. Clauses 3.12 and 12.7 and the change record of the standard carry the date. Start, Target, Position, Report, and Grade keep their definitions. `TIME.md` was not changed. Ruled by the founder.
 
+2.19 **Calendar-first presentation of Time, founder clarification, October 11, 2026.** The founder observed in Founder Test Session 01 that Time's facts were being filed without a resident-facing working calendar. The founder reaffirmed that the first Time product is a calendar and schedule, populated as the guide learns existing obligations and establishes commitments. `TIME.md` already identified the seven-day schedule as the system in 11.1–11.4. The clarification adds required day/week/month visual views and progression in `TIME.md` 2.9.1–2.9.2, 9.3.1, and 11.4.1–11.4.2. It does not replace the planning, execution, Daily Close, Review, or follow-through work that runs on the schedule.
+
+2.20 **Operations Version 1.1 and Time Version 4.1, October 11, 2026.** `TIME_OPERATIONS.md` now separates the existing numerical week summary from the unverified visual weekly calendar, specifies the day/week/month product requirements, the shared canonical Time record, access and editing constraints, unknown-time display, and acceptance tests. The exact unresolved mechanics remain explicitly To define, and the work in Claude's founder-test branch remains unverified. Reason: prevent a page of stored facts or a week-totals table from being described as a finished Time system.
+
+2.21 **Existing Curriculum and Research located in Google Drive, October 11, 2026.** The Google document titled `Folder 01 Time Curriculum (4)` contains **Curriculum Version 2**, dated October 11, 2026, with twelve revised questions and a Schedule intake in section 18. It says that Time intake begins after Orientation and assembles the first seven-day schedule through conversation. `Folder 01 Time Research (3)` contains updated dated entries, including October 11 research verification. Both remain outside the GitHub repository. This corrects the outdated repository status claim that neither was revised and both still covered Version 3. Their content and source evidence have not been replaced by this revision; their official integration and approval status remain to resolve.
+
 ## 3. Errors found
 
 3.1 October 11, 2026. Version 3 listed five features as live that the repository does not hold: plain language collection, the day view by whole hours, the month view, direct editing by hand, and reminders. Corrected in `TIME.md` 14.3.
@@ -103,6 +109,10 @@ Department I, Agency Assessment. Log. Version 1, October 11, 2026. The dated log
 3.5 October 11, 2026. A comment in `lib/domain/time.ts` states twelve kinds of time. The code holds eleven. Open.
 
 3.6 October 11, 2026. `TIME.md` 11.6 counted an executed commitment as successful while its consequences were not established. Corrected. See 2.16.
+
+3.7 October 11, 2026. The existing week view was a numerical table of time figures, not a visual seven-day grid. The day and month calendar and direct editing were also not built according to the prior repository inventory. The founder-test File listed commitments but lacked the corresponding working calendar. The requirement was stated in the system definition but not fully carried into the UI implementation contract. Product and Operations were clarified; actual preview behavior remains to verify.
+
+3.8 October 11, 2026. An earlier status statement that the Curriculum and Research had not been revised was out of date when this documentation review found the October 11 Google Drive copies. Previous entries are preserved for history; see 2.21 and 4.8.
 
 ## 4. Open issues
 
@@ -118,7 +128,13 @@ Department I, Agency Assessment. Log. Version 1, October 11, 2026. The dated log
 
 4.6 `LANGUAGE_STANDARD.md` 3.20 keeps a third output, engagement level, which sets how much the agent asks for. `TIME.md` 5.9.3 retires the Version 3 rule that set how often the agent asks by the twelve answers. The two overlap. The standard lists the engagement level output as kept without review. Open.
 
-4.7 The Curriculum of August 28, 2026 holds a table for each question that states what the agent does at each start band. Those tables rest on the retired rules. They are part of the Curriculum revision in `TIME.md` 15.1. Open.
+4.7 The Curriculum of August 28, 2026 holds a table for each question that states what the agent does at each start band. Those tables rest on the retired rules. They are part of the Curriculum revision in `TIME.md` 15.1. Open in this prior review; see updated status in 4.8.
+
+4.8 **October 11, 2026, status correction.** A Google Drive Curriculum Version 2 and updated Research are now identified. The earlier conclusion in 4.3 that both were unrevised Version 3 is superseded. Curriculum Version 2 section 18 already addresses building the first seven-day schedule and section 20.7 says no lesson is a condition for the schedule or a Plan. Remaining work is to reconcile the new *visual calendar* experience with the existing Schedule intake and teaching text, review approval status, and bring authoritative source copies into the repository under the five-document convention. Do not rewrite the twelve questions or the Research evidence merely to describe the UI.
+
+4.9 **Calendar code review open.** The founder-test calendar is under development; verify all three views, their time positioning, an unknown end time, manual edits, the one-record contract, permission and revision preservation, and full Time intake progression before declaring the system built. The running prototype must also preserve a pending or tentative commitment without prematurely changing a schedule entry. See Founder Test issue #29 and `TIME_OPERATIONS.md` 4.5–4.15.
+
+4.10 **Interface-shell decision separate.** The founder also requested full-center Conversation and a right-side decisions/context panel. This updates the direction of the founder test and conflicts with the earlier `docs/product/RESIDENT_INTERFACE.md` right-side Agent default. Record that discrepancy for a later deliberate interface-document ruling after preview; it is not a change to Time's record semantics. See Founder Test issue #30.
 
 ## 5. Ideas held for later
 
