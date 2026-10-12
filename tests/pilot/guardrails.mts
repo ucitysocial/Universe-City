@@ -801,7 +801,7 @@ const shift = (await asResident(A, q => q(`select id from uc_pilot.commitments w
   ]);
   const row = (await asResident(A, q => q(
     `select id, start_min, end_min from uc_pilot.commitments where on_date = $1::date and label = 'Tidy my desk' order by created_at desc limit 1`, [day])))[0];
-  check('C-01', 'A dated commitment with both planned times is initially filed', added.effects.some(e => e.outcome === 'filed') && row?.start_min === 60 && row?.end_min === 120, row);
+  check('F-OPEN-01', 'A dated commitment with both planned times is initially filed', added.effects.some(e => e.outcome === 'filed') && row?.start_min === 60 && row?.end_min === 120, row);
 
   const cleared = await send(A, 'Leave the end time open.', [
     call('change_commitment', { ref: row.id.slice(0, 8), clear_end: true, quote: 'Leave the end time open' }),
@@ -811,13 +811,13 @@ const shift = (await asResident(A, q => q(`select id from uc_pilot.commitments w
     `select id, start_min, end_min from uc_pilot.commitments where id = $1`, [row.id])))[0];
   const changes = await asResident(A, q => q(
     `select before ->> 'end_min' as was, after ->> 'end_min' as became from uc_pilot.revisions where row_id = $1 and before ->> 'end_min' is distinct from after ->> 'end_min' order by seq`, [row.id]));
-  check('C-02', 'A request to leave an end open clears only the end, preserving the same entry and its start', cleared.effects.some(e => e.outcome === 'filed') && after?.id === row.id && after?.start_min === 60 && after?.end_min === null && changes.some(x => x.was === '120' && x.became === null), { after, changes });
+  check('F-OPEN-02', 'A request to leave an end open clears only the end, preserving the same entry and its start', cleared.effects.some(e => e.outcome === 'filed') && after?.id === row.id && after?.start_min === 60 && after?.end_min === null && changes.some(x => x.was === '120' && x.became === null), { after, changes });
 
   const repeated = await send(A, 'Keep the end time open.', [
     call('change_commitment', { ref: row.id.slice(0, 8), clear_end: true, quote: 'Keep the end time open' }),
     say('The end is already open.')
   ]);
-  check('C-03', 'Repeating the clear action makes no false change', repeated.effects[0]?.outcome === 'unchanged', repeated.effects);
+  check('F-OPEN-03', 'Repeating the clear action makes no false change', repeated.effects[0]?.outcome === 'unchanged', repeated.effects);
 
   await send(A, 'Set the desk end time to 2 AM again.', [
     call('change_commitment', { ref: row.id.slice(0, 8), end: '02:00', quote: 'Set the desk end time to 2 AM again' }),
@@ -829,7 +829,7 @@ const shift = (await asResident(A, q => q(`select id from uc_pilot.commitments w
   ]);
   const last = (await asResident(A, q => q(
     `select start_min, end_min from uc_pilot.commitments where id = $1`, [row.id])))[0];
-  check('C-04', 'The earlier end empty-string instruction still clears the end', legacy.effects[0]?.outcome === 'filed' && last?.start_min === 60 && last?.end_min === null, { last, result: legacy.effects });
+  check('F-OPEN-04', 'The earlier end empty-string instruction still clears the end', legacy.effects[0]?.outcome === 'filed' && last?.start_min === 60 && last?.end_min === null, { last, result: legacy.effects });
 }
 
 // ================================================================= 26. a preference is not a question merely because it starts with what
@@ -837,8 +837,8 @@ const shift = (await asResident(A, q => q(`select id from uc_pilot.commitments w
   const { checkQuote } = await import('../../lib/pilot/guard');
   const preference = checkQuote('what helps me is breaking things down', 'what helps me is breaking things down into steps');
   const question = checkQuote('What time is it', 'What time is it?');
-  check('C-05', 'A declarative task-support preference may be filed', preference.ok, preference);
-  check('C-06', 'An actual question still cannot become a filed fact', !question.ok && question.why === 'question', question);
+  check('F-OPEN-05', 'A declarative task-support preference may be filed', preference.ok, preference);
+  check('F-OPEN-06', 'An actual question still cannot become a filed fact', !question.ok && question.why === 'question', question);
 }
 
 const failed = results.filter(r => !r.pass);
