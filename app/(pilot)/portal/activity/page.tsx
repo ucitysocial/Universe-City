@@ -21,6 +21,7 @@ export default async function ActivityPage() {
 
   return (
     <div className="pt-page">
+      <span id="uc-path" data-path="Activity" hidden />
       <p className="pt-kick">Founder test</p>
       <h1>Activity</h1>
       <p className="pt-lede">

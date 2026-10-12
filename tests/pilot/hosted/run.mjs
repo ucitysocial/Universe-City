@@ -101,6 +101,8 @@ function pathOf(step) {
   if (step.say) q.set('say', step.say);
   if (step.rk) q.set('rk', step.rk);
   if (step.file) q.set('file', '1');
+  if (step.press) q.set('press', step.press);
+  if (step.again) q.set('again', step.again);
   return `selftest?${q.toString()}`;
 }
 

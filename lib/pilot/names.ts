@@ -21,6 +21,8 @@ export const ACTION_NAME: Record<string, string> = {
   open_follow_up: 'Open a follow up',
   change_follow_up: 'Change a follow up',
   close_follow_up: 'Close a follow up',
+  open_work: 'Keep ongoing work',
+  close_work: 'Close ongoing work',
   screen_decision: 'Your press on the screen',
   desk_decision: 'A decision by a person'
 };

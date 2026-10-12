@@ -1,20 +1,31 @@
+import type { Viewport } from 'next';
 import { notFound, redirect } from 'next/navigation';
-import PilotNav from '@/components/PilotNav';
+import PilotGuide from '@/components/PilotGuide';
+import PilotRail from '@/components/PilotRail';
+import PilotViewport from '@/components/PilotViewport';
 import { who } from '@/lib/pilot/auth';
+import { loadIndex } from '@/lib/pilot/browse';
+import { withResident } from '@/lib/pilot/db';
 import './pilot.css';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Founder test', robots: { index: false, follow: false } };
+// On a phone the page is resized when the keyboard opens, where the browser supports it, and the page may use the
+// space beside a notch.
+export const viewport: Viewport = { width: 'device-width', initialScale: 1, viewportFit: 'cover', interactiveWidget: 'resizes-content' };
 
 /**
  * The founder test has its own layout. It checks the login and the test list itself,
  * so the Resident Portal layout and its residency rule are unchanged.
+ *
+ * The frame is fixed, as docs/product/RESIDENT_INTERFACE.md states it: the File at the left,
+ * one working pane in the center, and the guide at the right.
  */
 export default async function PilotLayout({ children }: { children: React.ReactNode }) {
   const w = await who();
   if (!w.ok) {
     if (w.why === 'off') notFound();
-    if (w.why === 'logged_out') redirect('/login?next=/portal/conversation');
+    if (w.why === 'logged_out') redirect('/login?next=/portal/home');
     return (
       <div className="simple-auth-page">
         <div className="wrap">
@@ -33,10 +44,13 @@ export default async function PilotLayout({ children }: { children: React.ReactN
       </div>
     );
   }
+  const index = await withResident({ userId: w.userId, actor: 'resident' }, q => loadIndex(q, w.access.timezone));
   return (
-    <div className="pt-shell">
-      <PilotNav name={w.access.display_name} synthetic={w.access.synthetic} />
-      <main className="pt-main">{children}</main>
+    <div className="os">
+      <PilotViewport />
+      <PilotRail index={index} name={w.access.display_name} synthetic={w.access.synthetic} />
+      <main className="os-main">{children}</main>
+      <PilotGuide />
     </div>
   );
 }

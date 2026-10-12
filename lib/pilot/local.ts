@@ -24,6 +24,12 @@ export function ensureLocal(): Promise<void> {
     await mem.db.exec('set role uc_pilot_server');
     useDriver(mem.driver);
     if (!process.env.ANTHROPIC_API_KEY) useModel(standIn);
+    // A made up conversation, so each screen has entries to show. Local work only.
+    if (process.env.PILOT_LOCAL_SEED === '1') {
+      const { seedLocal } = await import('./local-seed');
+      await seedLocal(LOCAL_USER);
+      if (!process.env.ANTHROPIC_API_KEY) useModel(standIn);
+    }
   })());
 }
 

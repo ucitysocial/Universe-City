@@ -3,10 +3,23 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-/** Two buttons for one waiting item. The server files the decision. The screen shows what the server answered. */
+/** Asks the guide for its next reply after a press, then tells the conversation on screen to load it. */
+export async function goOnAfterPress(next: string | null) {
+  if (next) {
+    try {
+      await fetch('/api/pilot/continue', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ after: next }) });
+    } catch { /* the decision is on file. The guide goes on when the resident writes again. */ }
+  }
+  window.dispatchEvent(new Event('uc:thread'));
+}
+
+/**
+ * Two buttons for one waiting item. The server files the decision. The screen shows what the server answered.
+ * The same item can be answered in the conversation. Whichever comes first is the decision, and the other changes nothing.
+ */
 export default function PilotDecide({
-  id, kind, desk = false, onDone
-}: { id: string; kind: string; desk?: boolean; onDone?: () => void }) {
+  id, kind, desk = false, onDecided
+}: { id: string; kind: string; desk?: boolean; onDecided?: (next: string | null) => void }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [said, setSaid] = useState<string | null>(null);
@@ -21,7 +34,15 @@ export default function PilotDecide({
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) setErr(data.error || 'The decision was not filed. Nothing changed. Press the button again.');
-      else { setSaid(data.detail || 'The decision is on file.'); onDone?.(); router.refresh(); }
+      else {
+        setSaid(data.detail || 'The decision is on file.');
+        if (onDecided) onDecided(data.next ?? null);
+        else {
+          window.dispatchEvent(new Event('uc:thread'));
+          void goOnAfterPress(data.next ?? null).then(() => router.refresh());
+        }
+        router.refresh();
+      }
     } catch {
       setErr('The decision was not filed, because the server did not answer. Nothing changed. Press the button again.');
     }

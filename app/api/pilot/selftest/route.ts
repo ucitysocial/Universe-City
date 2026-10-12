@@ -4,7 +4,8 @@ import { loadAccess, loadFile } from '@/lib/pilot/file';
 import { operatorOk } from '@/lib/pilot/operator';
 import { saySpan, sayDays } from '@/lib/pilot/time';
 import { sayCommitment } from '@/lib/pilot/tools';
-import { receive } from '@/lib/pilot/turn';
+import { press } from '@/lib/pilot/press';
+import { continueAfterPress, receive } from '@/lib/pilot/turn';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -33,6 +34,27 @@ export async function GET(req: Request) {
     }
     const say = (url.searchParams.get('say') || '').trim();
     const out: Record<string, unknown> = { ...extra };
+    // A press on the oldest item that waits for the made up resident, as the button on the screen does it,
+    // followed by the guide's next reply.
+    const pressed = url.searchParams.get('press');
+    if (pressed === 'confirm' || pressed === 'decline') {
+      const waiting = await withResident({ userId, actor: 'resident' }, q => q<any>(
+        `select id, summary from uc_pilot.pending where state = 'open' and decider = 'resident' order by created_at limit 1`));
+      // again=last presses the item that was decided most recently, to check that a second answer changes nothing.
+      const again = url.searchParams.get('again');
+      const last = again === 'last' ? await withResident({ userId, actor: 'resident' }, q => q<any>(
+        `select id from uc_pilot.pending where decider = 'resident' and state <> 'open' order by decided_at desc limit 1`)) : [];
+      const id = again === 'last' ? last[0]?.id : again && isUuid(again) ? again : waiting[0]?.id;
+      if (!id) out.press = 'No item waits for this resident.';
+      else {
+        const r = await press(userId, access, id, pressed);
+        const t0 = Date.now();
+        const go = r.outcome === 'unchanged' ? { state: 'skipped', reply: null } : await continueAfterPress(userId, id);
+        out.pressed_item = id;
+        out.press = { outcome: r.outcome, shown: r.brief ?? null, detail: r.detail };
+        out.guide_went_on = { state: go.state, ms: Date.now() - t0, said: go.reply?.body ?? null };
+      }
+    }
     if (say) {
       const key = url.searchParams.get('rk');
       const t0 = Date.now();
@@ -42,6 +64,7 @@ export async function GET(req: Request) {
       out.resident_said = r.message?.body ?? null;
       out.guide_replied = r.reply?.body ?? null;
       if (r.note) out.note = r.note;
+      out.shown_under_the_reply = r.effects.filter(e => e.outcome !== 'refused').map(e => e.brief);
       out.what_the_server_did = r.effects.map(e => `${e.outcome.toUpperCase()} [${e.tool}] ${e.detail}`);
       if (r.message) {
         const use = await withResident({ userId, actor: 'resident' }, q => q<any>(
@@ -50,7 +73,7 @@ export async function GET(req: Request) {
              from uc_pilot.turns t where t.message_id = $1`, [r.message!.id]));
         out.turn = use[0] ?? null;
       }
-    } else {
+    } else if (!pressed) {
       out.ok = true;
     }
     if (url.searchParams.get('file') === '1') {
@@ -64,6 +87,8 @@ export async function GET(req: Request) {
         waiting_for_resident: v.waitingResident.map(p => p.summary),
         proposals_for_agent: v.waitingAgent.map(p => p.summary),
         follow_ups: v.followUps.map(f => `${f.owner}/${f.kind}: ${f.what}`),
+        ongoing_work: v.work.map(x => `${x.folder}: ${x.label}. Words: "${x.said}"`),
+        decided_in_the_last_day: v.decided.map(d => `${d.state} by ${d.decided_via}: ${d.entry || d.summary}`),
         not_established: v.notEstablished
       };
     }

@@ -18,6 +18,7 @@ export default async function ConversationPage() {
       initial={{
         messages: t.messages as any,
         more: t.more,
+        presses: t.presses,
         waiting: view.waitingResident.map(p => ({ id: p.id, kind: p.kind, summary: p.summary })),
         noticeSeen: !!w.access.notice_seen_at,
         ownAccount: modelRoute() === 'own account'
