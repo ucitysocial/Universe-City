@@ -64,6 +64,20 @@ async function link(step) {
   }
 }
 
+// A step { site: '/path', host: 'www' | 'apex' } asks the public site as a visitor with no login and follows no redirect.
+async function site(step) {
+  const t0 = Date.now();
+  const host = step.host === 'www' ? 'https://www.ucitysocial.com' : 'https://ucitysocial.com';
+  try {
+    const res = await fetch(`${host}${step.site}`, { redirect: 'manual' });
+    const text = await res.text();
+    let body; try { body = JSON.parse(text); } catch { body = text.replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>|<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 160); }
+    return { status: res.status, ms: Date.now() - t0, body: { asked: `${host}${step.site}`, goes_to: res.headers.get('location'), server: res.headers.get('server'), cache: res.headers.get('cache-control'), body } };
+  } catch (e) {
+    return { status: 0, ms: Date.now() - t0, body: String(e?.message || e) };
+  }
+}
+
 let input;
 try { input = JSON.parse(process.env.STEPS || 'null'); } catch { input = null; }
 const mem = !!(input && !Array.isArray(input) && input.mem);
@@ -97,7 +111,7 @@ for (let attempt = 0; attempt < 4; attempt++) {
   let instance = null;
   let moved = false;
   for (const step of steps) {
-    const r = step && typeof step === 'object' && step.link ? await link(step) : step && typeof step === 'object' && step.open ? await open(step) : await get(pathOf(step));
+    const r = step && typeof step === 'object' && step.site ? await site(step) : step && typeof step === 'object' && step.link ? await link(step) : step && typeof step === 'object' && step.open ? await open(step) : await get(pathOf(step));
     const here = r.body?.mem_instance ?? null;
     if (mem && here) {
       if (instance && here !== instance) { moved = true; break; }
