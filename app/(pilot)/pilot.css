@@ -728,3 +728,20 @@ button.dash-more{background:none;border:0;padding:0;cursor:pointer;font:inherit;
 .pt-search .os-search .os-search-field input{border-width:2px;padding-left:38px}
 .os-search-field input:focus{outline:2px solid var(--II);outline-offset:1px}
 @media (min-width:1280px){.os-side{padding-top:9px}.os-side .win-bar{height:34px;box-sizing:border-box;display:flex;align-items:center;padding-top:0;padding-bottom:0}.side-fold{top:13px}}
+
+/* ---------------------------------------------------------------- one dark bar across the top of the frame */
+/* The name at the left, the place and the time in the center, and Overview at the right sit in one bar. */
+@media (min-width:1280px){
+  .os-side{padding:0;display:flex;flex-direction:column;overflow:hidden}
+  .side-head{flex:none;height:54px;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:0 14px 0 18px;background:var(--ink);color:var(--paper)}
+  .side-title{font-family:'VT323',monospace;font-size:22px;letter-spacing:.06em;line-height:1}
+  .side-body{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding:14px 16px 24px 18px}
+  .side-head .side-fold{position:static;margin-left:auto;border-color:rgba(244,239,233,.5)}
+  .uc-side-off .os-side{padding:0}
+  .uc-side-off .side-head{padding:0;justify-content:center}
+  .uc-side-off .side-title,.uc-side-off .side-body{display:none}
+  .uc-side-off .side-strip{height:auto;padding:0;width:auto}
+  .uc-side-off .side-strip svg path{stroke:var(--paper)}
+  .uc-side-off .side-strip i{top:-6px;right:-10px}
+  .os-side{border-left:3px solid var(--ink)}
+}
