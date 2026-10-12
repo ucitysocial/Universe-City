@@ -14,7 +14,7 @@ import { addDays, sayDate, sayDay, weekdayName, weekdayOf } from '@/lib/pilot/ti
 export type CalView = 'day' | 'week' | 'month';
 
 const WORD: Record<string, string> = {
-  planned: 'Planned', executed: 'Executed', partly: 'Partly executed', missed: 'Did not happen', weekly: 'From the weekly schedule'
+  planned: 'Planned', executed: 'Executed', partly: 'Partly executed', missed: 'Did not happen', weekly: 'From your routines'
 };
 
 export const weekHref = (on: string) => `${SCHEDULE_PATH}?view=week&on=${on}`;
@@ -62,7 +62,7 @@ export function Legend({ month = false }: { month?: boolean }) {
         Department
       </span>
       <span><i className="cal-key d-I executed" />Executed</span>
-      <span><i className="cal-key d-I weekly" />Weekly routine</span>
+      <span><i className="cal-key d-I weekly" />Routine</span>
       {!month && <span><i className="cal-key d-I open" />End unknown</span>}
     </p>
   );

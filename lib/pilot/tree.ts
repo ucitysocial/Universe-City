@@ -48,7 +48,7 @@ export function treeRows(ix: FileIndex, path: string): TreeRow[] {
       if (f.name === 'Time') {
         // Time holds four files. The days are inside Schedule, so the tree stays short.
         add({ href: `${fp}/schedule`, label: 'Schedule', depth: 3, icon: 'day', color: dept.color, count: ix.time.days.reduce((n, d) => n + d.count, 0) });
-        add({ href: `${fp}/weekly`, label: 'Weekly routine', depth: 3, icon: 'clock', color: dept.color, count: ix.time.weekly });
+        add({ href: `${fp}/weekly`, label: 'Routines', depth: 3, icon: 'clock', color: dept.color, count: ix.time.weekly });
       }
       if (here.waiting || f.name === 'Time') add({ href: `${fp}/waiting`, label: 'Pending', depth: 3, icon: 'wait', color: dept.color, count: here.waiting });
     }

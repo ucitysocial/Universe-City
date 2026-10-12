@@ -41,7 +41,7 @@ type Ctx = { q: Q; zone: string; ix: FileIndex; decides: boolean; view: CalView;
 
 const BASIS: Record<string, string> = {
   resident_statement: 'You said it', resident_confirmation: 'You confirmed it',
-  agent_decision: 'A person decided it', schedule: 'From the weekly schedule'
+  agent_decision: 'A person decided it', schedule: 'From your routines'
 };
 const count = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
 const Unknown = () => <span className="none">unknown</span>;
@@ -378,7 +378,7 @@ async function folderPane(ctx: Ctx, folder: Folder | null, base: string, color?:
       <h2 className="fb-h">Files</h2>
       <Tiles items={[
         node('schedule', 'Schedule', 'day', days, 'entry', 'entries'),
-        node('weekly', 'Weekly routine', 'clock', ix.time.weekly, 'item that repeats', 'items that repeat'),
+        node('weekly', 'Routines', 'clock', ix.time.weekly, 'item that repeats', 'items that repeat'),
         node('waiting', 'Pending', 'wait', here.waiting, 'entry', 'entries', true)
       ]} />
     </>
@@ -722,7 +722,7 @@ async function historyPane({ q, zone }: Ctx, base: string) {
 // ------------------------------------------------------------------ the page
 
 const NODES: Record<string, string> = {
-  weekly: 'Weekly routine', said: 'What\'s known', waiting: 'Pending', work: 'Ongoing work', schedule: 'Schedule',
+  weekly: 'Routines', said: 'What\'s known', waiting: 'Pending', work: 'Ongoing work', schedule: 'Schedule',
   'follow-ups': 'Follow ups', unknown: 'Still unknown', history: 'History'
 };
 

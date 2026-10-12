@@ -13,7 +13,7 @@ const say = (date: string) => {
   return `${WEEKDAY[d.getUTCDay()]}, ${MONTH[d.getUTCMonth()]} ${d.getUTCDate()}`;
 };
 
-const WORD: Record<string, string> = { planned: 'Planned', executed: 'Executed', partly: 'Partly executed', missed: 'Did not happen', weekly: 'Weekly routine' };
+const WORD: Record<string, string> = { planned: 'Planned', executed: 'Executed', partly: 'Partly executed', missed: 'Did not happen', weekly: 'Routine' };
 
 /**
  * The schedule in the overview at the right: one day at a time, in order of time. The arrows step through today and
