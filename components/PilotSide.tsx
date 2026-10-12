@@ -1,4 +1,5 @@
 import PilotBoard from '@/components/PilotBoard';
+import PilotAttention from '@/components/PilotAttention';
 import PilotSideResize from '@/components/PilotSideResize';
 import PilotSideToggle from '@/components/PilotSideToggle';
 import type { Board } from '@/lib/pilot/board';
@@ -17,7 +18,8 @@ export default function PilotSide({ board }: { board: Board }) {
         <span className="side-title">Overview</span>
         <PilotSideToggle waiting={board.panel.pending.length} />
       </div>
-      <div className="side-body"><PilotBoard board={board} /></div>
+      <PilotAttention panel={board.panel} />
+      <div className="side-body"><PilotBoard board={board} hidePending /></div>
     </aside>
   );
 }
