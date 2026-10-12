@@ -9,7 +9,7 @@ import type { PanelView } from '@/lib/pilot/browse';
  * The full forms and approval actions open in a local panel, never below a long calendar.
  * Small-screen Overview uses the same PilotPending list before the calendar.
  */
-export default function PilotAttention({ panel }: { panel: PanelView }) {
+export default function PilotAttention({ panel, inline = false }: { panel: PanelView; inline?: boolean }) {
   const [open, setOpen] = useState(false);
   const id = useId();
   const count = panel.pending.length;
@@ -19,7 +19,7 @@ export default function PilotAttention({ panel }: { panel: PanelView }) {
   const preview = first.type === 'ask' ? first.question : first.summary;
 
   return (
-    <section className="side-attention" aria-label="Waiting for you">
+    <section className={inline ? 'side-attention inline' : 'side-attention'} aria-label="Waiting for you">
       <button type="button" className="side-alert" aria-controls={id} aria-expanded={open}
         onClick={() => setOpen(v => !v)}>
         <span className="side-alert-icon" aria-hidden="true">
