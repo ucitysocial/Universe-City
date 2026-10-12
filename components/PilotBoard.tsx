@@ -4,6 +4,7 @@ import PilotBoardDay from '@/components/PilotBoardDay';
 import PilotBoardTabs from '@/components/PilotBoardTabs';
 import { Countdown } from '@/components/PilotPanelBits';
 import PilotPending from '@/components/PilotPending';
+import PilotAttention from '@/components/PilotAttention';
 import { popData } from '@/app/(pilot)/portal/file/[[...path]]/calendar';
 import { spanWords } from '@/lib/pilot/browse';
 import type { Board } from '@/lib/pilot/board';
@@ -88,13 +89,8 @@ export default function PilotBoard({ board, wide = false, hidePending = false }:
       )}
       <PilotBoardTabs calendar={
         <>
+          {waiting > 0 && <PilotAttention panel={panel} inline />}
           {wide ? calendar : <PilotBoardDay days={days} today={today} />}
-          {waiting > 0 && (
-            <section className="dash-sec dash-schedule-pending" aria-label="Pending for you">
-              <div className="dash-h"><h2>Pending</h2><span className="dash-count">{waiting}</span></div>
-              <div className="dash-pending"><PilotPending panel={panel} /></div>
-            </section>
-          )}
         </>
       } depts={depts} filled={folders} />
     </div>
