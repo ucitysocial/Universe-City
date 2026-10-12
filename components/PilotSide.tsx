@@ -8,7 +8,7 @@ import { briefOf } from '@/lib/pilot/turn';
 
 /**
  * The small window at the right of the frame. It stays in place on every screen and shows what the File holds
- * right now: the work that is open, what waits for an answer, what was filed lately, and what comes next.
+ * right now: what is pending, what was filed lately, and what comes next.
  * Each line is read from the File. The window keeps no entry of its own.
  */
 export default function PilotSide({ side, hrefs }: { side: SideView; hrefs: Record<string, string> }) {
@@ -18,18 +18,8 @@ export default function PilotSide({ side, hrefs }: { side: SideView; hrefs: Reco
         <div className="win-bar">Now on file</div>
         <div className="win-body">
           <section>
-            <h2>Ongoing work</h2>
-            {side.work.length === 0 && <p className="win-none">No work is open.</p>}
-            {side.work.map(w => <Link key={w.id} href={w.href} className="win-line"><span className="fi i-work" /><b>{w.label}</b><em>open</em></Link>)}
-            {side.work.length > 0 && side.unknown.length > 0 && (
-              <ul className="win-gaps">
-                {side.unknown.map((u, i) => <li key={i}>{u} <span className="none">unknown</span></li>)}
-              </ul>
-            )}
-          </section>
-          <section>
-            <h2>Waiting for your answer</h2>
-            {side.waiting.length === 0 && <p className="win-none">No entry waits.</p>}
+            <h2>Pending</h2>
+            {side.waiting.length === 0 && <p className="win-none">Nothing is pending.</p>}
             {side.waiting.map(p => (
               <div key={p.id} className="win-wait">
                 <p>{p.summary}</p>

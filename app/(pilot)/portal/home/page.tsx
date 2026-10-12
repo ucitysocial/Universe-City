@@ -21,14 +21,13 @@ export default async function HomePage() {
   if (!w.ok) redirect('/login?next=/portal/home');
   const zone = w.access.timezone;
   const now = localNow(zone);
-  const { ix, waiting, next, work } = await withResident({ userId: w.userId, actor: 'resident' }, async q => ({
+  const { ix, waiting, next } = await withResident({ userId: w.userId, actor: 'resident' }, async q => ({
     ix: await loadIndex(q, zone),
     waiting: (await loadWaiting(q)).filter(p => p.decider === 'resident'),
     next: await q<{ id: string; label: string; on_date: string; start_min: number | null; end_min: number | null; folder: string | null }>(
       `select id, label, on_date::text as on_date, start_min, end_min, folder from uc_pilot.commitments
         where withdrawn_at is null and execution = 'planned' and on_date >= $1::date
-        order by on_date, start_min nulls last limit 4`, [now.date]),
-    work: await q<{ id: string; label: string; folder: string }>(`select id, label, folder from uc_pilot.work where state = 'open' order by created_at limit 4`)
+        order by on_date, start_min nulls last limit 4`, [now.date])
   }));
   const entries = totalEntries(ix);
   const said = ix.lastMessageAt ? `Last message ${localNow(zone, new Date(ix.lastMessageAt)).label}` : 'No message yet';
@@ -59,15 +58,15 @@ export default async function HomePage() {
         </Link>
       </div>
 
-      {/* On a wide screen the small window at the right holds these three lists. Here they show where it is absent. */}
+      {/* On a wide screen the small window at the right holds these lists. Here they show where it is absent. */}
       <div className="when-no-window">
       {waiting.length > 0 && (
         <>
-          <h2>Waiting for your answer</h2>
+          <h2>Pending</h2>
           <div className="ents">
             {waiting.map(p => (
               <Link key={p.id} href={`${folderPath(p.folder)}/waiting`} className="ent">
-                <span className="fi i-wait" /><b>{p.summary}</b><span className="pt-chip wait">Waiting for you</span>
+                <span className="fi i-wait" /><b>{p.summary}</b><span className="pt-chip wait">Pending</span>
               </Link>
             ))}
           </div>
@@ -89,19 +88,6 @@ export default async function HomePage() {
         </div>
       )}
 
-      {work.length > 0 && (
-        <>
-          <h2>Ongoing work</h2>
-          <div className="ents">
-            {work.map(x => (
-              <Link key={x.id} href={`${folderPath(x.folder)}/work/${x.id}`} className="ent">
-                <span className="fi i-work" /><b>{x.label}</b><span className="pt-chip wait">Open</span>
-                <span className="sub">The guide leads it and asks the next question in the conversation.</span>
-              </Link>
-            ))}
-          </div>
-        </>
-      )}
       </div>
     </div>
     </div>

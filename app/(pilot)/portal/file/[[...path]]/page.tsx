@@ -241,9 +241,8 @@ async function folderPane(ctx: Ctx, folder: Folder | null, base: string, color?:
 
   if (name !== 'Time') {
     const items = [
-      here.said ? node('said', 'What you said', 'said', here.said, 'statement') : null,
-      here.waiting ? node('waiting', 'Waiting', 'wait', here.waiting, 'entry', 'entries', true) : null,
-      here.work ? node('work', 'Ongoing work', 'work', here.work, 'piece of work', 'pieces of work') : null
+      here.said ? node('said', 'Statements', 'said', here.said, 'statement') : null,
+      here.waiting ? node('waiting', 'Pending', 'wait', here.waiting, 'entry', 'entries', true) : null
     ].filter((x): x is TileItem => !!x);
     return (
       <>
@@ -253,8 +252,59 @@ async function folderPane(ctx: Ctx, folder: Folder | null, base: string, color?:
     );
   }
 
+  // Time opens on a summary: what comes next, what is pending, and what is missing. Its four files sit below.
   const view = await loadFile(q, zone, { daysBack: 3, daysAhead: 10, statements: 1 });
-  // The calendar: one week by default, one month when asked. One day has its own address.
+  const pending = (await loadWaiting(q)).filter(w => w.folder === 'Time');
+  const next = await q<{ id: string; label: string; on_date: string; start_min: number | null; end_min: number | null; folder: string | null }>(
+    `select id, label, on_date::text as on_date, start_min, end_min, folder from uc_pilot.commitments
+      where withdrawn_at is null and execution = 'planned' and on_date >= $1::date order by on_date, start_min nulls last limit 5`, [ix.today]);
+  const days = ix.time.days.reduce((n, d) => n + d.count, 0);
+  return (
+    <>
+      <div className="sum">
+        <section className="sum-box">
+          <h2>Coming up</h2>
+          {next.length === 0 && <p className="sum-none">Nothing is on the schedule for today or a day ahead.</p>}
+          {next.map(c => (
+            <Link key={c.id} href={`${base}/${c.on_date}/${c.id}`} className="sum-line">
+              <span className="sw" style={{ background: belongsTo(c.folder, c.label).color }} />
+              <b>{c.label}</b>
+              <span>{dayLabel(c.on_date)}{c.on_date === ix.today ? ', today' : ''}. {spanWords(c.start_min, c.end_min)}</span>
+            </Link>
+          ))}
+        </section>
+        <section className="sum-box">
+          <h2>Pending</h2>
+          {pending.length === 0 && <p className="sum-none">Nothing is pending.</p>}
+          {pending.slice(0, 3).map(p => (
+            <div key={p.id} className="sum-wait">
+              <p>{p.summary}</p>
+              {p.decider === 'resident' && <PilotDecide id={p.id} kind={p.kind} />}
+            </div>
+          ))}
+          {pending.length > 3 && <Link href={`${base}/waiting`} className="sum-more">{pending.length - 3} more pending</Link>}
+        </section>
+        <section className="sum-box">
+          <h2>Missing details</h2>
+          {view.notEstablished.length === 0 && <p className="sum-none">No detail is missing.</p>}
+          {view.notEstablished.slice(0, 4).map((u, i) => <p key={i} className="sum-gap">{u}</p>)}
+          {view.notEstablished.length > 4 && <p className="sum-none">{view.notEstablished.length - 4} more. The guide asks about them in the conversation.</p>}
+        </section>
+      </div>
+      <h2 className="fb-h">Files</h2>
+      <Tiles items={[
+        node('schedule', 'Schedule', 'day', days, 'entry', 'entries'),
+        node('weekly', 'Weekly routine', 'clock', ix.time.weekly, 'item that repeats', 'items that repeat'),
+        node('said', 'Statements', 'said', here.said, 'statement'),
+        node('waiting', 'Pending', 'wait', here.waiting, 'entry', 'entries', true)
+      ]} />
+    </>
+  );
+}
+
+/** The calendar of Time: one week by default, one month when asked. One day has its own address. */
+async function schedulePane(ctx: Ctx) {
+  const { ix, q, zone } = ctx;
   const now = localNow(zone);
   const on = ctx.on ?? now.date;
   const month = ctx.view === 'month';
@@ -267,42 +317,18 @@ async function folderPane(ctx: Ctx, folder: Folder | null, base: string, color?:
       <Legend month={month} />
       <PilotCalFocus on={`${month ? 'month' : 'week'} ${on} ${ix.lastFiledAt ?? ''}`} />
       <PilotCalPop />
-      <h2 className="fb-h">In this folder</h2>
-      <Tiles items={[
-        node('weekly', 'Weekly schedule', 'clock', ix.time.weekly, 'item that repeats', 'items that repeat'),
-        node('said', 'What you said', 'said', here.said, 'statement'),
-        node('waiting', 'Waiting', 'wait', here.waiting, 'entry', 'entries', true),
-        node('work', 'Ongoing work', 'work', here.work, 'piece of work', 'pieces of work'),
-        node('follow-ups', 'Follow ups', 'wait', ix.time.followUps, 'open follow up'),
-        node('unknown', 'Still unknown', 'page', view.notEstablished.length, 'gap'),
-        node('history', 'History', 'page', ix.time.history, 'change')
-      ]} />
     </>
   );
 }
 
 async function dayPane({ q, zone, decides, ix }: Ctx, base: string, date: string, color?: string) {
-  const { commitments, plan, waiting } = await loadDay(q, date);
+  void ix;
+  const { commitments, waiting } = await loadDay(q, date);
   const now = localNow(zone);
   const cal = await loadCalendar(q, date, date, now.date, DAY_FIT);
   return (
     <>
       <CalendarBar view="day" on={date} today={now.date} />
-      <div className="doc" style={{ maxWidth: 'none' }}>
-        <div className="doc-bar" style={fc(color)}>
-          <b>Plan for {date === ix.today ? 'today' : 'this day'}</b>
-          {plan?.state === 'confirmed' && <span className="pt-chip filed">Confirmed by you</span>}
-          {plan?.state === 'draft' && <span className="pt-chip wait">Draft</span>}
-          {!plan && <span className="pt-chip unknown">No Plan yet</span>}
-        </div>
-        {plan?.realism && <div className="words"><p className="flab">How realistic it felt, in your words</p><p className="fq">{plan.realism}</p></div>}
-        {plan?.confirmed_at && (
-          <dl className="fields" style={{ borderTop: plan.realism ? '1px solid var(--rule)' : undefined }}>
-            <dt>Plan confirmed</dt>
-            <dd>{localNow(zone, new Date(plan.confirmed_at)).label}{plan.confirmed_via === 'screen' ? ', with the button on the screen' : plan.confirmed_via === 'conversation' ? ', in the conversation' : ''}</dd>
-          </dl>
-        )}
-      </div>
       <WaitingList list={waiting} zone={zone} decides={decides} />
       <HourGrid cal={cal} today={now.date} nowMin={now.minutes} single />
       <Legend />
@@ -619,7 +645,7 @@ async function historyPane({ q, zone }: Ctx, base: string) {
 // ------------------------------------------------------------------ the page
 
 const NODES: Record<string, string> = {
-  weekly: 'Weekly schedule', said: 'What you said', waiting: 'Waiting', work: 'Ongoing work',
+  weekly: 'Weekly routine', said: 'Statements', waiting: 'Pending', work: 'Ongoing work', schedule: 'Schedule',
   'follow-ups': 'Follow ups', unknown: 'Still unknown', history: 'History'
 };
 
@@ -658,8 +684,13 @@ export default async function FilePage({ params, searchParams }: { params: { pat
     if (rest.length > 2) return null;
 
     const [node, id] = rest;
-    // A day in Time.
+    // The calendar, and one day in it.
+    if (name === 'Time' && node === 'schedule' && !id) {
+      crumbs.push({ label: 'Schedule', href: `${base}/schedule` });
+      return { ix, crumbs, color, body: await schedulePane(ctx) };
+    }
     if (name === 'Time' && isDate(node)) {
+      crumbs.push({ label: 'Schedule', href: `${base}/schedule` });
       crumbs.push({ label: dayLabel(node), href: `${base}/${node}` });
       if (!id) return { ix, crumbs, color, body: await dayPane(ctx, base, node, color) };
       const c = isUuid(id) ? await commitmentPane(ctx, base, id, color) : null;

@@ -25,6 +25,8 @@ export function folderPath(folderName: string): string {
 }
 
 export const TIME_PATH = folderPath('Time');
+/** The calendar of Time. One day keeps its own address under Time. */
+export const SCHEDULE_PATH = `${TIME_PATH}/schedule`;
 
 type Target = { target: string | null; target_id: string | null };
 

@@ -70,7 +70,7 @@ export async function loadIndex(q: Q, zone: string): Promise<FileIndex> {
 export function entriesIn(ix: FileIndex, folder: string): number {
   const f = ix.folders[folder] || { said: 0, waiting: 0, work: 0 };
   const time = folder === 'Time' ? ix.time.weekly + ix.time.days.reduce((n, d) => n + d.count, 0) : 0;
-  return f.said + f.work + time;
+  return f.said + time;
 }
 export const waitingIn = (ix: FileIndex, folder: string) => (ix.folders[folder]?.waiting ?? 0);
 

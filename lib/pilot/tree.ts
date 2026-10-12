@@ -18,7 +18,7 @@ export const dayLabel = (date: string) => `${MONTHS[Number(date.slice(5, 7)) - 1
 
 const count = (ix: FileIndex, folder: string) => {
   const f = ix.folders[folder] || { said: 0, waiting: 0, work: 0 };
-  return f.said + f.work + (folder === 'Time' ? ix.time.weekly + ix.time.days.reduce((n, d) => n + d.count, 0) : 0);
+  return f.said + (folder === 'Time' ? ix.time.weekly + ix.time.days.reduce((n, d) => n + d.count, 0) : 0);
 };
 
 export function totalEntries(ix: FileIndex): number {
@@ -43,24 +43,17 @@ export function treeRows(ix: FileIndex, path: string): TreeRow[] {
       add({ href: fp, label: f.name, num: String(f.num).padStart(2, '0'), depth: 2, icon: n ? 'folder' : 'folder empty', color: dept.color, count: n });
       if (!inside(fp)) continue;
       if (f.name === 'Time') {
-        // The days near today, and the day on screen. The folder itself lists every day.
-        const near = ix.time.days.filter(d => (d.count > 0 || d.plan) && (d.date >= ix.today || inside(`${fp}/${d.date}`))).slice(0, 14);
-        for (const d of near) add({ href: `${fp}/${d.date}`, label: dayLabel(d.date), depth: 3, icon: 'day', color: dept.color, count: d.count });
-        add({ href: `${fp}/weekly`, label: 'Weekly schedule', depth: 3, icon: 'clock', color: dept.color, count: ix.time.weekly });
+        // Time holds four files. The days are inside Schedule, so the tree stays short.
+        add({ href: `${fp}/schedule`, label: 'Schedule', depth: 3, icon: 'day', color: dept.color, count: ix.time.days.reduce((n, d) => n + d.count, 0) });
+        add({ href: `${fp}/weekly`, label: 'Weekly routine', depth: 3, icon: 'clock', color: dept.color, count: ix.time.weekly });
       }
-      if (here.said || f.name === 'Time') add({ href: `${fp}/said`, label: 'What you said', depth: 3, icon: 'said', color: dept.color, count: here.said });
-      if (here.waiting) add({ href: `${fp}/waiting`, label: 'Waiting', depth: 3, icon: 'wait', color: dept.color, count: here.waiting });
-      if (here.work) add({ href: `${fp}/work`, label: 'Ongoing work', depth: 3, icon: 'work', color: dept.color, count: here.work });
-      if (f.name === 'Time') {
-        if (ix.time.followUps) add({ href: `${fp}/follow-ups`, label: 'Follow ups', depth: 3, icon: 'wait', color: dept.color, count: ix.time.followUps });
-        add({ href: `${fp}/unknown`, label: 'Still unknown', depth: 3, icon: 'page', color: dept.color });
-        if (ix.time.history) add({ href: `${fp}/history`, label: 'History', depth: 3, icon: 'page', color: dept.color, count: ix.time.history });
-      }
+      if (here.said || f.name === 'Time') add({ href: `${fp}/said`, label: 'Statements', depth: 3, icon: 'said', color: dept.color, count: here.said });
+      if (here.waiting || f.name === 'Time') add({ href: `${fp}/waiting`, label: 'Pending', depth: 3, icon: 'wait', color: dept.color, count: here.waiting });
     }
   }
   const general = ix.folders.General;
-  if (general && (general.said || general.work || general.waiting)) {
-    add({ href: `${FILE_ROOT}/general`, label: 'General', depth: 1, icon: 'folder', count: general.said + general.work });
+  if (general && (general.said || general.waiting)) {
+    add({ href: `${FILE_ROOT}/general`, label: 'General', depth: 1, icon: 'folder', count: general.said });
   }
   return rows;
 }

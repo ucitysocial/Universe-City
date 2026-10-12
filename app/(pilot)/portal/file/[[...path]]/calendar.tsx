@@ -2,7 +2,7 @@ import type { CSSProperties } from 'react';
 import Link from 'next/link';
 import { DEPARTMENTS } from '@/lib/domain/folders';
 import { addMonths, hourShort, KIND_WORD, monthEnd, monthStart, weekStart, type CalDay, type Calendar, type CalItem, type Placed } from '@/lib/pilot/calendar';
-import { TIME_PATH } from '@/lib/pilot/paths';
+import { SCHEDULE_PATH, TIME_PATH } from '@/lib/pilot/paths';
 import { addDays, sayDate, sayDay, weekdayName, weekdayOf } from '@/lib/pilot/time';
 
 // The calendar in Time. Three views of the same entries: one day, one week, one month.
@@ -16,8 +16,8 @@ const WORD: Record<string, string> = {
   planned: 'Planned', executed: 'Executed', partly: 'Partly executed', missed: 'Did not happen', weekly: 'From the weekly schedule'
 };
 
-export const weekHref = (on: string) => `${TIME_PATH}?view=week&on=${on}`;
-export const monthHref = (on: string) => `${TIME_PATH}?view=month&on=${on}`;
+export const weekHref = (on: string) => `${SCHEDULE_PATH}?view=week&on=${on}`;
+export const monthHref = (on: string) => `${SCHEDULE_PATH}?view=month&on=${on}`;
 export const dayHref = (on: string) => `${TIME_PATH}/${on}`;
 
 /** October 11 to 17, 2026 */
@@ -125,8 +125,6 @@ export function HourGrid({ cal, today, nowMin, single = false }: { cal: Calendar
           <Link key={d.date} href={dayHref(d.date)} className={d.date === today ? 'cal-head today' : 'cal-head'}>
             <span>{weekdayName(weekdayOf(d.date)).slice(0, 3)}</span>
             <b>{Number(d.date.slice(8, 10))}</b>
-            {d.plan === 'confirmed' && <i title="Plan confirmed by you">Plan</i>}
-            {d.plan === 'draft' && <i className="draft" title="Plan is a draft">Draft</i>}
           </Link>
         ))}
         {anyUntimed && <div className="cal-side" title="Entries with no time on file">No time</div>}
@@ -162,8 +160,6 @@ export function MonthGrid({ cal, on, today }: { cal: Calendar; on: string; today
           <Link key={d.date} href={dayHref(d.date)} className={cls} title={`${sayDate(d.date)}. ${all.length} ${all.length === 1 ? 'entry' : 'entries'}.`}>
             <span className="mon-num">
               <b>{Number(d.date.slice(8, 10))}</b>
-              {d.plan === 'confirmed' && <i>Plan</i>}
-              {d.plan === 'draft' && <i className="draft">Draft</i>}
             </span>
             {d.timed.length > 0 && (
               <span className="mon-strip" aria-hidden="true">

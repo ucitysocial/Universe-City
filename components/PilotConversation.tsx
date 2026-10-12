@@ -25,7 +25,8 @@ const TONE: Record<string, string> = {
 function parts(brief: string): { word: string; tone: string; line: string } {
   const i = brief.indexOf(': ');
   const word = i > 0 ? brief.slice(0, i) : '';
-  return TONE[word] ? { word, tone: TONE[word], line: brief.slice(i + 2) } : { word: 'Done', tone: 'unknown', line: brief };
+  // The server's word for an item that waits for the resident is shown as Pending.
+  return TONE[word] ? { word: word === 'Waiting for you' ? 'Pending' : word, tone: TONE[word], line: brief.slice(i + 2) } : { word: 'Done', tone: 'unknown', line: brief };
 }
 
 const dayOf = (iso: string) => new Date(iso).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
@@ -335,8 +336,8 @@ export default function PilotConversation({ initial }: { initial: Thread }) {
       </div>
 
       {thread.waiting.length > 0 && (
-        <section className="pt-wait" aria-label="Waiting for your answer">
-          <h2>Waiting for your answer</h2>
+        <section className="pt-wait" aria-label="Pending">
+          <h2>Pending</h2>
           {thread.waiting.map(w => (
             <div className="pt-wait-item" key={w.id}>
               <p>{w.summary}</p>
