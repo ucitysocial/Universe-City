@@ -1,5 +1,8 @@
 import type { CSSProperties, ReactNode } from 'react';
 import Link from 'next/link';
+import PilotGhost from '@/components/PilotGhost';
+import { ghostsOf, withGhosts } from '@/lib/pilot/ghosts';
+import { loadIntake } from '@/lib/pilot/intake';
 import { notFound, redirect } from 'next/navigation';
 import PilotAsk from '@/components/PilotAsk';
 import PilotBoard from '@/components/PilotBoard';
@@ -407,15 +410,19 @@ async function dayPane({ q, zone, decides, ix }: Ctx, base: string, date: string
   void ix;
   const { commitments, waiting } = await loadDay(q, date);
   const now = localNow(zone);
+  // The pieces Time still needs show as faded rows on today and the days ahead.
+  const ghosts = date >= now.date ? ghostsOf(await loadIntake(q, now.date)) : [];
   return (
     <>
       <CalendarBar view="day" on={date} today={now.date} />
       <WaitingList list={waiting} zone={zone} decides={decides} />
       <div className="day-extra">
-      {commitments.length === 0 && <p className="fb-empty">No commitment is on this day.</p>}
-      {commitments.length > 0 && (
+      {commitments.length === 0 && !ghosts.length && <p className="fb-empty">No commitment is on this day.</p>}
+      {(commitments.length > 0 || ghosts.length > 0) && (
         <div className="ents" style={{ maxWidth: 820 }}>
-          {commitments.map(c => {
+          {withGhosts(commitments.map(c => ({ ...c, start: c.start_min })), ghosts).map(r => {
+            if ('ghost' in r) return <PilotGhost key={`g:${r.ghost.key}`} label={r.ghost.label} ask={r.ghost.ask} />;
+            const c = r.item;
             const o = outcomeOf(c);
             return (
               <Link key={c.id} href={`${base}/${date}/${c.id}`} className={c.withdrawn_at ? 'ent off' : 'ent'} style={fc(belongsTo(c.folder, c.label).color)}>

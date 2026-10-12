@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import type { BoardDay } from '@/lib/pilot/board';
+import PilotGhost from '@/components/PilotGhost';
+import { withGhosts, type Ghost } from '@/lib/pilot/ghosts';
 import { dayHref, monthHref, popData, weekHref } from '@/app/(pilot)/portal/file/[[...path]]/calendar';
 
 const WEEKDAY = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -21,7 +23,7 @@ const WORD: Record<string, string> = { planned: 'Planned', executed: 'Executed',
  * one is marked Next. Pressing an entry opens the calendar window. Blocks are kept for the week and the month.
  * The founder set on October 12, 2026 that the overview holds the day and nothing more.
  */
-export default function PilotBoardDay({ days, today, nowId = null, live = false }: { days: BoardDay[]; today: string; nowId?: string | null; live?: boolean }) {
+export default function PilotBoardDay({ days, today, nowId = null, live = false, ghosts = [] }: { days: BoardDay[]; today: string; nowId?: string | null; live?: boolean; ghosts?: Ghost[] }) {
   const [n, setN] = useState(0);
   const d = days[n];
   if (!d) return null;
@@ -41,10 +43,12 @@ export default function PilotBoardDay({ days, today, nowId = null, live = false 
         <Link href={weekHref(d.date)}>Week</Link>
         <Link href={monthHref(d.date)}>Month</Link>
       </span>
-      {d.items.length === 0 && <p className="dash-empty">Nothing is on file for this day.</p>}
-      {d.items.length > 0 && (
+      {d.items.length === 0 && !ghosts.length && <p className="dash-empty">Nothing is on file for this day.</p>}
+      {(d.items.length > 0 || ghosts.length > 0) && (
         <div className="ents sday-list">
-          {d.items.map(i => {
+          {withGhosts(d.items, d.date >= today ? ghosts : []).map(r => {
+            if ('ghost' in r) return <PilotGhost key={`g:${r.ghost.key}`} label={r.ghost.label} ask={r.ghost.ask} />;
+            const i = r.item;
             const here = nowId !== null && i.key.split(':')[0] === nowId;
             return (
               <a key={i.key} href={i.href} className={`ent d-${i.dept}${here ? (live ? ' is-now' : ' is-next') : ''}`} {...popData(i)}>

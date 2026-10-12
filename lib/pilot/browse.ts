@@ -407,7 +407,7 @@ export async function loadPanel(q: Q, zone: string): Promise<PanelView> {
   const tomorrow = addDays(today, 1);
   const soon = await q<Entry>(
     `select id, label, on_date::text as on_date, start_min, end_min, folder, execution from uc_pilot.commitments
-      where withdrawn_at is null and on_date between $1::date and $2::date and start_min is not null
+      where withdrawn_at is null and execution = 'planned' and on_date between $1::date and $2::date and start_min is not null
       order by on_date, start_min`, [today, tomorrow]);
   let now: PanelView['now'] = null;
   let then: Entry | null = null;

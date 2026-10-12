@@ -3,11 +3,11 @@ import Link from 'next/link';
 import PilotBoardDay from '@/components/PilotBoardDay';
 import PilotBoardTabs from '@/components/PilotBoardTabs';
 import { Countdown } from '@/components/PilotPanelBits';
-import PilotIntake from '@/components/PilotIntake';
 import PilotPending from '@/components/PilotPending';
 import { popData } from '@/app/(pilot)/portal/file/[[...path]]/calendar';
 import { spanWords } from '@/lib/pilot/browse';
 import type { Board } from '@/lib/pilot/board';
+import { ghostsOf } from '@/lib/pilot/ghosts';
 import { belongsTo } from '@/lib/pilot/dept';
 import { DEPARTMENTS, FOLDERS } from '@/lib/domain/folders';
 import { folderPath, SCHEDULE_PATH, slugOf, TIME_PATH } from '@/lib/pilot/paths';
@@ -62,7 +62,7 @@ export default function PilotBoard({ board, wide = false }: { board: Board; wide
   if (!wide) {
     return (
       <div className="board side-clean">
-        <PilotBoardDay days={days} today={today} nowId={cur?.id ?? null} live={!!cur?.live} />
+        <PilotBoardDay days={days} today={today} nowId={cur?.id ?? null} live={!!cur?.live} ghosts={ghostsOf(board.intake)} />
         {waiting > 0 && (
           <div className="dash-sec side-wait">
             <div className="dash-h"><h2>Waiting for you</h2><span className="dash-count">{waiting}</span></div>
@@ -86,14 +86,7 @@ export default function PilotBoard({ board, wide = false }: { board: Board; wide
       ) : (
         <p className="dash-now none">Nothing is on file for the rest of today or tomorrow.</p>
       )}
-      {!wide && <PilotIntake intake={board.intake} short />}
       <PilotBoardTabs calendar={wide ? calendar : <PilotBoardDay days={days} today={today} />} depts={depts} filled={folders} />
-      {wide && board.intake.done < board.intake.of && (
-        <div className="dash-sec">
-          <div className="dash-h"><h2>Missing pieces</h2></div>
-          <PilotIntake intake={board.intake} />
-        </div>
-      )}
       <div className="dash-sec">
         <div className="dash-h"><h2>Pending</h2>{waiting > 0 && <span className="dash-count">{waiting}</span>}</div>
         <div className="dash-pending"><PilotPending panel={panel} /></div>

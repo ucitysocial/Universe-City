@@ -962,3 +962,11 @@ html.uc-nav::after{content:"";position:fixed;left:0;top:0;height:3px;width:100%;
 .sday-list .ent.is-now b{font-size:16px}
 .sday-list .ent .day-flag{color:var(--fc,var(--ink))}
 @media (prefers-reduced-motion:reduce){.sday-list .ent.is-now{animation:none}}
+
+/* A piece Time still needs, faded in the day where it would sit. Pressing it asks the agent for it. */
+.ent.ghost{display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 11px;align-items:center;width:100%;text-align:left;font:inherit;cursor:pointer;
+  background:transparent;border:0;border-bottom:1px solid var(--rule);border-left:5px dashed color-mix(in srgb,var(--I) 45%,transparent);color:var(--ink);opacity:.62;padding:9px 12px}
+.ent.ghost:hover,.ent.ghost:focus-visible{opacity:1;background:#fff}
+.ent.ghost b{font-weight:600;font-style:italic}
+.ent.ghost .sub{grid-column:2;font-size:12.5px}
+.ghost-plus{grid-row:span 2;width:18px;height:18px;display:grid;place-items:center;border:1.5px dashed var(--ink2);font-size:14px;line-height:1;color:var(--ink2)}
