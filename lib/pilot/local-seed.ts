@@ -100,4 +100,22 @@ export async function seedLocal(userId: string): Promise<void> {
     [call('add_commitment', { date: addDays(today, 4), label: 'Review my standards list', start: '14:00', end: '15:30', folder: 'Standards', quote: 'i will review my standards list for an hour and a half, 2 to 3:30 pm' })],
     say('On file.')
   ]);
+  // A packed day, so each view shows how a full day looks.
+  const full = addDays(today, 2);
+  const msg = 'that day: morning routine 6 to 6:45 am, commute 7 to 7:45 am, work shift 8 am to 12 pm, lunch 12:15 to 12:45 pm, pharmacy pickup 1 to 1:30 pm, laundry 2 to 3 pm, call the landlord 3:15 to 3:30 pm, cook dinner 6 to 7 pm, study 7:30 to 9 pm, night routine 10 to 10:30 pm';
+  const piece = (label: string, start: string, end: string, folder: string, quote: string) =>
+    call('add_commitment', { date: full, label, start, end, folder, quote });
+  await send(msg, [
+    [piece('Morning routine', '06:00', '06:45', 'Health', 'morning routine 6 to 6:45 am'),
+      piece('Commute', '07:00', '07:45', 'Transportation', 'commute 7 to 7:45 am'),
+      piece('Work shift', '08:00', '12:00', 'Schedule', 'work shift 8 am to 12 pm'),
+      piece('Lunch', '12:15', '12:45', 'Inventory', 'lunch 12:15 to 12:45 pm'),
+      piece('Pharmacy pickup', '13:00', '13:30', 'Health', 'pharmacy pickup 1 to 1:30 pm'),
+      piece('Laundry', '14:00', '15:00', 'Sanitation', 'laundry 2 to 3 pm'),
+      piece('Call the landlord', '15:15', '15:30', 'Communal Space', 'call the landlord 3:15 to 3:30 pm'),
+      piece('Cook dinner', '18:00', '19:00', 'Inventory', 'cook dinner 6 to 7 pm'),
+      piece('Study', '19:30', '21:00', 'Education', 'study 7:30 to 9 pm'),
+      piece('Night routine', '22:00', '22:30', 'Health', 'night routine 10 to 10:30 pm')],
+    say('All ten are on file.')
+  ]);
 }

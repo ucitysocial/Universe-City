@@ -4,6 +4,8 @@ import PilotBoard from '@/components/PilotBoard';
 import PilotCalPop from '@/components/PilotCalPop';
 import PilotStar from '@/components/PilotStar';
 import PilotTopBar from '@/components/PilotTopBar';
+import { Suspense } from 'react';
+import PilotNav from '@/components/PilotNav';
 import PilotRail from '@/components/PilotRail';
 import PilotSide from '@/components/PilotSide';
 import PilotSwitch from '@/components/PilotSwitch';
@@ -62,6 +64,7 @@ export default async function PilotLayout({ children }: { children: React.ReactN
   return (
     <div className="os">
       <PilotViewport />
+      <Suspense fallback={null}><PilotNav /></Suspense>
       <PilotRail index={index} name={w.access.display_name} synthetic={w.access.synthetic} />
       <main className="os-main"><PilotTopBar zone={w.access.timezone} waiting={board.panel.pending.length} />{children}</main>
       <PilotStar waiting={board.panel.pending.length}><PilotBoard board={board} /></PilotStar>

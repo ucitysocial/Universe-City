@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react';
 import Link from 'next/link';
+import PilotBoardDay from '@/components/PilotBoardDay';
 import PilotBoardTabs from '@/components/PilotBoardTabs';
 import { Countdown } from '@/components/PilotPanelBits';
 import PilotPending from '@/components/PilotPending';
@@ -26,7 +27,7 @@ export default function PilotBoard({ board, wide = false }: { board: Board; wide
     <div className="dash-sec">
       <div className="dash-h">
         <h2>Today and the next six days</h2>
-        <Link href={SCHEDULE_PATH} className="dash-more">Open the calendar</Link>
+        <Link href={SCHEDULE_PATH} className="dash-more">Open the schedule</Link>
       </div>
       <div className="dash-days">
         {days.map(d => (
@@ -68,7 +69,7 @@ export default function PilotBoard({ board, wide = false }: { board: Board; wide
       ) : (
         <p className="dash-now none">Nothing is on file for the rest of today or tomorrow.</p>
       )}
-      <PilotBoardTabs calendar={calendar} depts={depts} filled={folders} />
+      <PilotBoardTabs calendar={wide ? calendar : <PilotBoardDay days={days} today={today} />} depts={depts} filled={folders} />
       <div className="dash-sec">
         <div className="dash-h"><h2>Pending</h2>{waiting > 0 && <span className="dash-count">{waiting}</span>}</div>
         <div className="dash-pending"><PilotPending panel={panel} /></div>

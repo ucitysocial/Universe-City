@@ -758,3 +758,30 @@ button.dash-more{background:none;border:0;padding:0;cursor:pointer;font:inherit;
   .os:has(.fb) .topbar-star{display:none}
 }
 @media (min-width:1560px){.uc-side-off .os,.uc-side-off .os:has(.fb){grid-template-columns:280px minmax(0,1fr) 0}}
+
+/* ---------------------------------------------------------------- moving between pages */
+/* The page stays until the next one is ready. A bar in the department colors runs along the top, the page dims a
+   little, and the next page fades in. */
+html.uc-nav::after{content:"";position:fixed;left:0;top:0;height:3px;width:100%;z-index:200;pointer-events:none;
+  background:linear-gradient(90deg,var(--I) 0 25%,var(--II) 25% 50%,var(--III) 50% 75%,var(--IV) 75% 100%);background-size:200% 100%;animation:ucbar 1s linear infinite}
+@keyframes ucbar{from{background-position:0 0}to{background-position:-200% 0}}
+.uc-nav .os-main>*:not(.topbar){opacity:.55;transition:opacity .2s ease .12s}
+.os-main>*:not(.topbar){animation:ucin .22s ease-out}
+@keyframes ucin{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){html.uc-nav::after{animation:none}.os-main>*:not(.topbar){animation:none}}
+
+/* ---------------------------------------------------------------- one day in the overview */
+.day-h{align-items:center;gap:6px}
+.day-h h2{font-size:14.5px}
+.day-h h2 a{color:var(--ink);text-decoration:none}
+.day-h h2 a:hover{text-decoration:underline}
+.day-step{width:26px;height:26px;border:2px solid var(--ink);background:#fff;color:var(--ink);font-size:16px;line-height:1;cursor:pointer;padding:0;border-radius:0}
+.day-step:disabled{opacity:.3;cursor:default}
+.day-list{display:grid;border:2px solid var(--ink);background:#fff}
+.day-row{display:grid;grid-template-columns:128px minmax(0,1fr);align-items:baseline;gap:8px;padding:7px 10px 7px 0;border-bottom:1px solid var(--rule);border-left:6px solid var(--fc);color:var(--ink);text-decoration:none;cursor:pointer}
+.day-row:last-child{border-bottom:0}
+.day-row:hover{background:var(--paper)}
+.day-row.weekly{border-left-style:dashed}
+.day-row.executed .day-l{text-decoration:line-through;text-decoration-thickness:1px;color:var(--ink2)}
+.day-t{font-family:'VT323',monospace;font-size:16px;color:var(--ink2);padding-left:9px;white-space:nowrap}
+.day-l{font-size:13.5px;font-weight:600;line-height:1.3}

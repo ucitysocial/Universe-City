@@ -143,6 +143,72 @@
       });
   }
 
+  /*
+   * Moving from a public page into the Resident Portal, the Log in page, or the application loads a different part of
+   * the site. Until that page appears, a screen with five stars in the department colors covers the old page, so the
+   * move reads as one step. The Back button brings the old page back without the screen.
+   */
+  var MOVES = /^\/(portal|login|signup|apply|reset)(\/|$|\?)/;
+  var STAR = 'M12 1.6l3.1 6.6 7.2.9-5.3 5 1.4 7.1L12 17.7l-6.4 3.5 1.4-7.1-5.3-5 7.2-.9z';
+  var COLORS = ['#5C0F1B', '#A07818', '#4A2A78', '#2A4B3C', '#160c0c'];
+  var MOVE_RULES = [
+    '#uc-move{position:fixed;inset:0;z-index:2147483000;background:#f4efe9;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;opacity:0;transition:opacity .16s ease-out}',
+    '#uc-move.on{opacity:1}',
+    '#uc-move .uc-stars{display:flex;gap:10px}',
+    '#uc-move svg{width:34px;height:34px;overflow:visible}',
+    '#uc-move path{fill:transparent;stroke:#160c0c;stroke-width:1.6;stroke-linejoin:round;transform-origin:12px 12px;transform-box:view-box;animation:ucstar 2s ease-in-out infinite}',
+    '@keyframes ucstar{0%,8%{fill:transparent;transform:scale(1)}22%{fill:var(--c);transform:scale(1.18)}36%,62%{fill:var(--c);transform:scale(1)}80%,100%{fill:transparent;transform:scale(1)}}',
+    '@media (prefers-reduced-motion:reduce){#uc-move{transition:none}#uc-move path{animation:none;fill:var(--c)}}'
+  ].join('');
+
+  function cover() {
+    if (document.getElementById('uc-move')) return;
+    var style = document.createElement('style');
+    style.id = 'uc-move-rules';
+    style.appendChild(document.createTextNode(MOVE_RULES));
+    document.head.appendChild(style);
+    var box = document.createElement('div');
+    box.id = 'uc-move';
+    box.setAttribute('role', 'status');
+    box.setAttribute('aria-label', 'The next page is loading');
+    var row = document.createElement('div');
+    row.className = 'uc-stars';
+    for (var i = 0; i < COLORS.length; i++) {
+      var c = COLORS[i];
+      var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('viewBox', '0 0 24 24');
+      svg.setAttribute('aria-hidden', 'true');
+      var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', STAR);
+      path.setAttribute('style', '--c:' + c + ';animation-delay:' + (i * 0.2) + 's');
+      svg.appendChild(path);
+      row.appendChild(svg);
+    }
+    box.appendChild(row);
+    document.body.appendChild(box);
+    requestAnimationFrame(function () { box.className = 'on'; });
+  }
+
+  function uncover() {
+    var box = document.getElementById('uc-move');
+    if (box && box.parentNode) box.parentNode.removeChild(box);
+  }
+
+  document.addEventListener('click', function (event) {
+    if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    var link = event.target && event.target.closest ? event.target.closest('a[href]') : null;
+    if (!link || link.target === '_blank' || link.hasAttribute('download')) return;
+    var url;
+    try { url = new URL(link.getAttribute('href'), location.href); } catch (e) { return; }
+    if (url.origin !== location.origin || !MOVES.test(url.pathname + url.search)) return;
+    cover();
+  });
+  document.addEventListener('submit', function (event) {
+    var form = event.target;
+    if (form && form.getAttribute && form.getAttribute('action') === LOG_OUT) cover();
+  });
+  window.addEventListener('pageshow', function (event) { if (event.persisted) uncover(); });
+
   if (!window.fetch || !document.querySelectorAll) return;
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ask);

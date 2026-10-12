@@ -44,7 +44,7 @@ export default function PilotBoardTabs({ calendar, depts, filled }: { calendar: 
     <>
       <div className="dash-tabs" role="tablist" aria-label="What the overview shows">
         <button type="button" role="tab" aria-selected={on === 'calendar'} className={on === 'calendar' ? 'on' : ''}
-          style={{ '--fc': 'var(--ink)' } as CSSProperties} onClick={() => pick('calendar')}>Calendar</button>
+          style={{ '--fc': 'var(--ink)' } as CSSProperties} onClick={() => pick('calendar')}>Schedule</button>
         {depts.map(d => (
           <button key={d.key} type="button" role="tab" aria-selected={on === d.key} className={on === d.key ? 'on' : ''}
             style={{ '--fc': d.color } as CSSProperties} onClick={() => pick(d.key)} title={d.name}>{d.name}</button>
