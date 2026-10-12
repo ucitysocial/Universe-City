@@ -832,6 +832,15 @@ const shift = (await asResident(A, q => q(`select id from uc_pilot.commitments w
   check('C-04', 'The earlier end empty-string instruction still clears the end', legacy.effects[0]?.outcome === 'filed' && last?.start_min === 60 && last?.end_min === null, { last, result: legacy.effects });
 }
 
+// ================================================================= 26. a preference is not a question merely because it starts with what
+{
+  const { checkQuote } = await import('../../lib/pilot/guard');
+  const preference = checkQuote('what helps me is breaking things down', 'what helps me is breaking things down into steps');
+  const question = checkQuote('What time is it', 'What time is it?');
+  check('C-05', 'A declarative task-support preference may be filed', preference.ok, preference);
+  check('C-06', 'An actual question still cannot become a filed fact', !question.ok && question.why === 'question', question);
+}
+
 const failed = results.filter(r => !r.pass);
 console.log(`\n${results.length - failed.length} of ${results.length} passed`);
 if (failed.length) process.exit(1);
