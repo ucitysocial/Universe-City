@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactNode } from 'react';
 import Link from 'next/link';
+import PilotCheck from '@/components/PilotCheck';
 import PilotGhost from '@/components/PilotGhost';
 import { ghostsOf, withGhosts } from '@/lib/pilot/ghosts';
 import { loadIntake } from '@/lib/pilot/intake';
@@ -425,8 +426,10 @@ async function dayPane({ q, zone, decides, ix }: Ctx, base: string, date: string
             const c = r.item;
             const o = outcomeOf(c);
             return (
-              <Link key={c.id} href={`${base}/${date}/${c.id}`} className={c.withdrawn_at ? 'ent off' : 'ent'} style={fc(belongsTo(c.folder, c.label).color)}>
-                <span className="fi i-page" />
+              <Link key={c.id} href={`${base}/${date}/${c.id}`} className={[c.withdrawn_at ? 'ent off' : 'ent', c.execution === 'executed' ? 'is-done' : ''].join(' ').trim()} style={fc(belongsTo(c.folder, c.label).color)}>
+                {!c.withdrawn_at && date <= now.date && (c.execution === 'planned' || c.execution === 'executed' || c.execution === 'partly_executed')
+                  ? <PilotCheck id={c.id} label={c.label} done={c.execution === 'executed'} />
+                  : <span className="fi i-page" />}
                 <b>{c.label}</b>
                 <span className="right">{spanWords(c.start_min, c.end_min)}</span>
                 <span className="sub">

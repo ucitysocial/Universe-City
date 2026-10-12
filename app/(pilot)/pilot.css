@@ -999,3 +999,6 @@ html.uc-nav::after{content:"";position:fixed;left:0;top:0;height:3px;width:100%;
 .sday-done a{font-size:13.5px;color:var(--ink2);text-decoration:line-through}
 .sday-open .sub{grid-column:auto}
 .pn-need.carry .pt-btn.carry-done{display:inline-block;width:auto;justify-self:start}
+
+.ent .day-check{grid-row:span 2;align-self:start;margin-top:2px}
+.ent.is-done b{color:var(--ink2);text-decoration:line-through}

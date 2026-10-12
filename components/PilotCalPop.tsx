@@ -203,8 +203,7 @@ export default function PilotCalPop() {
         )}
         {mode === 'view' && (
           <div className="pop-acts">
-            {full?.canDone && <button type="button" className="pt-btn done" disabled={busy} onClick={() => void send({ done: true }, 'time')}>Mark this done</button>}
-            {full?.editable && <button type="button" className={full?.canDone ? 'pt-btn ghost' : 'pt-btn'} onClick={() => setMode('time')}>Change the time</button>}
+            {full?.editable && <button type="button" className="pt-btn" onClick={() => setMode('time')}>Change the time</button>}
             {full?.editable && <button type="button" className="pt-btn ghost" onClick={() => setMode('note')}>Add a note</button>}
             {brief.weekly && <p className="pop-meta">Tell the agent to change an item that repeats each week.</p>}
           </div>
