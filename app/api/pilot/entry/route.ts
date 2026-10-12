@@ -47,9 +47,11 @@ export async function POST(req: Request) {
   try {
     const r = typeof body?.note === 'string'
       ? await noteOnCommitment(a.userId, a.access, id, removeNumbers(body.note.slice(0, 1200)).text)
-      : await editCommitment(a.userId, a.access, id, { label: field('label'), date: field('date'), start: field('start'), end: field('end') });
+      : await editCommitment(a.userId, a.access, id, { label: field('label'), date: field('date'), start: field('start'), end: field('end'), keepBoth: body?.keepBoth === true });
     return Response.json({ ok: true, detail: r.brief || r.detail, changed: r.outcome !== 'unchanged', href: null }, { headers: { 'cache-control': 'no-store' } });
   } catch (e: any) {
+    const hits = (e as { hits?: unknown })?.hits;
+    if (e instanceof Refusal && Array.isArray(hits)) return Response.json({ error: `That time overlaps ${hits.join(', and ')}. Choose a different time, or keep both.`, overlap: true }, { status: 409 });
     if (e instanceof Refusal) return Response.json({ error: e.message }, { status: 400 });
     const rule = typeof e?.message === 'string' && e?.code === 'P0001' ? e.message : null;
     return Response.json({ error: rule || 'Not changed, because the database did not answer. The entry is as it was.' }, { status: rule ? 400 : 503 });

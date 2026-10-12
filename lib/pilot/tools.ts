@@ -40,6 +40,59 @@ export type Env = {
 /** The server declined the action. The reason goes back to the language model and into the activity list. */
 export class Refusal extends Error {}
 
+/**
+ * An entry would share hours with an entry already on file. The founder set on October 11, 2026 that a conflict is
+ * never filed before the resident is told about it. The resident decides which one moves, or keeps both.
+ */
+export class Overlap extends Refusal {
+  constructor(message: string, readonly hits: string[]) { super(message); }
+}
+
+const OVERLAP_ARG = { type: 'boolean', description: 'True only when the resident was told about the overlap with an entry already on file and then said to keep both.' };
+
+/** The entries on one day whose hours the new hours share. An unknown end counts as one hour. */
+async function overlapsOn(env: Pick<Env, 'q'>, date: string, start: number | null, end: number | null, except: string | null): Promise<string[]> {
+  if (start === null && end === null) return [];
+  const s = start ?? (end as number) - 60;
+  const e = end ?? (start as number) + 60;
+  const rows = await env.q<{ id: string; label: string; start_min: number | null; end_min: number | null }>(
+    `select id, label, start_min, end_min from uc_pilot.commitments
+      where on_date = $1::date and withdrawn_at is null and (start_min is not null or end_min is not null)`, [date]);
+  return rows.filter(r => r.id !== except).filter(r => {
+    const rs = r.start_min ?? (r.end_min as number) - 60;
+    const re = r.end_min ?? (r.start_min as number) + 60;
+    return rs < e && s < re;
+  }).map(r => `${r.label}, ${saySpan(r.start_min, r.end_min)}`);
+}
+
+/**
+ * In the conversation an entry that overlaps another is not filed. It waits for the resident, with the overlap named,
+ * and the guide tells the resident. Confirming it keeps both. On the screen the form names the overlap at once.
+ */
+async function holdOverlap(env: Env, action: 'add_commitment' | 'change_commitment', a: Args, hits: string[]): Promise<Result> {
+  const args = { ...a, despite_overlap: true } as Args;
+  const summary = clip(`${await describe(env, action, args)} It overlaps ${hits.join('; ')}.`, 600);
+  const payload = JSON.stringify({ action, args });
+  const open = await env.q<{ id: string }>(`select id from uc_pilot.pending where state = 'open' and kind = $1 and payload = $2::jsonb limit 1`, [action, payload]);
+  const id = open.length ? open[0].id : (await env.q<{ id: string }>(
+    `insert into uc_pilot.pending (decider, kind, summary, payload, rests_on) values ('resident', $1, $2, $3::jsonb, $4) returning id`,
+    [action, summary, payload, clip(`It overlaps ${hits.join('; ')}.`, 300)]))[0].id;
+  return {
+    outcome: 'prepared', detail: `Not filed yet, because it overlaps an entry on file. Waiting for your answer: ${summary}`,
+    brief: `Waiting for you: ${summary}`, target: 'pending', targetId: id,
+    data: {
+      waiting_ref: shortId(id), overlaps: hits,
+      note: 'Nothing is filed. Tell the resident in one sentence which entries overlap and ask which one moves. When the resident keeps both, confirm this waiting item with resident_decision. When the resident moves one of them, change that entry, and decline this item if it no longer applies.'
+    }
+  };
+}
+
+function refuseOverlap(label: string, start: number | null, end: number | null, hits: string[]): never {
+  throw new Overlap(
+    `Not filed. ${label} at ${saySpan(start, end)} overlaps ${hits.join('; ')}. Tell the resident about the overlap in one sentence and ask which one moves. File it with despite_overlap true only when the resident, after hearing about the overlap, says to keep both.`,
+    hits);
+}
+
 export const FOLDER_NAMES: string[] = [...FOLDERS.map(f => f.name), 'General'];
 
 // ------------------------------------------------------------------ reading arguments
@@ -689,6 +742,7 @@ export const TOOLS: Tool[] = [
       start: CLOCK('When it starts'), end: CLOCK('When it ends'),
       done_means: { type: 'string', description: 'What counts as done, in the resident\'s words. Leave it out when the resident did not say.' },
       folder: BELONGS,
+      despite_overlap: OVERLAP_ARG,
       quote: QUOTE
     }, ['date', 'label', 'quote']),
     async run(env, a) {
@@ -709,6 +763,14 @@ export const TOOLS: Tool[] = [
           target: 'commitments', targetId: same[0].id,
           data: { ref: shortId(same[0].id), already_on_file: true, nothing_changed: true, hint: 'The entry on file was left as it is. Use change_commitment to change its time or name.' }
         };
+      }
+      // A conflict is never filed before the resident hears about it.
+      if (a.despite_overlap !== true) {
+        const hits = await overlapsOn(env, date, start, end, null);
+        if (hits.length) {
+          if (env.via === 'screen') refuseOverlap(label, start, end, hits);
+          return holdOverlap(env, 'add_commitment', a, hits);
+        }
       }
       const row = (await env.q<{ id: string }>(
         `insert into uc_pilot.commitments (label, on_date, start_min, end_min, completion, time_is_estimate, said, basis, folder)
@@ -739,6 +801,7 @@ export const TOOLS: Tool[] = [
       date: DATE('The new day'), label: { type: 'string' },
       start: CLOCK('The new start'), end: CLOCK('The new end'),
       done_means: { type: 'string' },
+      despite_overlap: OVERLAP_ARG,
       quote: QUOTE
     }, ['ref', 'quote']),
     async run(env, a) {
@@ -758,6 +821,13 @@ export const TOOLS: Tool[] = [
         given(a, 'start') ? clockArg(a, 'start') : old.start_min,
         given(a, 'end') ? clockArg(a, 'end') : (old.end_min !== null ? old.end_min % 1440 : null));
       const completion = text(a, 'done_means', 300, false) ?? old.completion;
+      if (a.despite_overlap !== true && (date !== old.on_date || start !== old.start_min || end !== old.end_min)) {
+        const hits = await overlapsOn(env, date, start, end, id);
+        if (hits.length) {
+          if (env.via === 'screen') refuseOverlap(label, start, end, hits);
+          return holdOverlap(env, 'change_commitment', a, hits);
+        }
+      }
       const rough = said && (given(a, 'start') || given(a, 'end')) ? isRough(said) : old.time_is_estimate;
       // The entry already holds every value asked for. Nothing is written, and nothing is reported as changed.
       if (date === old.on_date && label === old.label && start === old.start_min && end === old.end_min && completion === old.completion) {

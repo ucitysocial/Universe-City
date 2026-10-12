@@ -15,9 +15,7 @@ export default function Login() {
   const params = useSearchParams();
   // The page to open after login is a path on this site. A full address or a script is replaced with the Resident Portal.
   const asked = params.get('next') || '';
-  // On the founder test preview the Resident Portal opens at its home in the test.
-  const home = process.env.PILOT_CONTEXT === 'deploy-preview' ? '/portal/home' : '/portal';
-  const next = /^\/(?![\/\\])[^\s]*$/.test(asked) ? (asked === '/portal' ? home : asked) : home;
+  const next = /^\/(?![\/\\])[^\s]*$/.test(asked) ? asked : '/portal';
   const arrived = params.get('link') || (params.get('error') === 'link' ? 'expired' : '');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -101,7 +99,13 @@ export default function Login() {
           <button className="btn" style={{ width: '100%' }} disabled={busy || opening}>
             {opening ? 'Opening the Resident Portal' : busy ? 'Logging in' : 'Log in'}
           </button>
-          {opening && <p className="note" role="status" style={{ marginTop: 12 }}>You are logged in. The Resident Portal is loading.</p>}
+          {opening && (
+            <div className="opening" role="status">
+              <p className="kick">Universe City</p>
+              <p className="opening-line">You are logged in. The Resident Portal is loading.</p>
+              <span className="opening-bar" aria-hidden="true" />
+            </div>
+          )}
           {showSend && (
             <button type="button" className="btn ghost" style={{ width: '100%', marginTop: 12 }} disabled={busy} onClick={sendConfirmation}>
               Send a new confirmation email

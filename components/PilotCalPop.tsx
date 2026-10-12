@@ -23,6 +23,7 @@ export default function PilotCalPop() {
   const [note, setNote] = useState('');
   const [busy, setBusy] = useState(false);
   const [said, setSaid] = useState<{ ok: boolean; text: string } | null>(null);
+  const [clash, setClash] = useState(false);
   const box = useRef<HTMLDivElement>(null);
 
   const load = useCallback(async (id: string) => {
@@ -47,6 +48,7 @@ export default function PilotCalPop() {
       e.stopPropagation();
       const r = el.getBoundingClientRect();
       const d = el.dataset;
+      setClash(false);
       setBrief({ id: d.pop!, weekly: d.weekly === '1', label: d.label || '', time: d.time || '', belongs: d.belongs || '', href: d.href || '#', kind: d.kind || '', x: r.left, y: r.top, w: r.width, h: r.height });
       setFull(null); setMode('view'); setSaid(null); setNote('');
       if (d.weekly !== '1') void load(d.pop!);
@@ -67,12 +69,13 @@ export default function PilotCalPop() {
     return () => { document.removeEventListener('keydown', key); document.removeEventListener('mousedown', out); };
   }, [brief]);
 
-  async function send(body: Record<string, string>, after: 'time' | 'note') {
+  async function send(body: Record<string, string | boolean>, after: 'time' | 'note') {
     if (!brief) return;
     setBusy(true); setSaid(null);
     try {
       const res = await fetch('/api/pilot/entry', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ id: brief.id, ...body }) });
       const d = await res.json().catch(() => ({}));
+      setClash(res.status === 409 && d.overlap === true);
       if (!res.ok) setSaid({ ok: false, text: d.error || 'Not changed. The entry is as it was.' });
       else {
         setSaid({ ok: true, text: d.detail || 'The change is on file.' });
@@ -126,6 +129,7 @@ export default function PilotCalPop() {
             </div>
             <div className="pt-btns">
               <button type="submit" className="pt-btn" disabled={busy || !f.date}>Save the new time</button>
+              {clash && <button type="button" className="pt-btn ghost" disabled={busy} onClick={() => void send({ ...f, keepBoth: true } as any, 'time')}>Keep both entries</button>}
               <button type="button" className="pt-btn ghost" onClick={() => setMode('view')}>Keep it as it is</button>
             </div>
           </form>

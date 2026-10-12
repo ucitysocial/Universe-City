@@ -10,8 +10,8 @@ import { useEffect } from 'react';
  * already shows the time. Then the name is shortened to its first whole words, with three dots after them.
  * The whole name, the time, and the folder are in the entry, which opens when the block is pressed.
  *
- * It brings the first entry into view. A day starts at 6:00 AM on the page, and an entry late in the day would sit
- * below the edge of the screen. On a narrow screen a week scrolls sideways, and today is brought into view.
+ * It opens the day at the morning. The calendar runs from midnight, so the page starts one hour before the first
+ * entry, and no later than 6:00 AM. On a narrow screen a week scrolls sideways, and today is brought into view.
  */
 export default function PilotCalFocus({ on }: { on: string }) {
   useEffect(() => {
@@ -51,14 +51,29 @@ export default function PilotCalFocus({ on }: { on: string }) {
       const gutter = grid.querySelector<HTMLElement>('.cal-gutter')?.offsetWidth ?? 50;
       side.scrollLeft = Math.max(0, today.getBoundingClientRect().left - side.getBoundingClientRect().left + side.scrollLeft - gutter);
     }
-    const blocks = Array.from(grid.querySelectorAll<HTMLElement>('.cal-block'));
-    const marks = blocks.length ? blocks : Array.from(grid.querySelectorAll<HTMLElement>('.cal-now'));
-    if (!marks.length) pane.scrollTop = 0;
-    else {
-      const top = Math.min(...marks.map(m => m.getBoundingClientRect().top)) - pane.getBoundingClientRect().top + pane.scrollTop;
-      pane.scrollTop = top > pane.clientHeight - 90 ? Math.max(0, top - 150) : 0;
-    }
-    return () => watch?.disconnect();
+    // The day starts at midnight. With larger hours the calendar scrolls inside its own frame, under day headings
+    // that stay in place, and opens one hour before the first entry and no later than 6:00 AM. With the whole day
+    // fitted, every hour is already on screen.
+    const place = () => {
+      if (!side) return;
+      if (grid.classList.contains('fit')) { side.style.maxHeight = ''; return; }
+      const room = pane.getBoundingClientRect().bottom - side.getBoundingClientRect().top - 44;
+      side.style.maxHeight = `${Math.max(320, Math.floor(room))}px`;
+      const gutter = grid.querySelector<HTMLElement>('.cal-gutter');
+      const head = grid.querySelector<HTMLElement>('.cal-head, .cal-side');
+      const h = parseFloat(getComputedStyle(grid).getPropertyValue('--h')) || 60;
+      if (!gutter) return;
+      const g = gutter.getBoundingClientRect().top;
+      const firstMin = Math.min(7 * 60, ...Array.from(grid.querySelectorAll<HTMLElement>('.cal-block')).map(b => ((b.getBoundingClientRect().top - g) / h) * 60));
+      const startMin = Math.max(0, Math.min(6 * 60, firstMin - 60));
+      const headH = grid.querySelector<HTMLElement>('.cal-head')?.offsetHeight ?? 0;
+      grid.style.setProperty('--head-h', `${headH}px`);
+      const sticky = headH + (grid.querySelector<HTMLElement>('.cal-side')?.offsetHeight ?? 0);
+      side.scrollTop = g - side.getBoundingClientRect().top + side.scrollTop + (startMin / 60) * h - sticky - (head && head.classList.contains('cal-side') ? 0 : 0);
+    };
+    place();
+    window.addEventListener('uc:calzoom', place);
+    return () => { watch?.disconnect(); window.removeEventListener('uc:calzoom', place); };
   }, [on]);
   return null;
 }

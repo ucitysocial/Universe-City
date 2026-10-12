@@ -480,10 +480,16 @@ a.pt-btn{text-decoration:none;display:inline-block}
 .sum-more{font-size:13.5px;font-weight:600;color:var(--ink)}
 
 /* The whole day on one screen: an hour is short, so a block holds one line and its open lower edge is short. */
-.cal.fit .cal-block{padding:1px 5px 0}
+.cal.fit .cal-block{padding:1px 5px 0;border-width:1px}
 .cal.fit .cal-block b{font-size:11.5px;line-height:1.2}
-.cal.fit .cal-text{max-height:calc(var(--clear) * var(--h) / 60 - 7px)}
+.cal.fit .cal-text{max-height:calc(var(--clear) * var(--h) / 60 - 4px)}
 .cal.fit .cal-block.executed,.cal.fit .cal-block.partly{padding-left:14px}
 .cal.fit .cal-block.open-end{height:calc(var(--len) * var(--h) / 60 - 8px)}
 .cal.fit .cal-block.open-end::after{height:6px}
-.cal.fit .cal-block.open-end .cal-text{max-height:calc(var(--clear) * var(--h) / 60 - 13px)}
+.cal.fit .cal-block.open-end .cal-text{max-height:calc(var(--clear) * var(--h) / 60 - 9px)}
+
+/* Larger hours: the calendar scrolls inside its frame, and the day headings stay at the top of it. */
+.cal-scroll{overscroll-behavior:contain}
+.cal-corner,.cal-head{position:sticky;top:0;z-index:30}
+.cal-corner{background:var(--paper)}
+.cal:not(.fit) .cal-side,.cal:not(.fit) .cal-untimed{position:sticky;top:var(--head-h,39px);z-index:29}

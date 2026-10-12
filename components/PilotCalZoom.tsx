@@ -19,11 +19,14 @@ export default function PilotCalZoom() {
     const gutter = grid?.querySelector<HTMLElement>('.cal-gutter');
     if (!grid || !pane || !bar || !gutter) return;
     grid.classList.toggle('fit', on);
-    if (!on) { grid.style.removeProperty('--h'); return; }
+    if (!on) { grid.style.removeProperty('--h'); window.dispatchEvent(new Event('uc:calzoom')); return; }
+    const scroller = grid.closest<HTMLElement>('.cal-scroll');
+    if (scroller) scroller.style.maxHeight = '';
     const hours = Number(getComputedStyle(grid).getPropertyValue('--hours')) || 16;
     const above = gutter.getBoundingClientRect().top - bar.getBoundingClientRect().top;
     const h = Math.max(16, Math.floor((pane.clientHeight - above - 48) / hours));
     grid.style.setProperty('--h', `${h}px`);
+    window.dispatchEvent(new Event('uc:calzoom'));
     pane.scrollTop = bar.getBoundingClientRect().top - pane.getBoundingClientRect().top + pane.scrollTop - 12;
   }, []);
 

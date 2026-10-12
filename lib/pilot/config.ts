@@ -5,10 +5,14 @@ export function deployContext(): string {
   return process.env.PILOT_CONTEXT || '';
 }
 
-/** The founder test runs on a preview that holds its database address. It never runs on a production deploy. */
+/**
+ * The founder test runs on a preview that holds its database address. On the live site it runs only when
+ * PILOT_LIVE is 1, which the founder approved on October 11, 2026 for her own login. Only an account in the test list
+ * sees any part of it. The check routes stay off on the live site.
+ */
 export function pilotEnabled(): boolean {
   if (process.env.PILOT_LOCAL === '1' && process.env.NODE_ENV === 'development') return true;
-  if (deployContext() === 'production') return false;
+  if (deployContext() === 'production' && process.env.PILOT_LIVE !== '1') return false;
   return !!process.env.PILOT_DATABASE_URL;
 }
 

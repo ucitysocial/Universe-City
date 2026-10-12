@@ -246,13 +246,13 @@ const shift = (await asResident(A, q => q(`select id from uc_pilot.commitments w
   check('G-24', 'The same message sent twice is one message, one reply, and one entry', second.reply?.id === first.reply?.id && calls === callsBefore && (await count(A, 'messages')) === before + 2 && (await count(A, 'commitments', `label = 'Haircut'`)) === 1, { calls: calls - callsBefore });
 
   const key2 = randomUUID();
-  const broken = await send(A, 'Add a call with my landlord tomorrow at noon.', [
-    call('add_commitment', { date: tomorrow, label: 'Call with landlord', start: '12:00', quote: 'Add a call with my landlord tomorrow at noon' }),
+  const broken = await send(A, 'Add a call with my landlord tomorrow at 7 AM.', [
+    call('add_commitment', { date: tomorrow, label: 'Call with landlord', start: '07:00', quote: 'Add a call with my landlord tomorrow at 7 AM' }),
     new Error('the model stopped answering')
   ], key2);
   const kept = await count(A, 'commitments', `label = 'Call with landlord'`);
   check('G-25', 'A reply that stops part way is reported as failed, keeps the message, and lists what was done', broken.state === 'failed' && broken.reply === null && kept === 1 && broken.effects.length === 1, { state: broken.state, effects: broken.effects.length });
-  const resumed = await send(A, 'Add a call with my landlord tomorrow at noon.', [
+  const resumed = await send(A, 'Add a call with my landlord tomorrow at 7 AM.', [
     say('The call is on file for tomorrow at 12:00 PM.')
   ], key2);
   const replay = JSON.stringify(lastRequest!.messages);
@@ -501,7 +501,7 @@ const shift = (await asResident(A, q => q(`select id from uc_pilot.commitments w
   check('R-13', 'A day dropped from a weekly item loses the commitment that was placed from it', friRow?.off === true, friRow);
 
   // An entry that is already on file is reported as no change.
-  await send(C, 'Tuesday I work 9 to 5.', [call('add_commitment', { date: tomorrow, label: 'Shift', start: '09:00', end: '17:00', quote: 'Tuesday I work 9 to 5' }), say('On file.')]);
+  await send(C, 'Tuesday I work 9 to 5.', [call('add_commitment', { date: tomorrow, label: 'Shift', start: '09:00', end: '17:00', despite_overlap: true, quote: 'Tuesday I work 9 to 5' }), say('On file.')]);
   const dup = await send(C, 'Tuesday I work 2 to 10.', [call('add_commitment', { date: tomorrow, label: 'Shift', start: '14:00', end: '22:00', quote: 'Tuesday I work 2 to 10' }), say('That shift is already on file with a different time.')]);
   check('R-14', 'A second add for an entry already on file changes no entry and is listed as no change', dup.effects[0]?.outcome === 'unchanged' && (await cCount('commitments', `label = 'Shift' and start_min = 540`)) === 1, dup.effects[0]);
 
@@ -675,7 +675,7 @@ const shift = (await asResident(A, q => q(`select id from uc_pilot.commitments w
   const filed = await send(H, `on ${day} i work a bar shift from 4 pm to 10 pm, i go grocery shopping from 10 to 11 am, and i call my sister from 10:30 to 11:30 am`, [
     [...call('add_commitment', { date: day, label: 'Bar shift', start: '16:00', end: '22:00', folder: 'Schedule', quote: 'i work a bar shift from 4 pm to 10 pm' }),
       ...call('add_commitment', { date: day, label: 'Grocery shopping', start: '10:00', end: '11:00', folder: 'Inventory', quote: 'i go grocery shopping from 10 to 11 am' }),
-      ...call('add_commitment', { date: day, label: 'Call my sister', start: '10:30', end: '11:30', quote: 'i call my sister from 10:30 to 11:30 am' })],
+      ...call('add_commitment', { date: day, label: 'Call my sister', start: '10:30', end: '11:30', despite_overlap: true, quote: 'i call my sister from 10:30 to 11:30 am' })],
     say('Three are on file.')
   ]);
   const ids = filed.effects.map(e => e.target_id as string);
@@ -693,6 +693,18 @@ const shift = (await asResident(A, q => q(`select id from uc_pilot.commitments w
   const bad = await send(H, 'put it under fun', [call('set_folder', { kind: 'commitment', ref: ids[2].slice(0, 8), folder: 'Fun' }), say('That is no folder.')]);
   check('C-06', 'The guide sets the folder of an entry, the change is kept in its history, and a name that is no folder is refused', moved.effects[0]?.outcome === 'filed' && afterMove === 'Socializing' && /belongs to Socializing, in Life Management/.test(moved.effects[0]?.brief || '') && bad.effects[0]?.outcome === 'refused' && (await count(H, 'revisions', `row_id = '${ids[2]}' and 'folder' = any (changed)`)) === 1, [moved.effects[0], bad.effects[0]]);
   check('C-07', 'The model is shown the folder of each entry in Time, and which entries have none', /Folder: Schedule/.test(lastRequest!.system[1].text) && /Folder: (Socializing|none set)/.test(lastRequest!.system[1].text), lastRequest!.system[1].text.slice(0, 200));
+
+  // A conflict is never filed before the resident hears about it.
+  const clash = await send(H, `on ${day} i have a dentist appointment from 4:30 to 5 pm`, [call('add_commitment', { date: day, label: 'Dentist', start: '16:30', end: '17:00', quote: 'i have a dentist appointment from 4:30 to 5 pm' }), say('That overlaps the bar shift. Which one moves?')]);
+  const held = (await asResident(H, q => q(`select id, summary from uc_pilot.pending where state = 'open' and kind = 'add_commitment'`)))[0];
+  const dentistBefore = await count(H, 'commitments', `label = 'Dentist'`);
+  const kept = await send(H, 'yes keep both, i will leave the shift for it', [call('resident_decision', { waiting_ref: held?.id.slice(0, 8), decision: 'confirm', quote: 'yes keep both' }), say('Both are on file.')]);
+  check('C-08', 'An entry that overlaps another is not filed. It waits for the resident with the overlap named, and is filed when the resident keeps both', clash.effects[0]?.outcome === 'prepared' && /It overlaps Bar shift/.test(held?.summary || '') && dentistBefore === 0 && kept.effects[0]?.outcome === 'decided' && (await count(H, 'commitments', `label = 'Dentist'`)) === 1, [clash.effects[0]?.outcome, held?.summary, dentistBefore, kept.effects[0]?.outcome, kept.effects[0]?.detail]);
+  const { Overlap } = await import('../../lib/pilot/tools');
+  let screenClash: unknown = null;
+  try { await editCommitment(H, access, ids[1], { start: '17:00', end: '18:00' }); } catch (e) { screenClash = e; }
+  const screenKept = await editCommitment(H, access, ids[1], { start: '17:00', end: '18:00', keepBoth: true });
+  check('C-09', 'The form refuses a time that overlaps another entry, names it, and saves it when the resident keeps both', Array.isArray((screenClash as any)?.hits) && (screenClash as InstanceType<typeof Overlap>).hits.some(h => h.startsWith('Bar shift')) && screenKept.outcome === 'filed', [screenClash instanceof Overlap, (screenClash as any)?.hits, screenKept.outcome]);
 
   // The form on the entry: the resident's own hand, with no language model.
   const before = calls;
@@ -714,7 +726,7 @@ const shift = (await asResident(A, q => q(`select id from uc_pilot.commitments w
   try { await editCommitment(B, (await asResident(B, q => loadAccess(q)))!, ids[0], { start: '09:00', end: '10:00' }); } catch (e: any) { strange = String(e.message); }
   check('E-04', 'A second resident can change no entry of the first and can put no note on it', !other.ok && /not on file/.test(strange), [other, strange]);
   const t = await thread(H);
-  check('E-05', 'The conversation lists each change made in the form where it happened, and the model is shown it', (t.presses || []).length === 2 && /^Updated: Bar shift/.test(t.presses![0].brief) && /^Filed: Note on Bar shift/.test(t.presses![1].brief), t.presses);
+  check('E-05', 'The conversation lists each change made in the form where it happened, and the model is shown it', (t.presses || []).length === 3 && t.presses!.some(p => /^Updated: Bar shift/.test(p.brief)) && t.presses!.some(p => /^Filed: Note on Bar shift/.test(p.brief)), t.presses);
   const withPlace = await (async () => { queue = [say('Okay.')]; return receive(H, 'what is on this day', randomUUID(), { viewing: 'My File › Agency Assessment › Time › October 16' }); })();
   check('E-06', 'A message written under a part of the File tells the model which part, for that message', withPlace.state === 'done' && JSON.stringify(lastRequest!.messages).includes('The resident wrote this from this part of the File: My File › Agency Assessment › Time › October 16'), '');
 }

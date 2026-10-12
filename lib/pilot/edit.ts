@@ -14,7 +14,7 @@ import { Refusal, TOOLS, type Env, type Result } from './tools';
 
 const tool = (name: string) => TOOLS.find(t => t.name === name)!;
 
-export type Patch = { label?: string; date?: string; start?: string; end?: string };
+export type Patch = { label?: string; date?: string; start?: string; end?: string; keepBoth?: boolean };
 
 async function listed(env: Env, kind: 'screen_edit' | 'screen_note', args: unknown, r: Result) {
   // A save that changed no value is no action. The activity list and the conversation keep to what changed.
@@ -39,6 +39,8 @@ export async function editCommitment(userId: string, access: Access, id: string,
     }
     const args: Record<string, unknown> = { ref: id };
     for (const k of ['label', 'date', 'start', 'end'] as const) if (typeof patch[k] === 'string' && patch[k]!.trim()) args[k] = patch[k]!.trim();
+    // The screen showed the overlap and the resident pressed the button that keeps both.
+    if (patch.keepBoth === true) args.despite_overlap = true;
     const r = await tool('change_commitment').run(env, args);
     await listed(env, 'screen_edit', args, r);
     return r;

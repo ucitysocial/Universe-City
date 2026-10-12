@@ -13,12 +13,14 @@ export default function PilotEntry({ id, label, date, start, end }: { id: string
   const [note, setNote] = useState('');
   const [busy, setBusy] = useState(false);
   const [said, setSaid] = useState<{ ok: boolean; text: string; about: 'entry' | 'note' } | null>(null);
+  const [clash, setClash] = useState(false);
 
-  async function send(body: Record<string, string>, about: 'entry' | 'note') {
+  async function send(body: Record<string, string | boolean>, about: 'entry' | 'note') {
     setBusy(true); setSaid(null);
     try {
       const res = await fetch('/api/pilot/entry', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ id, ...body }) });
       const data = await res.json().catch(() => ({}));
+      setClash(res.status === 409 && data.overlap === true);
       if (!res.ok) setSaid({ ok: false, text: data.error || 'Not changed. The entry is as it was. Press the button again.', about });
       else {
         setSaid({ ok: true, text: data.detail || 'The change is on file.', about });
@@ -44,7 +46,10 @@ export default function PilotEntry({ id, label, date, start, end }: { id: string
           <label>Start<input type="time" value={f.start} onChange={e => setF({ ...f, start: e.target.value })} /></label>
           <label>End<input type="time" value={f.end} onChange={e => setF({ ...f, end: e.target.value })} /></label>
         </div>
-        <div className="pt-btns"><button type="submit" className="pt-btn" disabled={busy || same || !f.label.trim() || !f.date}>Save the changes</button></div>
+        <div className="pt-btns">
+          <button type="submit" className="pt-btn" disabled={busy || same || !f.label.trim() || !f.date}>Save the changes</button>
+          {clash && <button type="button" className="pt-btn ghost" disabled={busy} onClick={() => void send({ ...f, keepBoth: true }, 'entry')}>Keep both entries</button>}
+        </div>
         {line('entry')}
       </form>
       <form className="edit-part" onSubmit={e => { e.preventDefault(); if (note.trim() && !busy) void send({ note }, 'note'); }}>

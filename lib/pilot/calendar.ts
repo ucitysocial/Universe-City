@@ -154,11 +154,11 @@ export async function loadCalendar(q: Q, from: string, to: string, today: string
     });
   }
 
-  // The hours shown: 6:00 AM to 10:00 PM, and wider when an entry sits outside them. The latest row ends at 2:00 AM.
+  // The whole day, midnight to midnight. An entry that runs past midnight, such as a late shift, extends the last
+  // row into the next morning, up to 6:00 AM.
   const all = days.flatMap(d => d.timed);
-  const firstMin = Math.min(6 * 60, ...all.map(t => Math.floor(t.from / 60) * 60));
-  const lastMin = Math.min(26 * 60, Math.max(22 * 60, ...all.map(t => Math.ceil((t.from + t.len) / 60) * 60)));
-  return { days, firstMin: Math.max(0, firstMin), lastMin, hour: fit.hour };
+  const lastMin = Math.min(30 * 60, Math.max(24 * 60, ...all.map(t => Math.ceil((t.from + t.len) / 60) * 60)));
+  return { days, firstMin: 0, lastMin, hour: fit.hour };
 }
 
 /** The Sunday that starts the week of a date. */

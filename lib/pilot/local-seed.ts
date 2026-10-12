@@ -86,7 +86,7 @@ export async function seedLocal(userId: string): Promise<void> {
   ]);
   await send('tomorrow i have a dentist appointment from 10 to 11 am and a call with my sister from 10:30 to 11:30 am and i need to pick up my check', [
     [call('add_commitment', { date: tomorrow, label: 'Dentist appointment', start: '10:00', end: '11:00', quote: 'a dentist appointment from 10 to 11 am' }),
-      call('add_commitment', { date: tomorrow, label: 'Call with my sister', start: '10:30', end: '11:30', quote: 'a call with my sister from 10:30 to 11:30 am' }),
+      call('add_commitment', { date: tomorrow, label: 'Call with my sister', start: '10:30', end: '11:30', despite_overlap: true, quote: 'a call with my sister from 10:30 to 11:30 am' }),
       call('add_commitment', { date: tomorrow, label: 'Pick up my check', quote: 'i need to pick up my check' })],
     say('Three are on tomorrow.')
   ]);
