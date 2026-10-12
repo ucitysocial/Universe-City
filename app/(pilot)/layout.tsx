@@ -1,11 +1,15 @@
 import type { Viewport } from 'next';
 import { notFound, redirect } from 'next/navigation';
+import PilotBoard from '@/components/PilotBoard';
+import PilotCalPop from '@/components/PilotCalPop';
+import PilotFold from '@/components/PilotFold';
 import PilotRail from '@/components/PilotRail';
 import PilotSide from '@/components/PilotSide';
 import PilotSwitch from '@/components/PilotSwitch';
 import PilotViewport from '@/components/PilotViewport';
 import { who } from '@/lib/pilot/auth';
-import { loadIndex, loadPanel } from '@/lib/pilot/browse';
+import { loadBoard } from '@/lib/pilot/board';
+import { loadIndex } from '@/lib/pilot/browse';
 import { withResident } from '@/lib/pilot/db';
 import './pilot.css';
 
@@ -22,9 +26,9 @@ export const viewport: Viewport = { width: 'device-width', initialScale: 1, view
  * The frame is fixed, in three parts. The founder set it on October 11, 2026:
  *   left    the places, a search, and the File as one tree
  *   center  one working pane: the conversation, or the inside of a folder
- *   right   a small window that shows what the File holds right now
- * docs/product/RESIDENT_INTERFACE.md puts the agent in the right part. In this test the conversation takes the
- * center, and the right part is the small window.
+ *   right   the dashboard: now, one view the resident picks, and Pending
+ * Home is the conversation with the agent. docs/product/RESIDENT_INTERFACE.md puts the agent in the right part. In
+ * this test the conversation takes the center, and the right part is the dashboard.
  */
 export default async function PilotLayout({ children }: { children: React.ReactNode }) {
   const w = await who();
@@ -50,16 +54,23 @@ export default async function PilotLayout({ children }: { children: React.ReactN
       </div>
     );
   }
-  const { index, panel } = await withResident({ userId: w.userId, actor: 'resident' }, async q => ({
-    index: await loadIndex(q, w.access.timezone),
-    panel: await loadPanel(q, w.access.timezone)
-  }));
+  const { index, board } = await withResident({ userId: w.userId, actor: 'resident' }, async q => {
+    const index = await loadIndex(q, w.access.timezone);
+    return { index, board: await loadBoard(q, w.access.timezone, index) };
+  });
+  const cur = board.panel.now;
+  const waiting = board.panel.pending.length;
+  const fold = `${cur ? `${cur.live ? 'Now' : 'Coming up'}: ${cur.label}` : 'Dashboard'}${waiting ? `. ${waiting} pending` : ''}`;
   return (
     <div className="os">
       <PilotViewport />
       <PilotRail index={index} name={w.access.display_name} synthetic={w.access.synthetic} />
-      <main className="os-main">{children}</main>
-      <PilotSide panel={panel} />
+      <main className="os-main">
+        <PilotFold summary={fold}><PilotBoard board={board} /></PilotFold>
+        {children}
+      </main>
+      <PilotSide board={board} />
+      <PilotCalPop />
     </div>
   );
 }

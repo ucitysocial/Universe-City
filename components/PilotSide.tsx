@@ -1,63 +1,18 @@
-import type { CSSProperties } from 'react';
-import Link from 'next/link';
-import { Countdown } from '@/components/PilotPanelBits';
-import PilotPending from '@/components/PilotPending';
-import { spanWords, type PanelView } from '@/lib/pilot/browse';
-import { belongsTo } from '@/lib/pilot/dept';
-import { TIME_PATH } from '@/lib/pilot/paths';
-import { sayDate, weekdayName, weekdayOf } from '@/lib/pilot/time';
-
-const short = (date: string) => sayDate(date).replace(/, \d{4}$/, '');
+import PilotBoard from '@/components/PilotBoard';
+import type { Board } from '@/lib/pilot/board';
+import { sayDate } from '@/lib/pilot/time';
 
 /**
- * The panel at the right of the frame. It stays in place on every screen.
- *   Now        what the resident is in, or what comes next, and how long until it starts
- *   This week  Monday to Sunday, how full each day is, and how many days are planned. On a Sunday it shows the
- *              coming week, because most planning happens on Sunday
- *   Pending    each item that waits for the resident: an overlap, an entry that passed with its end or its outcome
- *              unknown, and each item that waits for a yes or a no
- * The agent's job is to keep the resident planned seven days out. This panel shows how that stands.
+ * The right part of the frame: the dashboard. It stays in place on every page. The founder set it on October 11,
+ * 2026: the conversation is home, and the dashboard shows what is happening now, one view the resident picks, and
+ * what waits for the resident. After each reply the page is read again, so the dashboard shows each new entry.
  */
-export default function PilotSide({ panel }: { panel: PanelView }) {
-  const { now, then } = panel;
-  const level = (h: number, n: number) => (n === 0 ? 0 : h < 3 ? 1 : h < 6 ? 2 : 3);
+export default function PilotSide({ board }: { board: Board }) {
   return (
-    <aside className="os-side" aria-label="Now and this week">
+    <aside className="os-side" aria-label="Dashboard">
       <div className="win">
-        <div className="win-bar">{sayDate(panel.today).replace(/, \d{4}$/, '')}</div>
-        <div className="win-body">
-          <section>
-            <h2>Now</h2>
-            {!now && <p className="win-none">Nothing is on file for the rest of today or tomorrow.</p>}
-            {now && (
-              <Link href={`${TIME_PATH}/${now.on_date}/${now.id}`} className="pn-now" style={{ '--fc': belongsTo(now.folder, now.label).color } as CSSProperties}>
-                <b>{now.label}</b>
-                <Countdown until={now.minutesUntil} left={now.minutesLeft} live={now.live} />
-                <span className="pn-time">{now.on_date === panel.today ? '' : `${short(now.on_date)}. `}{spanWords(now.start_min, now.end_min)}</span>
-              </Link>
-            )}
-            {then && <p className="pn-then">Then: <Link href={`${TIME_PATH}/${then.on_date}/${then.id}`}>{then.label}</Link>, {then.on_date === panel.today ? 'today' : short(then.on_date)}, {spanWords(then.start_min, then.end_min)}</p>}
-          </section>
-
-          <section>
-            <h2>{panel.week.some(d => d.date === panel.today) ? 'This week' : 'The coming week'}</h2>
-            <div className="pn-week">
-              {panel.week.map(d => (
-                <Link key={d.date} href={`${TIME_PATH}/${d.date}`} className={`pn-day l${level(d.hours, d.count)}${d.date === panel.today ? ' today' : ''}`}
-                  title={`${sayDate(d.date)}. ${d.count} ${d.count === 1 ? 'entry' : 'entries'}.`}>
-                  <i aria-hidden="true" />
-                  <span>{weekdayName(weekdayOf(d.date)).slice(0, 3)}</span>
-                </Link>
-              ))}
-            </div>
-            <p className="pn-count">{panel.planned} of 7 days planned</p>
-          </section>
-
-          <section>
-            <h2>Pending</h2>
-            <PilotPending panel={panel} />
-          </section>
-        </div>
+        <div className="win-bar">{sayDate(board.today).replace(/, \d{4}$/, '')}</div>
+        <div className="win-body"><PilotBoard board={board} /></div>
       </div>
     </aside>
   );

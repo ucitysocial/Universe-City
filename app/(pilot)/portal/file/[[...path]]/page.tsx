@@ -3,7 +3,6 @@ import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import PilotAsk from '@/components/PilotAsk';
 import PilotCalFocus from '@/components/PilotCalFocus';
-import PilotCalPop from '@/components/PilotCalPop';
 import PilotDecide from '@/components/PilotDecide';
 import PilotEntry from '@/components/PilotEntry';
 import { DEPARTMENTS, FOLDERS, type Folder } from '@/lib/domain/folders';
@@ -367,7 +366,6 @@ async function schedulePane(ctx: Ctx) {
       {month ? <MonthGrid cal={cal} on={on} today={now.date} /> : <HourGrid cal={cal} today={now.date} nowMin={now.minutes} />}
       <Legend month={month} />
       <PilotCalFocus on={`${month ? 'month' : 'week'} ${on} ${ix.lastFiledAt ?? ''}`} />
-      <PilotCalPop />
     </>
   );
 }
@@ -384,7 +382,6 @@ async function dayPane({ q, zone, decides, ix }: Ctx, base: string, date: string
       <HourGrid cal={cal} today={now.date} nowMin={now.minutes} single />
       <Legend />
       <PilotCalFocus on={`day ${date} ${ix.lastFiledAt ?? ''}`} />
-      <PilotCalPop />
       <h2 className="fb-h">Commitments</h2>
       {commitments.length === 0 && <p className="fb-empty">No commitment is on this day.</p>}
       {commitments.length > 0 && (
