@@ -1,6 +1,6 @@
 # Folder 01 Time Operations
 
-Department I, Agency Assessment. Systems operations. Version 1, October 11, 2026. How the Time system runs: fields, states, views, queries, permissions, and contact.
+Department I, Agency Assessment. Systems operations. Version 1.1, October 11, 2026. How the Time system runs: fields, states, views, queries, permissions, and contact.
 
 ## 1. About this document
 
@@ -15,6 +15,8 @@ Department I, Agency Assessment. Systems operations. Version 1, October 11, 2026
 1.5 Where this document and `TIME.md` disagree, `TIME.md` governs. `LANGUAGE_STANDARD.md` governs the wording of both.
 
 1.6 A change to this document is entered in `docs/systems/TIME_DEVELOPMENTS.md` with the date and the reason.
+
+1.7 Version 1.1 specifies the calendar-first views and their record contract as established requirements. A view or interaction whose implementation mechanics are still undecided remains marked To define. This revision does not assert that the founder-test calendar has passed verification.
 
 ## 2. Fields
 
@@ -88,13 +90,35 @@ Department I, Agency Assessment. Systems operations. Version 1, October 11, 2026
 
 ## 4. Views
 
-4.1 The week view. Defined and built. It shows one row for each day and four figures: observed hours, estimated hours, unaccounted hours, and the hours that were the client's.
+4.1 The existing **numerical weekly summary**. Defined and built in the repository described by `TIME.md` 14.2.3. It shows one row per day and four figures: observed hours, estimated hours, unaccounted hours, and hours the client controls. It is **not** the visual week calendar required by `TIME.md` 2.9.1 and 11.4.1.
 
 4.2 The first Plan. Defined and built. It asks five questions in order. `TIME.md` 14.2.5 lists them.
 
-4.3 To define: the day view, the month view, editing a block by hand, the Plan with the outcome of each commitment, and the list of open follow ups.
+4.3 **Calendar requirement defined, implementation to build.** Day, week, and month are views of the same Time system. They must show the actual dates and, in day and week, visually positioned time slots and blocks. Direct editing by hand is established in `TIME.md` 5.8.1. The exact UI event rules, accessibility interactions, rendering granularity, and wiring to existing storage remain to define and test. The Plan with outcomes and the open follow-up list remain to define as views.
 
 4.4 To define: the agent console view of commitments, follow ups, ongoing work, and proposals for one client.
+
+4.5 **First Time surface. Defined in `TIME.md` 2.4.1, 9.3.1 and 11.4.** The calendar is available when Time intake begins after Orientation, before the initial seven-day schedule or first Plan is complete. It can initially be sparse. Entries appear as commitments are established from the File and conversation. Visibility of a calendar is not proof that Time's operational conditions have been satisfied.
+
+4.6 **Day view. Product behavior defined; build status unverified.** Show the selected calendar date with the actual time axis and timed entries occupying their proper times. Show untimed, unknown-time, or incomplete commitments distinctly rather than inventing a start, end, or duration. Select an entry to open its source-backed details and history.
+
+4.7 **Week view. Product behavior defined; visual grid not yet verified.** Show seven consecutive calendar days with the corresponding time axis and blocks positioned in their actual local hours. Do not substitute the numerical table of 4.1 for the visual week. The numerical figures can coexist without replacing it.
+
+4.8 **Month view. Product behavior defined; build status unverified.** Show an actual calendar month with weekday alignment and commitments under the correct dates. The month view may summarize multiple entries per date; selecting an entry opens its maintained details. The month view reads the same record as day and week.
+
+4.9 **One maintained schedule. Defined in `TIME.md` 2.9.1 and 11.4.2.** Conversation, day/week/month, the selected File view, and Activity refer to the same authorized entries and history. Rendering is a view of the data, not a second store or a new copy of the commitment. Repeated approval of the same action shall not be reported as a fresh change; the proposed, confirmed, unchanged, and revised outcomes remain distinguishable.
+
+4.10 **Unknown and tentative time. Defined in `TIME.md` 2.9.2 and 3.6.** A date with unknown timing remains a dated or unscheduled entry as permitted by the existing record model. A known start with unknown end is never drawn as an invented duration. A tentative time is distinguishable from a confirmed one, and does not become confirmed without applicable authority. A view must not silently transform an incomplete commitment into a fabricated block.
+
+4.11 **Client interaction. Defined by `TIME.md` 2.9, 5.8 and 8.7; detailed mechanics to define.** The resident can open the calendar and add, move, resize, edit, or remove authorized time blocks directly. Each permitted operation must validate the affected record, retain the source and prior versions, and be visible to the guide. Editing via the visual grid never bypasses File approval or scheduling permissions. On denial or conflict, explain the result without claiming a change.
+
+4.12 **Overnight time and timezone. Existing rule and remaining implementation detail.** `TIME_OPERATIONS.md` 2.1.1 already assigns a block to its start date and uses local time for the client's timezone. To define and test: rendering across midnight, daylight-saving changes, ranges spanning a date boundary, conversion between local time and stored values, and how incomplete endings appear in all views. Do not assume a 9-to-5 day or truncate a late shift at midnight.
+
+4.13 **Calendar progression. Defined by `TIME.md` 9.3, 10.2–10.4.** The guide progressively establishes the first seven-day schedule and first confirmed Plan. Calendar entries must become visible once authorized, without asking the client to fill the grid or complete all the teaching lessons. The resident's assessment answers are collected during Enrollment as separately established; calendar-first Time intake does not reverse Enrollment and Orientation.
+
+4.14 **To define and verify:** precise axis/grid resolution; keyboard, touch and screen-reader interaction; collision/overlap handling; recurrences in day/week/month; all-day and deadline display; local-time and DST edge cases; status legends; which service queries power each view; direct edit authorization and rollback; matching stored blocks/commitments with the founder-test data model; and responsive behavior. Those decisions belong to implementation review rather than being silently assumed by a visual mockup.
+
+4.15 **Acceptance test for the system.** Starting from a sparse calendar, establish an irregular work week in conversation. After the resident confirms an October 16 shift at 3:00 PM, show it in the correct place in day, week, and month without inventing its end. Open the record and verify source and history. Change the timing under the permitted process and verify all views agree, no duplicate action is filed, and direct calendar edits update the same record. Repeat with an overnight shift and a deferred estimate. A static grid or a page listing facts does not pass.
 
 ## 5. Queries
 
@@ -104,9 +128,13 @@ Department I, Agency Assessment. Systems operations. Version 1, October 11, 2026
 
 5.3 To define: the data each of the seventeen queries reads.
 
+5.4 **Calendar read contract. Defined requirement; query implementation to verify.** Day, week and month resolve the same canonical Time blocks, scheduled commitments, applicable recurrence and permitted status data for the selected date range. The query layer must retain event identity, time zone, uncertainty, status, origin/source link, and earlier versions as needed for detail/history. It must not infer a time from business opening hours or render an unconfirmed estimate as a confirmed commitment. Exact endpoints and indexes remain to define.
+
 ## 6. Action permissions
 
 6.1 Defined in `TIME.md` 5.6. Three acts are kept separate: preparation, authorized execution, and approval of a permanent change to the client's file.
+
+6.1.1 A calendar drag, resize, add or deletion is an action under the same permission and authority rules as an equivalent conversational change. The interface cannot assert that dragging alone authorizes a protected change. A repeated confirmation of a completed pending action does not cause another mutation or misreport an unchanged value as Changed. The implementation must preserve a meaningful, idempotent decision outcome.
 
 6.2 Defined. Software can carry out an action a standing permission covers, with no person releasing it. The action is filed with who carried it out and which permission covered it.
 
