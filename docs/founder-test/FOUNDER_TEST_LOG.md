@@ -35,6 +35,10 @@ No entry is a defect just because the prototype is unfinished. Do not report uns
 | FT-006 | File — working interface | Current File reads like a static report and differs markedly from the established Universe City Window OS-style Resident Portal | Founder-directed primary visual redesign | Main visual priority; #25 |
 | FT-007 | Conversation — mobile composer | Keep the approved conversation layout, with composer anchored to bottom on mobile as in a messaging app | Founder requirement; mobile behavior not yet verified | Implement and device-test; #26 |
 | FT-008 | Public website — account state | No visible Log out and homepage appears anonymous after returning via logo on www.ucitysocial.com | Founder-reported issues; missing UI confirmed by code | Fix and verify session handling; #27 |
+| FT-009 | Working shell — conversation location | Left File/conversation navigation, center active workspace, right decisions/context; not a permanent right-rail chat | New founder prototype direction; preview not yet verified | In progress with Claude; #30 |
+| FT-010 | Time — visual schedule | Daily, weekly, and monthly visual calendar with time-positioned blocks is the Time system, not merely stored entries | Founder core product requirement; partial existing spec, missing views | In progress with Claude; #29 |
+| FT-011 | Resident Portal — visual review package | Updated three-panel File/Conversation, visual calendars, record editor and mobile screenshots supplied as a static walkthrough | Screenshot evidence only; functional claims unverified | Received; awaiting founder review and runnable preview |
+| FT-012 | Portal Home — global UI scale | Entire desktop portal appears miniature: narrow nav/context, undersized cards/type, large unused center | Founder-directed size and readability correction | P0 design fix requested; #32 |
 
 ---
 
@@ -292,17 +296,123 @@ These are suggested examples for design discussion, **not implemented UI copy**.
 
 ---
 
+## FT-009 — Conversation in the main workspace, contextual decisions on the right
+
+**Date reported:** October 11, 2026; additional screenshot shows Claude mid-build. **Status:** Founder clarification while a new preview is in development; final build not tested.
+
+**Founder direction:** The interface should take cues from the broader Claude layout: left panel for File and conversation navigation, large center working area for the selected conversation, Time calendar or File contents, and a separate right panel for decisions, pending confirmations, related follow ups and relevant context. The conversation must **not** remain a narrow pane off on the right. The right context area can be optional/collapsible. This does not mean adopting Claude's color palette or replacing Universe City branding.
+
+**Specification difference to reconcile:** `docs/product/RESIDENT_INTERFACE.md` still describes the Agent as persistent in the right rail and the center as selected Portal content. That earlier direction conflicts with the latest founder preference for full center Conversation. Build and visually review the new founder-test composition, then explicitly update the governing interface doc if approved; do not pretend the old spec already reflects this change.
+
+**Evidence:** The founder's screenshot captures Claude actively listing work to take the guide out of the right frame and make Conversation a full main pane. The screenshot reports intentions and in-progress tasks, not verified implementation or deployment.
+
+**Verification:** Open the Conversation in center without squeezing it; switch into File and Time; return to the same conversation state; show decisions on the right without a duplicate chat; collapse the context area; verify responsive navigation and brand styling.
+
+**Implementation tracker:** [#30](https://github.com/ucitysocial/Universe-City/issues/30). Existing YAPTAIN browser reference remains [#25](https://github.com/ucitysocial/Universe-City/issues/25).
+
+---
+
+## FT-010 — Time's system is a functional visual calendar
+
+**Date reported:** October 11, 2026; Claude reportedly implementing a Time calendar. **Status:** Founder core product requirement explicitly recorded; not yet verified in a preview.
+
+**Founder direction:** The Time folder must build and maintain the resident's actual **visual schedule**, with **day, week and month** views; the daily and weekly grids must show time slots and events physically placed at the right time. A month grid shows events on their actual dates. The product is not complete when only facts about a shift are filed or listed as text. Conversation creates or updates the schedule, and the schedule displays those changes. The resident must also be able to open and work with the calendar directly.
+
+**Existing specifications:** `docs/systems/TIME.md` defines the maintained schedule as Time's system, and its section 5.8 explicitly provides for dragging, resizing, adding, editing, and deleting blocks by hand. `docs/systems/TIME_OPERATIONS.md` 4.3 leaves day and month views to define; a previous week view was calculated as hour figures rather than a finished, visual time-block calendar. This test requirement clarifies expected UI completion without replacing those operating documents or changing permissions.
+
+**Verification requirements:** Create a dated commitment by chat and inspect the exact date/time placement in all three calendar views. Update it with proper approval, then verify all views reflect the same canonical Time record. Unknown end time stays unknown—show the known start without fabricating a duration. Test work crossing midnight, timezone, overlaps, empty slots, direct permitted manipulation, error states, and history/provenance. A separate pop-out or expanded calendar is an **optional design concept**, not an approved requirement or a replacement for the main Time workspace.
+
+**Evidence limit:** The screenshot shows Claude's in-progress checklist including a calendar, day/month design, and removing the chat side rail. No screenshot of a finished working calendar is provided.
+
+**Implementation tracker:** [#29](https://github.com/ucitysocial/Universe-City/issues/29). Related to [#22](https://github.com/ucitysocial/Universe-City/issues/22), [#23](https://github.com/ucitysocial/Universe-City/issues/23), [#25](https://github.com/ucitysocial/Universe-City/issues/25), [#30](https://github.com/ucitysocial/Universe-City/issues/30).
+
+---
+
+## FT-011 — Resident Portal visual review package
+
+**Received:** October 11–12, 2026 (the source describes itself as an October 11 preview).  
+**Evidence:** User-uploaded `Universe City Resident Portal.zip` supplied in ChatGPT. ZIP contents: `index.html` plus nine PNG images: `home`, `conversation`, `week`, `day`, `month`, `entry`, `search`, `phone-week`, `phone-conversation`. The images and ZIP remain in the conversation; no raw screenshot assets were committed to public GitHub.  
+**Source type / verification limit:** `index.html` is an **illustrated walkthrough**, not the running Resident Portal. The ZIP contains **no app source JS, server code, tests, or deployed preview link**. Its claims about tests and database integration are supplied by its author, not independently proven by this review.  
+**Status:** Visual redesign supplied for review, awaiting founder feedback and functional testing. **Do not mark issues closed from screenshots.**
+
+### What the supplied screenshots actually demonstrate
+
+- **Three zones:** left File tree/places/search; center Conversation, Home, selected Time calendar or record; right **Now on file** panel for ongoing work, unknowns, pending decision buttons, recently filed items, and next events. Conversation is no longer visually squeezed into the right rail. This reflects FT-009 / #30 at the screenshot level.
+- **YAPTAIN-style navigation:** browsable department and folder hierarchy with icons, counts, selected rows and breadcrumbs. Four fixed departments and nested folders are visible. This appears closer to the founder's stated File direction than the earlier text-only report, but usability and actual routing remain untested.
+- **Time calendar:** the screenshots show a 7-day time-grid with colored appointment/commitment blocks, an individual day time-grid with overlapping appointments, and a true monthly date grid. A separate **No time** row shows entries with missing start information. These are **design evidence**, not proof that entries are generated accurately from canonical records or that edits persist.
+- **Entry detail:** selected Bar shift displays a source quote/message link, a note, a direct edit form for date/time/name, a note composer, and history with a prior start time. The demo screenshot shows an updated start at 3:30 PM versus earlier 3 PM.
+- **Search:** the left rail can visually show a search result list comprising File entries and conversation messages.
+- **Mobile:** screenshots show a vertical navigation/header, a conversation with its input along the bottom edge, and a horizontally scrollable-looking weekly time grid. A picture cannot establish keyboard handling, viewport anchoring, or scroll behavior.
+- **Color:** visual appearance is broadly aligned to Universe City's ink/ivory base and department accent colors rather than copying YAPTAIN teal.
+
+### Statements made by the walkthrough, not independently verified
+
+The HTML presentation says **108 automated checks pass**, a test message was written to the test database, and the public site is unchanged. It also lists open work: no direct edit form for weekly schedule items, mobile keyboard not tested on an actual phone, and public-site sign-out still separate. These are **the author's claims**, not findings from running tests or inspecting implementation code.
+
+### Candidate issues or next questions (no new founder-approved fixes)
+
+**FT-011-A — Confirm the calendar actually works with real data.** Repeat the first founder-test scenario: discuss an uncertain, dated bar shift, approve once, then inspect all 3 calendar views, the File record, and history. Editing from the displayed form must update those same records, not an isolated UI list. Check week scrolling to late hours, overnight work, and source attribution. Link #29, #23, #25.
+
+**FT-011-B — Untimed/unknown-end display.** The captions say entries with no end time **fade out at the bottom** of the week display. Inspect whether that visual treatment implies an invented duration or occupies time the resident never authorized. Requirement: no fabricated block duration; missing end must be clearly labeled, with an honest start marker or equivalent. Link #29.
+
+**FT-011-C — Guide continuity remains a live test.** The illustrated conversation displays very short replies such as **"Three are on tomorrow," "Both are on file," and "On file."** That meets the request to shorten filing feedback but the screenshot does not show the guide asking a purposeful next question. Do not claim regression solely from a screenshot excerpt; test an actual conversation with an original Time-building objective. Link #22 and #24.
+
+**FT-011-D — Context panel density.** The right panel currently displays recurring work, several unknown times, waiting approval, recent files and next items concurrently. Review whether it makes the next required decision clear or recreates an overlong information dump; don't treat it as a confirmed flaw without founder input. Link #30.
+
+**FT-011-E — Classification/ownership and colors.** Monthly Time calendar shows differently colored appointments by their originating departments; the left File tree shows the same set of Time commitments under Agency Assessment. Confirm that color means origin/linked folder rather than an entirely different canonical owner. Cross-folder links should not create duplicate records. Link #29 and #25.
+
+**FT-011-F — Search/history across screenshots.** The search screenshot displays a Bar shift with a 3 PM start while the later individual-entry screenshot displays 3:30 PM and change history. These may be different moments in the demonstration, not stale data. Test search after an edit to establish that it reflects the current canonical value.
+
+**FT-011-G — Mobile composer.** Check a real mobile device, opening the keyboard and scrolling a long conversation. The screenshot alone cannot verify a fixed footer or prevent double scrolling. Link #26.
+
+### Founder direction
+
+**Awaiting founder feedback.** The founder supplied the ZIP while Claude was working on the full build. No newly specified changes were sent with the ZIP. Existing approved direction (visual calendar, persistent File navigation, center Conversation, right decisions/context, stable mobile composer) remains the benchmark.
+
+### Next verification
+
+Request the **actual Netlify deploy preview URL and commit SHA** when Claude finishes. Re-run FT-003 through FT-010 against the live preview and compare real Time data, permission handling, and conversation continuity. Do not mark #22, #23, #24, #25, #26, #29 or #30 closed based on this package alone.
+
+---
+
+## FT-012 — Resident Portal desktop scale and legibility
+
+**Date reported:** October 11, 2026.  
+**Evidence:** Founder-supplied screenshot of the actual Netlify Founder Test Resident Portal Home, approximately 1728 × 888 in captured pixels. Not added as a raw image to the public repo.  
+**Priority:** P0 interface sizing and readability, independent of the visual architecture. [Issue #32](https://github.com/ucitysocial/Universe-City/issues/32).
+
+### What is visible
+
+A three-zone layout (dark left File/navigation rail, central Home work area, narrow right "Now on file" panel) exists, but it is disproportionately tiny on desktop. The navigation is approximately 155 px wide, the right context rail about 180 px, Home's My File and Conversation tiles ~200 px wide each, and type looks extremely small. Most of the Home center surface is unused; the editor rests along the bottom but is likewise thin. These are visual estimates, not computed CSS measurements. Because the embedded Netlify preview toolbar also looks small, verify **browser zoom at 100%** before assigning all fault to styles.
+
+### Founder direction
+
+The founder rejects the miniature appearance and wants the actual portal sized like readable, full-size working software. **Preserve Universe City brand palette, fonts and rectangular visual language.** Do not simply enlarge a screenshot, force a page zoom transform, or turn the app into generic oversized rounded cards.
+
+### Implementation acceptance
+
+- Audit root `font-size`, `rem` scale, `zoom`, `transform`, viewport meta and desktop layout variables; verify normal 100% browser zoom.
+- Desktop starting proportions: File rail approximately 250–280 px, right context 290–340 px, center responsive `minmax(0, 1fr)`; make panel widths adaptable and context collapsible.
+- Body/conversation text 16 px, action labels at least 14 px, meaningful metadata 12–13 px minimum and headings around 24–32 px. Use existing Montserrat/VT323 appropriately.
+- Home tiles expand and become easy to interact with instead of staying huddled in the top-left. Use available center space thoughtfully with normal readable cards, icon sizing, spacing and click targets.
+- Verify Conversation, File and day/week/month Time views at 1728×888, 1440×900, 1280×800; check tablet and phone adaptations separately. Keep mobile composer anchored, and the calendar usable.
+- Founder visually reviews actual 100%-zoom before/after screenshots before any issue closure.
+
+**Status:** Reported and logged while Founder Test is under review. No code changed by this log.
+
+---
+
 ## Findings and implementation tracking
 
 - **Confirmed duplicate-action issue:** FT-004-C and exported JSON: a screen action already confirmed and saved the new start; a later typed confirmation invoked an additional no-op action and was labeled Changed.
 - **Source of earlier inconsistency established:** FT-004-B: the first screen confirmation had already changed the stored start before the repeated chat confirmation. No premature write was established.
-- **Founder-requested improvements:** FT-004-A: concise inline filing and confirmation summaries; FT-005: continue the original schedule purpose and choose the next relevant question; FT-006: make File match the established Resident Portal working interface; FT-007: stable mobile conversation composer; FT-008: usable Log out and authenticated public navigation.
+- **Founder-requested improvements:** FT-004-A: concise filing; FT-005: agent-led next question; FT-006: YAPTAIN-inspired File; FT-007: mobile composer; FT-008: public navigation/Log out; FT-009: center Conversation and right decisions; FT-010: visual Time calendar; FT-012: correct global sizing and legibility.
 - **Potential improvements / review questions:** FT-001-A, FT-001-C, FT-002-A, FT-002-D, FT-003-D; FT-003-C is partially retested (approval works; deferral untested).
 - **Observed positive behavior:** FT-003-A, founder-reported FT-003-B, and FT-004-D (conversation continues after confirmation).
 - **Unverified functional claims:** FT-001-B; FT-002-B and FT-002-C partially observed; FT-003-E and FT-004-B require File/Activity/history inspection.
 - **Approved direction for future improvement:** Shorten and clarify the feedback beneath guide responses (FT-004-A); final copy and implementation not yet approved.
 - **Code fixes deployed:** None through this founder-testing log. Session 01 paused for cleanup. Behavioral priorities #22 and #23; primary visual priority #25; public navigation #27; feedback #24; mobile composer #26.
-- **Pending retests:** FT-005 next question after a confirmation; FT-004 repeated confirmation by both screen and chat; FT-004 concise feedback; FT-003 deferred proposal; FT-006 File navigation/design; FT-007 mobile keyboard/composer; FT-008 public homepage auth state and sign-out.
+- **Pending retests:** FT-005 next purposeful question; FT-004 duplicate confirmation and concise feedback; FT-003 deferral; FT-006 File navigation; FT-007 mobile composer; FT-008 public auth; FT-009 center chat/right context shell; FT-010 Time calendar day/week/month, data synchronization and manual edits; FT-011 screenshots versus actual running preview; FT-012 100%-zoom full-size responsive sizing in the real preview.
 
 ### Maintenance rules
 
