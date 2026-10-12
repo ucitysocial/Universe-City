@@ -2,7 +2,6 @@ import PilotBoard from '@/components/PilotBoard';
 import PilotSideResize from '@/components/PilotSideResize';
 import PilotSideToggle from '@/components/PilotSideToggle';
 import type { Board } from '@/lib/pilot/board';
-import { sayDate } from '@/lib/pilot/time';
 
 /**
  * The right part of the frame: the dashboard. It stays in place on every page. The founder set it on October 11,
@@ -15,7 +14,7 @@ export default function PilotSide({ board }: { board: Board }) {
       <PilotSideResize />
       <PilotSideToggle waiting={board.panel.pending.length} />
       <div className="win">
-        <div className="win-bar">{sayDate(board.today).replace(/, \d{4}$/, '')}</div>
+        <div className="win-bar">Overview</div>
         <div className="win-body"><PilotBoard board={board} /></div>
       </div>
     </aside>

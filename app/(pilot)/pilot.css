@@ -703,3 +703,12 @@ button.dash-more{background:none;border:0;padding:0;cursor:pointer;font:inherit;
   .uc-side-off .side-grip{display:none}
   .uc-resizing,.uc-resizing *{cursor:col-resize!important;user-select:none}
 }
+
+/* ---------------------------------------------------------------- the bar at the top of the center */
+/* One bar on every page: where the resident is, and the date and time. It replaces the page's own heading bar. */
+.topbar{flex:none;display:flex;align-items:baseline;gap:16px;padding:10px clamp(16px,2.4vw,30px) 8px;background:var(--ink);color:var(--paper);font-family:'VT323',monospace;line-height:1;border-bottom:3px solid var(--ink)}
+.topbar-t{font-size:22px;letter-spacing:.06em}
+.topbar-n{margin-left:auto;font-size:18px;letter-spacing:.04em;color:rgba(244,239,233,.78);white-space:nowrap}
+.os-main>.topbar~* .fb-bar,.os-main>.topbar~* .pt-talk-head{display:none}
+.pt-stream-wrap{background:var(--paper)}
+@media (max-width:860px){.topbar{display:none}.os-main>.topbar~* .pt-talk-head{display:block}}
