@@ -785,3 +785,57 @@ html.uc-nav::after{content:"";position:fixed;left:0;top:0;height:3px;width:100%;
 .day-row.executed .day-l{text-decoration:line-through;text-decoration-thickness:1px;color:var(--ink2)}
 .day-t{font-family:'VT323',monospace;font-size:16px;color:var(--ink2);padding-left:9px;white-space:nowrap}
 .day-l{font-size:13.5px;font-weight:600;line-height:1.3}
+
+/* ---------------------------------------------------------------- the schedule on a phone fits the screen */
+@media (max-width:860px){
+  .fb-pane:has(.cal){display:flex;flex-direction:column;overflow:hidden;padding:8px 10px 6px}
+  .fb-pane:has(.cal-bar) .fb-back{display:none}
+  .fb-pane:has(.cal) .day-extra{display:none}
+  .fb-pane:has(.cal-bar) .cal-bar{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 8px;margin:0 0 8px;flex:none}
+  .fb-pane:has(.cal-bar) .cal-title{width:auto;font-size:15px;align-self:center;overflow:hidden;text-overflow:ellipsis}
+  .cal-word{display:none}
+  .fb-pane:has(.cal-bar) .cal-seg a,.fb-pane:has(.cal-bar) .cal-seg button{padding:4px 9px;font-size:12.5px;line-height:1.3}
+  .fb-pane:has(.cal-bar) .cal-views{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,1fr)}
+  .fb-pane:has(.cal-bar) .cal-views a{text-align:center}
+  .fb-pane:has(.cal-bar) .cal-bar>.cal-seg:not(.cal-move):not(.cal-views):not(.cal-mode){display:none}
+  .fb-pane:has(.cal-bar) .cal-mode{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr}
+  .fb-pane:has(.cal) .cal-scroll{flex:1;min-height:0;overflow:hidden}
+  .fb-pane:has(.cal) .cal{min-width:0}
+  .fb-pane:has(.cal) .cal-legend{flex:none;gap:2px 10px;font-size:13px;margin-top:6px}
+  .fb-pane:has(.cal) .cal-legend .cal-key{width:10px;height:10px}
+  .fb-pane:has(.cal) .cal-head{font-size:11px;padding-left:2px;padding-right:2px}
+  .fb-status{display:none}
+}
+@media (max-width:860px){
+  .fb-pane:has(.cal-bar){padding-top:8px}
+  .fb-pane:has(.cal) .cal-head{flex-direction:column;align-items:center;gap:0;padding:4px 1px 3px;font-size:11px}
+  .fb-pane:has(.cal) .cal-untimed{max-height:46px;overflow:hidden;padding:2px}
+  .fb-pane:has(.cal) .cal-chip{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;word-break:normal;font-size:11px;padding:2px 4px}
+  .fb-pane:has(.mon) .cal-legend{font-size:13px}
+}
+
+/* ---------------------------------------------------------------- the star is the menu on a phone */
+@media (max-width:860px){
+  .os-places{display:none!important}
+  .os:has(.fb) .pt-star{display:flex}
+}
+.sheet-places{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sheet-places a{display:block;text-align:center;padding:10px 8px;border:2px solid var(--ink);background:#fff;color:var(--ink);font-weight:600;font-size:15px;text-decoration:none}
+.sheet-places a.on{background:var(--ink);color:var(--paper)}
+.pt-sheet-body .os-search{padding:0}
+.pt-sheet-body .os-search-field input{border:2px solid var(--ink);background:#fff;font-size:15px}
+.sheet-found{display:grid;gap:6px}
+.sheet-found .os-found{color:var(--ink)}
+.sheet-foot{display:flex;align-items:center;gap:18px;border-top:2px solid var(--ink);padding-top:12px;margin-top:4px}
+.sheet-foot a{color:var(--ink);font-weight:600;font-size:15px}
+.sheet-foot a.on{text-decoration:underline}
+.sheet-foot .pt-link{color:var(--ink);font-size:14px}
+
+/* ---------------------------------------------------------------- one day as a list */
+.day-list-mode .cal-scroll,.day-list-mode .cal-legend,.day-list-mode .cal-bar>.cal-seg:not(.cal-move):not(.cal-views):not(.cal-mode){display:none!important}
+.day-list-mode .day-extra>.fb-h{margin-top:4px}
+@media (max-width:860px){
+  .fb-pane.day-list-mode .day-extra{display:block;flex:1;min-height:0;overflow-y:auto}
+  .fb-pane.day-list-mode .day-extra>.fb-h{display:none}
+}
+.pt-sheet-body .os-search button{color:var(--ink)}

@@ -12,22 +12,26 @@ const KEY = 'uc:calfit';
 export default function PilotCalZoom() {
   const [fit, setFit] = useState(false);
 
+  // On a phone the whole day always fits the screen, and the page does not scroll.
+  const phone = () => window.innerWidth <= 860;
   const apply = useCallback((on: boolean) => {
     const grid = document.querySelector<HTMLElement>('.cal');
     const pane = document.querySelector<HTMLElement>('.fb-pane');
-    const bar = document.querySelector<HTMLElement>('.cal-bar');
     const gutter = grid?.querySelector<HTMLElement>('.cal-gutter');
-    if (!grid || !pane || !bar || !gutter) return;
-    grid.classList.toggle('fit', on);
-    if (!on) { grid.style.removeProperty('--h'); window.dispatchEvent(new Event('uc:calzoom')); return; }
+    if (!grid || !pane || !gutter) return;
+    const fit = on || phone();
+    grid.classList.toggle('fit', fit);
+    if (!fit) { grid.style.removeProperty('--h'); window.dispatchEvent(new Event('uc:calzoom')); return; }
     const scroller = grid.closest<HTMLElement>('.cal-scroll');
     if (scroller) scroller.style.maxHeight = '';
+    pane.scrollTop = 0;
     const hours = Number(getComputedStyle(grid).getPropertyValue('--hours')) || 16;
-    const above = gutter.getBoundingClientRect().top - bar.getBoundingClientRect().top;
-    const h = Math.max(16, Math.floor((pane.clientHeight - above - 48) / hours));
+    const legend = pane.querySelector<HTMLElement>('.cal-legend');
+    const below = (legend ? legend.getBoundingClientRect().height + 10 : 0) + (phone() ? 10 : 28);
+    const room = pane.getBoundingClientRect().bottom - gutter.getBoundingClientRect().top - below;
+    const h = Math.max(phone() ? 12 : 16, Math.floor(room / hours));
     grid.style.setProperty('--h', `${h}px`);
     window.dispatchEvent(new Event('uc:calzoom'));
-    pane.scrollTop = bar.getBoundingClientRect().top - pane.getBoundingClientRect().top + pane.scrollTop - 12;
   }, []);
 
   useEffect(() => {
@@ -37,7 +41,8 @@ export default function PilotCalZoom() {
     apply(on);
     const again = () => { try { apply(localStorage.getItem(KEY) === '1'); } catch { /* nothing to do */ } };
     window.addEventListener('resize', again);
-    return () => window.removeEventListener('resize', again);
+    window.addEventListener('uc:refit', again);
+    return () => { window.removeEventListener('resize', again); window.removeEventListener('uc:refit', again); };
   }, [apply]);
 
   const choose = (on: boolean) => {

@@ -33,7 +33,7 @@ export default function PilotBoardDay({ days, today }: { days: BoardDay[]; today
       <div className="day-list">
         {d.items.map(i => (
           <a key={i.key} href={i.href} className={`day-row d-${i.dept} ${i.kind}`} {...popData(i)}>
-            <span className="day-t">{i.start === null ? 'No time' : i.timeShort}</span>
+            <span className="day-t">{i.start === null ? 'No time' : i.timeShort.replace(/, end unknown$/, '')}</span>
             <span className="day-l">{i.label}</span>
           </a>
         ))}

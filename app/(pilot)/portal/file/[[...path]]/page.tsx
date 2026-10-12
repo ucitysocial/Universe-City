@@ -375,6 +375,7 @@ async function dayPane({ q, zone, decides, ix }: Ctx, base: string, date: string
       <HourGrid cal={cal} today={now.date} nowMin={now.minutes} single />
       <Legend />
       <PilotCalFocus on={`day ${date} ${ix.lastFiledAt ?? ''}`} />
+      <div className="day-extra">
       <h2 className="fb-h">Commitments</h2>
       {commitments.length === 0 && <p className="fb-empty">No commitment is on this day.</p>}
       {commitments.length > 0 && (
@@ -387,14 +388,15 @@ async function dayPane({ q, zone, decides, ix }: Ctx, base: string, date: string
                 <b>{c.label}</b>
                 <span className="right">{spanWords(c.start_min, c.end_min)}</span>
                 <span className="sub">
-                  <span className={`pt-chip ${o.tone}`}>{o.word}</span>{' '}
-                  {BASIS[c.basis] || 'On file'}{c.changes ? `. ${count(c.changes, 'change')} in its history` : ''}
+                  <span className={`pt-chip ${o.tone}`}>{o.word}</span>
+                  {c.changes ? ` ${count(c.changes, 'change')} in its history` : ''}
                 </span>
               </Link>
             );
           })}
         </div>
       )}
+      </div>
     </>
   );
 }

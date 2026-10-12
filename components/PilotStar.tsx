@@ -1,7 +1,9 @@
 'use client';
 
 import { useEffect, useState, type ReactNode } from 'react';
+import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { SearchBox, SearchResults, useSearch } from '@/components/PilotSearch';
 import { supabaseBrowser } from '@/lib/supabase/client';
 
 /**
@@ -11,9 +13,10 @@ import { supabaseBrowser } from '@/lib/supabase/client';
  */
 export default function PilotStar({ waiting, children }: { waiting: number; children: ReactNode }) {
   const [open, setOpen] = useState(false);
-  const path = usePathname();
+  const path = usePathname() || '';
   const router = useRouter();
-  useEffect(() => { setOpen(false); }, [path]);
+  const search = useSearch();
+  useEffect(() => { setOpen(false); search.setText(''); }, [path]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!open) return;
     const key = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
@@ -41,8 +44,22 @@ export default function PilotStar({ waiting, children }: { waiting: number; chil
           <button type="button" className="pop-x" onClick={() => setOpen(false)} aria-label="Close the overview">×</button>
         </div>
         <div className="pt-sheet-body">
-          {children}
-          <button type="button" className="pt-link pt-sheet-out" onClick={logOut}>Log out of the test</button>
+          <SearchBox text={search.text} setText={search.setText} id="sheet-search-box" />
+          {search.active ? (
+            <div className="sheet-found"><SearchResults found={search.found} err={search.err} onOpen={() => setOpen(false)} /></div>
+          ) : (
+            <>
+              <nav className="sheet-places" aria-label="Places">
+                <Link href="/portal/home" className={path === '/portal/home' ? 'on' : undefined}>Home</Link>
+                <Link href="/portal/file" className={path.startsWith('/portal/file') ? 'on' : undefined}>My File</Link>
+              </nav>
+              {children}
+            </>
+          )}
+          <div className="sheet-foot">
+            <Link href="/portal/settings" className={path.startsWith('/portal/settings') ? 'on' : undefined}>Settings</Link>
+            <button type="button" className="pt-link" onClick={logOut}>Log out of the test</button>
+          </div>
         </div>
       </div>
     </>

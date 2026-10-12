@@ -40,7 +40,7 @@ export default function PilotBoard({ board, wide = false }: { board: Board; wide
               {d.items.length === 0 && <p className="dash-empty">Nothing on file</p>}
               {d.items.map(i => (
                 <a key={i.key} href={i.href} className={`dash-item d-${i.dept} ${i.kind}`} {...popData(i)}>
-                  <span className="dash-it">{i.start === null ? 'No time' : i.timeShort}</span>
+                  <span className="dash-it">{i.start === null ? 'No time' : i.timeShort.replace(/, end unknown$/, '')}</span>
                   <span className="dash-il">{i.label}</span>
                 </a>
               ))}
