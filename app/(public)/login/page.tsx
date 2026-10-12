@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { supabaseBrowser } from '@/lib/supabase/client';
 
 // What the page says when a visitor arrives from an emailed link.
@@ -12,7 +12,6 @@ const LINK_NOTE: Record<string, string> = {
 };
 
 export default function Login() {
-  const router = useRouter();
   const params = useSearchParams();
   // The page to open after login is a path on this site. A full address or a script is replaced with the Resident Portal.
   const asked = params.get('next') || '';
@@ -24,6 +23,7 @@ export default function Login() {
   const [busy, setBusy] = useState(false);
   const [unconfirmed, setUnconfirmed] = useState(false);
   const [sentTo, setSentTo] = useState<string | null>(null);
+  const [opening, setOpening] = useState(false);
 
   // A preview is outside the list of addresses the login service returns a link to. The public site is on that list.
   const onPreview = process.env.PILOT_CONTEXT === 'deploy-preview';
@@ -41,8 +41,9 @@ export default function Login() {
       setErr(error.message);
       return;
     }
-    router.push(next);
-    router.refresh();
+    // The page loads in full, so the server reads the new login on the first request.
+    setOpening(true);
+    window.location.assign(next);
   }
 
   async function sendConfirmation() {
@@ -95,9 +96,16 @@ export default function Login() {
             <input id="p" type="password" autoComplete="current-password" value={password}
                    onChange={e => setPassword(e.target.value)} required />
           </div>
-          <button className="btn" style={{ width: '100%' }} disabled={busy}>
-            {busy ? 'One moment' : 'Log in'}
+          <button className="btn" style={{ width: '100%' }} disabled={busy || opening}>
+            {opening ? 'Opening the Resident Portal' : busy ? 'Logging in' : 'Log in'}
           </button>
+          {opening && (
+            <div className="opening" role="status">
+              <p className="kick">Universe City</p>
+              <p className="opening-line">You are logged in. The Resident Portal is loading.</p>
+              <span className="opening-bar" aria-hidden="true" />
+            </div>
+          )}
           {showSend && (
             <button type="button" className="btn ghost" style={{ width: '100%', marginTop: 12 }} disabled={busy} onClick={sendConfirmation}>
               Send a new confirmation email
