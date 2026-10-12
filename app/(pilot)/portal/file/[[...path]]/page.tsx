@@ -2,6 +2,7 @@ import type { CSSProperties, ReactNode } from 'react';
 import Link from 'next/link';
 import PilotGhost from '@/components/PilotGhost';
 import { ghostsOf, withGhosts } from '@/lib/pilot/ghosts';
+import { loadGhostCatalogue } from '@/lib/pilot/ghost-catalogue';
 import { loadIntake } from '@/lib/pilot/intake';
 import { notFound, redirect } from 'next/navigation';
 import PilotAsk from '@/components/PilotAsk';
@@ -411,7 +412,7 @@ async function dayPane({ q, zone, decides, ix }: Ctx, base: string, date: string
   const { commitments, waiting } = await loadDay(q, date);
   const now = localNow(zone);
   // The pieces Time still needs show as faded rows on today and the days ahead.
-  const ghosts = date >= now.date ? ghostsOf(await loadIntake(q, now.date)) : [];
+  const ghosts = date >= now.date ? ghostsOf(await loadIntake(q, now.date), (await loadGhostCatalogue(q)).templates) : [];
   return (
     <>
       <CalendarBar view="day" on={date} today={now.date} />

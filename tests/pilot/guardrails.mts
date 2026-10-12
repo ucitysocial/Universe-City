@@ -877,6 +877,37 @@ const shift = (await asResident(A, q => q(`select id from uc_pilot.commitments w
     empty.done === 0 && !empty.items.find(i => i.key === 'sleep')!.done && full.done === 5, [empty.done, full.items.filter(i => !i.done).map(i => i.key)]);
 }
 
+// ================================================================= Agent Studio — configurable faded suggestions
+{
+  const { ghostsOf, DEFAULT_GHOSTS } = await import('../../lib/pilot/ghosts');
+  const { loadGhostCatalogue } = await import('../../lib/pilot/ghost-catalogue');
+  const intake = { items: [
+    { key: 'sleep', label: 'Sleep and wake times', done: false, ask: 'sleep' },
+    { key: 'morning', label: 'Morning routine', done: true, ask: 'morning' },
+    { key: 'work', label: 'Work schedule', done: false, ask: 'work' },
+    { key: 'meals', label: 'Meals', done: false, ask: 'meals' },
+    { key: 'night', label: 'Night routine', done: false, ask: 'night' }
+  ], done: 1, of: 5 };
+  const initial = ghostsOf(intake, DEFAULT_GHOSTS);
+  check('AG-01', 'The existing six faded suggestions remain intact except when their underlying intake need is satisfied',
+    initial.length === 5 && !initial.some(g => g.key === 'morning') && initial.some(g => g.key === 'wake') && initial.some(g => g.key === 'bed'), initial);
+
+  const custom = ghostsOf(intake, [
+    ...DEFAULT_GHOSTS.map(g => g.key === 'meals' ? { ...g, label: 'Plan food breaks' } : g),
+    { key: 'custom-demo', label: 'Travel time', ask: 'Help me plan the travel time.', at: 500, whenMissing: null, enabled: true },
+    { key: 'custom-hidden', label: 'Hidden', ask: 'Hidden prompt', at: 501, whenMissing: null, enabled: false }
+  ]);
+  check('AG-02', 'Agent-authored and edited suggestions display without creating actual commitments',
+    custom.some(g => g.key === 'custom-demo') && custom.some(g => g.label === 'Plan food breaks') && !custom.some(g => g.key === 'custom-hidden'), custom);
+
+  const priorFlag = process.env.PILOT_GHOST_CATALOGUE;
+  delete process.env.PILOT_GHOST_CATALOGUE;
+  const catalogue = await loadGhostCatalogue(async <T = Record<string, any>>() => [] as T[]);
+  if (priorFlag === undefined) delete process.env.PILOT_GHOST_CATALOGUE; else process.env.PILOT_GHOST_CATALOGUE = priorFlag;
+  check('AG-03', 'Without an opt-in migration flag the six defaults remain usable without issuing a database query',
+    !catalogue.ready && catalogue.templates.length === 6 && catalogue.templates[0].key === 'wake', catalogue.templates);
+}
+
 const failed = results.filter(r => !r.pass);
 console.log(`\n${results.length - failed.length} of ${results.length} passed`);
 if (failed.length) process.exit(1);
