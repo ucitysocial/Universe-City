@@ -857,3 +857,5 @@ html.uc-nav::after{content:"";position:fixed;left:0;top:0;height:3px;width:100%;
 .day-block.weekly{background:#fff;color:var(--ink);border-style:dashed;border-left:6px solid var(--fc)}
 .day-block .day-t{color:inherit;opacity:.85;padding-left:0}
 .day-block .day-l{font-size:13.5px}
+.day-item{border-left:4px solid var(--fc,var(--ink))}
+.day-extra .ent{border-left:4px solid var(--fc,var(--ink))}

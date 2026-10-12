@@ -367,23 +367,18 @@ async function dayPane({ q, zone, decides, ix }: Ctx, base: string, date: string
   void ix;
   const { commitments, waiting } = await loadDay(q, date);
   const now = localNow(zone);
-  const cal = await loadCalendar(q, date, date, now.date, DAY_FIT);
   return (
     <>
       <CalendarBar view="day" on={date} today={now.date} />
       <WaitingList list={waiting} zone={zone} decides={decides} />
-      <HourGrid cal={cal} today={now.date} nowMin={now.minutes} single />
-      <Legend />
-      <PilotCalFocus on={`day ${date} ${ix.lastFiledAt ?? ''}`} />
       <div className="day-extra">
-      <h2 className="fb-h">Commitments</h2>
       {commitments.length === 0 && <p className="fb-empty">No commitment is on this day.</p>}
       {commitments.length > 0 && (
         <div className="ents" style={{ maxWidth: 820 }}>
           {commitments.map(c => {
             const o = outcomeOf(c);
             return (
-              <Link key={c.id} href={`${base}/${date}/${c.id}`} className={c.withdrawn_at ? 'ent off' : 'ent'} style={fc(color)}>
+              <Link key={c.id} href={`${base}/${date}/${c.id}`} className={c.withdrawn_at ? 'ent off' : 'ent'} style={fc(belongsTo(c.folder, c.label).color)}>
                 <span className="fi i-page" />
                 <b>{c.label}</b>
                 <span className="right">{spanWords(c.start_min, c.end_min)}</span>

@@ -1,7 +1,6 @@
 import type { CSSProperties } from 'react';
 import Link from 'next/link';
 import PilotCalZoom from '@/components/PilotCalZoom';
-import PilotDayMode from '@/components/PilotDayMode';
 import { DEPARTMENTS } from '@/lib/domain/folders';
 import { addMonths, hourShort, KIND_WORD, monthEnd, monthStart, weekStart, type CalDay, type Calendar, type CalItem, type Placed } from '@/lib/pilot/calendar';
 import { SCHEDULE_PATH, TIME_PATH } from '@/lib/pilot/paths';
@@ -49,8 +48,7 @@ export function CalendarBar({ view, on, today }: { view: CalView; on: string; to
         <Link href={weekHref(on)} className={view === 'week' ? 'on' : undefined} aria-current={view === 'week' ? 'page' : undefined}>Week</Link>
         <Link href={monthHref(on)} className={view === 'month' ? 'on' : undefined} aria-current={view === 'month' ? 'page' : undefined}>Month</Link>
       </span>
-      {view === 'day' && <PilotDayMode />}
-      {view !== 'month' && <PilotCalZoom />}
+      {view === 'week' && <PilotCalZoom />}
     </div>
   );
 }
