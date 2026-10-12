@@ -164,7 +164,7 @@ function historyFor(rows: MessageView[], zone: string, presses: Press[] = []): T
 async function pressesSince(q: Q, since: string | null): Promise<Press[]> {
   return q<Press>(
     `select id, ${TS('at')} as at, brief, detail, outcome from uc_pilot.actions
-      where turn_id is null and tool = 'screen_decision' and ($1::timestamptz is null or at >= $1::timestamptz)
+      where turn_id is null and tool in ('screen_decision', 'screen_edit', 'screen_note') and ($1::timestamptz is null or at >= $1::timestamptz)
       order by seq desc limit 12`, [since]);
 }
 
@@ -273,9 +273,9 @@ export async function receive(userId: string, rawText: string, requestKey: strin
     ];
     const tools = TOOLS.map(t => ({ name: t.name, description: t.description, input_schema: t.input_schema }));
     const messages: Turn[] = historyFor(before.recent, access.timezone, before.presses);
-    // What the resident has open on the screen is context for the message. It is no instruction.
+    // The part of the File the resident wrote the message from is context for the message. It is no instruction.
     const viewing = opts.viewing ? clip(opts.viewing.replace(/[^\w ,.:'›\-]/g, ' ').replace(/\s+/g, ' ').trim(), 160) : '';
-    const mine = `(sent ${localNow(access.timezone, new Date(message.created_at)).label}${viewing ? `. The resident has this open on the screen: ${viewing}` : ''})\n${message.body}`;
+    const mine = `(sent ${localNow(access.timezone, new Date(message.created_at)).label}${viewing ? `. The resident wrote this from this part of the File: ${viewing}` : ''})\n${message.body}`;
     const lastTurn = messages[messages.length - 1];
     if (lastTurn && lastTurn.role === 'user') lastTurn.content = `${lastTurn.content as string}\n\n${mine}`;
     else messages.push({ role: 'user', content: mine });
@@ -379,7 +379,7 @@ export async function thread(userId: string, opts: { before?: string | null; lim
     // Each press on the screen in the span of this page, so the conversation shows the decision where it happened.
     const presses = page.length ? await q<Press & { target: string | null; target_id: string | null }>(
       `select id, ${TS('at')} as at, brief, detail, outcome, target, target_id from uc_pilot.actions
-        where turn_id is null and tool = 'screen_decision' and at >= $1::timestamptz
+        where turn_id is null and tool in ('screen_decision', 'screen_edit', 'screen_note') and at >= $1::timestamptz
           and ($2::timestamptz is null or at < $2::timestamptz)
         order by seq`, [page[0].created_at, opts.before && isUuid(opts.before) ? page[page.length - 1].created_at : null]) : [];
     const hrefs = await hrefsFor(q, [...effects, ...presses]);

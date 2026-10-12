@@ -13,6 +13,7 @@ export const ACTION_NAME: Record<string, string> = {
   add_commitment: 'Add a commitment',
   change_commitment: 'Change a commitment',
   withdraw_commitment: 'Take a commitment off',
+  set_folder: 'Set the folder of an entry in Time',
   report_outcome: 'File an outcome',
   draft_plan: 'Prepare a Plan',
   prepare: 'Prepare an entry for your answer',
@@ -24,6 +25,8 @@ export const ACTION_NAME: Record<string, string> = {
   open_work: 'Keep ongoing work',
   close_work: 'Close ongoing work',
   screen_decision: 'Your press on the screen',
+  screen_edit: 'Your change on the screen',
+  screen_note: 'Your note on the screen',
   desk_decision: 'A decision by a person'
 };
 

@@ -87,10 +87,11 @@ const FIELD: Record<string, string> = {
   label: 'Name', on_date: 'Day', start_min: 'Start', end_min: 'End', completion: 'What counts as done',
   execution: 'Outcome', actual_start_min: 'Actual start', actual_end_min: 'Actual end', timing: 'Timing',
   time_is_estimate: 'Rough time', outcome_said: 'Your words on the outcome', days: 'Days', realism: 'How realistic it felt',
-  plan_date: 'Day', said: 'Your words', what: 'What is needed', due_on: 'Needed by'
+  plan_date: 'Day', said: 'Your words', what: 'What is needed', due_on: 'Needed by', folder: 'Folder'
 };
 
 function sayValue(key: string, v: unknown): string {
+  if (key === 'folder' && !v) return 'none';
   if (v === null || v === undefined || v === '') return 'unknown';
   if (key.endsWith('_min')) return sayClock(Number(v));
   if (key === 'on_date' || key === 'plan_date' || key === 'due_on') return sayDate(String(v).slice(0, 10));
@@ -106,7 +107,7 @@ export async function revisionsOf(q: Q, table: string, id: string): Promise<Revi
     `select r.id, r.before, r.after, r.changed, r.actor, r.reason, ${TS('r.at')} as at,
             coalesce(m.id, pm.id) as m_id, coalesce(m.body, pm.body) as m_body,
             coalesce(${TS('m.created_at')}, ${TS('pm.created_at')}) as m_at, coalesce(m.speaker, pm.speaker) as m_speaker,
-            p.decided_via as via
+            coalesce(p.decided_via, e.via) as via
        from uc_pilot.revisions r
        left join uc_pilot.messages m on m.id = r.message_id
        -- A change the resident confirmed came from a waiting card, in the same transaction, so the two rows carry the
@@ -115,6 +116,10 @@ export async function revisionsOf(q: Q, table: string, id: string): Promise<Revi
          select x.decided_via, x.source_message_id from uc_pilot.pending x
           where x.result ->> 'target_id' = r.row_id::text and x.state = 'confirmed' and x.decided_at = r.at
           limit 1) p on true
+       -- A change the resident made in the form on the entry is listed as an action in the same transaction.
+       left join lateral (
+         select 'edit' as via from uc_pilot.actions a
+          where a.tool = 'screen_edit' and a.target_id = r.row_id and a.at = r.at limit 1) e on true
        left join uc_pilot.messages pm on pm.id = p.source_message_id and r.message_id is null
       where r.table_name = $1 and r.row_id = $2 order by r.seq desc limit 60`, [table, id]);
   return rows.map((r: any) => {
@@ -147,10 +152,10 @@ export type CommitmentFull = {
   schedule_item_id: string | null; execution: string; actual_start_min: number | null; actual_end_min: number | null;
   timing: string | null; time_is_estimate: boolean; outcome_said: string | null; outcome_at: string | null;
   withdrawn_at: string | null; withdrawn_said: string | null; basis: string; said: string | null; filed_by: string;
-  created_at: string; source_message_id: string | null; outcome_message_id: string | null; changes: number;
+  created_at: string; source_message_id: string | null; outcome_message_id: string | null; changes: number; folder: string | null;
 };
 
-const COMMITMENT = `c.id, c.label, c.on_date::text as on_date, c.start_min, c.end_min, c.completion, c.schedule_item_id, c.execution,
+const COMMITMENT = `c.id, c.label, c.folder, c.on_date::text as on_date, c.start_min, c.end_min, c.completion, c.schedule_item_id, c.execution,
   c.actual_start_min, c.actual_end_min, c.timing, c.time_is_estimate, c.outcome_said, ${TS('c.outcome_at')} as outcome_at,
   ${TS('c.withdrawn_at')} as withdrawn_at, c.withdrawn_said, c.basis, c.said, c.filed_by, ${TS('c.created_at')} as created_at,
   c.source_message_id, c.outcome_message_id,
@@ -176,8 +181,11 @@ export async function loadCommitment(q: Q, id: string) {
   const weekly = c.schedule_item_id
     ? (await q<any>(`select id, label, days, start_min, end_min, state from uc_pilot.schedule_items where id = $1`, [c.schedule_item_id]))[0] || null : null;
   const waiting = (await loadWaiting(q)).filter(w => typeof w.payload?.args?.ref === 'string' && c.id.startsWith(String(w.payload.args.ref).toLowerCase()));
+  const notes = await q<{ id: string; said: string; created_at: string; source_message_id: string | null }>(
+    `select id, said, ${TS('created_at')} as created_at, source_message_id from uc_pilot.statements
+      where commitment_id = $1 and state = 'current' order by created_at`, [c.id]);
   return {
-    c, weekly, waiting,
+    c, weekly, waiting, notes,
     source: await sourceOf(q, c.source_message_id),
     outcomeSource: await sourceOf(q, c.outcome_message_id),
     history: await revisionsOf(q, 'commitments', c.id)
@@ -188,9 +196,9 @@ export async function loadCommitment(q: Q, id: string) {
 
 export type WeeklyFull = {
   id: string; label: string; days: number[]; start_min: number | null; end_min: number | null; state: string; said: string | null;
-  basis: string; created_at: string; ended_at: string | null; source_message_id: string | null; changes: number;
+  basis: string; created_at: string; ended_at: string | null; source_message_id: string | null; changes: number; folder: string | null;
 };
-const WEEKLY = `s.id, s.label, s.days, s.start_min, s.end_min, s.state, s.said, s.basis, ${TS('s.created_at')} as created_at,
+const WEEKLY = `s.id, s.label, s.folder, s.days, s.start_min, s.end_min, s.state, s.said, s.basis, ${TS('s.created_at')} as created_at,
   ${TS('s.ended_at')} as ended_at, s.source_message_id,
   (select count(*)::int from uc_pilot.revisions r where r.table_name = 'schedule_items' and r.row_id = s.id) as changes`;
 
@@ -315,3 +323,81 @@ export async function loadTimeHistory(q: Q): Promise<Change[]> {
 /** A short phrase for the time of an entry, in the words the File uses. */
 export const spanWords = (start: number | null, end: number | null) =>
   saySpan(start, end).replace('time not established', 'Time unknown').replace('end not established', 'end unknown').replace('start not established', 'start unknown');
+
+// ------------------------------------------------------------------ the small window at the right of the frame
+
+export type SideView = {
+  work: { id: string; label: string; href: string }[];
+  unknown: string[];
+  waiting: { id: string; kind: string; summary: string }[];
+  filed: { id: string; brief: string | null; detail: string | null; outcome: string; at: string; target: string | null; target_id: string | null }[];
+  next: { id: string; label: string; on_date: string; start_min: number | null; end_min: number | null; folder: string | null }[];
+};
+
+/** What the File holds right now, in four short lists: open work, what waits, what was filed lately, what is next. */
+export async function loadSide(q: Q, zone: string): Promise<SideView> {
+  const today = localNow(zone).date;
+  const work = await q<{ id: string; label: string; folder: string }>(`select id, label, folder from uc_pilot.work where state = 'open' order by created_at limit 5`);
+  const waiting = await q<{ id: string; kind: string; summary: string }>(
+    `select id, kind, summary from uc_pilot.pending where state = 'open' and decider = 'resident' order by created_at limit 5`);
+  const filed = await q<SideView['filed'][number]>(
+    `select id, brief, detail, outcome, ${TS('at')} as at, target, target_id from uc_pilot.actions
+      where outcome in ('filed', 'decided') order by seq desc limit 6`);
+  const next = await q<SideView['next'][number]>(
+    `select id, label, on_date::text as on_date, start_min, end_min, folder from uc_pilot.commitments
+      where withdrawn_at is null and execution = 'planned' and on_date >= $1::date order by on_date, start_min nulls last limit 4`, [today]);
+  // The gaps the guide asks about next: a time that is missing on a day ahead.
+  const gaps = await q<{ label: string; on_date: string; start_min: number | null; end_min: number | null }>(
+    `select label, on_date::text as on_date, start_min, end_min from uc_pilot.commitments
+      where withdrawn_at is null and execution = 'planned' and on_date >= $1::date and (start_min is null or end_min is null)
+      order by on_date limit 4`, [today]);
+  return {
+    work: work.map(w => ({ id: w.id, label: w.label, href: `${folderPath(w.folder)}/work/${w.id}` })),
+    unknown: gaps.map(g => `${g.start_min === null && g.end_min === null ? 'The time' : g.start_min === null ? 'The start' : 'The end'} of ${g.label} on ${sayDate(g.on_date).replace(/, \d{4}$/, '')}`),
+    waiting, filed, next
+  };
+}
+
+// ------------------------------------------------------------------ search
+
+export type Found = { key: string; href: string; title: string; sub: string; kind: 'entry' | 'message'; at: string | null };
+
+/** Looks for words in the File and in the conversation. Each result leads to the entry or the message. */
+/** The start of a long text, ended at a whole word. The words say that more follows. */
+const excerpt = (text: string, max = 150) => {
+  const flat = text.replace(/\s+/g, ' ').trim();
+  if (flat.length <= max) return flat;
+  const cut = flat.slice(0, max);
+  return `${cut.slice(0, Math.max(cut.lastIndexOf(' '), 60))} (more text follows)`;
+};
+
+export async function searchAll(q: Q, text: string): Promise<Found[]> {
+  const words = text.toLowerCase().replace(/[%_\\]/g, ' ').split(/\s+/).filter(w => w.length > 1).slice(0, 5);
+  if (!words.length) return [];
+  const like = `{${words.map(w => `"%${w.replace(/"/g, '')}%"`).join(',')}}`;
+  const time = folderPath('Time');
+  const out: Found[] = [];
+  for (const r of await q<any>(
+    `select id, said, topic, folder, state, ${TS('created_at')} as at from uc_pilot.statements
+      where lower(said || ' ' || topic || ' ' || folder) like all ($1::text[]) order by state <> 'current', created_at desc limit 20`, [like])) {
+    out.push({ key: r.id, href: `${folderPath(r.folder)}/said/${r.id}`, title: r.topic, sub: `${r.folder}. ${excerpt(r.said)}${r.state !== 'current' ? ' (replaced or withdrawn)' : ''}`, kind: 'entry', at: r.at });
+  }
+  for (const r of await q<any>(
+    `select id, label, on_date::text as on_date, start_min, end_min, coalesce(said, '') as said from uc_pilot.commitments
+      where lower(label || ' ' || coalesce(said, '')) like all ($1::text[]) order by on_date desc limit 20`, [like])) {
+    out.push({ key: r.id, href: `${time}/${r.on_date}/${r.id}`, title: r.label, sub: `Time. ${sayDate(r.on_date)}, ${spanWords(r.start_min, r.end_min)}`, kind: 'entry', at: null });
+  }
+  for (const r of await q<any>(
+    `select id, label, days, start_min, end_min from uc_pilot.schedule_items where lower(label || ' ' || coalesce(said, '')) like all ($1::text[]) limit 10`, [like])) {
+    out.push({ key: r.id, href: `${time}/weekly/${r.id}`, title: r.label, sub: `Time. Weekly schedule, ${sayDays(r.days)}, ${spanWords(r.start_min, r.end_min)}`, kind: 'entry', at: null });
+  }
+  for (const r of await q<any>(
+    `select id, label, said, folder from uc_pilot.work where lower(label || ' ' || said) like all ($1::text[]) limit 10`, [like])) {
+    out.push({ key: r.id, href: `${folderPath(r.folder)}/work/${r.id}`, title: r.label, sub: `${r.folder}. Ongoing work. ${excerpt(r.said)}`, kind: 'entry', at: null });
+  }
+  for (const r of await q<any>(
+    `select id, speaker, body, ${TS('created_at')} as at from uc_pilot.messages where lower(body) like all ($1::text[]) order by seq desc limit 25`, [like])) {
+    out.push({ key: r.id, href: `/portal/conversation#m-${r.id}`, title: r.speaker === 'resident' ? 'You' : r.speaker === 'agent' ? 'Your agent' : 'Guide, software', sub: excerpt(r.body), kind: 'message', at: r.at });
+  }
+  return out;
+}

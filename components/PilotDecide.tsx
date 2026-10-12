@@ -6,9 +6,12 @@ import { useRouter } from 'next/navigation';
 /** Asks the guide for its next reply after a press, then tells the conversation on screen to load it. */
 export async function goOnAfterPress(next: string | null) {
   if (next) {
+    // The conversation on screen shows that a reply is being written, wherever the button was pressed.
+    window.dispatchEvent(new CustomEvent('uc:going', { detail: true }));
     try {
       await fetch('/api/pilot/continue', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ after: next }) });
     } catch { /* the decision is on file. The guide goes on when the resident writes again. */ }
+    window.dispatchEvent(new CustomEvent('uc:going', { detail: false }));
   }
   window.dispatchEvent(new Event('uc:thread'));
 }

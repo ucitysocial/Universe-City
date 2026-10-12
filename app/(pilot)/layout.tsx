@@ -1,10 +1,11 @@
 import type { Viewport } from 'next';
 import { notFound, redirect } from 'next/navigation';
-import PilotGuide from '@/components/PilotGuide';
 import PilotRail from '@/components/PilotRail';
+import PilotSide from '@/components/PilotSide';
 import PilotViewport from '@/components/PilotViewport';
 import { who } from '@/lib/pilot/auth';
-import { loadIndex } from '@/lib/pilot/browse';
+import { loadIndex, loadSide } from '@/lib/pilot/browse';
+import { hrefsFor } from '@/lib/pilot/paths';
 import { withResident } from '@/lib/pilot/db';
 import './pilot.css';
 
@@ -18,8 +19,12 @@ export const viewport: Viewport = { width: 'device-width', initialScale: 1, view
  * The founder test has its own layout. It checks the login and the test list itself,
  * so the Resident Portal layout and its residency rule are unchanged.
  *
- * The frame is fixed, as docs/product/RESIDENT_INTERFACE.md states it: the File at the left,
- * one working pane in the center, and the guide at the right.
+ * The frame is fixed, in three parts. The founder set it on October 11, 2026:
+ *   left    the places, a search, and the File as one tree
+ *   center  one working pane: the conversation, or the inside of a folder
+ *   right   a small window that shows what the File holds right now
+ * docs/product/RESIDENT_INTERFACE.md puts the agent in the right part. In this test the conversation takes the
+ * center, and the right part is the small window.
  */
 export default async function PilotLayout({ children }: { children: React.ReactNode }) {
   const w = await who();
@@ -44,13 +49,16 @@ export default async function PilotLayout({ children }: { children: React.ReactN
       </div>
     );
   }
-  const index = await withResident({ userId: w.userId, actor: 'resident' }, q => loadIndex(q, w.access.timezone));
+  const { index, side, hrefs } = await withResident({ userId: w.userId, actor: 'resident' }, async q => {
+    const side = await loadSide(q, w.access.timezone);
+    return { index: await loadIndex(q, w.access.timezone), side, hrefs: Object.fromEntries(await hrefsFor(q, side.filed)) };
+  });
   return (
     <div className="os">
       <PilotViewport />
       <PilotRail index={index} name={w.access.display_name} synthetic={w.access.synthetic} />
       <main className="os-main">{children}</main>
-      <PilotGuide />
+      <PilotSide side={side} hrefs={hrefs} />
     </div>
   );
 }

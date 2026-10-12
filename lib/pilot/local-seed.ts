@@ -73,4 +73,31 @@ export async function seedLocal(userId: string): Promise<void> {
       call('prepare', { action: 'add_commitment', args: { date: addDays(friday, 2), label: 'Laundry' }, rests_on: 'You said you might do laundry on Sunday.' })],
     say('The grocery decision is on file under Finance. Laundry on Sunday was said as a thought, so it waits for your answer.')
   ]);
+
+  // More made up entries, so the calendar shows each department and each kind of block.
+  const tomorrow = addDays(today, 1);
+  const gym = await send('today i went to the gym from 7 to 8:15 am', [
+    [call('add_commitment', { date: today, label: 'Gym', start: '07:00', end: '08:15', quote: 'today i went to the gym from 7 to 8:15 am' })],
+    say('Gym is on today.')
+  ]);
+  await send('yes the gym happened from 7 to 8:15 am', [
+    [call('report_outcome', { ref: String(gym.effects[0]?.target_id).slice(0, 8), execution: 'executed', actual_start: '07:00', actual_end: '08:15', quote: 'the gym happened from 7 to 8:15 am' })],
+    say('Filed.')
+  ]);
+  await send('tomorrow i have a dentist appointment from 10 to 11 am and a call with my sister from 10:30 to 11:30 am and i need to pick up my check', [
+    [call('add_commitment', { date: tomorrow, label: 'Dentist appointment', start: '10:00', end: '11:00', quote: 'a dentist appointment from 10 to 11 am' }),
+      call('add_commitment', { date: tomorrow, label: 'Call with my sister', start: '10:30', end: '11:30', quote: 'a call with my sister from 10:30 to 11:30 am' }),
+      call('add_commitment', { date: tomorrow, label: 'Pick up my check', quote: 'i need to pick up my check' })],
+    say('Three are on tomorrow.')
+  ]);
+  const wed = addDays(today, 3);
+  await send('wednesday i am going grocery shopping from 12 to 1 pm and saturday i will clean the kitchen at 9 am', [
+    [call('add_commitment', { date: wed, label: 'Grocery shopping', start: '12:00', end: '13:00', folder: 'Inventory', quote: 'i am going grocery shopping from 12 to 1 pm' }),
+      call('add_commitment', { date: addDays(today, 6), label: 'Clean the kitchen', start: '09:00', folder: 'Sanitation', quote: 'saturday i will clean the kitchen at 9 am' })],
+    say('Both are on file.')
+  ]);
+  await send('thursday at 2 pm i will review my standards list for an hour and a half, 2 to 3:30 pm', [
+    [call('add_commitment', { date: addDays(today, 4), label: 'Review my standards list', start: '14:00', end: '15:30', folder: 'Standards', quote: 'i will review my standards list for an hour and a half, 2 to 3:30 pm' })],
+    say('On file.')
+  ]);
 }

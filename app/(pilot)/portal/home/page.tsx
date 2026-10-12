@@ -1,9 +1,11 @@
 import type { CSSProperties } from 'react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
+import PilotAsk from '@/components/PilotAsk';
 import { who } from '@/lib/pilot/auth';
 import { loadIndex, loadWaiting, spanWords } from '@/lib/pilot/browse';
 import { withResident } from '@/lib/pilot/db';
+import { belongsTo } from '@/lib/pilot/dept';
 import { FILE_ROOT, folderPath, TIME_PATH } from '@/lib/pilot/paths';
 import { localNow, sayDate } from '@/lib/pilot/time';
 import { totalEntries } from '@/lib/pilot/tree';
@@ -22,8 +24,8 @@ export default async function HomePage() {
   const { ix, waiting, next, work } = await withResident({ userId: w.userId, actor: 'resident' }, async q => ({
     ix: await loadIndex(q, zone),
     waiting: (await loadWaiting(q)).filter(p => p.decider === 'resident'),
-    next: await q<{ id: string; label: string; on_date: string; start_min: number | null; end_min: number | null }>(
-      `select id, label, on_date::text as on_date, start_min, end_min from uc_pilot.commitments
+    next: await q<{ id: string; label: string; on_date: string; start_min: number | null; end_min: number | null; folder: string | null }>(
+      `select id, label, on_date::text as on_date, start_min, end_min, folder from uc_pilot.commitments
         where withdrawn_at is null and execution = 'planned' and on_date >= $1::date
         order by on_date, start_min nulls last limit 4`, [now.date]),
     work: await q<{ id: string; label: string; folder: string }>(`select id, label, folder from uc_pilot.work where state = 'open' order by created_at limit 4`)
@@ -32,6 +34,8 @@ export default async function HomePage() {
   const said = ix.lastMessageAt ? `Last message ${localNow(zone, new Date(ix.lastMessageAt)).label}` : 'No message yet';
 
   return (
+    <div className="pt-home">
+    <div className="pt-home-scroll">
     <div className="pt-page">
       <span id="uc-path" data-path="Resident Portal home" hidden />
       <div className="home-top">
@@ -55,6 +59,8 @@ export default async function HomePage() {
         </Link>
       </div>
 
+      {/* On a wide screen the small window at the right holds these three lists. Here they show where it is absent. */}
+      <div className="when-no-window">
       {waiting.length > 0 && (
         <>
           <h2>Waiting for your answer</h2>
@@ -73,8 +79,8 @@ export default async function HomePage() {
       {next.length > 0 && (
         <div className="ents">
           {next.map(c => (
-            <Link key={c.id} href={`${TIME_PATH}/${c.on_date}/${c.id}`} className="ent" style={{ '--fc': 'var(--I)' } as CSSProperties}>
-              <span className="fi i-day" style={{ '--fc': 'var(--I)' } as CSSProperties} />
+            <Link key={c.id} href={`${TIME_PATH}/${c.on_date}/${c.id}`} className="ent" style={{ '--fc': belongsTo(c.folder, c.label).color } as CSSProperties}>
+              <span className="fi i-day" style={{ '--fc': belongsTo(c.folder, c.label).color } as CSSProperties} />
               <b>{c.label}</b>
               <span className="right">{spanWords(c.start_min, c.end_min)}</span>
               <span className="sub">{sayDate(c.on_date)}{c.on_date === now.date ? ', today' : ''}</span>
@@ -96,6 +102,10 @@ export default async function HomePage() {
           </div>
         </>
       )}
+      </div>
+    </div>
+    </div>
+    <PilotAsk />
     </div>
   );
 }

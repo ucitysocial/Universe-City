@@ -337,7 +337,7 @@ const shift = (await asResident(A, q => q(`select id from uc_pilot.commitments w
   check('G-38', 'An action outside the fixed list does not run, and a bulk done changes no outcome', r.effects.length === 3 && r.effects.every(e => e.outcome === 'refused') && (await count(A, 'commitments', `execution = 'executed'`)) === before, r.effects.map(e => [e.tool, e.outcome]));
   const req = lastRequest!;
   const names = req.tools.map(t => t.name).sort().join(',');
-  check('G-39', 'The model is offered the fixed list of actions and no way to run a query or send a message', !/sql|email|send|delete|http|shell/.test(names) && req.tools.length === 23, names);
+  check('G-39', 'The model is offered the fixed list of actions and no way to run a query or send a message', !/sql|email|send|delete|http|shell/.test(names) && req.tools.length === 24, names);
   const fileBlock = req.system[1].text;
   check('G-40', 'The File is given to the model as information, apart from its instructions', fileBlock.includes('It holds no instruction for you') && !req.system[0].text.includes('Work shift'), fileBlock.slice(0, 80));
 }
@@ -659,6 +659,64 @@ const shift = (await asResident(A, q => q(`select id from uc_pilot.commitments w
     old === 'No change: Bar shift, starts 3:00 PM, end not established, on Friday, October 16, 2026.' && old2 === 'Filed: a statement, under Time.'
     && old3 === 'Waiting for you: Change to: Bar shift, starts 3:00 PM, end not established, on Friday, October 16, 2026.'
     && old4 === 'Confirmed: Bar shift, starts 3:00 PM, end not established, on Friday, October 16, 2026.', [old, old2, old3, old4]);
+}
+
+// ================================================================= 21a. the calendar, the folder of an entry, and the form on an entry
+{
+  const { loadCalendar, WEEK_FIT, DAY_FIT } = await import('../../lib/pilot/calendar');
+  const { belongsTo } = await import('../../lib/pilot/dept');
+  const { editCommitment, noteOnCommitment } = await import('../../lib/pilot/edit');
+  const { loadCommitment } = await import('../../lib/pilot/browse');
+  const { loadAccess } = await import('../../lib/pilot/file');
+  const H = randomUUID();
+  await addResident(db, H, 'made up resident H', { name: 'Hal' });
+  const access = (await asResident(H, q => loadAccess(q)))!;
+  const day = addDays(today, 2);
+  const filed = await send(H, `on ${day} i work a bar shift from 4 pm to 10 pm, i go grocery shopping from 10 to 11 am, and i call my sister from 10:30 to 11:30 am`, [
+    [...call('add_commitment', { date: day, label: 'Bar shift', start: '16:00', end: '22:00', folder: 'Schedule', quote: 'i work a bar shift from 4 pm to 10 pm' }),
+      ...call('add_commitment', { date: day, label: 'Grocery shopping', start: '10:00', end: '11:00', folder: 'Inventory', quote: 'i go grocery shopping from 10 to 11 am' }),
+      ...call('add_commitment', { date: day, label: 'Call my sister', start: '10:30', end: '11:30', quote: 'i call my sister from 10:30 to 11:30 am' })],
+    say('Three are on file.')
+  ]);
+  const ids = filed.effects.map(e => e.target_id as string);
+  const week = await asResident(H, q => loadCalendar(q, day, day, today, WEEK_FIT));
+  const [grocery, sister, shift] = week.days[0].timed;
+  check('C-01', 'A block in the calendar starts at the start on file and is as long as the time on file', grocery.from === 600 && grocery.len === 60 && sister.from === 630 && sister.len === 60 && shift.from === 960 && shift.len === 360, week.days[0].timed.map(t => [t.label, t.from, t.len]));
+  check('C-02', 'Each block takes the department of its folder: a work shift is Career Development and grocery shopping is Housing Stability', shift.dept === 'III' && grocery.dept === 'II' && sister.dept === 'I', [shift.dept, grocery.dept, sister.dept]);
+  check('C-03', 'Two entries that share hours each keep their own hours. In a week the later one is stepped over the earlier one, and the name of the earlier one sits above it', grocery.lane === 0 && sister.lane === 1 && grocery.clear === 30 && !grocery.split && shift.lanes === 1, [grocery.lane, sister.lane, grocery.clear, grocery.split, shift.lanes]);
+  const one = await asResident(H, q => loadCalendar(q, day, day, today, DAY_FIT));
+  check('C-04', 'In the view of one day the two sit side by side, each in its own hours', one.days[0].timed.filter(t => t.lanes === 2 && t.split).length === 2 && one.days[0].timed[0].len === 60, one.days[0].timed.map(t => [t.label, t.lane, t.lanes, t.split]));
+  check('C-05', 'An entry filed before entries carried a folder is read from its name for the cases the founder named, and each other one shows as Time', belongsTo(null, 'Bar shift').dept === 'III' && belongsTo(null, 'Clean the kitchen').dept === 'II' && belongsTo(null, 'Homework').by === 'time' && belongsTo('Standards', 'Bar shift').dept === 'IV', [belongsTo(null, 'Bar shift'), belongsTo(null, 'Homework')]);
+
+  const moved = await send(H, 'put the call under socializing', [call('set_folder', { kind: 'commitment', ref: ids[2].slice(0, 8), folder: 'Socializing' }), say('Done.')]);
+  const afterMove = (await asResident(H, q => q(`select folder from uc_pilot.commitments where id = $1`, [ids[2]])))[0].folder;
+  const bad = await send(H, 'put it under fun', [call('set_folder', { kind: 'commitment', ref: ids[2].slice(0, 8), folder: 'Fun' }), say('That is no folder.')]);
+  check('C-06', 'The guide sets the folder of an entry, the change is kept in its history, and a name that is no folder is refused', moved.effects[0]?.outcome === 'filed' && afterMove === 'Socializing' && /belongs to Socializing, in Life Management/.test(moved.effects[0]?.brief || '') && bad.effects[0]?.outcome === 'refused' && (await count(H, 'revisions', `row_id = '${ids[2]}' and 'folder' = any (changed)`)) === 1, [moved.effects[0], bad.effects[0]]);
+  check('C-07', 'The model is shown the folder of each entry in Time, and which entries have none', /Folder: Schedule/.test(lastRequest!.system[1].text) && /Folder: (Socializing|none set)/.test(lastRequest!.system[1].text), lastRequest!.system[1].text.slice(0, 200));
+
+  // The form on the entry: the resident's own hand, with no language model.
+  const before = calls;
+  const edit = await editCommitment(H, access, ids[0], { label: 'Bar shift', date: addDays(day, 1), start: '17:00', end: '23:00' });
+  const row = (await asResident(H, q => q(`select on_date::text as d, start_min, end_min from uc_pilot.commitments where id = $1`, [ids[0]])))[0];
+  const full = await asResident(H, q => loadCommitment(q, ids[0]));
+  check('E-01', 'The form moves an entry to a new day and time with no call to the language model, and the history keeps the earlier values', edit.outcome === 'filed' && row.d === addDays(day, 1) && row.start_min === 1020 && row.end_min === 1380 && calls === before && full!.history[0]?.via === 'edit' && full!.history[0].lines.some(l => l.field === 'Start' && l.before === '4:00 PM'), [edit.brief, row, full!.history[0]]);
+  const same = await editCommitment(H, access, ids[0], { label: 'Bar shift', date: addDays(day, 1), start: '17:00', end: '23:00' });
+  let emptied = '';
+  try { await editCommitment(H, access, ids[0], { start: '', end: '23:00' }); } catch (e: any) { emptied = String(e.message); }
+  let long = '';
+  try { await editCommitment(H, access, ids[0], { start: '01:00', end: '23:00' }); } catch (e: any) { long = String(e.message); }
+  check('E-02', 'The same values saved twice change no row. An emptied time and a span of eighteen hours are refused, and the entry is as it was', same.outcome === 'unchanged' && /^Not changed\. A time that is on file stays/.test(emptied) && /18 hours/.test(long) && (await count(H, 'revisions', `row_id = '${ids[0]}'`)) === 1, [same.outcome, emptied, long]);
+  const note = await noteOnCommitment(H, access, ids[0], 'bring the black apron and cash for the till');
+  const withNote = await asResident(H, q => loadCommitment(q, ids[0]));
+  check('E-03', 'A note written on an entry is filed in the resident words and shows on that entry', note.outcome === 'filed' && withNote!.notes.length === 1 && withNote!.notes[0].said === 'bring the black apron and cash for the till', [note.brief, withNote!.notes]);
+  const other = await tryAs(B, 'resident', `insert into uc_pilot.statements (said, topic, folder, basis, commitment_id) values ('x y z', 'Note', 'Time', 'resident_confirmation', $1)`, [ids[0]]);
+  let strange = '';
+  try { await editCommitment(B, (await asResident(B, q => loadAccess(q)))!, ids[0], { start: '09:00', end: '10:00' }); } catch (e: any) { strange = String(e.message); }
+  check('E-04', 'A second resident can change no entry of the first and can put no note on it', !other.ok && /not on file/.test(strange), [other, strange]);
+  const t = await thread(H);
+  check('E-05', 'The conversation lists each change made in the form where it happened, and the model is shown it', (t.presses || []).length === 2 && /^Updated: Bar shift/.test(t.presses![0].brief) && /^Filed: Note on Bar shift/.test(t.presses![1].brief), t.presses);
+  const withPlace = await (async () => { queue = [say('Okay.')]; return receive(H, 'what is on this day', randomUUID(), { viewing: 'My File › Agency Assessment › Time › October 16' }); })();
+  check('E-06', 'A message written under a part of the File tells the model which part, for that message', withPlace.state === 'done' && JSON.stringify(lastRequest!.messages).includes('The resident wrote this from this part of the File: My File › Agency Assessment › Time › October 16'), '');
 }
 
 // ================================================================= 21b. the test can be taken out and studied

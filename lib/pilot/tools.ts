@@ -10,7 +10,7 @@
 
 import type { Q } from './db';
 import { isUuid, TS } from './db';
-import { FOLDERS } from '../domain/folders';
+import { DEPARTMENTS, FOLDERS } from '../domain/folders';
 import { checkAnswer, checkQuote, clip, hasNegation, isRough, plain, quotePresent, shortId, type QuoteRules } from './guard';
 import {
   addDays, isDate, parseClock, sayClock, sayDate, sayDays, saySpan, weekdayOf, type LocalNow
@@ -114,6 +114,19 @@ function daysArg(a: Args, key: string, required = true): number[] | null {
   return [...out].sort((x, y) => x - y);
 }
 
+/** The folder an entry in Time belongs to: one of the forty eight, or none. */
+function belongsArg(a: Args): string | null {
+  const v = a.folder;
+  if (typeof v !== 'string' || !v.trim()) return null;
+  const hit = FOLDERS.find(f => f.name.toLowerCase() === v.trim().toLowerCase());
+  if (!hit) throw new Refusal(`Not done. ${clip(v, 40)} is no folder name. Use one of the forty eight folder names, or leave the folder out.`);
+  return hit.name;
+}
+const BELONGS = {
+  type: 'string', enum: FOLDERS.map(f => f.name),
+  description: 'The folder of the forty eight that this activity is about. The calendar colors the entry by the department of that folder. A work shift belongs to Schedule. Grocery shopping belongs to Inventory, cleaning to Sanitation, organizing to Organization. Leave it out when no folder plainly fits.'
+};
+
 function folderArg(a: Args, key = 'folder'): string {
   const v = a[key];
   if (typeof v !== 'string' || !v.trim()) return 'General';
@@ -208,10 +221,11 @@ type CommitmentRow = {
   completion: string | null; schedule_item_id: string | null; execution: string;
   actual_start_min: number | null; actual_end_min: number | null; timing: string | null;
   time_is_estimate: boolean; outcome_said: string | null; withdrawn_at: string | null; basis: string; said: string | null;
+  folder?: string | null;
 };
 
 const COMMITMENT_COLS = `id, label, on_date::text as on_date, start_min, end_min, completion, schedule_item_id, execution,
-  actual_start_min, actual_end_min, timing, time_is_estimate, outcome_said, ${TS('withdrawn_at')} as withdrawn_at, basis, said`;
+  actual_start_min, actual_end_min, timing, time_is_estimate, outcome_said, ${TS('withdrawn_at')} as withdrawn_at, basis, said, folder`;
 
 export function sayCommitment(c: CommitmentRow): string {
   const parts = [`${c.label}, ${saySpan(c.start_min, c.end_min)}`];
@@ -234,8 +248,8 @@ async function commitmentsOn(env: Env, date: string): Promise<CommitmentRow[]> {
 /** Puts the day's recurring items on the day. A commitment the resident took off is left off. */
 export async function placeSchedule(env: Pick<Env, 'q'>, date: string): Promise<number> {
   const made = await env.q<{ id: string }>(
-    `insert into uc_pilot.commitments (label, on_date, start_min, end_min, schedule_item_id, basis, said, source_message_id)
-     select s.label, $1::date, s.start_min, s.end_min, s.id, 'schedule', s.said, s.source_message_id
+    `insert into uc_pilot.commitments (label, on_date, start_min, end_min, schedule_item_id, basis, said, source_message_id, folder)
+     select s.label, $1::date, s.start_min, s.end_min, s.id, 'schedule', s.said, s.source_message_id, s.folder
        from uc_pilot.schedule_items s
       where s.state = 'current' and $2::smallint = any (s.days)
      on conflict (user_id, schedule_item_id, on_date) do nothing
@@ -418,7 +432,7 @@ export const TOOLS: Tool[] = [
   {
     name: 'get_history',
     group: 'read',
-    description: 'Reads how one entry changed: each earlier value, when it changed, who changed it, and the message the change rests on. Use it when the resident asks what an entry said before a correction.',
+    description: 'Reads how one entry changed: each earlier value, when it changed, who changed it, and the message the change was filed from. Use it when the resident asks what an entry said before a correction.',
     input_schema: obj({
       kind: { type: 'string', enum: ['statement', 'commitment', 'schedule_item', 'plan'] },
       ref: REF('the entry')
@@ -469,13 +483,17 @@ export const TOOLS: Tool[] = [
       quote: QUOTE,
       topic: { type: 'string', description: 'A short plain label for finding this entry later, in two to five words. Work schedule, landlord, and morning routine are three labels of the right size.' },
       folder: { type: 'string', description: 'The one folder name this belongs to, or General.' },
-      about_date: DATE('The day the statement is about, when it is about one day')
+      about_date: DATE('The day the statement is about, when it is about one day'),
+      about_ref: { type: 'string', description: 'The reference of one commitment, when the resident gives a note about that commitment. The note then shows on the commitment. Leave it out for every other statement.' }
     }, ['quote', 'topic', 'folder']),
     async run(env, a) {
       const said = words(env, a) ?? text(a, 'summary', 1000)!;
       const topic = text(a, 'topic', 80)!;
       const folder = folderArg(a);
-      const about = dateArg(a, 'about_date', false);
+      // A note about one commitment names it, and takes its day when no day is given.
+      const noteOn = given(a, 'about_ref') ? await find(env, 'commitment', a.about_ref) : null;
+      const noted = noteOn ? (await env.q<{ on_date: string }>(`select on_date::text as on_date from uc_pilot.commitments where id = $1`, [noteOn]))[0] : null;
+      const about = dateArg(a, 'about_date', false) ?? noted?.on_date ?? null;
       const same = await env.q<{ id: string; topic: string; folder: string }>(
         `select id, topic, folder from uc_pilot.statements where state = 'current' and lower(said) = lower($1) limit 1`, [said]);
       if (same.length) {
@@ -486,8 +504,8 @@ export const TOOLS: Tool[] = [
         };
       }
       const row = (await env.q<{ id: string }>(
-        `insert into uc_pilot.statements (said, topic, folder, about_date, basis) values ($1, $2, $3, $4::date, $5) returning id`,
-        [said, topic, folder, about, env.basis]))[0];
+        `insert into uc_pilot.statements (said, topic, folder, about_date, basis, commitment_id) values ($1, $2, $3, $4::date, $5, $6) returning id`,
+        [said, topic, folder, about, env.basis, noteOn]))[0];
       return { outcome: 'filed', detail: `Filed under ${folder}: "${clip(said, 160)}"`, brief: `Filed: ${topic}, under ${folder}.`, target: 'statements', targetId: row.id, data: { ref: shortId(row.id), folder, topic } };
     }
   },
@@ -550,6 +568,7 @@ export const TOOLS: Tool[] = [
       label: { type: 'string', description: 'What it is, in a few plain words.' },
       days: { type: 'array', items: { type: 'string' }, description: 'The days of the week it falls on, as day names.' },
       start: CLOCK('When it starts'), end: CLOCK('When it ends'),
+      folder: BELONGS,
       quote: QUOTE
     }, ['label', 'days', 'quote']),
     async run(env, a) {
@@ -561,8 +580,8 @@ export const TOOLS: Tool[] = [
         `select id from uc_pilot.schedule_items where state = 'current' and lower(label) = lower($1) and days && $2::smallint[] limit 1`, [label, `{${days.join(',')}}`]);
       if (same.length) throw new Refusal(`Not filed. A weekly item named ${label} is already on file for one of those days, with the reference ${shortId(same[0].id)}. Use change_schedule_item to change it.`);
       const row = (await env.q<{ id: string }>(
-        `insert into uc_pilot.schedule_items (label, days, start_min, end_min, said, basis) values ($1, $2::smallint[], $3, $4, $5, $6) returning id`,
-        [label, `{${days.join(',')}}`, start, end, said, env.basis]))[0];
+        `insert into uc_pilot.schedule_items (label, days, start_min, end_min, said, basis, folder) values ($1, $2::smallint[], $3, $4, $5, $6, $7) returning id`,
+        [label, `{${days.join(',')}}`, start, end, said, env.basis, belongsArg(a)]))[0];
       return { outcome: 'filed', detail: `Filed in the weekly schedule: ${label}, ${sayDays(days)}, ${saySpan(start, end)}.${inWords(said)}`, brief: `Filed: ${weeklyBrief(label, days, start, end)} Weekly schedule.`, target: 'schedule_items', targetId: row.id, data: { ref: shortId(row.id) } };
     }
   },
@@ -662,6 +681,7 @@ export const TOOLS: Tool[] = [
       label: { type: 'string', description: 'What it is, in a few plain words.' },
       start: CLOCK('When it starts'), end: CLOCK('When it ends'),
       done_means: { type: 'string', description: 'What counts as done, in the resident\'s words. Leave it out when the resident did not say.' },
+      folder: BELONGS,
       quote: QUOTE
     }, ['date', 'label', 'quote']),
     async run(env, a) {
@@ -684,8 +704,8 @@ export const TOOLS: Tool[] = [
         };
       }
       const row = (await env.q<{ id: string }>(
-        `insert into uc_pilot.commitments (label, on_date, start_min, end_min, completion, time_is_estimate, said, basis)
-         values ($1, $2::date, $3, $4, $5, $6, $7, $8) returning id`, [label, date, start, end, completion, rough, said, env.basis]))[0];
+        `insert into uc_pilot.commitments (label, on_date, start_min, end_min, completion, time_is_estimate, said, basis, folder)
+         values ($1, $2::date, $3, $4, $5, $6, $7, $8, $9) returning id`, [label, date, start, end, completion, rough, said, env.basis, belongsArg(a)]))[0];
       await refreshPlanCard(env, date);
       const plan = (await env.q<any>(`select state from uc_pilot.plans where plan_date = $1::date`, [date]))[0];
       const others = (await commitmentsOn(env, date)).filter(c => c.id !== row.id && !c.withdrawn_at);
@@ -768,6 +788,35 @@ export const TOOLS: Tool[] = [
         brief: `Updated: ${entryBrief(label, date, start, end)}${was.length ? ` Before: ${was.join(', ')}.` : ''}`,
         target: 'commitments', targetId: id, data: { ref: shortId(id) }
       };
+    }
+  },
+  {
+    name: 'set_folder',
+    group: 'file',
+    description: 'Sets the folder that one commitment or one weekly schedule item belongs to. The entry stays in Time, and the calendar colors it by the department of that folder. Use it when an entry in view shows no folder and its activity plainly fits one, and when the resident says an entry belongs under a different folder. It changes no day, no time, and no name.',
+    input_schema: obj({
+      kind: { type: 'string', enum: ['commitment', 'weekly item'] },
+      ref: REF('the commitment or the weekly schedule item'),
+      folder: { ...BELONGS, description: 'The folder of the forty eight that this activity is about.' }
+    }, ['kind', 'ref', 'folder']),
+    async run(env, a) {
+      const weekly = a.kind === 'weekly item';
+      if (!weekly && a.kind !== 'commitment') throw new Refusal('Not done. The kind is commitment or weekly item.');
+      const folder = belongsArg(a);
+      if (!folder) throw new Refusal('Not done. Name one of the forty eight folders.');
+      const id = await find(env, weekly ? 'schedule_item' : 'commitment', a.ref);
+      const table = weekly ? 'schedule_items' : 'commitments';
+      const old = (await env.q<any>(`select label, folder${weekly ? '' : ', on_date::text as on_date'} from uc_pilot.${table} where id = $1`, [id]))[0];
+      const dept = DEPARTMENTS.find(d => d.key === FOLDERS.find(f => f.name === folder)!.dept)!.name;
+      const where = weekly ? 'in the weekly schedule' : `on ${dayBrief(old.on_date)}`;
+      if (old.folder === folder) {
+        return { outcome: 'unchanged', detail: `Nothing changed. ${old.label} ${where} already belongs to ${folder}.`, brief: `No change: ${old.label} ${where} belongs to ${folder}, in ${dept}.`, target: table, targetId: id, data: { nothing_changed: true } };
+      }
+      await env.q(`select set_config('uc.reason', 'The guide set the folder.', true)`);
+      await env.q(`update uc_pilot.${table} set folder = $2 where id = $1`, [id, folder]);
+      // The days ahead that were placed from a weekly item follow it.
+      if (weekly) await env.q(`update uc_pilot.commitments set folder = $2 where schedule_item_id = $1 and on_date >= $3::date and execution = 'planned' and withdrawn_at is null`, [id, folder, env.now.date]);
+      return { outcome: 'filed', detail: `Folder set: ${old.label} ${where} belongs to ${folder}, in ${dept}.${old.folder ? ` Before: ${old.folder}.` : ''}`, brief: `Updated: ${old.label} ${where} belongs to ${folder}, in ${dept}.`, target: table, targetId: id, data: { ref: shortId(id) } };
     }
   },
   {
@@ -891,7 +940,7 @@ export const TOOLS: Tool[] = [
     input_schema: obj({
       action: { type: 'string', enum: ['file_statement', 'set_schedule_item', 'change_schedule_item', 'end_schedule_item', 'add_commitment', 'change_commitment', 'withdraw_commitment'] },
       args: { type: 'object', description: 'The fields of that action. For file_statement, put the exact text to file in summary.' },
-      rests_on: { type: 'string', description: 'What this rests on, in a few words.' }
+      rests_on: { type: 'string', description: 'What the resident said that this is based on, in a few plain words.' }
     }, ['action', 'args']),
     async run(env, a) {
       const action = String(a.action || '');
@@ -943,7 +992,7 @@ export const TOOLS: Tool[] = [
     description: 'Sends one interpretation to the resident\'s agent as a proposal. Use it for a reading that goes beyond what the resident said: a pattern across days, a likely cause, a conclusion about the resident. A proposal is no entry on file. A person decides it. You never decide it, and you never state it to the resident as a fact.',
     input_schema: obj({
       summary: { type: 'string', description: 'The interpretation, in one or two plain sentences.' },
-      rests_on: { type: 'string', description: 'The dated entries or messages it rests on.' },
+      rests_on: { type: 'string', description: 'The dated entries or messages it is based on.' },
       folder: { type: 'string', description: 'The folder it belongs to, or General.' },
       topic: { type: 'string', description: 'A short label.' }
     }, ['summary', 'rests_on']),

@@ -1,7 +1,10 @@
 import type { CSSProperties, ReactNode } from 'react';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
+import PilotAsk from '@/components/PilotAsk';
+import PilotCalFocus from '@/components/PilotCalFocus';
 import PilotDecide from '@/components/PilotDecide';
+import PilotEntry from '@/components/PilotEntry';
 import { DEPARTMENTS, FOLDERS, type Folder } from '@/lib/domain/folders';
 import { who } from '@/lib/pilot/auth';
 import {
@@ -14,6 +17,10 @@ import { loadFile } from '@/lib/pilot/file';
 import { deptBySlug, deptPath, FILE_ROOT, folderBySlug, folderPath, slugOf } from '@/lib/pilot/paths';
 import { isDate, localNow, sayClock, sayDate, sayDays } from '@/lib/pilot/time';
 import { dayLabel, totalEntries } from '@/lib/pilot/tree';
+import { DAY_FIT, loadCalendar, MONTH_FIT, WEEK_FIT, weekStart } from '@/lib/pilot/calendar';
+import { belongsTo, sayBelongs } from '@/lib/pilot/dept';
+import { addDays } from '@/lib/pilot/time';
+import { CalendarBar, HourGrid, Legend, MonthGrid, monthRange, type CalView } from './calendar';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,7 +33,7 @@ export const dynamic = 'force-dynamic';
 // The tree at the left shows the same place. This page shows what that place holds, and builds no entry.
 
 type Crumb = { label: string; href: string };
-type Ctx = { q: Q; zone: string; ix: FileIndex; decides: boolean };
+type Ctx = { q: Q; zone: string; ix: FileIndex; decides: boolean; view: CalView; on: string | null };
 
 const BASIS: Record<string, string> = {
   resident_statement: 'You said it', resident_confirmation: 'You confirmed it',
@@ -34,6 +41,8 @@ const BASIS: Record<string, string> = {
 };
 const count = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
 const Unknown = () => <span className="none">unknown</span>;
+/** 15:30, for a time box. An unknown time is an empty box. */
+const clock24 = (min: number | null) => (min === null ? '' : `${String(Math.floor((min % 1440) / 60)).padStart(2, '0')}:${String(min % 60).padStart(2, '0')}`);
 const fc = (color?: string) => ({ '--fc': color || 'var(--ink)' } as CSSProperties);
 
 function outcomeOf(c: CommitmentFull): { word: string; tone: string } {
@@ -73,6 +82,8 @@ function Browser({ crumbs, color, ix, zone, children }: { crumbs: Crumb[]; color
         <span>{waiting === 0 ? 'No entry waits' : `${count(waiting, 'entry waits', 'entries wait')}`}</span>
         {ix.lastFiledAt && <span>Last filed {localNow(zone, new Date(ix.lastFiledAt)).label}</span>}
       </div>
+      {/* The guide is reached from each place in the File. The message is sent in the conversation. */}
+      <PilotAsk place={last.label} path={crumbs.map(c => c.label).join(' › ')} />
     </div>
   );
 }
@@ -123,8 +134,9 @@ function History({ list, zone }: { list: Revision[]; zone: string }) {
               {r.lines.map((l, i) => <p key={i}><strong>{l.field}:</strong> {l.now}. <del>Before: {l.before}.</del></p>)}
               {r.via === 'screen' && <p className="src">You confirmed it with the button on the screen.</p>}
               {r.via === 'conversation' && <p className="src">You confirmed it in the conversation.</p>}
+              {r.via === 'edit' && <p className="src">You changed it in the form on this entry.</p>}
               {r.message && r.message.speaker === 'resident' && (
-                <p className="src">It rests on your message: {r.message.body} <Link href={`/portal/conversation#m-${r.message.id}`}>Open it</Link></p>
+                <p className="src">Your message: {r.message.body} <Link href={`/portal/conversation#m-${r.message.id}`}>Open it</Link></p>
               )}
             </li>
           ))}
@@ -144,7 +156,7 @@ function WaitingList({ list, zone, decides }: { list: WaitingRow[]; zone: string
           <b>{p.summary}</b>
           <span className={`pt-chip ${p.decider === 'agent' ? 'agent' : 'wait'}`}>{p.decider === 'agent' ? 'Proposal' : 'Waiting for you'}</span>
           <div className="sub">
-            {p.rests_on && <p>It rests on: {p.rests_on}</p>}
+            {p.rests_on && <p>Why it waits: {p.rests_on}</p>}
             {p.source && p.source.speaker === 'resident' && (
               <p>Your message, {localNow(zone, new Date(p.source.at)).label}: {p.source.body} <Link href={`/portal/conversation#m-${p.source.id}`}>Open it</Link></p>
             )}
@@ -157,6 +169,20 @@ function WaitingList({ list, zone, decides }: { list: WaitingRow[]; zone: string
         </div>
       ))}
     </div>
+  );
+}
+
+/** The folder an entry in Time belongs to, and how that folder was chosen. The calendar colors the entry by it. */
+function Belongs({ b }: { b: ReturnType<typeof belongsTo> }) {
+  return (
+    <>
+      <span className="dot" style={{ background: b.color }} /> {sayBelongs(b)}.{' '}
+      <span className="src">
+        {b.by === 'file' ? 'The guide chose the folder. Tell the guide to move the entry to a different folder.'
+          : b.by === 'name' ? 'No folder is on the entry yet. Software read this one from the name of the entry. Tell the guide to move the entry to a different folder.'
+            : 'No folder is on the entry yet, so it shows in the color of Time. Tell the guide which folder it belongs to.'}
+      </span>
+    </>
   );
 }
 
@@ -227,19 +253,18 @@ async function folderPane(ctx: Ctx, folder: Folder | null, base: string, color?:
   }
 
   const view = await loadFile(q, zone, { daysBack: 3, daysAhead: 10, statements: 1 });
-  const day = (d: FileIndex['time']['days'][number]): TileItem => ({
-    href: `${base}/${d.date}`, icon: 'day', color, name: sayDate(d.date).replace(/, \d{4}$/, ''),
-    meta: `${count(d.count, 'commitment')}${d.plan === 'confirmed' ? ' / Plan confirmed' : d.plan === 'draft' ? ' / Plan is a draft' : ''}${d.date === ix.today ? ' / today' : ''}`
-  });
-  const held = ix.time.days.filter(d => d.count > 0 || d.plan);
-  const ahead = held.filter(d => d.date >= ix.today);
-  const past = held.filter(d => d.date < ix.today).reverse();
+  // The calendar: one week by default, one month when asked. One day has its own address.
+  const now = localNow(zone);
+  const on = ctx.on ?? now.date;
+  const month = ctx.view === 'month';
+  const range = month ? monthRange(on) : { from: weekStart(on), to: addDays(weekStart(on), 6) };
+  const cal = await loadCalendar(q, range.from, range.to, now.date, month ? MONTH_FIT : WEEK_FIT);
   return (
     <>
-      {folder && <p className="fb-note">{folder.system}. {folder.question}?</p>}
-      <h2 className="fb-h">Days</h2>
-      {ahead.length ? <Tiles items={ahead.map(day)} /> : <p className="fb-empty">No commitment is on file for today or a day ahead.</p>}
-      {past.length > 0 && <><h2 className="fb-h">Earlier days</h2><Tiles items={past.map(day)} /></>}
+      <CalendarBar view={month ? 'month' : 'week'} on={on} today={now.date} />
+      {month ? <MonthGrid cal={cal} on={on} today={now.date} /> : <HourGrid cal={cal} today={now.date} nowMin={now.minutes} />}
+      <Legend month={month} />
+      <PilotCalFocus on={`${month ? 'month' : 'week'} ${on} ${ix.lastFiledAt ?? ''}`} />
       <h2 className="fb-h">In this folder</h2>
       <Tiles items={[
         node('weekly', 'Weekly schedule', 'clock', ix.time.weekly, 'item that repeats', 'items that repeat'),
@@ -256,13 +281,16 @@ async function folderPane(ctx: Ctx, folder: Folder | null, base: string, color?:
 
 async function dayPane({ q, zone, decides, ix }: Ctx, base: string, date: string, color?: string) {
   const { commitments, plan, waiting } = await loadDay(q, date);
+  const now = localNow(zone);
+  const cal = await loadCalendar(q, date, date, now.date, DAY_FIT);
   return (
     <>
-      <div className="doc">
+      <CalendarBar view="day" on={date} today={now.date} />
+      <div className="doc" style={{ maxWidth: 'none' }}>
         <div className="doc-bar" style={fc(color)}>
-          <b>{sayDate(date)}{date === ix.today ? ', today' : ''}</b>
-          {plan?.state === 'confirmed' && <span className="pt-chip filed">Plan confirmed by you</span>}
-          {plan?.state === 'draft' && <span className="pt-chip wait">Plan is a draft</span>}
+          <b>Plan for {date === ix.today ? 'today' : 'this day'}</b>
+          {plan?.state === 'confirmed' && <span className="pt-chip filed">Confirmed by you</span>}
+          {plan?.state === 'draft' && <span className="pt-chip wait">Draft</span>}
           {!plan && <span className="pt-chip unknown">No Plan yet</span>}
         </div>
         {plan?.realism && <div className="words"><p className="flab">How realistic it felt, in your words</p><p className="fq">{plan.realism}</p></div>}
@@ -274,6 +302,9 @@ async function dayPane({ q, zone, decides, ix }: Ctx, base: string, date: string
         )}
       </div>
       <WaitingList list={waiting} zone={zone} decides={decides} />
+      <HourGrid cal={cal} today={now.date} nowMin={now.minutes} single />
+      <Legend />
+      <PilotCalFocus on={`day ${date} ${ix.lastFiledAt ?? ''}`} />
       <h2 className="fb-h">Commitments</h2>
       {commitments.length === 0 && <p className="fb-empty">No commitment is on this day.</p>}
       {commitments.length > 0 && (
@@ -304,19 +335,23 @@ async function commitmentPane({ q, zone, decides }: Ctx, base: string, id: strin
   const { c } = x;
   const o = outcomeOf(c);
   const rough = c.time_is_estimate ? ', a rough time as you gave it' : '';
+  const b = belongsTo(c.folder, c.label);
+  // The form changes an entry that is still planned. An entry with an outcome is changed by a correction.
+  const open = !c.withdrawn_at && c.execution === 'planned';
   return {
     label: c.label,
     date: c.on_date,
     node: (
       <>
         <div className="doc">
-          <div className="doc-bar" style={fc(color)}>
+          <div className="doc-bar" style={fc(b.color)}>
             <b>{c.label}</b>
             <span className={`pt-chip ${o.tone}`}>{o.word}</span>
             <span className="pt-chip">{BASIS[c.basis] || 'On file'}</span>
           </div>
           <dl className="fields">
             <dt>Day</dt><dd><Link href={`${base}/${c.on_date}`}>{sayDate(c.on_date)}</Link></dd>
+            <dt>Belongs to</dt><dd><Belongs b={b} /></dd>
             <dt>Start</dt><dd>{c.start_min === null ? <Unknown /> : `${sayClock(c.start_min)}${rough}`}</dd>
             <dt>End</dt><dd>{c.end_min === null ? <Unknown /> : `${sayClock(c.end_min)}${rough}`}</dd>
             <dt>What counts as done</dt><dd>{c.completion || <Unknown />}</dd>
@@ -328,6 +363,19 @@ async function commitmentPane({ q, zone, decides }: Ctx, base: string, id: strin
           <Words label={c.basis === 'schedule' ? 'Your words for the weekly item' : 'Your words when it was filed'} quote={c.said} source={x.source} zone={zone} />
           {c.outcome_said && <Words label="Your words on the outcome" quote={c.outcome_said} source={x.outcomeSource} zone={zone} />}
           {c.withdrawn_said && <div className="words"><p className="flab">When it was taken off</p><p className="fq">{c.withdrawn_said}</p></div>}
+          {x.notes.length > 0 && (
+            <div className="words">
+              <p className="flab">Notes</p>
+              {x.notes.map(n => (
+                <div key={n.id}>
+                  <p className="fq">{n.said}</p>
+                  <p className="src">Added {localNow(zone, new Date(n.created_at)).label}. <Link href={`${base}/said/${n.id}`}>Open the note</Link></p>
+                </div>
+              ))}
+            </div>
+          )}
+          {open && <PilotEntry key={`${c.label} ${c.on_date} ${c.start_min} ${c.end_min}`} id={c.id} label={c.label} date={c.on_date} start={clock24(c.start_min)} end={clock24(c.end_min)} />}
+          {!open && <p className="fb-note" style={{ padding: '10px 12px 0', margin: 0 }}>{c.withdrawn_at ? 'This entry was taken off its day, so its day and time stay as they are.' : 'This entry has an outcome on file, so its day and time stay as they are. Tell the guide to correct the outcome.'}</p>}
           <History list={x.history} zone={zone} />
         </div>
         <WaitingList list={x.waiting} zone={zone} decides={decides} />
@@ -357,17 +405,19 @@ async function weeklyItemPane({ q, zone }: Ctx, id: string, color?: string) {
   const x = await loadWeeklyItem(q, id);
   if (!x) return null;
   const { s } = x;
+  const b = belongsTo(s.folder, s.label);
   return {
     label: s.label,
     node: (
       <div className="doc">
-        <div className="doc-bar" style={fc(color)}>
+        <div className="doc-bar" style={fc(b.color)}>
           <b>{s.label}</b>
           <span className={`pt-chip ${s.state === 'current' ? 'filed' : 'unknown'}`}>{s.state === 'current' ? 'Repeats each week' : 'Ended'}</span>
           <span className="pt-chip">{BASIS[s.basis] || 'On file'}</span>
         </div>
         <dl className="fields">
           <dt>Days</dt><dd>{sayDays(s.days)}</dd>
+          <dt>Belongs to</dt><dd><Belongs b={b} /></dd>
           <dt>Start</dt><dd>{s.start_min === null ? <Unknown /> : sayClock(s.start_min)}</dd>
           <dt>End</dt><dd>{s.end_min === null ? <Unknown /> : sayClock(s.end_min)}</dd>
           <dt>On file since</dt><dd>{localNow(zone, new Date(s.created_at)).label}</dd>
@@ -540,7 +590,7 @@ async function historyPane({ q, zone }: Ctx, base: string) {
               <span className="fi i-page" />
               <b>{c.title}</b>
               <span className="right">{localNow(zone, new Date(c.at)).label.replace(/, \d{4},/, ',')}</span>
-              <span className="sub">{c.lines.join(' ')}{c.message ? ` It rests on your message: ${c.message}` : ''}</span>
+              <span className="sub">{c.lines.join(' ')}{c.message ? ` Your message: ${c.message}` : ''}</span>
             </Link>
           ))}
         </div>
@@ -570,7 +620,7 @@ const NODES: Record<string, string> = {
   'follow-ups': 'Follow ups', unknown: 'Still unknown', history: 'History'
 };
 
-export default async function FilePage({ params }: { params: { path?: string[] } }) {
+export default async function FilePage({ params, searchParams }: { params: { path?: string[] }; searchParams?: { view?: string; on?: string } }) {
   const w = await who();
   if (!w.ok) redirect('/login?next=/portal/file');
   const zone = w.access.timezone;
@@ -579,7 +629,11 @@ export default async function FilePage({ params }: { params: { path?: string[] }
 
   const out = await withResident({ userId: w.userId, actor: 'resident' }, async q => {
     const ix = await loadIndex(q, zone);
-    const ctx: Ctx = { q, zone, ix, decides: w.access.decides_proposals };
+    const ctx: Ctx = {
+      q, zone, ix, decides: w.access.decides_proposals,
+      view: searchParams?.view === 'month' ? 'month' : 'week',
+      on: typeof searchParams?.on === 'string' && isDate(searchParams.on) ? searchParams.on : null
+    };
     const crumbs: Crumb[] = [{ label: 'My File', href: FILE_ROOT }];
     if (seg.length === 0) return { ix, crumbs, color: undefined, body: rootPane(ctx) };
 

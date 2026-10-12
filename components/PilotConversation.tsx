@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { DRAFT_KEY } from '@/components/PilotAsk';
 import PilotDecide, { goOnAfterPress } from '@/components/PilotDecide';
 
 type Effect = { tool: string; outcome: string; brief: string; href?: string | null };
@@ -49,17 +50,10 @@ function Effects({ list }: { list: Effect[] }) {
   );
 }
 
-/** What the resident has open on the screen, in the words of the path. The guide is told, so a message can rest on it. */
-function viewing(): string | null {
-  const el = document.getElementById('uc-path');
-  const text = el?.getAttribute('data-path') || '';
-  return text ? text.slice(0, 180) : null;
-}
-
-export default function PilotConversation({ initial, mode = 'page' }: { initial?: Thread; mode?: 'page' | 'side' }) {
+export default function PilotConversation({ initial }: { initial: Thread }) {
   const router = useRouter();
-  const side = mode === 'side';
-  const [thread, setThread] = useState<Thread | null>(initial ?? null);
+
+  const [thread, setThread] = useState<Thread>(initial);
   const [draft, setDraft] = useState('');
   const [sending, setSending] = useState(false);
   const [goingOn, setGoingOn] = useState(false);
@@ -81,14 +75,14 @@ export default function PilotConversation({ initial, mode = 'page' }: { initial?
     } catch { return null; }
   }, []);
 
-  // Beside the File, the conversation is loaded when the side opens.
-  useEffect(() => { if (!initial) void load(); }, [initial, load]);
-
-  // A press on a button elsewhere on the screen changes the conversation. It is loaded again.
+  // A press on a button elsewhere on the screen changes the conversation. It is loaded again, and the line that
+  // says a reply is being written shows while the guide goes on.
   useEffect(() => {
     const again = () => { void load(); };
+    const going = (e: Event) => { atEnd.current = true; setGoingOn((e as CustomEvent).detail === true); };
     window.addEventListener('uc:thread', again);
-    return () => window.removeEventListener('uc:thread', again);
+    window.addEventListener('uc:going', going);
+    return () => { window.removeEventListener('uc:thread', again); window.removeEventListener('uc:going', going); };
   }, [load]);
 
   const toEnd = useCallback(() => {
@@ -99,18 +93,17 @@ export default function PilotConversation({ initial, mode = 'page' }: { initial?
   }, []);
 
   // New messages are brought into view for a reader who is at the end. A reader who scrolled up to read stays there.
-  const count = (thread?.messages.length ?? 0) + (thread?.presses?.length ?? 0);
+  const count = thread.messages.length + (thread.presses?.length ?? 0);
   useLayoutEffect(() => {
-    if (!thread) return;
     if (!opened.current) {
       opened.current = true;
-      const want = !side && window.location.hash.startsWith('#m-') ? document.getElementById(window.location.hash.slice(1)) : null;
+      const want = window.location.hash.startsWith('#m-') ? document.getElementById(window.location.hash.slice(1)) : null;
       if (want) { want.scrollIntoView({ block: 'center' }); atEnd.current = false; return; }
       toEnd();
       return;
     }
     if (atEnd.current) toEnd(); else setFresh(true);
-  }, [count, unsent, sending, goingOn, thread, side, toEnd]);
+  }, [count, unsent, sending, goingOn, toEnd]);
 
   const onScroll = () => {
     const el = stream.current;
@@ -129,17 +122,18 @@ export default function PilotConversation({ initial, mode = 'page' }: { initial?
 
   // A reply that is still being written is checked for until it is finished.
   useEffect(() => {
-    const running = thread?.messages.some(m => m.speaker === 'resident' && m.turn?.state === 'running');
+    const running = thread.messages.some(m => m.speaker === 'resident' && m.turn?.state === 'running');
     if (!running || sending) return;
     const t = setTimeout(() => { void load(); }, 3000);
     return () => clearTimeout(t);
   }, [thread, sending, load]);
 
-  async function post(text: string, key: string) {
+  // place: the part of the File the message was written from, when it was written in the box under that part.
+  async function post(text: string, key: string, place: string | null = null) {
     setSending(true); setErr(null);
     try {
       const res = await fetch('/api/pilot/message', {
-        method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ text, key, viewing: viewing() })
+        method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ text, key, viewing: place })
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
@@ -162,31 +156,52 @@ export default function PilotConversation({ initial, mode = 'page' }: { initial?
     if (window.matchMedia('(min-width: 861px)').matches) box.current?.focus();
   }
 
-  function send() {
-    const text = draft.trim();
-    if (!text || sending) return;
+  function sendText(text: string, place: string | null = null) {
     const key = crypto.randomUUID();
     atEnd.current = true;
     setUnsent({ id: key, key, speaker: 'resident', body: text, created_at: new Date().toISOString(), removed: null, reply_to: null, turn: null, unsent: true });
-    setDraft('');
-    void post(text, key);
+    void post(text, key, place);
   }
 
+  function send() {
+    const text = draft.trim();
+    if (!text || sending) return;
+    setDraft('');
+    sendText(text);
+  }
+
+  // A message written in the box under a part of the File arrives here and is sent once. The guide is told which
+  // part of the File it was written from, for that one message.
+  useEffect(() => {
+    try {
+      const held = sessionStorage.getItem(DRAFT_KEY);
+      if (!held) return;
+      sessionStorage.removeItem(DRAFT_KEY);
+      const d = JSON.parse(held);
+      const text = typeof d?.text === 'string' ? d.text.trim().slice(0, 4000) : '';
+      const place = typeof d?.place === 'string' ? d.place.slice(0, 200) : null;
+      if (text && initial.noticeSeen) sendText(text, place);
+      else if (text) setDraft(text);
+    } catch { /* the browser keeps no storage for this page. The conversation opens as it is. */ }
+    // It runs once, when the conversation opens.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   async function earlier() {
-    const first = thread?.messages[0];
+    const first = thread.messages[0];
     if (!first) return;
     try {
       const res = await fetch(`/api/pilot/thread?before=${first.id}`, { cache: 'no-store' });
       if (!res.ok) return;
       const data = (await res.json()) as Thread;
       atEnd.current = false;
-      setThread(t => (t ? { ...t, more: data.more, messages: [...data.messages, ...t.messages], presses: [...(data.presses || []), ...(t.presses || [])] } : t));
+      setThread(t => ({ ...t, more: data.more, messages: [...data.messages, ...t.messages], presses: [...(data.presses || []), ...(t.presses || [])] }));
     } catch { /* the earlier messages stay on the server. The button can be pressed again. */ }
   }
 
   async function start() {
     try { await fetch('/api/pilot/notice', { method: 'POST' }); } catch { /* the notice shows again on the next visit */ }
-    setThread(t => (t ? { ...t, noticeSeen: true } : t));
+    setThread(t => ({ ...t, noticeSeen: true }));
     setTimeout(() => box.current?.focus(), 50);
   }
 
@@ -195,35 +210,13 @@ export default function PilotConversation({ initial, mode = 'page' }: { initial?
     atEnd.current = true;
     await load();
     if (next) {
-      setGoingOn(true);
       await goOnAfterPress(next);
       await load();
-      setGoingOn(false);
     }
     router.refresh();
   }
 
-  if (!thread) {
-    return (
-      <div className="pt-talk">
-        <header className="pt-talk-head"><h1>{side ? 'Guide, software' : 'Conversation'}</h1></header>
-        <div className="pt-stream-wrap"><div className="pt-stream"><p className="pt-thinking">Loading the conversation.</p></div></div>
-      </div>
-    );
-  }
-
   if (!thread.noticeSeen) {
-    if (side) {
-      return (
-        <div className="pt-talk">
-          <header className="pt-talk-head"><h1>Guide, software</h1></header>
-          <div className="pt-stream-wrap"><div className="pt-stream">
-            <p className="pt-empty">The guide answers here once the conversation has started.</p>
-            <div><Link className="pt-btn" href="/portal/conversation">Open the conversation</Link></div>
-          </div></div>
-        </div>
-      );
-    }
     return (
       <div className="pt-talk">
         <div className="pt-stream-wrap"><div className="pt-stream">
@@ -232,7 +225,7 @@ export default function PilotConversation({ initial, mode = 'page' }: { initial?
             <h2>What this test keeps</h2>
             <ol>
               <li>Each message you send and each reply, word for word.</li>
-              <li>Each entry filed from the conversation, the message it rests on, and each earlier version of it.</li>
+              <li>Each entry filed from the conversation, the message it was filed from, and each earlier version of it.</li>
               <li>A list of each action software took. An action the server refused is on the list too.</li>
             </ol>
             <p>
@@ -269,10 +262,7 @@ export default function PilotConversation({ initial, mode = 'page' }: { initial?
   return (
     <div className="pt-talk">
       <header className="pt-talk-head">
-        <h1>{side ? 'Guide, software' : 'Conversation'}</h1>
-        <p>{side
-          ? 'The guide sees the part of your File that is open.'
-          : 'You are talking with the guide. The guide is Universe City software. Your agent is a person.'}</p>
+        <h1>Conversation</h1>
       </header>
 
       <div className="pt-stream-wrap">
@@ -282,9 +272,7 @@ export default function PilotConversation({ initial, mode = 'page' }: { initial?
           )}
           {shown.length === 0 && (
             <p className="pt-empty">
-              {side
-                ? 'No message is here yet. Write to the guide about the part of your File that is open, or about any part of your life.'
-                : 'No message is here yet. Write about any part of your day or your life. The guide answers, and each entry it files is listed under its reply.'}
+              No message is here yet. Write about any part of your day or your life. The guide answers, and each entry it files is listed under its reply.
             </p>
           )}
           {line.map(item => {
@@ -297,7 +285,7 @@ export default function PilotConversation({ initial, mode = 'page' }: { initial?
                 <div key={`p-${item.p.id}`} style={{ display: 'contents' }}>
                   {newDay && <p className="pt-kick" style={{ alignSelf: 'center' }}>{day}</p>}
                   <p className="pt-press">
-                    <span className="when">Your press {clockOf(item.at)}</span>
+                    <span className="when">You, on the screen {clockOf(item.at)}</span>
                     <span className={`pt-chip ${p.tone}`}>{p.word}</span>
                     {item.p.href ? <Link href={item.p.href}>{p.line}</Link> : <span>{p.line}</span>}
                   </p>
@@ -359,9 +347,9 @@ export default function PilotConversation({ initial, mode = 'page' }: { initial?
       )}
 
       <div className="pt-compose">
-        <label htmlFor={side ? 'pt-box-side' : 'pt-box'} style={{ position: 'absolute', left: -9999 }}>Your message</label>
+        <label htmlFor="pt-box" style={{ position: 'absolute', left: -9999 }}>Your message</label>
         <textarea
-          id={side ? 'pt-box-side' : 'pt-box'} ref={box} value={draft} rows={1} maxLength={4000}
+          id="pt-box" ref={box} value={draft} rows={1} maxLength={4000}
           placeholder="Write to the guide" enterKeyHint="send"
           onChange={e => setDraft(e.target.value)}
           onFocus={() => { if (atEnd.current) setTimeout(toEnd, 250); }}

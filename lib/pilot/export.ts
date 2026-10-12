@@ -156,7 +156,7 @@ export function exportText(x: Awaited<ReturnType<typeof exportAll>>): string {
   L.push('');
   L.push('==================== FILE: WHAT YOU SAID ====================');
   for (const s of x.file.statements) {
-    L.push(`- [${s.state}] ${s.folder} / ${s.topic}: ${s.said} (rests on: ${String(s.basis).replace(/_/g, ' ')}, filed ${when(s.created_at)})`);
+    L.push(`- [${s.state}] ${s.folder} / ${s.topic}: ${s.said} (basis: ${String(s.basis).replace(/_/g, ' ')}, filed ${when(s.created_at)})`);
   }
   if (!x.file.statements.length) L.push('No statement is on file.');
   L.push('');

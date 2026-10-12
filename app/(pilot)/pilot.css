@@ -1,18 +1,63 @@
 /* The founder test. It uses the site's own tokens from globals.css and adds no color of its own.
-   The frame is fixed: the File at the left, one working pane in the center, the guide at the right.
-   docs/product/RESIDENT_INTERFACE.md states that frame. The File browser borrows its tree, path, and tiles from YAPTAIN. */
+   The frame is fixed: the places and the File tree at the left, and one working pane that fills the rest.
+   The conversation is one of the places and takes the whole pane when it is open.
+   The File browser borrows its tree, path, and tiles from YAPTAIN. */
 
 /* ---------------------------------------------------------------- the frame */
 .os{display:grid;grid-template-columns:272px minmax(0,1fr);height:100vh;height:100dvh;background:var(--ink);overflow:hidden}
-.os:has(.os-guide){grid-template-columns:272px minmax(0,1fr) 352px}
 .os-main{min-width:0;min-height:0;background:var(--paper);overflow-y:auto;display:flex;flex-direction:column}
-.os-main:has(.fb),.os-main:has(.pt-talk){overflow:hidden}
+.os-main:has(.fb),.os-main:has(.pt-talk),.os-main:has(.pt-home){overflow:hidden}
+.os .vh{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+
+/* ---------------------------------------------------------------- right: the small window */
+.os-side{display:none;min-height:0;overflow-y:auto;background:var(--paper2);border-left:3px solid var(--ink);padding:16px 19px 24px 14px}
+.win{border:3px solid var(--ink);background:#fff;box-shadow:5px 5px 0 var(--ink)}
+.win-bar{background:var(--ink);color:var(--paper);font-family:'VT323',monospace;font-size:19px;letter-spacing:.06em;line-height:1;padding:8px 12px 6px}
+.win-body section{padding:10px 12px 11px;border-bottom:2px solid var(--ink)}
+.win-body section:last-child{border-bottom:0}
+.win-body h2{font-family:'VT323',monospace;font-size:15px;letter-spacing:.16em;text-transform:uppercase;font-weight:400;color:var(--dim);margin:0 0 5px;padding:0;border:0;line-height:1.1}
+.win-line{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:start;margin:0;padding:4px 0;font-size:13px;line-height:1.35;color:var(--ink);text-decoration:none;overflow-wrap:anywhere}
+.win-line b{font-weight:700}
+.win-line .fi{margin-top:1px}
+a.win-line:hover{background:var(--paper)}
+.win-line em{font-style:normal;font-family:'VT323',monospace;font-size:15px;line-height:1.2;color:#fff;background:var(--II);padding:0 6px}
+.win-none{font-size:13px;line-height:1.35;color:var(--dim);margin:0}
+.win-gaps{list-style:none;margin:5px 0 0;padding:6px 0 0;border-top:1px solid var(--rule);display:grid;gap:5px;font-size:12.5px;line-height:1.35;color:var(--ink2)}
+.win-wait{padding:5px 0 9px;border-bottom:1px solid var(--rule);font-size:13.5px;line-height:1.4}
+.win-wait:last-child{border-bottom:0;padding-bottom:2px}
+.win-wait .pt-btns{gap:6px;margin-top:7px}
+.win-wait .pt-btn{padding:6px 9px;font-size:12.5px}
+@media (min-width:1280px){
+  .os{grid-template-columns:264px minmax(0,1fr) 304px}
+  .os-side{display:block}
+  /* The window holds what waits, so the conversation and the home screen leave it to the window. */
+  .pt-talk .pt-wait,.when-no-window{display:none}
+}
+@media (min-width:1560px){
+  .os{grid-template-columns:288px minmax(0,1fr) 340px}
+}
 
 /* ---------------------------------------------------------------- left: the rail and the File tree */
 .os-rail{background:var(--ink);color:var(--paper);display:flex;flex-direction:column;min-height:0;border-right:3px solid var(--ink)}
 .os-rail-head{padding:18px 18px 12px}
 .pt-mark{font-weight:600;font-size:17px;text-decoration:none;color:var(--paper)}
 .pt-tag{display:inline-block;font-family:'VT323',monospace;font-size:15px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink);background:var(--paper);padding:1px 8px 0;white-space:nowrap}
+.os-search{padding:0 12px 10px;display:flex;flex-direction:column;align-items:flex-start;gap:5px}
+.os-search input{width:100%;border:2px solid var(--paper);border-radius:0;background:var(--paper);color:var(--ink);padding:7px 9px;font:inherit;font-size:14px;line-height:1.3;-webkit-appearance:none;appearance:none}
+.os-search input::placeholder{color:var(--dim);opacity:1}
+.os-search input::-webkit-search-cancel-button{display:none}
+.os-search button{background:none;border:0;padding:0;color:var(--paper);font-size:12.5px;text-decoration:underline;cursor:pointer}
+.os-found{display:grid;grid-template-columns:auto minmax(0,1fr);gap:1px 8px;padding:7px 10px 8px;text-decoration:none;color:var(--ink);border-bottom:1px solid var(--rule);font-size:13px;line-height:1.3}
+.os-found:hover{background:#fff}
+.os-found .fi{grid-row:span 2;margin-top:2px}
+.os-found b{font-weight:700;overflow-wrap:break-word}
+.os-found span:last-child{grid-column:2;font-size:12.5px;line-height:1.35;color:var(--ink2);overflow-wrap:break-word}
+.os-found-none{font-size:13px;line-height:1.4;color:var(--ink2);padding:8px 12px;margin:0}
+.pt-search .os-search{padding:0;margin-top:16px;max-width:560px}
+.pt-search .os-search input{border-color:var(--ink);background:#fff;font-size:16px;padding:10px 12px}
+.pt-search .os-search button{color:var(--ink);font-size:13.5px}
+.os-founds{border:2px solid var(--ink);background:#fff;margin-top:14px;max-width:720px}
+.os-founds .os-tree-label{padding-top:8px}
 .os-places{display:flex;flex-direction:column;gap:1px;padding:0 10px 12px}
 .os-places a{color:var(--paper);text-decoration:none;font-size:14.5px;font-weight:500;padding:8px 10px;opacity:.74;border-left:3px solid transparent}
 .os-places a:hover{opacity:1}
@@ -27,7 +72,7 @@
 .tree-row.on{background:var(--ink);color:var(--paper);border-left-color:var(--fc);font-weight:700}
 .tree-row.on .tree-num,.tree-row.on em{color:rgba(244,239,233,.7)}
 .tree-num{font-family:'VT323',monospace;font-size:16px;line-height:1;color:var(--fc);min-width:15px;font-weight:400}
-.tree-label{overflow:hidden;text-overflow:ellipsis;min-width:0}
+.tree-label{min-width:0;white-space:normal;overflow-wrap:break-word}
 .tree-row em{margin-left:auto;padding-left:8px;font-style:normal;font-family:'VT323',monospace;font-size:16px;line-height:1;color:var(--dim);font-weight:400}
 .os-rail-foot{padding:12px 18px 14px;font-size:13px;color:rgba(244,239,233,.6);display:flex;flex-direction:column;gap:6px}
 .os-rail-foot strong{color:var(--paper);font-weight:600}
@@ -67,7 +112,7 @@
 /* ---------------------------------------------------------------- center: the File browser */
 .fb{display:flex;flex-direction:column;flex:1;min-height:0;background:#fff}
 .fb-bar{display:flex;align-items:baseline;gap:14px;padding:9px 16px 7px;background:var(--ink);color:var(--paper);font-family:'VT323',monospace;font-size:19px;letter-spacing:.06em;line-height:1}
-.fb-bar em{margin-left:auto;font-style:normal;font-size:16px;letter-spacing:.02em;color:rgba(244,239,233,.55);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.fb-bar em{margin-left:auto;font-style:normal;font-size:16px;letter-spacing:.02em;color:rgba(244,239,233,.55);overflow-wrap:anywhere;text-align:right;min-width:0}
 .fb-crumbs{display:flex;flex-wrap:wrap;align-items:center;gap:3px 6px;padding:9px 16px;background:var(--paper);border-bottom:2px solid var(--ink);font-size:14px}
 .fb-crumbs a{color:var(--ink);text-decoration:underline;text-decoration-color:var(--rule);text-underline-offset:3px}
 .fb-crumbs a:hover{text-decoration-color:var(--ink)}
@@ -123,6 +168,8 @@ a.row:hover{background:var(--paper)}
 .fields dt{font-family:'VT323',monospace;font-size:17px;color:var(--ink2);padding:8px 12px 6px;border-bottom:1px solid var(--rule);line-height:1.15}
 .fields dd{font-size:14.5px;padding:8px 12px;border-bottom:1px solid var(--rule);margin:0}
 .fields dt:last-of-type,.fields dd:last-of-type{border-bottom:0}
+.fields dd .dot{display:inline-block;width:11px;height:11px;border:2px solid var(--ink);vertical-align:-1px;margin-right:3px}
+.fields dd .src{font-size:12.5px;color:var(--ink2);line-height:1.45}
 .none{font-family:'VT323',monospace;font-size:16px;letter-spacing:.06em;color:var(--dim);background:var(--paper2);padding:0 6px;border:1px solid var(--rule)}
 .words{margin:0;padding:10px 12px 11px;border-top:2px solid var(--ink)}
 .words p.fq{font-size:15px;line-height:1.5;border-left:4px solid var(--ink);padding-left:10px;margin:4px 0 5px;white-space:pre-wrap;overflow-wrap:anywhere}
@@ -136,6 +183,17 @@ a.row:hover{background:var(--paper)}
 .hist li{padding:8px 0 9px;border-top:1px solid var(--rule);font-size:14px}
 .hist li p{margin:1px 0}
 .hist del{color:var(--dim)}
+.edit{border-top:2px solid var(--ink);background:var(--paper)}
+.edit-part{padding:11px 12px 12px}
+.edit-part+.edit-part{border-top:1px solid var(--rule)}
+.edit .flab{display:block;font-weight:400;font-family:'VT323',monospace;font-size:16px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin:0 0 7px}
+.edit-row{display:flex;flex-wrap:wrap;gap:8px 10px}
+.edit-row label{display:flex;flex-direction:column;gap:3px;font-family:'VT323',monospace;font-size:16px;color:var(--ink2);line-height:1.1}
+.edit-row label.grow{flex:1 1 200px}
+.edit input,.edit textarea{border:2px solid var(--ink);border-radius:0;background:#fff;color:var(--ink);font:inherit;font-family:'Montserrat',system-ui,sans-serif;font-size:15px;line-height:1.3;padding:7px 9px;min-height:40px;box-sizing:border-box}
+.edit textarea{display:block;width:100%;max-width:640px;resize:vertical}
+.edit .pt-btns{margin-top:9px}
+.edit .pt-meta,.edit .pt-err{margin-top:9px;font-size:14px}
 .fb-empty{font-size:14.5px;color:var(--ink2);border:2px dashed var(--rule);padding:14px 16px;max-width:620px}
 
 /* ---------------------------------------------------------------- pages inside the frame: home, activity */
@@ -168,12 +226,13 @@ a.pt-btn{text-decoration:none;display:inline-block}
 .home-top{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
 .home-top .pt-kick{margin-left:auto}
 .home-doors{margin-top:22px;max-width:760px}
+.pt-home{display:flex;flex-direction:column;flex:1;min-height:0}
+.pt-home-scroll{flex:1;min-height:0;overflow-y:auto}
 
 /* ---------------------------------------------------------------- conversation */
 .pt-talk{display:flex;flex-direction:column;flex:1;min-height:0;height:100%}
-.pt-talk-head{padding:16px clamp(16px,3vw,34px) 12px;border-bottom:2px solid var(--ink);background:var(--paper)}
+.pt-talk-head{padding:13px clamp(16px,3vw,34px) 11px;border-bottom:2px solid var(--ink);background:var(--paper)}
 .pt-talk-head h1{font-size:21px;line-height:1.2}
-.pt-talk-head p{font-size:13.5px;color:var(--ink2);margin-top:3px}
 .pt-stream-wrap{flex:1;min-height:0;position:relative;display:flex;flex-direction:column}
 .pt-stream{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:18px clamp(16px,3vw,34px) 10px;display:flex;flex-direction:column;gap:16px}
 .pt-msg{max-width:min(680px,92%)}
@@ -204,41 +263,25 @@ a.pt-btn{text-decoration:none;display:inline-block}
 .pt-notice p{font-size:15px;margin-top:9px}
 .pt-thinking{font-family:'VT323',monospace;font-size:17px;letter-spacing:.1em;color:var(--dim)}
 
-/* ---------------------------------------------------------------- right: the guide, beside the File */
-.os-guide{background:var(--paper2);border-left:3px solid var(--ink);display:flex;flex-direction:column;min-height:0;min-width:0}
-.os-guide .pt-talk-head{background:var(--paper2);padding:12px 14px 10px}
-.os-guide .pt-talk-head h1{font-family:'VT323',monospace;font-size:18px;letter-spacing:.16em;text-transform:uppercase;font-weight:400}
-.os-guide .pt-talk-head p{font-size:12.5px}
-.os-guide .pt-stream{padding:12px 14px 8px;gap:12px}
-.os-guide .pt-msg{max-width:96%}
-.os-guide .pt-bubble{font-size:14.5px;padding:9px 11px}
-.os-guide .pt-who{font-size:14px}
-.os-guide .pt-effects li{font-size:12.5px}
-.os-guide .pt-wait{padding:8px 14px}
-.os-guide .pt-compose{padding:10px 14px 12px;background:var(--paper2);grid-template-columns:1fr}
-.os-guide .pt-compose .pt-btn{height:auto;padding:9px 12px;font-size:14px}
-.os-guide .pt-compose textarea{font-size:15px;min-height:44px}
-
 /* ---------------------------------------------------------------- widths */
 @media (max-width:1180px){
-  .os,.os:has(.os-guide){grid-template-columns:248px minmax(0,1fr)}
-  .os-guide{display:none}
+  .os{grid-template-columns:248px minmax(0,1fr)}
 }
 
 @media (max-width:860px){
   /* One column. The frame fills the part of the screen that is in view, so the keyboard never covers the composer. */
-  .os,.os:has(.os-guide){display:flex;flex-direction:column;position:fixed;left:0;right:0;top:var(--pt-top,0px);height:var(--pt-vh,100dvh)}
+  .os{display:flex;flex-direction:column;position:fixed;left:0;right:0;top:var(--pt-top,0px);height:var(--pt-vh,100dvh)}
   .os-rail{flex:none;border-right:0;flex-direction:row;flex-wrap:wrap;align-items:center;padding:0}
-  .os-rail-head{padding:8px 14px 0;display:flex;align-items:center;gap:10px;flex:1}
+  .os-rail-head{padding:9px 14px 0;display:flex;align-items:center;gap:10px;flex:1;min-width:0}
   .os-rail-head>div{margin:0!important}
   .pt-tag{font-size:13px}
-  .os-rail-foot{padding:8px 14px 0;flex-direction:row;gap:10px;align-items:center}
+  .os-rail-foot{padding:9px 14px 0;flex-direction:row;gap:10px;align-items:center;flex:none}
   .os-rail-foot .pt-who-name{display:none}
   .os-places{flex-direction:row;gap:0;padding:2px 6px 0;width:100%;order:3}
   .os-places a{padding:8px 9px 7px;border-left:0;border-bottom:3px solid transparent;font-size:14px}
   .os-places a.current{border-bottom-color:var(--paper);background:transparent}
   .os-places a.only-narrow{display:block}
-  .os-tree{display:none}
+  .os-tree,.os-rail>.os-search{display:none}
   .os-main{flex:1;min-height:0}
   .fb-bar{display:none}
   .fb-crumbs{flex-wrap:nowrap;overflow-x:auto;white-space:nowrap;padding:8px 12px;font-size:13.5px}
@@ -258,7 +301,6 @@ a.pt-btn{text-decoration:none;display:inline-block}
   .pt-row{grid-template-columns:1fr}
   .pt-talk-head{padding:8px 14px 7px}
   .pt-talk-head h1{font-size:16px}
-  .pt-talk-head p{display:none}
   .fb-status{display:none}
   /* With the keyboard open the screen is short. The frame gives the room to the messages and the composer. */
   .pt-short .os-rail-head,.pt-short .os-rail-foot,.pt-short .pt-talk-head{display:none}
@@ -269,7 +311,131 @@ a.pt-btn{text-decoration:none;display:inline-block}
   .pt-wait{padding:8px 14px;max-height:30vh}
 }
 
+@media (max-width:520px){
+  /* A phone: the mark and the way out share one line. */
+  .os-rail-head>div{display:none}
+}
+
 @media (max-width:860px) and (max-height:520px){
   .os-rail-head,.os-rail-foot,.pt-talk-head{display:none}
   .pt-wait{max-height:24vh}
+}
+
+/* ---------------------------------------------------------------- the calendar in Time */
+/* An entry takes the color of the department it belongs to. Yellow carries ink text, so each name reads clearly. */
+.d-I{--fc:var(--I);--ft:var(--paper)}
+.d-II{--fc:var(--II);--ft:var(--ink)}
+.d-III{--fc:var(--III);--ft:var(--paper)}
+.d-IV{--fc:var(--IV);--ft:var(--paper)}
+
+.cal-bar{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;margin:0 0 12px}
+.cal-title{font-size:18px;font-weight:700;margin-right:auto;white-space:nowrap}
+.cal-seg{display:inline-flex;border:2px solid var(--ink);background:#fff}
+.cal-seg a{padding:5px 11px;font-size:13.5px;font-weight:600;text-decoration:none;color:var(--ink);border-right:2px solid var(--ink);white-space:nowrap}
+.cal-seg a:last-child{border-right:0}
+.cal-seg a:hover{background:var(--paper)}
+.cal-seg a.on{background:var(--ink);color:var(--paper)}
+.cal-scroll{overflow-x:auto;border:2px solid var(--ink);background:#fff}
+.cal{--h:60px;--cols:7;--hours:16;display:grid;grid-template-columns:50px repeat(var(--cols),minmax(0,1fr));min-width:700px}
+.cal.single{grid-template-columns:50px minmax(0,1fr);min-width:0}
+.cal-corner,.cal-head{border-bottom:2px solid var(--ink);background:var(--paper)}
+.cal-head{display:flex;align-items:baseline;gap:6px;padding:6px 8px 5px;text-decoration:none;color:var(--ink);border-left:1px solid var(--rule);min-width:0;white-space:nowrap}
+.cal-head span{font-family:'VT323',monospace;font-size:16px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
+.cal-head b{font-size:16px;font-weight:700}
+.cal-head i{margin-left:auto;font-style:normal;font-family:'VT323',monospace;font-size:14px;letter-spacing:.06em;background:var(--IV);color:#fff;padding:0 5px;line-height:1.2}
+.cal-head i.draft{background:var(--II)}
+.cal-head.today{background:var(--ink);color:var(--paper)}
+.cal-head.today span{color:rgba(244,239,233,.7)}
+.cal-head:hover b{text-decoration:underline}
+.cal-side{font-family:'VT323',monospace;font-size:14px;line-height:1.1;color:var(--dim);padding:7px 2px 4px 5px;border-bottom:2px solid var(--ink);background:var(--paper);white-space:nowrap}
+.cal-untimed{border-left:1px solid var(--rule);border-bottom:2px solid var(--ink);padding:4px;display:flex;flex-direction:column;gap:3px;min-width:0;background:var(--paper)}
+.cal-chip{display:block;font-size:12px;font-weight:700;line-height:1.3;color:var(--ft);text-decoration:none;background:var(--fc);border:2px solid var(--ink);padding:3px 6px;overflow-wrap:break-word}
+.cal-gutter{position:relative;height:calc(var(--hours) * var(--h))}
+.cal-gutter span{position:absolute;right:5px;top:calc(var(--top) * var(--h) / 60 + 3px);font-family:'VT323',monospace;font-size:15px;line-height:1;color:var(--dim);white-space:nowrap}
+.cal-col{position:relative;height:calc(var(--hours) * var(--h));border-left:1px solid var(--rule);
+  background-image:repeating-linear-gradient(to bottom,var(--rule) 0,var(--rule) 1px,transparent 1px,transparent var(--h))}
+.cal-col.today{background-color:rgba(244,239,233,.75)}
+.cal-now{position:absolute;left:0;right:0;top:calc(var(--top) * var(--h) / 60);border-top:2px solid var(--ink);z-index:3;pointer-events:none}
+.cal-now::before{content:"";position:absolute;left:-4px;top:-5px;width:8px;height:8px;background:var(--ink)}
+
+/* A block matches the time on file: its top is the start and its height is the length. The name inside is shortened
+   when the block is too small for it. Entries that share hours are stepped in a week and side by side in a day. */
+.cal-block{position:absolute;z-index:calc(2 + var(--z));box-sizing:border-box;text-decoration:none;
+  top:calc(var(--top) * var(--h) / 60 + 1px);height:calc(var(--len) * var(--h) / 60 - 2px);
+  left:calc(2px + var(--lane) * 14px);right:2px;
+  background:var(--fc);color:var(--ft);border:2px solid var(--ink);padding:2px 6px 0}
+.cal-block.step{box-shadow:0 0 0 1.5px #fff}
+.cal-block.split{left:calc(var(--lane) / var(--lanes) * 100% + 2px);right:auto;width:calc(100% / var(--lanes) - 4px)}
+.cal-text{display:flex;flex-direction:column;gap:1px;overflow:hidden;max-height:calc(var(--clear) * var(--h) / 60 - 7px)}
+.cal-block b{font-size:12px;font-weight:700;line-height:1.25}
+.cal-time{font-family:'VT323',monospace;font-size:15px;line-height:1.02}
+.cal-time i{font-style:normal;display:inline-block;white-space:nowrap;margin-right:.45em}
+.cal-block:hover,.cal-chip:hover{outline:2px solid var(--ink);outline-offset:1px;z-index:40}
+.cal.single .cal-block{padding:4px 11px 0}
+.cal.single .cal-block b{font-size:15px}
+.cal.single .cal-time{font-size:17px}
+.cal.single .cal-text{max-height:calc(var(--clear) * var(--h) / 60 - 10px)}
+/* Planned is filled. Executed is filled and carries a band at its left. The weekly schedule on a day ahead is an
+   outline, because no commitment is on that day yet. */
+.cal-block.executed,.cal-block.partly{padding-left:17px}
+.cal-block.executed::before,.cal-block.partly::before{content:"";position:absolute;left:0;top:0;bottom:0;width:7px;background:var(--ink);border-right:2px solid var(--paper)}
+.cal-block.partly::before{background:repeating-linear-gradient(to bottom,var(--ink) 0 5px,var(--paper) 5px 10px)}
+.cal-block.weekly,.cal-chip.weekly{background:#fff;color:var(--ink);border:2px dashed var(--fc);box-shadow:inset 6px 0 0 var(--fc);padding-left:13px}
+.cal-block.missed,.cal-chip.missed{background:#fff;color:var(--ink2);border:2px solid var(--fc)}
+.cal-block.missed b,.cal-chip.missed{text-decoration:line-through}
+.cal-chip.executed{box-shadow:inset 6px 0 0 var(--ink);padding-left:12px}
+.cal-block.rough{border-top-style:dashed;border-bottom-style:dashed}
+/* An end that is unknown has no lower edge. The block is one hour, and its color runs out in the last part of it. */
+.cal-block.open-end{border-bottom:0;height:calc(var(--len) * var(--h) / 60 - 18px)}
+.cal-block.open-end::after{content:"";position:absolute;left:-2px;right:-2px;top:100%;height:16px;box-sizing:border-box;
+  background:linear-gradient(to bottom,var(--fc),transparent);border-left:2px solid;border-right:2px solid;border-image:linear-gradient(to bottom,var(--ink),transparent) 1}
+.cal-block.open-end .cal-text{max-height:calc(var(--clear) * var(--h) / 60 - 22px)}
+.cal-block.open-start{border-top:0;top:calc(var(--top) * var(--h) / 60 + 17px);height:calc(var(--len) * var(--h) / 60 - 18px)}
+.cal-block.open-start::after{content:"";position:absolute;left:-2px;right:-2px;bottom:100%;height:16px;box-sizing:border-box;
+  background:linear-gradient(to top,var(--fc),transparent);border-left:2px solid;border-right:2px solid;border-image:linear-gradient(to top,var(--ink),transparent) 1}
+.cal-block.open-start .cal-text{max-height:calc(var(--clear) * var(--h) / 60 - 22px)}
+.cal-block.weekly.open-end::after,.cal-block.weekly.open-start::after{background:none;border-image:linear-gradient(to bottom,var(--fc),transparent) 1}
+
+.cal-legend{margin:10px 0 0;display:grid;gap:5px}
+.cal-legend p{display:flex;flex-wrap:wrap;gap:4px 16px;margin:0;font-family:'VT323',monospace;font-size:16px;color:var(--ink2);line-height:1.2}
+.cal-legend span{display:inline-flex;align-items:center;gap:6px}
+.cal-key{position:relative;flex:none;display:inline-block;width:20px;height:13px;border:2px solid var(--ink);background:var(--fc);box-sizing:border-box}
+.cal-key.executed{box-shadow:inset 5px 0 0 var(--ink),inset 7px 0 0 var(--paper)}
+.cal-key.weekly{background:#fff;border:2px dashed var(--fc);box-shadow:inset 4px 0 0 var(--fc)}
+.cal-key.open{border-bottom:0;height:9px;margin-bottom:6px}
+.cal-key.open::after{content:"";position:absolute;left:-2px;right:-2px;top:100%;height:7px;background:linear-gradient(to bottom,var(--fc),transparent)}
+.cal-key.strip{height:8px;width:26px;border:1px solid var(--rule);background:linear-gradient(90deg,var(--paper2) 0 55%,var(--I) 55% 80%,var(--paper2) 80%)}
+
+.mon{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border:2px solid var(--ink);background:var(--rule);gap:1px}
+.mon-dow{background:var(--paper);font-family:'VT323',monospace;font-size:16px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);padding:4px 8px 3px;border-bottom:1px solid var(--ink)}
+.mon-cell{position:relative;background:#fff;min-height:104px;padding:5px 6px 7px;display:flex;flex-direction:column;gap:3px;text-decoration:none;color:var(--ink);min-width:0}
+.mon-cell:hover{background:var(--paper)}
+.mon-cell.out{background:var(--paper)}
+.mon-cell.out .mon-num b{color:var(--dim);font-weight:500}
+.mon-num{display:flex;align-items:baseline;gap:6px}
+.mon-num b{font-size:14px;font-weight:700;line-height:1.2}
+.mon-cell.today .mon-num b{background:var(--ink);color:var(--paper);padding:0 6px}
+.mon-num i{margin-left:auto;font-style:normal;font-family:'VT323',monospace;font-size:13px;background:var(--IV);color:#fff;padding:0 4px;line-height:1.15}
+.mon-num i.draft{background:var(--II)}
+/* The day from midnight to midnight. The filled part is the hours that hold an entry. */
+.mon-strip{position:relative;display:block;height:8px;background:var(--paper2);border:1px solid var(--rule)}
+.mon-strip i{position:absolute;top:0;bottom:0;background:var(--fc)}
+.mon-strip i.weekly{background:repeating-linear-gradient(90deg,var(--fc) 0 2px,transparent 2px 4px)}
+.mon-strip i.open{-webkit-mask-image:linear-gradient(to right,#000 40%,transparent);mask-image:linear-gradient(to right,#000 40%,transparent)}
+.mon-item{display:block;font-size:11.5px;font-weight:700;line-height:1.3;overflow-wrap:break-word;background:var(--fc);color:var(--ft);padding:2px 5px;border:1px solid var(--ink)}
+.mon-item em{font-style:normal;font-family:'VT323',monospace;font-size:14px;font-weight:400;margin-right:5px;white-space:nowrap}
+.mon-item.executed{box-shadow:inset 4px 0 0 var(--ink),inset 5px 0 0 var(--paper);padding-left:9px}
+.mon-item.weekly{background:#fff;color:var(--ink);border:1px dashed var(--fc);box-shadow:inset 4px 0 0 var(--fc);padding-left:9px}
+.mon-item.missed{background:#fff;color:var(--ink2);border-color:var(--fc);text-decoration:line-through}
+.mon-count{display:none}
+
+@media (max-width:860px){
+  .cal-title{width:100%;font-size:16px}
+  .cal-seg a{padding:6px 9px;font-size:13px}
+  .cal{min-width:780px}
+  .cal.single{min-width:0}
+  .mon-cell{min-height:58px;padding:4px}
+  .mon-item{display:none}
+  .mon-count{display:block;font-family:'VT323',monospace;font-size:15px;color:var(--ink2);line-height:1}
+  .mon-num i{display:none}
 }

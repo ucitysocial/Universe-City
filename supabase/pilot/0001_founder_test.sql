@@ -162,6 +162,7 @@ create table if not exists uc_pilot.schedule_items (
   start_min           int check (start_min between 0 and 1439),     -- minutes after midnight, local. NULL is not established
   end_min             int check (end_min between 1 and 2880),       -- past 1440 crosses midnight and belongs to the day it started
   state               text not null default 'current' check (state in ('current','ended')),
+  folder              text,                          -- the folder of the forty eight the activity belongs to. NULL is not set
   said                text,
   source_message_id   uuid references uc_pilot.messages(id),
   basis               text not null check (basis in ('resident_statement','resident_confirmation','agent_decision')),
@@ -198,6 +199,7 @@ create table if not exists uc_pilot.commitments (
   start_min            int check (start_min between 0 and 1439),
   end_min              int check (end_min between 1 and 2880),
   completion           text,                          -- what counts as done, in the resident's words. NULL is not established
+  folder               text,                          -- the folder of the forty eight the activity belongs to. NULL is not set
   schedule_item_id     uuid references uc_pilot.schedule_items(id),
   execution            text not null default 'planned' check (execution in ('planned','executed','partly_executed','did_not_happen')),
   actual_start_min     int check (actual_start_min between 0 and 1439),
@@ -221,6 +223,12 @@ create table if not exists uc_pilot.commitments (
   check (withdrawn_at is null or execution = 'planned')                      -- a withdrawn commitment takes no outcome
 );
 create index if not exists commitments_user_date on uc_pilot.commitments (user_id, on_date);
+-- An entry in Time also belongs to one folder. The calendar colors it by the department of that folder.
+alter table uc_pilot.schedule_items add column if not exists folder text;
+alter table uc_pilot.commitments    add column if not exists folder text;
+-- A note on a commitment is a statement that names the commitment it is about.
+alter table uc_pilot.statements     add column if not exists commitment_id uuid references uc_pilot.commitments(id);
+create index if not exists statements_commitment on uc_pilot.statements (commitment_id) where commitment_id is not null;
 
 -- ---------------------------------------------------------------- waiting for a decision
 
@@ -358,15 +366,15 @@ declare
   who text;
 begin
   if new.basis = 'agent_decision' and uc_pilot.actor() <> 'agent' then
-    raise exception 'An entry that rests on an agent decision is filed by a person.';
+    raise exception 'An entry that states an agent decision is filed by a person.';
   end if;
   if new.basis = 'resident_statement' then
     if new.source_message_id is null then
-      raise exception 'An entry filed as the resident''s statement names the message it rests on.';
+      raise exception 'An entry filed as the resident''s statement names the message that holds the words.';
     end if;
     select speaker into who from uc_pilot.messages where id = new.source_message_id;
     if who is distinct from 'resident' then
-      raise exception 'An entry filed as the resident''s statement rests on a message the resident wrote.';
+      raise exception 'An entry filed as the resident''s statement names a message the resident wrote.';
     end if;
   end if;
   return new;
@@ -381,7 +389,7 @@ begin
   if new.execution <> 'planned' then
     select speaker into who from uc_pilot.messages where id = new.outcome_message_id;
     if who is distinct from 'resident' then
-      raise exception 'An outcome rests on a message the resident wrote.';
+      raise exception 'An outcome names a message the resident wrote.';
     end if;
   end if;
   if tg_op = 'UPDATE' then
@@ -432,12 +440,15 @@ begin
   for k, v in select key, value #>> '{}' from jsonb_each(to_jsonb(new) - 'search')
                where (key like '%message_id' or key = 'reply_to') and jsonb_typeof(value) = 'string' loop
     if not exists (select 1 from uc_pilot.messages m where m.id = v::uuid) then
-      raise exception 'An entry rests only on a message in the same resident''s conversation.';
+      raise exception 'An entry names only a message in the same resident''s conversation.';
     end if;
   end loop;
   if tg_table_name = 'statements' then
     if new.supersedes is not null and not exists (select 1 from uc_pilot.statements x where x.id = new.supersedes) then
       raise exception 'A statement replaces only a statement of the same resident.';
+    end if;
+    if new.commitment_id is not null and not exists (select 1 from uc_pilot.commitments x where x.id = new.commitment_id) then
+      raise exception 'A note is about a commitment of the same resident.';
     end if;
   elsif tg_table_name = 'commitments' then
     if new.schedule_item_id is not null and not exists (select 1 from uc_pilot.schedule_items x where x.id = new.schedule_item_id) then
@@ -574,14 +585,14 @@ grant select, insert         on uc_pilot.statements     to uc_pilot_resident;
 grant update (state, ended_at, ended_by_message_id)
                              on uc_pilot.statements     to uc_pilot_resident;
 grant select, insert         on uc_pilot.schedule_items to uc_pilot_resident;
-grant update (label, days, start_min, end_min, said, state, ended_at, ended_by_message_id)
+grant update (label, days, start_min, end_min, said, state, ended_at, ended_by_message_id, folder)
                              on uc_pilot.schedule_items to uc_pilot_resident;
 grant select, insert         on uc_pilot.plans          to uc_pilot_resident;
 grant update (state, confirmed_at, confirmed_via, confirmed_message_id, confirmed_items, realism)
                              on uc_pilot.plans          to uc_pilot_resident;
 grant select, insert         on uc_pilot.commitments    to uc_pilot_resident;
 grant update (label, on_date, start_min, end_min, completion, schedule_item_id, execution, actual_start_min, actual_end_min, timing,
-              time_is_estimate, outcome_said, outcome_message_id, outcome_at, withdrawn_at, withdrawn_said, withdrawn_message_id)
+              time_is_estimate, outcome_said, outcome_message_id, outcome_at, withdrawn_at, withdrawn_said, withdrawn_message_id, folder)
                              on uc_pilot.commitments    to uc_pilot_resident;
 grant select, insert         on uc_pilot.pending        to uc_pilot_resident;
 grant update (summary, payload, state, decided_via, decided_message_id, result)

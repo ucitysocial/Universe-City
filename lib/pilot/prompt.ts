@@ -2,7 +2,7 @@
 // The rules come from LANGUAGE_STANDARD.md sections 2, 3.20, 4, 5, and 10, docs/systems/TIME.md sections 5 and 6,
 // docs/product/AGENT_MODEL.md, and ARCHITECTURE.md. This text adds no rule of its own to those documents.
 
-export const PROMPT_VERSION = 'founder-test-2026-10-12.1';
+export const PROMPT_VERSION = 'founder-test-2026-10-12.2';
 
 import { DEPARTMENTS, FOLDERS } from '../domain/folders';
 
@@ -46,6 +46,7 @@ Never file a government identification number, a payment card number, a bank acc
 
 TIME
 Time is the folder built in depth here. The weekly schedule is what repeats. A commitment is one thing on one day. A Plan is the list of commitments for one day, and the resident confirms it. When the resident wants to plan a day, use draft_plan, say what the day already holds, and ask what is different from usual. Use draft_plan only when the resident asks to plan or to confirm a day. Before the resident's first Plan is confirmed, ask how realistic it feels, and simplify a Plan the resident calls unlikely. The resident can report a new commitment, a change, or an outcome at any moment, and it is filed the same way.
+A commitment and a weekly item sit in Time, and each one also belongs to one folder of the forty eight: the folder its activity is about. The calendar colors the entry by the department of that folder. Give the folder when you file the entry. A work shift belongs to Schedule. Grocery shopping belongs to Inventory, cleaning to Sanitation, and organizing to Organization. Leave the folder out when no folder plainly fits. When an entry in view shows Folder: none set and its activity plainly fits a folder, set it with set_folder in the same reply and say nothing about it. When the resident says an entry belongs under a different folder, set it with set_folder.
 Other folders are not built yet. For those subjects you can talk, remember, and file the resident's own statements under the folder name. Never claim a calculation, a record, or a service from a folder that is not built. Say plainly what exists, once, and only when it bears on what the resident asked.\nThe folder names, with what each one keeps. Use the exact name, or General when none fits:\n${FOLDER_LINES}
 
 YOUR ACTIONS

@@ -39,9 +39,12 @@ export default function PilotViewport() {
   }, []);
 
   // On a narrow screen the path scrolls sideways. It is moved to its end, so the place on screen is the part in view.
+  // A new place in the File opens at its top.
   useEffect(() => {
     const el = document.getElementById('uc-path');
     if (el && el.scrollWidth > el.clientWidth) el.scrollLeft = el.scrollWidth;
+    const pane = document.querySelector('.fb-pane');
+    if (pane) pane.scrollTop = 0;
   }, [path]);
 
   return null;

@@ -23,11 +23,12 @@ export type StatementRow = {
   id: string; said: string; topic: string; folder: string; state: string; basis: string; filed_by: string;
   about_date: string | null; supersedes: string | null; created_at: string; ended_at: string | null;
 };
-export type ScheduleRow = { id: string; label: string; days: number[]; start_min: number | null; end_min: number | null; state: string; said: string | null; created_at: string };
+export type ScheduleRow = { id: string; label: string; days: number[]; start_min: number | null; end_min: number | null; state: string; said: string | null; created_at: string; folder?: string | null };
 export type CommitmentView = {
   id: string; label: string; on_date: string; start_min: number | null; end_min: number | null; completion: string | null;
   schedule_item_id: string | null; execution: string; actual_start_min: number | null; actual_end_min: number | null;
   timing: string | null; time_is_estimate: boolean; outcome_said: string | null; withdrawn_at: string | null; basis: string; said: string | null;
+  folder?: string | null;
 };
 export type PlanRow = { id: string; plan_date: string; state: string; confirmed_at: string | null; confirmed_via: string | null; realism: string | null; confirmed_items: any };
 export type PendingRow = { id: string; decider: string; kind: string; summary: string; rests_on: string | null; state: string; created_at: string; payload: any; decided_at: string | null; decided_via: string | null };
@@ -66,11 +67,11 @@ export async function loadFile(q: Q, zone: string, opts: { daysBack?: number; da
   const statements = await q<StatementRow>(
     `select ${STATEMENT_COLS} from uc_pilot.statements where state = 'current' order by created_at desc limit $1`, [opts.statements ?? 60]);
   const schedule = await q<ScheduleRow>(
-    `select id, label, days, start_min, end_min, state, said, ${TS('created_at')} as created_at
+    `select id, label, days, start_min, end_min, state, said, ${TS('created_at')} as created_at, folder
        from uc_pilot.schedule_items where state = 'current' order by start_min nulls last, label`);
   const commitments = await q<CommitmentView>(
     `select id, label, on_date::text as on_date, start_min, end_min, completion, schedule_item_id, execution,
-            actual_start_min, actual_end_min, timing, time_is_estimate, outcome_said, ${TS('withdrawn_at')} as withdrawn_at, basis, said
+            actual_start_min, actual_end_min, timing, time_is_estimate, outcome_said, ${TS('withdrawn_at')} as withdrawn_at, basis, said, folder
        from uc_pilot.commitments where on_date between $1::date and $2::date
       order by on_date, withdrawn_at is not null, start_min nulls last, created_at`, [from, to]);
   const plans = await q<PlanRow>(
@@ -154,14 +155,14 @@ export function fileForModel(v: FileView, name: string | null): string {
   L.push('');
   L.push('WEEKLY SCHEDULE:');
   if (v.schedule.length === 0) L.push('  Nothing is on file. The weekly schedule is not established.');
-  for (const s of v.schedule) L.push(`  [${shortId(s.id)}] ${s.label}, ${sayDays(s.days)}, ${saySpan(s.start_min, s.end_min)}`);
+  for (const s of v.schedule) L.push(`  [${shortId(s.id)}] ${s.label}, ${sayDays(s.days)}, ${saySpan(s.start_min, s.end_min)}. Folder: ${s.folder || 'none set'}`);
   L.push('');
   L.push('DAYS:');
   for (const d of v.days) {
     const plan = d.plan ? (d.plan.state === 'confirmed' ? 'Plan confirmed by the resident' : 'Plan is a draft, waiting for the resident') : 'no Plan';
     if (d.commitments.length === 0 && !d.plan) continue;
     L.push(`  ${sayDate(d.date)} (${d.date})${d.date === n.date ? ', today' : ''}: ${plan}.`);
-    for (const c of d.commitments) L.push(`    [${shortId(c.id)}] ${sayCommitment(c as any)}${c.schedule_item_id ? ' (from the weekly schedule)' : ''}`);
+    for (const c of d.commitments) L.push(`    [${shortId(c.id)}] ${sayCommitment(c as any)}${c.schedule_item_id ? ' (from the weekly schedule)' : ''}. Folder: ${c.folder || 'none set'}`);
   }
   if (!v.days.some(d => d.commitments.length || d.plan)) L.push('  No commitment and no Plan is on file for the days in view.');
   if (v.emptyDays.length) L.push(`  Days ahead with no entry on file: ${v.emptyDays.map(d => `${['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][weekdayOf(d)]} ${d}`).join(', ')}.`);
