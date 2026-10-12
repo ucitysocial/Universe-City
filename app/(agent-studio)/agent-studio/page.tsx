@@ -39,7 +39,7 @@ export default async function AgentStudioPage() {
         <header className="studio-head">
           <div>
             <p className="studio-eyebrow">Universe City · Agent Portal · Founder test</p>
-            <h1>Resident workspace</h1>
+            <h1>Resident File</h1>
             <p>This is the same File and schedule the resident uses, with a separate agent editing surface.</p>
           </div>
           <Link className="pt-btn ghost" href="/portal/home">View the Resident Portal</Link>
