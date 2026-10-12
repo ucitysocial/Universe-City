@@ -160,3 +160,18 @@ These are **unsettled choices**, not grounds for another round of abstract docum
 - `TIME_RESEARCH.md`: no new evidence claim required to choose visual colors/patterns. If an availability or sleep-related behavioral claim is later proposed, separately verify the research.
 
 **Related:** [#35 — Sleep and daily routines](https://github.com/ucitysocial/Universe-City/issues/35), [#29 — Visual calendar](https://github.com/ucitysocial/Universe-City/issues/29), [#36 — In-block guided steps](https://github.com/ucitysocial/Universe-City/issues/36).
+
+## 9. Conversation economy and a history of postponed work (FT-017)
+
+**Founder screenshot, October 12:** One reschedule resulted in both an extensive conversational recap and an UPDATE status containing the same information, followed by an unrelated sleep question. The resident explicitly finds this overwhelming. The model needs to keep the response focused on the resident's current act and reserve full history for the File.
+
+**Source inventory:**
+- `lib/pilot/tools.ts` `change_commitment` returns both `detail` and `brief`. The latter currently contains the new date/time and optional previous values. `lib/pilot/turn.ts` `briefOf` exposes these short effects under the reply.
+- `lib/pilot/prompt.ts` asks for short replies but also strongly directs the guide to end almost every ongoing-work exchange with a next question, which can create an unrelated intake pivot after an isolated rescheduling. Clarify when no question is warranted. Don't silence genuinely necessary approval/conflict decisions.
+- `uc_pilot.revisions` can identify successive forward schedule changes for the same commitment ID with date/start before and after, without a separate "avoidance" label or inferred failure. Track only real changes; don't count no-ops, changed end only, edits that move earlier, declined proposals, or changes to other tasks.
+- `TIME.md` 7.14 and 7.15 address some repeated timing changes in other situations, but **do not directly establish** a proactive support trigger for multiple deliberate postponements. Its ordinary execution/outcome fields must stay separate from a planned timing history.
+- `TIME_DEVELOPMENTS.md` 5.2 and 5.7 contain older unapproved ideas about task difficulty and outcome patterns; founder FT-017 supplies the direction to support a resident after real repeated deferrals without treating those older drafts as approved in full.
+
+**Resident-facing acceptance:** One short, trustworthy UPDATE line is enough after an uncomplicated time change. A guide may give one relevant human response, but should not echo the same before/after, self-correct at length, or jump to an unrelated sleep/wake intake question. When repeated postponements of the **same** commitment have been objectively established, consider an optional small first step already on file; do not infer psychological cause or nag. Do not claim the four referenced office-cleaning steps have a persisted `uc_pilot` checklist until step storage is actually verified.
+
+**Five-document revisions:** Time (selective agent follow-up for repeated postponements), Operations (derivation from revisions and threshold/eligibility/permission contract), Developments (dated founder observation, correction and tests), Curriculum (how support and task decomposition help without blame, while not lowering ability assessment), Research (do not assert a study validates rescheduling count thresholds or the specific UI). This belongs with [FT-017](https://github.com/ucitysocial/Universe-City/blob/main/docs/founder-test/FOUNDER_TEST_LOG.md#ft-017--one-line-rescheduling-and-awareness-of-repeated-postponements) and [issue #38](https://github.com/ucitysocial/Universe-City/issues/38); **no behavior shipped in this audit**.
