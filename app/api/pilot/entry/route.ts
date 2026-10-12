@@ -2,7 +2,9 @@ import { admit } from '@/lib/pilot/auth';
 import { loadCommitment, loadWeeklyItem, owedOnCommitment, owedOnWeekly, spanWords } from '@/lib/pilot/browse';
 import { isUuid, withResident } from '@/lib/pilot/db';
 import { belongsTo } from '@/lib/pilot/dept';
-import { editCommitment, noteOnCommitment } from '@/lib/pilot/edit';
+import { editCommitment, markDone, markStepOnScreen, noteOnCommitment } from '@/lib/pilot/edit';
+import { stepsOfWeekly, stepsOn } from '@/lib/pilot/steps';
+import { localNow } from '@/lib/pilot/time';
 import { removeNumbers } from '@/lib/pilot/guard';
 import { folderOf, statusOf } from '@/lib/pilot/owed';
 import { sayDate, sayDays } from '@/lib/pilot/time';
@@ -29,10 +31,19 @@ export async function GET(req: Request) {
         if (!x) return null;
         const { s } = x;
         const b = belongsTo(s.folder, s.label);
+        // A routine on a given day shows that day's steps and marks, once the day holds the routine.
+        const date = u.searchParams.get('date') || '';
+        const placed = /^\d{4}-\d{2}-\d{2}$/.test(date)
+          ? (await q<{ id: string; on_date: string; schedule_item_id: string }>(`select id, on_date::text as on_date, schedule_item_id from uc_pilot.commitments where schedule_item_id = $1 and on_date = $2::date`, [s.id, date]))[0]
+          : null;
+        const all = await stepsOfWeekly(q, s.id);
+        const wd = date ? new Date(`${date}T12:00:00Z`).getUTCDay() : null;
+        const steps = placed ? await stepsOn(q, placed) : all.filter(x => wd === null || !x.days || x.days.includes(wd));
         return {
           id: s.id, label: s.label, date: '', start: s.start_min, end: s.end_min, day: sayDays(s.days), time: spanWords(s.start_min, s.end_min),
           dept: b.deptName, folder: folderOf(b), color: b.color, status: s.state === 'current' ? 'Repeats each week' : 'Ended',
-          pending: (await owedOnWeekly(q, zone, s, b)).map(o => o.folder), editable: false, notes: [], changes: x.history.length
+          pending: (await owedOnWeekly(q, zone, s, b)).map(o => o.folder), editable: false, notes: [], changes: x.history.length,
+          steps: steps.map(t => ({ id: t.id, label: t.label, done: t.done })), stepDate: date || null, canDone: false
         };
       }
       const x = await loadCommitment(q, id);
@@ -44,7 +55,10 @@ export async function GET(req: Request) {
         dept: b.deptName, folder: folderOf(b), color: b.color, status: statusOf(c),
         pending: (await owedOnCommitment(q, zone, c, b)).map(o => o.folder),
         editable: !c.withdrawn_at && c.execution === 'planned',
-        notes: x.notes.map(n => ({ id: n.id, said: n.said })), changes: x.history.length
+        notes: x.notes.map(n => ({ id: n.id, said: n.said })), changes: x.history.length,
+        steps: (await stepsOn(q, { id: c.id, on_date: c.on_date, schedule_item_id: c.schedule_item_id })).map(t => ({ id: t.id, label: t.label, done: t.done })),
+        stepDate: null,
+        canDone: !c.withdrawn_at && c.execution !== 'executed' && c.on_date <= localNow(zone).date
       };
     });
     if (!body) return Response.json({ error: 'That entry is not on file.' }, { status: 404 });
@@ -66,6 +80,14 @@ export async function POST(req: Request) {
   const id = String(body?.id ?? '');
   const field = (k: string) => (typeof body?.[k] === 'string' ? (body[k] as string).slice(0, 200) : undefined);
   try {
+    if (typeof body?.step === 'string') {
+      const r = await markStepOnScreen(a.userId, a.access, { id, weekly: body?.weekly === true, date: field('date'), step: body.step, done: body?.done !== false });
+      return Response.json({ ok: true, detail: r.brief || r.detail, changed: r.outcome !== 'unchanged', commitment: r.commitment }, { headers: { 'cache-control': 'no-store' } });
+    }
+    if (body?.done === true) {
+      const r = await markDone(a.userId, a.access, id);
+      return Response.json({ ok: true, detail: r.brief || r.detail, changed: r.outcome !== 'unchanged', href: null }, { headers: { 'cache-control': 'no-store' } });
+    }
     const r = typeof body?.note === 'string'
       ? await noteOnCommitment(a.userId, a.access, id, removeNumbers(body.note.slice(0, 1200)).text)
       : await editCommitment(a.userId, a.access, id, { label: field('label'), date: field('date'), start: field('start'), end: field('end'), keepBoth: body?.keepBoth === true });

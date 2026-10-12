@@ -349,7 +349,7 @@ begin
   if tg_table_name = 'messages' then
     new.speaker := uc_pilot.actor();
     new.created_at := now();
-  elsif tg_table_name in ('statements','schedule_items','commitments','plans') then
+  elsif tg_table_name in ('statements','schedule_items','commitments','plans','steps') then
     new.filed_by := uc_pilot.actor();
     if new.source_message_id is null then new.source_message_id := uc_pilot.msg(); end if;
   elsif tg_table_name in ('pending','follow_ups','work') then
@@ -383,16 +383,24 @@ begin
   return new;
 end $$;
 
--- An outcome rests on a message the resident wrote. Software never supplies one.
+-- An outcome rests on a message the resident wrote, or on the resident's own press of Mark this done on the screen.
+-- The founder set the press on October 12, 2026. Software and the agent never supply an outcome.
 create or replace function uc_pilot.outcome_guard() returns trigger
 language plpgsql as $$
 declare
   who text;
 begin
   if new.execution <> 'planned' then
-    select speaker into who from uc_pilot.messages where id = new.outcome_message_id;
-    if who is distinct from 'resident' then
-      raise exception 'An outcome names a message the resident wrote.';
+    if new.outcome_via = 'screen' then
+      if (tg_op = 'INSERT' or new.outcome_at is distinct from old.outcome_at or new.execution is distinct from old.execution)
+         and uc_pilot.actor() <> 'resident' then
+        raise exception 'An outcome marked on the screen is marked by the resident.';
+      end if;
+    else
+      select speaker into who from uc_pilot.messages where id = new.outcome_message_id;
+      if who is distinct from 'resident' then
+        raise exception 'An outcome names a message the resident wrote.';
+      end if;
     end if;
   end if;
   if tg_op = 'UPDATE' then
@@ -456,6 +464,17 @@ begin
   elsif tg_table_name = 'commitments' then
     if new.schedule_item_id is not null and not exists (select 1 from uc_pilot.schedule_items x where x.id = new.schedule_item_id) then
       raise exception 'A commitment comes only from a weekly item of the same resident.';
+    end if;
+  elsif tg_table_name = 'steps' then
+    if new.commitment_id is not null and not exists (select 1 from uc_pilot.commitments x where x.id = new.commitment_id) then
+      raise exception 'A step belongs only to a commitment of the same resident.';
+    end if;
+    if new.schedule_item_id is not null and not exists (select 1 from uc_pilot.schedule_items x where x.id = new.schedule_item_id) then
+      raise exception 'A step belongs only to a weekly item of the same resident.';
+    end if;
+  elsif tg_table_name = 'step_marks' then
+    if not exists (select 1 from uc_pilot.steps x where x.id = new.step_id) or not exists (select 1 from uc_pilot.commitments x where x.id = new.commitment_id) then
+      raise exception 'A step is marked only on an entry of the same resident.';
     end if;
   elsif tg_table_name = 'actions' then
     if new.turn_id is not null and not exists (select 1 from uc_pilot.turns x where x.id = new.turn_id) then
@@ -624,6 +643,103 @@ revoke execute on all functions in schema uc_pilot from public;
 revoke execute on all functions in schema uc_pilot from uc_pilot_resident;
 grant execute on function uc_pilot.uid(), uc_pilot.actor(), uc_pilot.msg(), uc_pilot.turn(), uc_pilot.allowed() to uc_pilot_resident;
 
+
+-- ---------------------------------------------------------------- marked done on the screen, and steps inside an entry
+
+-- The founder set on October 12, 2026 that the resident can mark an entry done on the screen. The press is the
+-- resident's own. The agent files nothing for it and says nothing about it.
+alter table uc_pilot.commitments add column if not exists outcome_via text check (outcome_via in ('message','screen'));
+do $$
+declare c text;
+begin
+  for c in select conname from pg_constraint
+            where conrelid = 'uc_pilot.commitments'::regclass and contype = 'c'
+              and pg_get_constraintdef(oid) like '%outcome_message_id IS NOT NULL%'
+              and conname <> 'commitments_outcome_rests' loop
+    execute format('alter table uc_pilot.commitments drop constraint %I', c);
+  end loop;
+  if not exists (select 1 from pg_constraint where conname = 'commitments_outcome_rests') then
+    alter table uc_pilot.commitments add constraint commitments_outcome_rests
+      check (execution = 'planned' or outcome_message_id is not null or outcome_via = 'screen');
+  end if;
+end $$;
+grant update (outcome_via) on uc_pilot.commitments to uc_pilot_resident;
+
+-- Steps inside one entry. The founder set on October 12, 2026 that any entry can hold an ordered list of smaller
+-- steps, built from what the resident says. A step on a weekly item applies on the days it names, or on every day
+-- of the item when it names none. A step is marked done on one day's entry, so each day keeps its own progress.
+create table if not exists uc_pilot.steps (
+  id                uuid primary key default gen_random_uuid(),
+  user_id           uuid not null default uc_pilot.uid(),
+  commitment_id     uuid references uc_pilot.commitments(id),
+  schedule_item_id  uuid references uc_pilot.schedule_items(id),
+  position          int not null check (position between 1 and 60),
+  label             text not null check (length(label) between 1 and 120),
+  days              smallint[] check (days is null or (days <@ array[0,1,2,3,4,5,6]::smallint[] and cardinality(days) between 1 and 7)),
+  state             text not null default 'current' check (state in ('current','removed')),
+  source_message_id uuid references uc_pilot.messages(id),
+  filed_by          text not null default 'resident',
+  created_at        timestamptz not null default now(),
+  check ((commitment_id is null) <> (schedule_item_id is null))
+);
+create index if not exists steps_owner on uc_pilot.steps (user_id, commitment_id, schedule_item_id) where state = 'current';
+
+create table if not exists uc_pilot.step_marks (
+  id             uuid primary key default gen_random_uuid(),
+  user_id        uuid not null default uc_pilot.uid(),
+  step_id        uuid not null references uc_pilot.steps(id),
+  commitment_id  uuid not null references uc_pilot.commitments(id),
+  done           boolean not null default true,
+  marked_by      text not null default 'resident',
+  created_at     timestamptz not null default now(),
+  updated_at     timestamptz not null default now(),
+  unique (user_id, step_id, commitment_id)
+);
+
+-- Who marked a step comes from the server's verified context.
+create or replace function uc_pilot.mark_stamp() returns trigger
+language plpgsql as $$
+begin
+  if uc_pilot.uid() is null then
+    raise exception 'No resident is set for this write.';
+  end if;
+  if tg_op = 'INSERT' then
+    new.user_id := uc_pilot.uid();
+    new.created_at := now();
+  end if;
+  new.marked_by := uc_pilot.actor();
+  new.updated_at := now();
+  return new;
+end $$;
+alter function uc_pilot.mark_stamp() set search_path = uc_pilot, pg_temp;
+
+drop trigger if exists steps_10_stamp on uc_pilot.steps;
+create trigger steps_10_stamp before insert on uc_pilot.steps for each row execute function uc_pilot.stamp();
+drop trigger if exists step_marks_10_stamp on uc_pilot.step_marks;
+create trigger step_marks_10_stamp before insert or update on uc_pilot.step_marks for each row execute function uc_pilot.mark_stamp();
+do $$
+declare t text;
+begin
+  foreach t in array array['steps','step_marks'] loop
+    execute format('drop trigger if exists %I on uc_pilot.%I', t || '_15_refs', t);
+    execute format('create trigger %I before insert or update on uc_pilot.%I for each row execute function uc_pilot.refs_guard()', t || '_15_refs', t);
+    execute format('drop trigger if exists %I on uc_pilot.%I', t || '_10_fixed', t);
+    execute format('create trigger %I before update on uc_pilot.%I for each row execute function uc_pilot.fixed_columns()', t || '_10_fixed', t);
+    execute format('drop trigger if exists %I on uc_pilot.%I', t || '_90_revision', t);
+    execute format('create trigger %I after update on uc_pilot.%I for each row execute function uc_pilot.keep_revision()', t || '_90_revision', t);
+    execute format('alter table uc_pilot.%I enable row level security', t);
+    execute format('alter table uc_pilot.%I force row level security', t);
+    execute format('revoke all on uc_pilot.%I from public', t);
+    execute format('drop policy if exists own_rows on uc_pilot.%I', t);
+    execute format('create policy own_rows on uc_pilot.%I for all to uc_pilot_resident using (user_id = uc_pilot.uid() and uc_pilot.allowed()) with check (user_id = uc_pilot.uid() and uc_pilot.allowed())', t);
+  end loop;
+end $$;
+grant select, insert on uc_pilot.steps to uc_pilot_resident;
+grant update (label, position, days, state) on uc_pilot.steps to uc_pilot_resident;
+grant select, insert on uc_pilot.step_marks to uc_pilot_resident;
+grant update (done, marked_by, updated_at) on uc_pilot.step_marks to uc_pilot_resident;
+revoke execute on function uc_pilot.mark_stamp() from public;
+
 -- ---------------------------------------------------------------- clearing the test
 
 -- Removes every row the test holds for the resident who asks. The login in auth stays.
@@ -640,7 +756,7 @@ begin
     raise exception 'No resident is set.';
   end if;
   update uc_pilot.turns set reply_id = null where user_id = u;
-  foreach t in array array['revisions','actions','work','follow_ups','pending','commitments','plans','schedule_items','statements','turns','messages','sessions'] loop
+  foreach t in array array['revisions','actions','work','follow_ups','pending','step_marks','steps','commitments','plans','schedule_items','statements','turns','messages','sessions'] loop
     execute format('delete from uc_pilot.%I where user_id = $1', t) using u;
     get diagnostics c = row_count;
     n := n || jsonb_build_object(t, c);

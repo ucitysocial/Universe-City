@@ -6,10 +6,11 @@
 import { FOLDERS } from '../domain/folders';
 import type { Q } from './db';
 import { isUuid, TS } from './db';
+import { carries, loadCarried } from './carry';
 import { belongsTo, type Belongs } from './dept';
 import { owedOn, type OwedFile } from './owed';
 import { folderPath } from './paths';
-import { addDays, localNow, sayClock, sayDate, sayDays, saySpan, weekdayOf } from './time';
+import { addDays, localNow, sayClock, sayDate, sayDays, saySpan, weekdayName, weekdayOf } from './time';
 
 // ------------------------------------------------------------------ the index: what each folder holds
 
@@ -381,10 +382,12 @@ type Entry = { id: string; label: string; on_date: string; start_min: number | n
  * One item in Pending. Each item waits for the resident.
  *   ask     a question the resident answers in words: an entry that has passed with its end or its outcome unknown
  *   decide  an item that waits for a yes or a no. An entry that overlaps another is one of these
+ *   carry   a task from an earlier day that is not marked done. It waits for a time, or for the resident to mark it done
  */
 export type PendingItem =
   | { type: 'ask'; key: string; question: string; href: string }
-  | { type: 'decide'; key: string; id: string; kind: string; summary: string; overlap: boolean };
+  | { type: 'decide'; key: string; id: string; kind: string; summary: string; overlap: boolean }
+  | { type: 'carry'; key: string; id: string; label: string; from: string; href: string };
 export type PanelView = {
   today: string;
   now: (Entry & { live: boolean; minutesUntil: number; minutesLeft: number | null }) | null;
@@ -421,18 +424,26 @@ export async function loadPanel(q: Q, zone: string): Promise<PanelView> {
 
   // An entry that has passed with its end or its outcome unknown, in the last seven days.
   const asks: PendingItem[] = [];
-  const passed = await q<Entry>(
-    `select id, label, on_date::text as on_date, start_min, end_min, folder, execution from uc_pilot.commitments
+  const passed = await q<Entry & { schedule_item_id: string | null }>(
+    `select id, label, on_date::text as on_date, start_min, end_min, folder, execution, schedule_item_id from uc_pilot.commitments
       where withdrawn_at is null and execution = 'planned' and on_date between $1::date and $2::date
       order by on_date desc, start_min nulls last`, [addDays(today, -7), today]);
   for (const c of passed) {
     const over = c.on_date < today || (c.start_min !== null && (c.end_min ?? c.start_min + 60) <= n.minutes);
     if (!over) continue;
+    // A task from an earlier day is no question about what happened. It waits to be scheduled, below.
+    if (c.on_date < today && carries(c)) continue;
     asks.push({
       type: 'ask', key: `ended:${c.id}`, href: `${folderPath('Time')}/${c.on_date}/${c.id}`,
       question: c.end_min === null ? `What time did ${c.label} on ${dayWord(c.on_date)} end?` : `Did ${c.label} on ${dayWord(c.on_date)} happen as planned?`
     });
   }
+  // Tasks from earlier days that are not marked done. The founder set on October 12, 2026 that each one waits for a
+  // time on a day ahead, and that the agent asks about them first.
+  const carried: PendingItem[] = (await loadCarried(q, today)).map(c => ({
+    type: 'carry', key: `carry:${c.id}`, id: c.id, label: c.label, href: `${folderPath('Time')}/${c.on_date}/${c.id}`,
+    from: c.days === 1 ? 'From yesterday' : c.days < 7 ? `From ${weekdayName(weekdayOf(c.on_date))}` : `From ${dayWord(c.on_date)}`
+  }));
   const open = await q<{ id: string; kind: string; summary: string; rests_on: string | null }>(
     `select id, kind, summary, rests_on from uc_pilot.pending where state = 'open' and decider = 'resident' order by created_at`);
   const decides: PendingItem[] = open.map(p => ({
@@ -454,8 +465,8 @@ export async function loadPanel(q: Q, zone: string): Promise<PanelView> {
   return {
     today, now, then,
     week, planned: week.filter(d => d.count > 0).length,
-    pending: [...decides.filter(d => d.type === 'decide' && d.overlap), ...asks.slice(0, 3), ...decides.filter(d => d.type === 'decide' && !d.overlap)],
-    more: Math.max(0, asks.length - 3)
+    pending: [...carried.slice(0, 3), ...decides.filter(d => d.type === 'decide' && d.overlap), ...asks.slice(0, 3), ...decides.filter(d => d.type === 'decide' && !d.overlap)],
+    more: Math.max(0, asks.length - 3) + Math.max(0, carried.length - 3)
   };
 }
 

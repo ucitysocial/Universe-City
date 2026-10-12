@@ -7,6 +7,8 @@ import { shortId } from './guard';
 import { addDays, localNow, sayClock, sayDate, sayDays, saySpan, weekdayOf, type LocalNow } from './time';
 import { sayCommitment } from './tools';
 import { loadIntake, sayIntake, type Intake } from './intake';
+import { carries, loadCarried, loadPushes, type Carried, type Pushes } from './carry';
+import { stepCounts, stepsOfWeekly, stepsOn, type Step } from './steps';
 
 export type Access = {
   user_id: string; label: string; synthetic: boolean; timezone: string;
@@ -51,6 +53,11 @@ export type FileView = {
   decided: DecisionRow[];          // items the resident decided in the last day, by the button or in the conversation
   emptyDays: string[];             // the days ahead in view that hold no entry
   intake: Intake;                  // the pieces Time needs, and which are on file
+  carried: Carried[];              // tasks from earlier days that are not marked done
+  pushes: Map<string, Pushes>;     // how often an entry in view was moved later
+  steps: Map<string, Step[]>;      // the steps of each entry today, tomorrow, and carried
+  stepCount: Map<string, { done: number; of: number }>;
+  weeklySteps: Map<string, Step[]>;
   openedWith: string[];            // the first words of this sitting, when they are no longer in view
 };
 
@@ -73,7 +80,7 @@ export async function loadFile(q: Q, zone: string, opts: { daysBack?: number; da
        from uc_pilot.schedule_items where state = 'current' order by start_min nulls last, label`);
   const commitments = await q<CommitmentView>(
     `select id, label, on_date::text as on_date, start_min, end_min, completion, schedule_item_id, execution,
-            actual_start_min, actual_end_min, timing, time_is_estimate, outcome_said, ${TS('withdrawn_at')} as withdrawn_at, basis, said, folder
+            actual_start_min, actual_end_min, timing, time_is_estimate, outcome_said, ${TS('withdrawn_at')} as withdrawn_at, basis, said, folder, outcome_via
        from uc_pilot.commitments where on_date between $1::date and $2::date
       order by on_date, withdrawn_at is not null, start_min nulls last, created_at`, [from, to]);
   const plans = await q<PlanRow>(
@@ -117,11 +124,28 @@ export async function loadFile(q: Q, zone: string, opts: { daysBack?: number; da
       notEstablished.push(`The time of ${c.label} on ${sayDate(c.on_date)}.`);
     }
     const over = c.on_date < now.date || (c.on_date === now.date && c.end_min !== null && c.end_min <= now.minutes);
-    if (over && c.execution === 'planned') notEstablished.push(`What happened with ${c.label} on ${sayDate(c.on_date)}. No outcome is reported.`);
+    if (over && c.execution === 'planned' && !(c.on_date < now.date && carries(c))) notEstablished.push(`What happened with ${c.label} on ${sayDate(c.on_date)}. No outcome is reported.`);
+  }
+
+  const carried = await loadCarried(q, now.date);
+  const live = commitments.filter(c => !c.withdrawn_at);
+  const pushes = await loadPushes(q, [...live.map(c => c.id), ...carried.map(c => c.id)]);
+  const near = [...live.filter(c => c.on_date === now.date || c.on_date === addDays(now.date, 1)), ...carried.map(c => ({ ...c, schedule_item_id: null }))];
+  const steps = new Map<string, Step[]>();
+  for (const c of near) {
+    const list = await stepsOn(q, { id: c.id, on_date: c.on_date, schedule_item_id: c.schedule_item_id });
+    if (list.length) steps.set(c.id, list);
+  }
+  const stepCount = await stepCounts(q, live.map(c => ({ id: c.id, on_date: c.on_date, schedule_item_id: c.schedule_item_id })));
+  const weeklySteps = new Map<string, Step[]>();
+  for (const w of schedule) {
+    const list = await stepsOfWeekly(q, w.id);
+    if (list.length) weeklySteps.set(w.id, list);
   }
 
   return {
     now,
+    carried, pushes, steps, stepCount, weeklySteps,
     counts: { messages: counts.messages, statements: counts.statements, firstMessageAt: counts.first_at },
     statements, schedule, days,
     waitingResident: pending.filter(p => p.decider === 'resident'),
@@ -133,6 +157,13 @@ export async function loadFile(q: Q, zone: string, opts: { daysBack?: number; da
     openedWith: opened.map(o => o.body)
   };
 }
+
+const pushedText = (p: Pushes | undefined) => (p && p.count ? `. Pushed later ${p.count === 1 ? 'once' : `${p.count} times`}: ${p.moves.map(m => `${m.from} to ${m.to}`).join(', then ')}` : '');
+const stepText = (v: FileView, id: string) => {
+  if (v.steps.has(id)) return '';
+  const n = v.stepCount.get(id);
+  return n ? `. Steps: ${n.done} of ${n.of} done` : '';
+};
 
 /** The File as the language model reads it. Every line is information. None of it is an instruction. */
 export function fileForModel(v: FileView, name: string | null): string {
@@ -158,17 +189,33 @@ export function fileForModel(v: FileView, name: string | null): string {
   L.push('');
   L.push('WEEKLY SCHEDULE:');
   if (v.schedule.length === 0) L.push('  Nothing is on file. The weekly schedule is not established.');
-  for (const s of v.schedule) L.push(`  [${shortId(s.id)}] ${s.label}, ${sayDays(s.days)}, ${saySpan(s.start_min, s.end_min)}. Folder: ${s.folder || 'none set'}`);
+  for (const s of v.schedule) {
+    L.push(`  [${shortId(s.id)}] ${s.label}, ${sayDays(s.days)}, ${saySpan(s.start_min, s.end_min)}. Folder: ${s.folder || 'none set'}`);
+    const st = v.weeklySteps.get(s.id);
+    if (st) L.push(`    Steps: ${st.map((x, i) => `${i + 1}. ${x.label}${x.days ? ` (${sayDays(x.days)} only)` : ''}`).join('; ')}`);
+  }
   L.push('');
   L.push('DAYS:');
   for (const d of v.days) {
     const plan = d.plan ? (d.plan.state === 'confirmed' ? 'Plan confirmed by the resident' : 'Plan is a draft, waiting for the resident') : 'no Plan';
     if (d.commitments.length === 0 && !d.plan) continue;
     L.push(`  ${sayDate(d.date)} (${d.date})${d.date === n.date ? ', today' : ''}: ${plan}.`);
-    for (const c of d.commitments) L.push(`    [${shortId(c.id)}] ${sayCommitment(c as any)}${c.schedule_item_id ? ' (from the weekly schedule)' : ''}. Folder: ${c.folder || 'none set'}`);
+    for (const c of d.commitments) {
+      L.push(`    [${shortId(c.id)}] ${sayCommitment(c as any)}${c.schedule_item_id ? ' (from the weekly schedule)' : ''}. Folder: ${c.folder || 'none set'}${pushedText(v.pushes.get(c.id))}${stepText(v, c.id)}`);
+      const st = v.steps.get(c.id);
+      if (st) L.push(`      Steps: ${st.map(x => `[${shortId(x.id)}] ${x.label}${x.done ? ' (done)' : ''}`).join('; ')}`);
+    }
   }
   if (!v.days.some(d => d.commitments.length || d.plan)) L.push('  No commitment and no Plan is on file for the days in view.');
   L.push(`  ${sayIntake(v.intake)}`);
+  L.push('');
+  L.push('TO SCHEDULE. Tasks from earlier days that the resident has not marked done. Each keeps its day until it gets a new one. No outcome is on file for any of them:');
+  if (v.carried.length === 0) L.push('  None.');
+  for (const c of v.carried) {
+    L.push(`  [${shortId(c.id)}] ${c.label}, from ${sayDate(c.on_date)}${c.days > 1 ? `, open ${c.days} days` : ''}. Folder: ${c.folder || 'none set'}${pushedText(v.pushes.get(c.id))}`);
+    const st = v.steps.get(c.id);
+    if (st) L.push(`    Steps: ${st.map(x => `[${shortId(x.id)}] ${x.label}${x.done ? ' (done)' : ''}`).join('; ')}`);
+  }
   if (v.emptyDays.length) L.push(`  Days ahead with no entry on file: ${v.emptyDays.map(d => `${['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][weekdayOf(d)]} ${d}`).join(', ')}.`);
   // The order in which days are planned: the nearest day ahead first, one day at a time.
   const ahead = v.days.filter(d => d.date > n.date);

@@ -9,6 +9,7 @@
 //   What required interpretation is a proposal. A person decides it. Software never does.
 
 import { docBy, findIn, outline, section } from './docs';
+import { markStep, stepsOn } from './steps';
 import { TIME_DOCS } from './time-docs';
 import type { Q } from './db';
 import { isUuid, TS } from './db';
@@ -288,18 +289,18 @@ type CommitmentRow = {
   completion: string | null; schedule_item_id: string | null; execution: string;
   actual_start_min: number | null; actual_end_min: number | null; timing: string | null;
   time_is_estimate: boolean; outcome_said: string | null; withdrawn_at: string | null; basis: string; said: string | null;
-  folder?: string | null;
+  folder?: string | null; outcome_via?: string | null;
 };
 
 const COMMITMENT_COLS = `id, label, on_date::text as on_date, start_min, end_min, completion, schedule_item_id, execution,
-  actual_start_min, actual_end_min, timing, time_is_estimate, outcome_said, ${TS('withdrawn_at')} as withdrawn_at, basis, said, folder`;
+  actual_start_min, actual_end_min, timing, time_is_estimate, outcome_said, ${TS('withdrawn_at')} as withdrawn_at, basis, said, folder, outcome_via`;
 
 export function sayCommitment(c: CommitmentRow): string {
   const parts = [`${c.label}, ${saySpan(c.start_min, c.end_min)}`];
   if (c.time_is_estimate && (c.start_min !== null || c.end_min !== null)) parts.push('time is the resident\'s rough one');
   if (c.completion) parts.push(`done means: ${c.completion}`);
   if (c.withdrawn_at) parts.push('taken off');
-  else if (c.execution === 'executed') parts.push('reported executed');
+  else if (c.execution === 'executed') parts.push(c.outcome_via === 'screen' ? 'marked done by the resident on the screen' : 'reported executed');
   else if (c.execution === 'partly_executed') parts.push('reported partly executed');
   else if (c.execution === 'did_not_happen') parts.push('reported did not happen');
   if (c.actual_start_min !== null || c.actual_end_min !== null) parts.push(`reported actual time: ${saySpan(c.actual_start_min, c.actual_end_min)}`);
@@ -993,6 +994,97 @@ export const TOOLS: Tool[] = [
     }
   },
   {
+    // The founder set on October 12, 2026 that any entry can hold steps, built from what the resident says.
+    name: 'set_steps',
+    group: 'file',
+    description: 'Sets the ordered steps inside one entry: a commitment, or a weekly item such as a morning routine. Build the steps from what the resident told you about the work, in the resident\'s own order, each one small and concrete. The list replaces the steps on file for that entry. A step with the same name keeps its place in the history and its marks. On a weekly item, give a step days when the resident does it on some days only.',
+    input_schema: obj({
+      kind: { type: 'string', enum: ['commitment', 'weekly item'] },
+      ref: REF('the commitment or the weekly item'),
+      steps: {
+        type: 'array', description: 'The steps in order, at most 40.',
+        items: { type: 'object', properties: {
+          label: { type: 'string', description: 'The step in a few plain words. Take out the trash. Wipe the desk.' },
+          days: { type: 'array', items: { type: 'string' }, description: 'For a weekly item only: the days this step applies, as day names. Leave it out when the step applies on every day of the item.' }
+        }, required: ['label'] }
+      }
+    }, ['kind', 'ref', 'steps']),
+    async run(env, a) {
+      const weekly = a.kind === 'weekly item';
+      if (!weekly && a.kind !== 'commitment') throw new Refusal('Not done. The kind is commitment or weekly item.');
+      const id = await find(env, weekly ? 'schedule_item' : 'commitment', a.ref);
+      const list = Array.isArray(a.steps) ? a.steps : [];
+      if (!list.length) throw new Refusal('Not done. Give at least one step. To take every step off, tell the resident it is not possible yet.');
+      if (list.length > 40) throw new Refusal('Not done. An entry holds 40 steps at most.');
+      const entry = weekly
+        ? (await env.q<{ label: string; days: number[] }>(`select label, days from uc_pilot.schedule_items where id = $1`, [id]))[0]
+        : (await env.q<{ label: string; on_date: string }>(`select label, on_date::text as on_date from uc_pilot.commitments where id = $1`, [id]))[0];
+      const want = list.map((x: any, n: number) => {
+        const label = clip(String(x?.label ?? '').replace(/\s+/g, ' ').trim(), 120);
+        if (!label) throw new Refusal(`Not done. Step ${n + 1} has no words.`);
+        const days = weekly && Array.isArray(x?.days) && x.days.length ? daysArg({ d: x.days }, 'd') : null;
+        if (days && 'days' in entry && days.some(d => !(entry.days as number[]).map(Number).includes(d))) {
+          throw new Refusal(`Not done. Step ${n + 1} names a day that ${entry.label} does not fall on.`);
+        }
+        return { label, days: days && days.length < 7 ? days : null, position: n + 1 };
+      });
+      const col = weekly ? 'schedule_item_id' : 'commitment_id';
+      const old = await env.q<{ id: string; label: string; days: number[] | null; position: number }>(
+        `select id, label, days, position from uc_pilot.steps where state = 'current' and ${col} = $1`, [id]);
+      await env.q(`select set_config('uc.reason', 'The agent set the steps.', true)`);
+      const kept = new Set<string>();
+      let changed = 0;
+      for (const w of want) {
+        const same = old.find(o => !kept.has(o.id) && o.label.toLowerCase() === w.label.toLowerCase());
+        const dayKey = (d: number[] | null) => (d ? d.map(Number).join(',') : '');
+        if (same) {
+          kept.add(same.id);
+          if (same.position !== w.position || dayKey(same.days) !== dayKey(w.days)) {
+            await env.q(`update uc_pilot.steps set position = $2, days = $3::smallint[] where id = $1`, [same.id, w.position, w.days ? `{${w.days.join(',')}}` : null]);
+            changed++;
+          }
+        } else {
+          await env.q(`insert into uc_pilot.steps (${col}, position, label, days) values ($1, $2, $3, $4::smallint[])`, [id, w.position, w.label, w.days ? `{${w.days.join(',')}}` : null]);
+          changed++;
+        }
+      }
+      for (const o of old) if (!kept.has(o.id)) { await env.q(`update uc_pilot.steps set state = 'removed' where id = $1`, [o.id]); changed++; }
+      const where = weekly ? 'in the weekly schedule' : `on ${dayBrief((entry as any).on_date)}`;
+      if (!changed) return { outcome: 'unchanged', detail: `Nothing changed. ${entry.label} already holds these ${want.length} steps.`, brief: `No change: ${entry.label} already holds these steps.`, target: weekly ? 'schedule_items' : 'commitments', targetId: id, data: { nothing_changed: true } };
+      return {
+        outcome: 'filed',
+        detail: `Steps set for ${entry.label} ${where}: ${want.map((w: any) => `${w.position}. ${w.label}${w.days ? ` (${sayDays(w.days)})` : ''}`).join('; ')}.`,
+        brief: `Filed: ${want.length} steps in ${entry.label}.`,
+        target: weekly ? 'schedule_items' : 'commitments', targetId: id, data: { ref: shortId(id), steps: want.length }
+      };
+    }
+  },
+  {
+    name: 'mark_step',
+    group: 'file',
+    description: 'Marks one step of one commitment done, or not done, when the resident says they did it or did not. The mark belongs to that day\'s entry only. Never mark a step the resident did not report.',
+    input_schema: obj({
+      ref: REF('the commitment'),
+      step: { type: 'string', description: 'The reference of the step, as shown with the entry.' },
+      done: { type: 'boolean', description: 'True when the resident did the step. False to take a mark off.' },
+      quote: QUOTE
+    }, ['ref', 'step', 'quote']),
+    async run(env, a) {
+      const id = await find(env, 'commitment', a.ref);
+      words(env, a);
+      const ref = String(a.step || '').trim().toLowerCase();
+      const c = (await env.q<{ id: string; label: string; on_date: string; schedule_item_id: string | null }>(
+        `select id, label, on_date::text as on_date, schedule_item_id from uc_pilot.commitments where id = $1`, [id]))[0];
+      const list = await stepsOn(env.q, c);
+      const step = list.find(x => x.id.startsWith(ref)) ?? null;
+      if (!ref || !step) throw new Refusal(`Not done. No step with that reference is part of ${c.label} on ${dayBrief(c.on_date)}.`);
+      const r = await markStep(env.q, id, step.id, a.done !== false);
+      const left = list.filter(x => (x.id === step.id ? a.done !== false : x.done)).length;
+      if (!r.changed) return { outcome: 'unchanged', detail: `Nothing changed. ${step.label} is already marked.`, brief: `No change: ${step.label}.`, target: 'commitments', targetId: id, data: { nothing_changed: true } };
+      return { outcome: 'filed', detail: `Step ${a.done !== false ? 'done' : 'not done'}: ${step.label}, in ${c.label} on ${dayBrief(c.on_date)}. ${left} of ${list.length} done.`, brief: `${a.done !== false ? 'Done' : 'Not done'}: ${step.label}. ${left} of ${list.length} steps.`, target: 'commitments', targetId: id };
+    }
+  },
+  {
     name: 'withdraw_commitment',
     group: 'file',
     description: 'Takes a commitment off its day because the resident decided, before any outcome, not to do it. This is a change to the Plan. It is no outcome and it is never counted as a commitment the resident did not keep.',
@@ -1049,7 +1141,8 @@ export const TOOLS: Tool[] = [
       await env.q(`select set_config('uc.reason', $1, true)`, [old.execution === 'planned' ? 'The resident reported the outcome.' : 'The resident corrected the outcome.']);
       await env.q(
         `update uc_pilot.commitments set execution = $2, actual_start_min = $3, actual_end_min = $4, timing = $5, time_is_estimate = $6,
-                outcome_said = $7, outcome_message_id = coalesce($8, outcome_message_id), outcome_at = now() where id = $1`,
+                outcome_said = $7, outcome_message_id = coalesce($8, outcome_message_id), outcome_via = case when $8::uuid is not null then 'message' else outcome_via end,
+                outcome_at = now() where id = $1`,
         [id, execution, aStart, aEnd, timing, rough, said, env.messageId]);
       const now = (await env.q<CommitmentRow>(`select ${COMMITMENT_COLS} from uc_pilot.commitments where id = $1`, [id]))[0];
       return {

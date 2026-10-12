@@ -4,11 +4,12 @@ import Link from 'next/link';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-type Brief = { id: string; weekly: boolean; label: string; time: string; belongs: string; href: string; kind: string; x: number; y: number; w: number; h: number };
+type Brief = { id: string; weekly: boolean; date: string; label: string; time: string; belongs: string; href: string; kind: string; x: number; y: number; w: number; h: number };
 type Full = {
   label: string; date: string; start: number | null; end: number | null; day: string; time: string;
   dept: string; folder: string; color: string; status: string; pending: string[];
   editable: boolean; notes: { id: string; said: string }[]; changes: number;
+  steps?: { id: string; label: string; done: boolean }[]; canDone?: boolean;
 };
 
 const clock24 = (min: number | null) => (min === null ? '' : `${String(Math.floor((min % 1440) / 60)).padStart(2, '0')}:${String(min % 60).padStart(2, '0')}`);
@@ -45,9 +46,9 @@ export default function PilotCalPop() {
     return () => window.removeEventListener('resize', again);
   }, []);
 
-  const load = useCallback(async (id: string, weekly = false) => {
+  const load = useCallback(async (id: string, weekly = false, date = '') => {
     try {
-      const res = await fetch(`/api/pilot/entry?id=${id}${weekly ? '&weekly=1' : ''}`, { cache: 'no-store' });
+      const res = await fetch(`/api/pilot/entry?id=${id}${weekly ? `&weekly=1${date ? `&date=${date}` : ''}` : ''}`, { cache: 'no-store' });
       if (!res.ok) return;
       const d = (await res.json()) as Full;
       setFull(d);
@@ -68,9 +69,9 @@ export default function PilotCalPop() {
       const r = el.getBoundingClientRect();
       const d = el.dataset;
       setClash(false);
-      setBrief({ id: d.pop!, weekly: d.weekly === '1', label: d.label || '', time: d.time || '', belongs: d.belongs || '', href: d.href || '#', kind: d.kind || '', x: r.left, y: r.top, w: r.width, h: r.height });
+      setBrief({ id: d.pop!, weekly: d.weekly === '1', date: d.date || '', label: d.label || '', time: d.time || '', belongs: d.belongs || '', href: d.href || '#', kind: d.kind || '', x: r.left, y: r.top, w: r.width, h: r.height });
       setFull(null); setMode('view'); setSaid(null); setNote('');
-      void load(d.pop!, d.weekly === '1');
+      void load(d.pop!, d.weekly === '1', d.date || '');
     };
     document.addEventListener('click', open, true);
     document.addEventListener('keydown', open, true);
@@ -100,13 +101,30 @@ export default function PilotCalPop() {
         setSaid({ ok: true, text: d.detail || 'The change is on file.' });
         if (after === 'note') setNote('');
         setMode('view');
-        await load(brief.id);
+        await load(brief.id, brief.weekly, brief.date);
         router.refresh();
       }
     } catch {
       setSaid({ ok: false, text: 'Not changed, because the server did not answer. The entry is as it was.' });
     }
     setBusy(false);
+  }
+
+  // A step is marked on that day's entry. The list moves at once and goes back when the server refuses.
+  async function tick(step: string, done: boolean) {
+    if (!brief || !full?.steps) return;
+    setFull({ ...full, steps: full.steps.map(x => (x.id === step ? { ...x, done } : x)) });
+    try {
+      const res = await fetch('/api/pilot/entry', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ id: brief.id, weekly: brief.weekly, date: brief.date, step, done }) });
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        setSaid({ ok: false, text: d.error || 'Not marked. The step is as it was.' });
+        await load(brief.id, brief.weekly, brief.date);
+      } else router.refresh();
+    } catch {
+      setSaid({ ok: false, text: 'Not marked, because the server did not answer.' });
+      await load(brief.id, brief.weekly, brief.date);
+    }
   }
 
   if (!brief) return null;
@@ -142,6 +160,21 @@ export default function PilotCalPop() {
             {full.notes.map(n => <p key={n.id}>{n.said}</p>)}
           </div>
         )}
+        {mode === 'view' && full?.steps && full.steps.length > 0 && (
+          <div className="pop-steps">
+            <p className="pop-steps-h">Steps <span>{full.steps.filter(x => x.done).length} of {full.steps.length} done</span></p>
+            <ul>
+              {full.steps.map(x => (
+                <li key={x.id}>
+                  <label className={x.done ? 'done' : undefined}>
+                    <input type="checkbox" checked={x.done} onChange={e => void tick(x.id, e.target.checked)} />
+                    <span>{x.label}</span>
+                  </label>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
         {said && <p className={said.ok ? 'pop-ok' : 'pt-err'} role="status">{said.text}</p>}
 
         {mode === 'time' && full && (
@@ -170,7 +203,8 @@ export default function PilotCalPop() {
         )}
         {mode === 'view' && (
           <div className="pop-acts">
-            {full?.editable && <button type="button" className="pt-btn" onClick={() => setMode('time')}>Change the time</button>}
+            {full?.canDone && <button type="button" className="pt-btn done" disabled={busy} onClick={() => void send({ done: true }, 'time')}>Mark this done</button>}
+            {full?.editable && <button type="button" className={full?.canDone ? 'pt-btn ghost' : 'pt-btn'} onClick={() => setMode('time')}>Change the time</button>}
             {full?.editable && <button type="button" className="pt-btn ghost" onClick={() => setMode('note')}>Add a note</button>}
             {brief.weekly && <p className="pop-meta">Tell the agent to change an item that repeats each week.</p>}
           </div>

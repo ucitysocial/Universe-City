@@ -165,7 +165,7 @@ function historyFor(rows: MessageView[], zone: string, presses: Press[] = []): T
 async function pressesSince(q: Q, since: string | null): Promise<Press[]> {
   return q<Press>(
     `select id, ${TS('at')} as at, brief, detail, outcome from uc_pilot.actions
-      where turn_id is null and tool in ('screen_decision', 'screen_edit', 'screen_note') and ($1::timestamptz is null or at >= $1::timestamptz)
+      where turn_id is null and tool in ('screen_decision', 'screen_edit', 'screen_note', 'screen_done', 'screen_step') and ($1::timestamptz is null or at >= $1::timestamptz)
       order by seq desc limit 12`, [since]);
 }
 
@@ -379,9 +379,10 @@ export async function thread(userId: string, opts: { before?: string | null; lim
       `select turn_id, tool, outcome, detail, brief, target, target_id from uc_pilot.actions
         where turn_id = any ($1::uuid[]) and ${SHOWN} order by seq`, [`{${turns.map((t: any) => t.id).join(',')}}`]) : [];
     // Each press on the screen in the span of this page, so the conversation shows the decision where it happened.
+    // A step checked off stays out of the conversation. It shows in the entry and in Activity.
     const presses = page.length ? await q<Press & { target: string | null; target_id: string | null }>(
       `select id, ${TS('at')} as at, brief, detail, outcome, target, target_id from uc_pilot.actions
-        where turn_id is null and tool in ('screen_decision', 'screen_edit', 'screen_note') and at >= $1::timestamptz
+        where turn_id is null and tool in ('screen_decision', 'screen_edit', 'screen_note', 'screen_done') and at >= $1::timestamptz
           and ($2::timestamptz is null or at < $2::timestamptz)
         order by seq`, [page[0].created_at, opts.before && isUuid(opts.before) ? page[page.length - 1].created_at : null]) : [];
     const hrefs = await hrefsFor(q, [...effects, ...presses]);

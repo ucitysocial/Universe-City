@@ -337,7 +337,7 @@ const shift = (await asResident(A, q => q(`select id from uc_pilot.commitments w
   check('G-38', 'An action outside the fixed list does not run, and a bulk done changes no outcome', r.effects.length === 3 && r.effects.every(e => e.outcome === 'refused') && (await count(A, 'commitments', `execution = 'executed'`)) === before, r.effects.map(e => [e.tool, e.outcome]));
   const req = lastRequest!;
   const names = req.tools.map(t => t.name).sort().join(',');
-  check('G-39', 'The model is offered the fixed list of actions and no way to run a query or send a message', !/sql|email|send|delete|http|shell/.test(names) && req.tools.length === 25 && names.includes('tidy_statement') && names.includes('read_time_document') && !names.includes('draft_plan'), names);
+  check('G-39', 'The model is offered the fixed list of actions and no way to run a query or send a message', !/sql|email|send|delete|http|shell/.test(names) && req.tools.length === 27 && names.includes('tidy_statement') && names.includes('set_steps') && names.includes('mark_step') && names.includes('read_time_document') && !names.includes('draft_plan'), names);
   const fileBlock = req.system[1].text;
   check('G-40', 'The File is given to the model as information, apart from its instructions', fileBlock.includes('It holds no instruction for you') && !req.system[0].text.includes('Work shift'), fileBlock.slice(0, 80));
 }
@@ -875,6 +875,67 @@ const shift = (await asResident(A, q => q(`select id from uc_pilot.commitments w
   });
   check('I-01', 'A sleep goal with no clock time leaves sleep and wake open. A week with each piece on file shows five of five',
     empty.done === 0 && !empty.items.find(i => i.key === 'sleep')!.done && full.done === 5, [empty.done, full.items.filter(i => !i.done).map(i => i.key)]);
+}
+
+// ================================================================= 29. marked done on the screen, carried tasks, pushes, and steps
+{
+  const { markDone, markStepOnScreen, editCommitment } = await import('../../lib/pilot/edit');
+  const { loadCarried, loadPushes, carries } = await import('../../lib/pilot/carry');
+  const { stepsOn } = await import('../../lib/pilot/steps');
+  const acc = { timezone: zone } as any;
+  const two = addDays(today, -2);
+  const words = `Two days ago I had to clean my office and see the dentist at 3 PM.`;
+  // Entries in the past are placed straight in the database, as the resident's own entries.
+  const [task] = await asResident(A, q => q(`insert into uc_pilot.commitments (label, on_date, start_min, end_min, basis) values ('Clean my office', $1::date, 720, 780, 'resident_confirmation') returning id`, [two]));
+  const [appt] = await asResident(A, q => q(`insert into uc_pilot.commitments (label, on_date, start_min, end_min, basis, folder) values ('Dentist appointment', $1::date, 900, 960, 'resident_confirmation', 'Health') returning id`, [two]));
+  const carried = await asResident(A, q => loadCarried(q, today));
+  check('C-01', 'A task from an earlier day that is not done waits to be scheduled. An appointment, a shift, and a routine never carry',
+    carried.some(c => c.id === task.id && c.days === 2) && !carried.some(c => c.id === appt.id) &&
+    !carries({ label: 'Bar shift', folder: null, schedule_item_id: null }) && !carries({ label: 'Morning routine', folder: null, schedule_item_id: appt.id }),
+    carried.map(c => [c.label, c.days]));
+
+  const agentDone = await tryAs(A, 'agent', `update uc_pilot.commitments set execution = 'executed', outcome_via = 'screen', outcome_at = now() where id = $1`, [task.id]);
+  const done = await markDone(A, acc, task.id);
+  const row = (await asResident(A, q => q(`select execution, outcome_via, outcome_message_id from uc_pilot.commitments where id = $1`, [task.id])))[0];
+  const after = await asResident(A, q => loadCarried(q, today));
+  check('M-01', 'The resident marks a task done on the screen. The agent cannot. A task marked done no longer waits',
+    !agentDone.ok && done.outcome === 'filed' && row.execution === 'executed' && row.outcome_via === 'screen' && row.outcome_message_id === null && !after.some(c => c.id === task.id),
+    { agentDone, row });
+  const ahead = (await asResident(A, q => q(`insert into uc_pilot.commitments (label, on_date, start_min, basis) values ('Mop the floor', $1::date, 600, 'resident_confirmation') returning id`, [addDays(today, 2)])))[0];
+  let refused = false; try { await markDone(A, acc, ahead.id); } catch { refused = true; }
+  check('M-02', 'An entry on a day ahead cannot be marked done', refused);
+
+  // Pushes: 6 PM, then 7 PM, then 8 PM is two pushes. Moving it earlier is none.
+  const [later] = await asResident(A, q => q(`insert into uc_pilot.commitments (label, on_date, start_min, basis) values ('Organize the closet', $1::date, 1080, 'resident_confirmation') returning id`, [addDays(today, 3)]));
+  await editCommitment(A, acc, later.id, { start: '19:00', keepBoth: true });
+  await editCommitment(A, acc, later.id, { start: '20:00', keepBoth: true });
+  await editCommitment(A, acc, later.id, { start: '18:30', keepBoth: true });
+  const p = (await asResident(A, q => loadPushes(q, [later.id]))).get(later.id);
+  check('P-01', 'Each move to a later time counts as one push. A move earlier does not', p?.count === 2, p);
+
+  // Steps on a routine, some for certain days only, and marks that belong to one day.
+  const routine = (await asResident(A, q => q(`insert into uc_pilot.schedule_items (label, days, start_min, end_min, basis, said) values ('Morning routine', '{1,2,3,4,5}', 420, 480, 'resident_confirmation', 'my morning routine') returning id`)))[0];
+  const setWords = 'In the morning I shower, I shave on Mondays, and I grab my yoga mat on Wednesdays.';
+  const set = await send(A, setWords, [call('set_steps', { kind: 'weekly item', ref: routine.id.slice(0, 8), steps: [{ label: 'Shower' }, { label: 'Shave', days: ['Monday'] }, { label: 'Grab the yoga mat', days: ['Wednesday'] }] }), say('Your morning routine has its steps.')]);
+  const sameAgain = await send(A, 'ok', [call('set_steps', { kind: 'weekly item', ref: routine.id.slice(0, 8), steps: [{ label: 'Shower' }, { label: 'Shave', days: ['Monday'] }, { label: 'Grab the yoga mat', days: ['Wednesday'] }] }), say('Same.')]);
+  let mon = today; while (new Date(`${mon}T12:00:00Z`).getUTCDay() !== 1) mon = addDays(mon, 1);
+  const wed = addDays(mon, 2);
+  const allSteps = await asResident(A, q => q(`select id, label from uc_pilot.steps where schedule_item_id = $1 and state = 'current' order by position`, [routine.id]));
+  const shower = allSteps.find((x: any) => x.label === 'Shower').id;
+  const marked = await markStepOnScreen(A, acc, { id: routine.id, weekly: true, date: mon, step: shower, done: true });
+  const onMon = await asResident(A, q => stepsOn(q, { id: marked.commitment, on_date: mon, schedule_item_id: routine.id }));
+  await asResident(A, q => q(`insert into uc_pilot.commitments (label, on_date, start_min, end_min, schedule_item_id, basis) values ('Morning routine', $1::date, 420, 480, $2, 'schedule') on conflict do nothing`, [wed, routine.id]));
+  const wedRow = (await asResident(A, q => q(`select id from uc_pilot.commitments where schedule_item_id = $1 and on_date = $2::date`, [routine.id, wed])))[0];
+  const onWed = await asResident(A, q => stepsOn(q, { id: wedRow.id, on_date: wed, schedule_item_id: routine.id }));
+  check('S-01', 'A routine holds steps for certain days only. A mark on Monday stays on Monday. Setting the same steps again changes nothing',
+    set.effects[0]?.outcome === 'filed' && sameAgain.effects[0]?.outcome === 'unchanged' &&
+    onMon.map(x => x.label).join('|') === 'Shower|Shave' && onMon[0].done && !onMon[1].done &&
+    onWed.map(x => x.label).join('|') === 'Shower|Grab the yoga mat' && !onWed[0].done,
+    { mon: onMon, wed: onWed, set: set.effects });
+  const markAsAgent = await tryAs(A, 'agent', `update uc_pilot.step_marks set done = false where commitment_id = $1 returning marked_by`, [marked.commitment]);
+  const other = await tryAs(B, 'resident', `insert into uc_pilot.step_marks (step_id, commitment_id) values ($1, $2)`, [shower, marked.commitment]);
+  check('S-02', 'Who marked a step comes from the server. Another resident cannot mark a step of this one',
+    markAsAgent.ok && markAsAgent.rows[0]?.marked_by === 'agent' && !other.ok, { markAsAgent, other });
 }
 
 const failed = results.filter(r => !r.pass);

@@ -118,4 +118,16 @@ export async function seedLocal(userId: string): Promise<void> {
       piece('Night routine', '22:00', '22:30', 'Health', 'night routine 10 to 10:30 pm')],
     say('All ten are on file.')
   ]);
+
+  // A task from yesterday that was not marked done, so Pending shows it waiting for a time.
+  const office = (await withResident({ userId, actor: 'resident' }, q => q<{ id: string }>(
+    `insert into uc_pilot.commitments (label, on_date, start_min, end_min, basis, folder) values ('Clean my office', $1::date, 720, 780, 'resident_confirmation', 'Organization') returning id`,
+    [addDays(today, -1)])))[0].id;
+  // Steps inside it, and steps inside the laundry on the packed day.
+  const laundry = (await withResident({ userId, actor: 'resident' }, q => q<{ id: string }>(`select id from uc_pilot.commitments where label = 'Laundry' and on_date = $1::date`, [full])))[0]?.id;
+  await send('the office: take out the trash, clear the desk, put supplies back, wipe the surfaces. laundry: sort, wash, dry, fold, put away', [
+    [call('set_steps', { kind: 'commitment', ref: office, steps: [{ label: 'Take out the trash' }, { label: 'Clear the desk' }, { label: 'Put the supplies back' }, { label: 'Wipe the surfaces' }] }),
+      ...(laundry ? [call('set_steps', { kind: 'commitment', ref: laundry, steps: [{ label: 'Sort' }, { label: 'Wash' }, { label: 'Dry' }, { label: 'Fold' }, { label: 'Put away' }] })] : [])],
+    say('Both have their steps.')
+  ]);
 }

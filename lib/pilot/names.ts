@@ -27,6 +27,11 @@ export const ACTION_NAME: Record<string, string> = {
   screen_decision: 'Your press on the screen',
   screen_edit: 'Your change on the screen',
   screen_note: 'Your note on the screen',
+  screen_done: 'Marked done on the screen',
+  screen_step: 'A step marked on the screen',
+  tidy_statement: 'Tidy an entry',
+  set_steps: 'Set the steps of an entry',
+  mark_step: 'Mark a step',
   desk_decision: 'A decision by a person'
 };
 
