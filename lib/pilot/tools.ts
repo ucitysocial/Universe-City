@@ -125,6 +125,18 @@ function dateArg(a: Args, key: string, required = true): string | null {
 }
 
 const given = (a: Args, key: string) => a[key] !== undefined && a[key] !== null && a[key] !== '';
+// An explicit empty clock value requests clearing the time. Omitting the field retains the old value.
+// Conversations before clear_end existed already used end: '' to express this request.
+const clearsClock = (a: Args, key: 'end') =>
+  a[`clear_${key}`] === true ||
+  (Object.prototype.hasOwnProperty.call(a, key) && (a[key] === null || a[key] === ''));
+
+function changedEndClock(a: Args, oldEnd: number | null): number | null {
+  const clear = clearsClock(a, 'end');
+  if (clear && given(a, 'end')) throw new Refusal('Not done. Give a new end time or clear the end time.');
+  if (clear) return null;
+  return given(a, 'end') ? clockArg(a, 'end') : (oldEnd !== null ? oldEnd % 1440 : null);
+}
 
 function clockArg(a: Args, key: string): number | null {
   if (!given(a, key)) return null;
@@ -683,11 +695,12 @@ export const TOOLS: Tool[] = [
   {
     name: 'change_schedule_item',
     group: 'file',
-    description: 'Changes a weekly schedule item from now on, as the resident stated. Days already past keep what they had. Give only the fields that change. When a time changes, give both the start and the end.',
+    description: 'Changes a weekly schedule item from now on, as the resident stated. Days already past keep what they had. Give only the fields that change. To leave the end time unknown, set clear_end to true. Keep the same entry.'
     input_schema: obj({
       ref: REF('the weekly schedule item'),
       label: { type: 'string' }, days: { type: 'array', items: { type: 'string' } },
       start: CLOCK('The new start'), end: CLOCK('The new end'),
+      clear_end: { type: 'boolean', description: 'True when the resident wants to remove the end time and leave it unknown. Do not also set a new end time.' },
       quote: QUOTE
     }, ['ref', 'quote']),
     async run(env, a) {
@@ -699,7 +712,7 @@ export const TOOLS: Tool[] = [
       const days: number[] = daysArg(a, 'days', false) ?? old.days;
       const { start, end } = span(
         given(a, 'start') ? clockArg(a, 'start') : old.start_min,
-        given(a, 'end') ? clockArg(a, 'end') : (old.end_min !== null ? old.end_min % 1440 : null));
+        changedEndClock(a, old.end_min));
       if (label === old.label && days.join(',') === (old.days as number[]).join(',') && start === old.start_min && end === old.end_min) {
         return {
           outcome: 'unchanged',
@@ -830,11 +843,12 @@ export const TOOLS: Tool[] = [
   {
     name: 'change_commitment',
     group: 'file',
-    description: 'Changes a commitment that has no outcome yet, as the resident stated: its day, its name, its time, or what counts as done. Moving it to another day keeps it as the same commitment. The earlier values are kept in its history. Give only the fields that change.',
+    description: 'Changes a commitment that has no outcome yet, as the resident stated: its day, its name, its time, or what counts as done. Moving it to another day keeps the same entry and earlier values in history. Give only changed fields. Set clear_end true to leave the planned end unknown. Do not withdraw and recreate to clear an end.'
     input_schema: obj({
       ref: REF('the commitment'),
       date: DATE('The new day'), label: { type: 'string' },
       start: CLOCK('The new start'), end: CLOCK('The new end'),
+      clear_end: { type: 'boolean', description: 'Set true to remove the existing planned end time. Keep the commitment and its history. Do not also set end.' },
       done_means: { type: 'string' },
       despite_overlap: OVERLAP_ARG,
       quote: QUOTE
@@ -848,13 +862,13 @@ export const TOOLS: Tool[] = [
       const date = dateArg(a, 'date', false) ?? old.on_date;
       const label = text(a, 'label', 120, false) ?? old.label;
       // A new start on an entry whose end stays would cross midnight by accident. Both times are asked for.
-      if (given(a, 'start') && !given(a, 'end') && old.end_min !== null) {
+      if (given(a, 'start') && !given(a, 'end') && !clearsClock(a, 'end') && old.end_min !== null) {
         const s = clockArg(a, 'start')!;
         if (s >= old.end_min % 1440 && old.end_min <= 1440) throw new Refusal('Not done. The new start is at or after the end on file. Give both the start and the end.');
       }
       const { start, end } = span(
         given(a, 'start') ? clockArg(a, 'start') : old.start_min,
-        given(a, 'end') ? clockArg(a, 'end') : (old.end_min !== null ? old.end_min % 1440 : null));
+        changedEndClock(a, old.end_min));
       const completion = text(a, 'done_means', 300, false) ?? old.completion;
       if (a.despite_overlap !== true && (date !== old.on_date || start !== old.start_min || end !== old.end_min)) {
         const hits = await overlapsOn(env, date, start, end, id);
@@ -1301,7 +1315,7 @@ async function describe(env: Env, action: string, args: Args): Promise<string> {
     if (action === 'end_schedule_item') return clip(`End ${old.label}, ${sayDays(old.days)}, in the weekly schedule from now on.`, 600);
     const { start, end } = span(
       given(args, 'start') ? clockArg(args, 'start') : old.start_min,
-      given(args, 'end') ? clockArg(args, 'end') : (old.end_min !== null ? old.end_min % 1440 : null));
+      changedEndClock(args, old.end_min));
     const days = daysArg(args, 'days', false) ?? old.days;
     const label = text(args, 'label', 120, false) ?? old.label;
     return clip(`Change ${old.label} in the weekly schedule to ${label === old.label ? '' : `${label}, `}${sayDays(days)}, ${spanBrief(start, end)}. On file now: ${sayDays(old.days)}, ${spanBrief(old.start_min, old.end_min)}.`, 600);
@@ -1312,7 +1326,7 @@ async function describe(env: Env, action: string, args: Args): Promise<string> {
     if (action === 'withdraw_commitment') return clip(`Take ${old.label} off ${dayBrief(old.on_date)}.`, 600);
     const { start, end } = span(
       given(args, 'start') ? clockArg(args, 'start') : old.start_min,
-      given(args, 'end') ? clockArg(args, 'end') : (old.end_min !== null ? old.end_min % 1440 : null));
+      changedEndClock(args, old.end_min));
     const date = dateArg(args, 'date', false) ?? old.on_date;
     const label = text(args, 'label', 120, false) ?? old.label;
     const done = text(args, 'done_means', 300, false);
