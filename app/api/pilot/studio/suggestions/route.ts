@@ -13,6 +13,7 @@ export async function POST(req: Request) {
   if (!canUseAgentStudio({ ok: true, userId: a.userId, access: a.access, email: null })) {
     return Response.json({ error: 'Not found.' }, { status: 404 });
   }
+  if (process.env.PILOT_GHOST_CATALOGUE !== '1') return Response.json({ error: 'Agent Studio suggestions are not enabled for this deployment.' }, { status: 503 });
   let body: any;
   try { body = await req.json(); } catch { return Response.json({ error: 'No valid suggestion was sent.' }, { status: 400 }); }
   if (!body || body.action !== 'save') return Response.json({ error: 'Unknown action.' }, { status: 400 });
