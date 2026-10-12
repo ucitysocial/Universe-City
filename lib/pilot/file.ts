@@ -6,6 +6,7 @@ import { TS } from './db';
 import { shortId } from './guard';
 import { addDays, localNow, sayClock, sayDate, sayDays, saySpan, weekdayOf, type LocalNow } from './time';
 import { sayCommitment } from './tools';
+import { loadIntake, sayIntake, type Intake } from './intake';
 
 export type Access = {
   user_id: string; label: string; synthetic: boolean; timezone: string;
@@ -49,6 +50,7 @@ export type FileView = {
   work: WorkRow[];                 // what the resident asked for help with, still open
   decided: DecisionRow[];          // items the resident decided in the last day, by the button or in the conversation
   emptyDays: string[];             // the days ahead in view that hold no entry
+  intake: Intake;                  // the pieces Time needs, and which are on file
   openedWith: string[];            // the first words of this sitting, when they are no longer in view
 };
 
@@ -126,6 +128,7 @@ export async function loadFile(q: Q, zone: string, opts: { daysBack?: number; da
     waitingAgent: pending.filter(p => p.decider === 'agent'),
     followUps, notEstablished,
     work, decided,
+    intake: await loadIntake(q, now.date),
     emptyDays: days.filter(d => d.date >= now.date && d.commitments.filter(c => !c.withdrawn_at).length === 0).map(d => d.date),
     openedWith: opened.map(o => o.body)
   };
@@ -150,7 +153,7 @@ export function fileForModel(v: FileView, name: string | null): string {
   if (v.statements.length === 0) L.push('  None.');
   for (const s of v.statements) {
     const basis = s.basis === 'agent_decision' ? ' (decided by a person)' : s.basis === 'resident_confirmation' ? ' (confirmed by the resident)' : '';
-    L.push(`  [${shortId(s.id)}] ${s.folder} / ${s.topic}: ${s.entry ? `${s.entry} Words: ` : ''}"${s.said}"${basis}, filed ${sayDate(localNow(n.zone, new Date(s.created_at)).date)}${s.about_date ? `, about ${s.about_date}` : ''}`);
+    L.push(`  [${shortId(s.id)}] ${s.folder} / ${s.topic}: ${s.entry ? `${s.entry} Words: ` : 'No entry line. Words: '}"${s.said}"${basis}, filed ${sayDate(localNow(n.zone, new Date(s.created_at)).date)}${s.about_date ? `, about ${s.about_date}` : ''}`);
   }
   L.push('');
   L.push('WEEKLY SCHEDULE:');
@@ -165,6 +168,7 @@ export function fileForModel(v: FileView, name: string | null): string {
     for (const c of d.commitments) L.push(`    [${shortId(c.id)}] ${sayCommitment(c as any)}${c.schedule_item_id ? ' (from the weekly schedule)' : ''}. Folder: ${c.folder || 'none set'}`);
   }
   if (!v.days.some(d => d.commitments.length || d.plan)) L.push('  No commitment and no Plan is on file for the days in view.');
+  L.push(`  ${sayIntake(v.intake)}`);
   if (v.emptyDays.length) L.push(`  Days ahead with no entry on file: ${v.emptyDays.map(d => `${['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][weekdayOf(d)]} ${d}`).join(', ')}.`);
   // The order in which days are planned: the nearest day ahead first, one day at a time.
   const ahead = v.days.filter(d => d.date > n.date);

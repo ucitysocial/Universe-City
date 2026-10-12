@@ -172,8 +172,10 @@ export default function PilotConversation({ initial }: { initial: Thread }) {
   }
 
   // A message written in the box under a part of the File arrives here and is sent once. The agent is told which
-  // part of the File it was written from, for that one message.
-  useEffect(() => {
+  // part of the File it was written from, for that one message. A prompt pressed under Progress while the conversation
+  // is open arrives the same way, with the event uc:draft.
+  const pickUp = useRef<() => void>(() => {});
+  pickUp.current = () => {
     try {
       const held = sessionStorage.getItem(DRAFT_KEY);
       if (!held) return;
@@ -184,8 +186,12 @@ export default function PilotConversation({ initial }: { initial: Thread }) {
       if (text && initial.noticeSeen) sendText(text, place);
       else if (text) setDraft(text);
     } catch { /* the browser keeps no storage for this page. The conversation opens as it is. */ }
-    // It runs once, when the conversation opens.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  };
+  useEffect(() => {
+    pickUp.current();
+    const on = () => pickUp.current();
+    window.addEventListener('uc:draft', on);
+    return () => window.removeEventListener('uc:draft', on);
   }, []);
 
   async function earlier() {

@@ -11,12 +11,13 @@ import { DAY_FIT, loadCalendar, type CalItem } from './calendar';
 import type { Q } from './db';
 import { belongsTo } from './dept';
 import { folderPath, TIME_PATH } from './paths';
+import { loadIntake, type Intake } from './intake';
 import { addDays, localNow } from './time';
 
 export type BoardDay = { date: string; items: CalItem[] };
 export type BoardLine = { key: string; href: string; title: string; sub: string };
 export type BoardFolder = { name: string; dept: string; color: string; href: string; lines: BoardLine[] };
-export type Board = { today: string; panel: PanelView; days: BoardDay[]; folders: BoardFolder[] };
+export type Board = { today: string; panel: PanelView; days: BoardDay[]; folders: BoardFolder[]; intake: Intake };
 
 export async function loadBoard(q: Q, zone: string, ix: FileIndex): Promise<Board> {
   const today = localNow(zone).date;
@@ -49,5 +50,6 @@ export async function loadBoard(q: Q, zone: string, ix: FileIndex): Promise<Boar
       ]
     }));
   }
-  return { today, panel, days, folders };
+  const intake = await loadIntake(q, today);
+  return { today, panel, days, folders, intake };
 }

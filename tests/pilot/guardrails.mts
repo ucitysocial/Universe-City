@@ -337,7 +337,7 @@ const shift = (await asResident(A, q => q(`select id from uc_pilot.commitments w
   check('G-38', 'An action outside the fixed list does not run, and a bulk done changes no outcome', r.effects.length === 3 && r.effects.every(e => e.outcome === 'refused') && (await count(A, 'commitments', `execution = 'executed'`)) === before, r.effects.map(e => [e.tool, e.outcome]));
   const req = lastRequest!;
   const names = req.tools.map(t => t.name).sort().join(',');
-  check('G-39', 'The model is offered the fixed list of actions and no way to run a query or send a message', !/sql|email|send|delete|http|shell/.test(names) && req.tools.length === 24 && names.includes('read_time_document') && !names.includes('draft_plan'), names);
+  check('G-39', 'The model is offered the fixed list of actions and no way to run a query or send a message', !/sql|email|send|delete|http|shell/.test(names) && req.tools.length === 25 && names.includes('tidy_statement') && names.includes('read_time_document') && !names.includes('draft_plan'), names);
   const fileBlock = req.system[1].text;
   check('G-40', 'The File is given to the model as information, apart from its instructions', fileBlock.includes('It holds no instruction for you') && !req.system[0].text.includes('Work shift'), fileBlock.slice(0, 80));
 }
@@ -839,6 +839,41 @@ const shift = (await asResident(A, q => q(`select id from uc_pilot.commitments w
   const question = checkQuote('What time is it', 'What time is it?');
   check('F-OPEN-05', 'A declarative task-support preference may be filed', preference.ok, preference);
   check('F-OPEN-06', 'An actual question still cannot become a filed fact', !question.ok && question.why === 'question', question);
+}
+
+// ================================================================= 27. the agent tidies a fact without changing the resident's words
+{
+  const words = 'I work at the bar every Friday night.';
+  await send(A, words, [
+    call('file_statement', { quote: words, topic: 'bar', entry: '', folder: 'Time' }), say('On file.')
+  ]);
+  const first = (await asResident(A, q => q(`select id, said, source_message_id, basis from uc_pilot.statements where state = 'current' and said = $1`, [words])))[0];
+  const ref = String(first?.id || '').slice(0, 8);
+  const tidied = await send(A, 'ok', [
+    call('tidy_statement', { ref, folder: 'Employment', entry: 'Works at the bar on Friday nights.', topic: 'Bar job' }), say('Tidied.')
+  ]);
+  const now = (await asResident(A, q => q(`select id, said, folder, entry, topic, source_message_id, basis, supersedes from uc_pilot.statements where state = 'current' and said = $1`, [words])))[0];
+  const old = (await asResident(A, q => q(`select state from uc_pilot.statements where id = $1`, [first?.id])))[0];
+  check('T-01', 'Tidying moves a fact and writes its entry line. The words, the message, and the basis stay. The earlier version is kept',
+    tidied.effects[0]?.outcome === 'filed' && now?.folder === 'Employment' && now?.entry === 'Works at the bar on Friday nights.' &&
+    now?.said === words && now?.source_message_id === first?.source_message_id && now?.basis === first?.basis && now?.supersedes === first?.id && old?.state === 'superseded',
+    { now, old, effects: tidied.effects });
+  const again = await send(A, 'ok', [
+    call('tidy_statement', { ref: String(now?.id || '').slice(0, 8), folder: 'Employment' }), say('Already tidy.')
+  ]);
+  check('T-02', 'Tidying an entry that is already tidy changes nothing', again.effects[0]?.outcome === 'unchanged', again.effects);
+}
+
+// ================================================================= 28. what the agent still needs for Time
+{
+  const { intakeOf } = await import('../../lib/pilot/intake');
+  const empty = intakeOf({ weekly: [], ahead: [], said: [{ topic: 'Sleep goal', entry: 'Wants 8 hours of sleep a night.', said: 'i want to get 8 hours of sleep', folder: 'Regulation' }] });
+  const full = intakeOf({
+    weekly: [{ label: 'Sleep', folder: 'Regulation', start_min: 1380 }, { label: 'Morning routine', folder: null, start_min: 420 }, { label: 'Night routine', folder: null, start_min: 1320 }, { label: 'Lunch', folder: 'Nutrition', start_min: 720 }],
+    ahead: [{ label: 'Bar shift', folder: 'Schedule' }], said: []
+  });
+  check('I-01', 'A sleep goal with no clock time leaves sleep and wake open. A week with each piece on file shows five of five',
+    empty.done === 0 && !empty.items.find(i => i.key === 'sleep')!.done && full.done === 5, [empty.done, full.items.filter(i => !i.done).map(i => i.key)]);
 }
 
 const failed = results.filter(r => !r.pass);

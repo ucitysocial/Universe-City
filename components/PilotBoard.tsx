@@ -3,6 +3,7 @@ import Link from 'next/link';
 import PilotBoardDay from '@/components/PilotBoardDay';
 import PilotBoardTabs from '@/components/PilotBoardTabs';
 import { Countdown } from '@/components/PilotPanelBits';
+import PilotIntake from '@/components/PilotIntake';
 import PilotPending from '@/components/PilotPending';
 import { popData } from '@/app/(pilot)/portal/file/[[...path]]/calendar';
 import { spanWords } from '@/lib/pilot/browse';
@@ -69,31 +70,12 @@ export default function PilotBoard({ board, wide = false }: { board: Board; wide
       ) : (
         <p className="dash-now none">Nothing is on file for the rest of today or tomorrow.</p>
       )}
+      {!wide && <PilotIntake intake={board.intake} short />}
       <PilotBoardTabs calendar={wide ? calendar : <PilotBoardDay days={days} today={today} />} depts={depts} filled={folders} />
       {wide && (
         <div className="dash-sec">
           <div className="dash-h"><h2>Progress</h2></div>
-          <div className="prog">
-            {(() => {
-              const planned = days.filter(d => d.items.length > 0).length;
-              const rows = [
-                { key: 'week', label: 'Days with entries, today and the next six', n: planned, of: 7, color: 'var(--ink)' },
-                ...DEPARTMENTS.map(dep => {
-                  const n = folders.filter(f => f.dept === dep.key).length + (dep.key === 'I' && days.some(d => d.items.length) ? 1 : 0);
-                  return { key: dep.key, label: `${dep.name}, folders with entries`, n, of: 12, color: dep.color };
-                })
-              ];
-              return rows.map(r => (
-                <div key={r.key} className="prog-row">
-                  <span className="prog-l">{r.label}</span>
-                  <span className="prog-bar" role="img" aria-label={`${r.n} of ${r.of}`}>
-                    <i style={{ width: `${Math.round((r.n / r.of) * 100)}%`, background: r.color }} />
-                  </span>
-                  <span className="prog-n">{r.n} of {r.of}</span>
-                </div>
-              ));
-            })()}
-          </div>
+          <PilotIntake intake={board.intake} />
         </div>
       )}
       <div className="dash-sec">

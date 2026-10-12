@@ -651,6 +651,57 @@ export const TOOLS: Tool[] = [
     }
   },
   {
+    // The founder set on October 12, 2026 that the agent's work is to keep the File tidy and organized. Tidying moves a
+    // fact to the folder it belongs to, writes its entry line, gives it a clearer label, or attaches it to one commitment
+    // as a note. The resident's words, the message they came from, and their basis never change. The earlier version is
+    // kept in the history and marked as replaced.
+    name: 'tidy_statement',
+    group: 'file',
+    description: 'Tidies one statement on file. It moves the statement to the folder it belongs to, writes its entry line, gives it a clearer label, or attaches it to one commitment as a note. The resident\'s words, the message they came from, and their basis stay exactly as filed, and the earlier version is kept in the history. Use it on your own when a statement in view sits in the wrong folder, has no entry line, reads as the resident\'s raw words, or is a note about one commitment that is not attached to it. Use it when the resident asks to move or clean up an entry. It never changes the fact. A change to the fact is correct_statement.',
+    input_schema: obj({
+      ref: REF('the statement'),
+      folder: { type: 'string', description: 'The folder the statement belongs to, when it sits in the wrong one.' },
+      entry: { type: 'string', description: 'How the entry reads in the File: one short plain sentence that states the fact as the resident stated it, written by you. Works at the bar on Fridays.' },
+      topic: { type: 'string', description: 'A clearer label in two to five words, when the label on file does not fit.' },
+      about_ref: { type: 'string', description: 'The reference of one commitment, when the statement is a note about that commitment. The note then shows on the commitment.' }
+    }, ['ref']),
+    async run(env, a) {
+      const id = await find(env, 'statement', a.ref);
+      const old = (await env.q<any>(
+        `select said, topic, folder, state, basis, entry, source_message_id, commitment_id, about_date::text as about_date from uc_pilot.statements where id = $1`, [id]))[0];
+      if (old.state !== 'current') throw new Refusal('Not done. That statement was already replaced or withdrawn. Look up the current one.');
+      const folder = given(a, 'folder') ? folderArg(a) : old.folder;
+      const entry = text(a, 'entry', 200, false) ?? old.entry ?? null;
+      const topic = text(a, 'topic', 80, false) ?? old.topic;
+      const noteOn = given(a, 'about_ref') ? await find(env, 'commitment', a.about_ref) : old.commitment_id;
+      const noted = noteOn && noteOn !== old.commitment_id
+        ? (await env.q<{ on_date: string; label: string }>(`select on_date::text as on_date, label from uc_pilot.commitments where id = $1`, [noteOn]))[0] : null;
+      const about = old.about_date ?? noted?.on_date ?? null;
+      const changed: string[] = [];
+      if (folder !== old.folder) changed.push(`moved from ${old.folder} to ${folder}`);
+      if (entry !== old.entry) changed.push(old.entry ? 'entry line rewritten' : 'entry line written');
+      if (topic !== old.topic) changed.push(`label now ${topic}`);
+      if (noted) changed.push(`attached to ${noted.label} on ${dayBrief(noted.on_date)}`);
+      if (!changed.length) {
+        return { outcome: 'unchanged', detail: `Nothing changed. ${old.topic} under ${old.folder} is already tidy.`, brief: `No change: ${old.topic}, under ${old.folder}.`, target: 'statements', targetId: id, data: { ref: shortId(id), nothing_changed: true } };
+      }
+      // The new version names the same message and the same basis as the version it replaces.
+      const row = (await env.q<{ id: string }>(
+        `insert into uc_pilot.statements (said, topic, folder, about_date, basis, supersedes, entry, source_message_id, commitment_id)
+         values ($1, $2, $3, $4::date, $5, $6, $7, $8, $9) returning id`,
+        [old.said, topic, folder, about, old.basis, id, entry, old.source_message_id, noteOn]))[0];
+      await env.q(`select set_config('uc.reason', 'The agent tidied it.', true)`);
+      await env.q(`update uc_pilot.statements set state = 'superseded', ended_at = now(), ended_by_message_id = $2 where id = $1`, [id, env.messageId]);
+      const what = changed.join(', ');
+      return {
+        outcome: 'filed',
+        detail: `Tidied ${topic}: ${what}. The resident's words are unchanged.`,
+        brief: `Tidied: ${entry ? entry.replace(/\.$/, '') : topic}, ${what}.`,
+        target: 'statements', targetId: row.id, data: { ref: shortId(row.id), replaced: shortId(id), folder }
+      };
+    }
+  },
+  {
     name: 'withdraw_statement',
     group: 'file',
     description: 'Marks a statement on file as withdrawn because the resident says it no longer holds or asks for it to be taken off. The statement and its history are kept.',

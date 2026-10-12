@@ -10,7 +10,7 @@ import { localNow, sayClock, sayDate } from '@/lib/pilot/time';
 export const dynamic = 'force-dynamic';
 
 const money = (micro: number) => `$${(micro / 1_000_000).toFixed(2)}`;
-const CHANGE = /^(change_|correct_|withdraw_|end_|set_folder|screen_edit|close_)/;
+const CHANGE = /^(change_|correct_|withdraw_|end_|set_folder|tidy_|screen_edit|close_)/;
 
 /**
  * Settings: the account, what changed in the File, taking the File out, and clearing the test. The founder set on
