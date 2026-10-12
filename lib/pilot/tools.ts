@@ -695,7 +695,7 @@ export const TOOLS: Tool[] = [
   {
     name: 'change_schedule_item',
     group: 'file',
-    description: 'Changes a weekly schedule item from now on, as the resident stated. Days already past keep what they had. Give only the fields that change. To leave the end time unknown, set clear_end to true. Keep the same entry.'
+    description: 'Changes a weekly schedule item from now on, as the resident stated. Days already past keep what they had. Give only the fields that change. To leave the end time unknown, set clear_end to true. Keep the same entry.',
     input_schema: obj({
       ref: REF('the weekly schedule item'),
       label: { type: 'string' }, days: { type: 'array', items: { type: 'string' } },
@@ -843,7 +843,7 @@ export const TOOLS: Tool[] = [
   {
     name: 'change_commitment',
     group: 'file',
-    description: 'Changes a commitment that has no outcome yet, as the resident stated: its day, its name, its time, or what counts as done. Moving it to another day keeps the same entry and earlier values in history. Give only changed fields. Set clear_end true to leave the planned end unknown. Do not withdraw and recreate to clear an end.'
+    description: 'Changes a commitment that has no outcome yet, as the resident stated: its day, its name, its time, or what counts as done. Moving it to another day keeps the same entry and earlier values in history. Give only changed fields. Set clear_end true to leave the planned end unknown. Do not withdraw and recreate to clear an end.',
     input_schema: obj({
       ref: REF('the commitment'),
       date: DATE('The new day'), label: { type: 'string' },
