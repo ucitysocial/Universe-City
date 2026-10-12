@@ -20,6 +20,11 @@ export default function SiteHeader({ signedIn }: { signedIn: boolean }) {
               ? <Link className="public-signin" href="/portal">Resident Portal</Link>
               : <Link className="public-signin" href="/login">Log in</Link>}
             {!signedIn && <a className="public-apply" href={mainSiteUrl + '/apply'}>Apply for residency</a>}
+            {signedIn && (
+              <form className="public-logout" method="post" action="/auth/logout">
+                <button type="submit" className="public-signin">Log out</button>
+              </form>
+            )}
 
             <button
               className="public-menu-button"
@@ -54,6 +59,11 @@ export default function SiteHeader({ signedIn }: { signedIn: boolean }) {
                 {signedIn
                   ? <Link className="public-menu-login" href="/portal">Resident Portal</Link>
                   : <Link className="public-menu-login" href="/login">Log in</Link>}
+                {signedIn && (
+                  <form className="public-menu-logout" method="post" action="/auth/logout">
+                    <button type="submit">Log out</button>
+                  </form>
+                )}
               </div>
 
               <div>
