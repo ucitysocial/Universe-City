@@ -48,6 +48,8 @@ const NEGATION = /\b(not|no|never|didn't|did not|don't|do not|doesn't|does not|w
 // A question that asks software to act is a request. It is no question about a fact.
 const REQUEST = /^(?:please\s+)?(?:can|could|would|will)\s+you\b|^(?:please\s+)?(?:put|add|schedule|move|change|take|remove|cancel|file|note|save|keep|remember|set|mark|plan|log|record)\b/;
 const QUESTION_START = /^(?:(?:do|does|did|would|could|should|can|will|is|are|am|was|were|have|has|had)\s+(?:i|you|we|they|he|she|it|my|the|this|that|there)\b|(?:what|when|where|who|why|how)\b)/;
+// 'What helps me is ...' is a statement about a preference, even though it begins with what.
+const DECLARATIVE_WHAT = /^what\s+(?:helps|works|matters)\s+(?:me|us|here)(?:\s+\w+){0,3}\s+(?:is|are)\b/;
 
 const TIME_WORD = /\d|\bnoon\b|\bmidnight\b|\bmidday\b/;
 
@@ -106,7 +108,7 @@ export function checkQuote(quote: unknown, message: string, rules: QuoteRules = 
     }
     const scope = reach.join(' ') || clause;
 
-    const asked = /\?\s*$/.test(sentence.trim()) || QUESTION_START.test(s);
+    const asked = /\?\s*$/.test(sentence.trim()) || (QUESTION_START.test(s) && !DECLARATIVE_WHAT.test(s));
     if (asked && !REQUEST.test(s)) return { ok: false, why: 'question' };
     if (!rules.allowTentative && HEDGE.test(clause)) return { ok: false, why: 'tentative' };
     if (REPORTED.test(clause)) return { ok: false, why: 'reported' };

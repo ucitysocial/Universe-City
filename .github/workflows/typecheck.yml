@@ -14,3 +14,5 @@ jobs:
           node-version: 22
       - run: npm install --ignore-scripts
       - run: npm run typecheck
+      - run: npm run test:pilot
+      - run: python3 scripts/language-check.py
