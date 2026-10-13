@@ -18,6 +18,8 @@ export default function Login() {
   const asked = params.get('next') || '';
   const next = /^\/(?![\/\\])[^\s]*$/.test(asked) ? asked : '/portal';
   const arrived = params.get('link') || (params.get('error') === 'link' ? 'expired' : '');
+  // Agent Login on the site opens this page with the Agent Portal as the page to open. The page says which login it is.
+  const agent = next === '/agent' || next.startsWith('/agent/');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [err, setErr] = useState<string | null>(null);
@@ -70,7 +72,11 @@ export default function Login() {
       <div className="wrap">
       <div className="panel">
         <p className="kick">Universe City</p>
-        <h2 style={{ marginTop: 8 }}>Log in</h2>
+        <h2 style={{ marginTop: 8 }}>{agent ? 'Agent Login' : 'Resident Login'}</h2>
+        <p className="note" style={{ marginTop: 6 }}>
+          {agent ? 'For the people of Universe City who serve its residents.' : 'For residents of Universe City.'}{' '}
+          <Link href={agent ? '/login?next=/portal/home' : '/login?next=/agent'}>{agent ? 'Resident Login' : 'Agent Login'}</Link>
+        </p>
         {err && <p className="err" style={{ marginTop: 18 }}>{err}</p>}
         {!err && sentTo && (
           <p className="err" style={{ marginTop: 18, borderLeftColor: 'var(--IV)' }}>

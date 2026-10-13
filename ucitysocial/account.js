@@ -17,6 +17,7 @@
   var SESSION = '/api/session';
   var LOG_IN = '/login';
   var PORTAL = '/portal';
+  var AGENT = '/agent';
   var LOG_OUT = '/auth/logout';
 
   var undo = null; // A function while the header shows the logged in state.
@@ -85,15 +86,19 @@
     if (undo) return;
     var steps = [];
 
-    /* Every Log in link: the header, the star menu, and the page body. */
-    each(document.querySelectorAll('a[href="' + LOG_IN + '"]'), function (link) {
+    /* Every login link: the header, the star menu, and the page body. Resident Login opens the Resident Portal, and
+       Agent Login opens the Agent Portal. The Agent Portal itself turns away a login that is not an agent's. */
+    var SWAP = { 'Log in': ['Resident Portal', PORTAL], 'Resident Login': ['Resident Portal', PORTAL], 'Agent Login': ['Agent Portal', AGENT] };
+    each(document.querySelectorAll('a[href^="' + LOG_IN + '"]'), function (link) {
       var text = link.textContent;
-      if (text.replace(/\s+/g, ' ').replace(/^ | $/g, '') !== 'Log in') return;
-      link.textContent = 'Resident Portal';
-      link.setAttribute('href', PORTAL);
+      var to = SWAP[text.replace(/\s+/g, ' ').replace(/^ | $/g, '')];
+      if (!to) return;
+      var href = link.getAttribute('href');
+      link.textContent = to[0];
+      link.setAttribute('href', to[1]);
       steps.push(function () {
         link.textContent = text;
-        link.setAttribute('href', LOG_IN);
+        link.setAttribute('href', href);
       });
     });
 
@@ -148,7 +153,7 @@
    * the site. Until that page appears, a screen with five stars in the department colors covers the old page, so the
    * move reads as one step. The Back button brings the old page back without the screen.
    */
-  var MOVES = /^\/(portal|login|signup|apply|reset)(\/|$|\?)/;
+  var MOVES = /^\/(portal|agent|login|signup|apply|reset)(\/|$|\?)/;
   var STAR = 'M12 1.6l3.1 6.6 7.2.9-5.3 5 1.4 7.1L12 17.7l-6.4 3.5 1.4-7.1-5.3-5 7.2-.9z';
   var COLORS = ['#5C0F1B', '#A07818', '#4A2A78', '#2A4B3C', '#160c0c'];
   var MOVE_RULES = [
@@ -208,6 +213,14 @@
     if (form && form.getAttribute && form.getAttribute('action') === LOG_OUT) cover();
   });
   window.addEventListener('pageshow', function (event) { if (event.persisted) uncover(); });
+
+  /* Two login links do not fit beside Apply for residency on a phone. Below 560 pixels they move into the star menu. */
+  (function () {
+    var style = document.createElement('style');
+    style.id = 'login-rules';
+    style.appendChild(document.createTextNode('@media(max-width:560px){nav a.signin,.signin-link{display:none}#menu a.menu-login,.menu-groups a.menu-login{display:block}}'));
+    document.head.appendChild(style);
+  })();
 
   if (!window.fetch || !document.querySelectorAll) return;
 

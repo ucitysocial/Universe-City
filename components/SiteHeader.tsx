@@ -17,8 +17,8 @@ export default function SiteHeader({ signedIn }: { signedIn: boolean }) {
 
           <div className="public-actions">
             {signedIn
-              ? <Link className="public-signin" href="/portal">Resident Portal</Link>
-              : <Link className="public-signin" href="/login">Log in</Link>}
+              ? <><Link className="public-signin" href="/portal">Resident Portal</Link><Link className="public-signin public-agent" href="/agent">Agent Portal</Link></>
+              : <><Link className="public-signin" href="/login">Resident Login</Link><Link className="public-signin public-agent" href="/login?next=/agent">Agent Login</Link></>}
             {!signedIn && <a className="public-apply" href={mainSiteUrl + '/apply'}>Apply for residency</a>}
             {signedIn && (
               <form className="public-logout" method="post" action="/auth/logout">
@@ -57,8 +57,8 @@ export default function SiteHeader({ signedIn }: { signedIn: boolean }) {
                 <a href={mainSiteUrl + '/#business'}>Residency</a>
                 <a href={mainSiteUrl + '/founder'}>Founder</a>
                 {signedIn
-                  ? <Link className="public-menu-login" href="/portal">Resident Portal</Link>
-                  : <Link className="public-menu-login" href="/login">Log in</Link>}
+                  ? <><Link className="public-menu-login" href="/portal">Resident Portal</Link><Link className="public-menu-login" href="/agent">Agent Portal</Link></>
+                  : <><Link className="public-menu-login" href="/login">Resident Login</Link><Link className="public-menu-login" href="/login?next=/agent">Agent Login</Link></>}
                 {signedIn && (
                   <form className="public-menu-logout" method="post" action="/auth/logout">
                     <button type="submit">Log out</button>
