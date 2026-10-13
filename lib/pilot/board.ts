@@ -17,7 +17,7 @@ import { addDays, localNow } from './time';
 export type BoardDay = { date: string; items: CalItem[] };
 export type BoardLine = { key: string; href: string; title: string; sub: string };
 export type BoardFolder = { name: string; dept: string; color: string; href: string; lines: BoardLine[] };
-export type Board = { today: string; panel: PanelView; days: BoardDay[]; folders: BoardFolder[]; intake: Intake };
+export type Board = { today: string; zone: string; panel: PanelView; days: BoardDay[]; folders: BoardFolder[]; intake: Intake };
 
 export async function loadBoard(q: Q, zone: string, ix: FileIndex): Promise<Board> {
   const today = localNow(zone).date;
@@ -51,5 +51,5 @@ export async function loadBoard(q: Q, zone: string, ix: FileIndex): Promise<Boar
     }));
   }
   const intake = await loadIntake(q, today);
-  return { today, panel, days, folders, intake };
+  return { today, zone, panel, days, folders, intake };
 }

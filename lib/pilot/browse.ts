@@ -411,12 +411,18 @@ export async function loadPanel(q: Q, zone: string): Promise<PanelView> {
       order by on_date, start_min`, [today, tomorrow]);
   let now: PanelView['now'] = null;
   let then: Entry | null = null;
-  for (const c of soon) {
+  // When entries overlap, the one that started last is the one happening now. See pickNow in now.ts.
+  const span = (c: Entry) => {
     const at = (c.on_date === today ? 0 : 1440) + (c.start_min as number);
-    const till = (c.on_date === today ? 0 : 1440) + (c.end_min ?? (c.start_min as number) + 60);
-    if (till <= n.minutes) continue;
-    if (!now) { now = { ...c, live: at <= n.minutes, minutesUntil: Math.max(0, at - n.minutes), minutesLeft: c.end_min !== null ? till - n.minutes : null }; continue; }
-    then = c; break;
+    return { at, till: (c.on_date === today ? 0 : 1440) + (c.end_min ?? (c.start_min as number) + 60) };
+  };
+  const ahead = soon.filter(c => span(c).till > n.minutes);
+  const live = ahead.filter(c => span(c).at <= n.minutes).sort((a, b) => span(b).at - span(a).at);
+  const first = live[0] ?? ahead[0] ?? null;
+  if (first) {
+    const { at, till } = span(first);
+    now = { ...first, live: at <= n.minutes, minutesUntil: Math.max(0, at - n.minutes), minutesLeft: first.end_min !== null ? till - n.minutes : null };
+    then = ahead.find(c => c !== first && span(c).at > n.minutes) ?? null;
   }
 
   // An entry that has passed with its end or its outcome unknown, in the last seven days.

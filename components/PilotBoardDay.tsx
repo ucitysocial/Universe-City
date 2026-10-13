@@ -1,10 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { BoardDay } from '@/lib/pilot/board';
 import PilotGhost from '@/components/PilotGhost';
 import { withGhosts, type Ghost } from '@/lib/pilot/ghosts';
+import { pickNow, type NowPick } from '@/lib/pilot/now';
+import { localNow } from '@/lib/pilot/time';
 import { dayHref, monthHref, popData, weekHref } from '@/app/(pilot)/portal/file/[[...path]]/calendar';
 
 const WEEKDAY = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -23,9 +25,20 @@ const WORD: Record<string, string> = { planned: 'Planned', executed: 'Executed',
  * one is marked Next. Pressing an entry opens the calendar window. Blocks are kept for the week and the month.
  * The founder set on October 12, 2026 that the overview holds the day and nothing more.
  */
-export default function PilotBoardDay({ days, today, nowId = null, live = false, ghosts = [] }: { days: BoardDay[]; today: string; nowId?: string | null; live?: boolean; ghosts?: Ghost[] }) {
+export default function PilotBoardDay({ days, today, zone, ghosts = [] }: { days: BoardDay[]; today: string; zone?: string; ghosts?: Ghost[] }) {
   const [n, setN] = useState(0);
   const d = days[n];
+  // The glow is worked out again each 15 seconds in the resident's time zone, so it moves on the minute an entry
+  // starts or ends, without loading the page again.
+  const [pick, setPick] = useState<NowPick>(null);
+  useEffect(() => {
+    if (!zone) return;
+    const items = days.find(x => x.date === today)?.items ?? [];
+    const tick = () => { const l = localNow(zone); setPick(l.date === today ? pickNow(items, l.minutes) : null); };
+    tick();
+    const t = setInterval(tick, 15_000);
+    return () => clearInterval(t);
+  }, [days, today, zone]);
   if (!d) return null;
   const full = `${say(d.date)}, ${d.date.slice(0, 4)}`;
   return (
@@ -49,7 +62,8 @@ export default function PilotBoardDay({ days, today, nowId = null, live = false,
           {withGhosts(d.items, d.date >= today ? ghosts : []).map(r => {
             if ('ghost' in r) return <PilotGhost key={`g:${r.ghost.key}`} label={r.ghost.label} ask={r.ghost.ask} />;
             const i = r.item;
-            const here = nowId !== null && i.key.split(':')[0] === nowId;
+            const here = d.date === today && pick !== null && i.key === pick.key;
+            const live = here && pick!.live;
             return (
               <a key={i.key} href={i.href} className={`ent d-${i.dept}${here ? (live ? ' is-now' : ' is-next') : ''}`} {...popData(i)}>
                 <span className="fi i-page" />

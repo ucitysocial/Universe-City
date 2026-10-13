@@ -895,6 +895,21 @@ const shift = (await asResident(A, q => q(`select id from uc_pilot.commitments w
     /You are the agent in Universe City/.test(sys) && /set_schedule_item/.test(sys) && /NOW: /.test(sys), r);
 }
 
+// ================================================================= 31. the glow on the entry happening now
+{
+  const { pickNow } = await import('../../lib/pilot/now');
+  const day = [
+    { key: 'shift', start: 870, end: 1350, kind: 'planned' },     // 2:30 PM to 10:30 PM
+    { key: 'doctor', start: 930, end: 990, kind: 'planned' },     // 3:30 PM to 4:30 PM, during the shift
+    { key: 'dinner', start: 1080, end: null, kind: 'weekly' },    // 6 PM, no end
+    { key: 'done', start: 840, end: 1400, kind: 'executed' }
+  ];
+  const at = (m: number) => pickNow(day, m);
+  check('N-01', 'The entry that started last glows. After an appointment inside a shift ends, the shift glows again. With no entry live, the next is marked Next. An entry with an outcome does not glow',
+    at(860)?.key === 'shift' && at(860)?.live === false && at(900)?.key === 'shift' && at(950)?.key === 'doctor' && at(990)?.key === 'shift' && at(990)?.live === true &&
+    at(1100)?.key === 'dinner' && at(1141)?.key === 'shift' && at(1400) === null, [860, 900, 950, 990, 1100, 1141, 1400].map(m => at(m)));
+}
+
 const failed = results.filter(r => !r.pass);
 console.log(`\n${results.length - failed.length} of ${results.length} passed`);
 if (failed.length) process.exit(1);
