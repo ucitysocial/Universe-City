@@ -4,7 +4,7 @@ import PilotGuided from '@/components/PilotGuided';
 import { who } from '@/lib/pilot/auth';
 import { loadCommitment, loadWeeklyItem, spanWords } from '@/lib/pilot/browse';
 import { isUuid, withResident } from '@/lib/pilot/db';
-import { planFor } from '@/lib/pilot/plan-for';
+import { planFor, planKeyFor } from '@/lib/pilot/plan-for';
 import { shownLabel } from '@/lib/pilot/private';
 import { DAY_FIT, loadCalendar } from '@/lib/pilot/calendar';
 import type { TodayItem } from '@/components/PilotGuided';
@@ -56,7 +56,7 @@ export default async function GuidedPage({ params, searchParams }: { params: { i
   return (
     <PilotGuided
       sessionKey={`uc:gl:${w.userId}:${id}:${date}`}
-      planKey={`uc:gl:plan:${w.userId}:${id}`}
+      planKey={planKeyFor(w.userId, entry.label, id)}
       href={`/portal/guided/${id}?${weekly ? 'weekly=1&' : ''}date=${date}`}
       label={shownLabel(entry.label, entry.folder)}
       when={`${date === today ? 'Today' : sayDate(date)}, ${spanWords(entry.start, entry.end)}`}

@@ -24,6 +24,9 @@ import { deptBySlug, deptPath, FILE_ROOT, folderBySlug, folderPath, slugOf, TIME
 import { isDate, localNow, sayClock, sayDate, sayDays } from '@/lib/pilot/time';
 import { dayLabel, totalEntries } from '@/lib/pilot/tree';
 import { DAY_FIT, loadCalendar, MONTH_FIT, WEEK_FIT, weekStart } from '@/lib/pilot/calendar';
+import PilotEntrySteps from '@/components/PilotEntrySteps';
+import { planFor, planKeyFor } from '@/lib/pilot/plan-for';
+import { shownLabel } from '@/lib/pilot/private';
 import { belongsTo } from '@/lib/pilot/dept';
 import { folderOf, statusOf, type Owed } from '@/lib/pilot/owed';
 import { addDays } from '@/lib/pilot/time';
@@ -40,7 +43,7 @@ export const dynamic = 'force-dynamic';
 // The tree at the left shows the same place. This page shows what that place holds, and builds no entry.
 
 type Crumb = { label: string; href: string };
-type Ctx = { q: Q; zone: string; ix: FileIndex; decides: boolean; view: CalView; on: string | null };
+type Ctx = { q: Q; zone: string; ix: FileIndex; decides: boolean; view: CalView; on: string | null; userId: string; synthetic: boolean };
 
 const BASIS: Record<string, string> = {
   resident_statement: 'You said it', resident_confirmation: 'You confirmed it',
@@ -443,7 +446,7 @@ async function dayPane({ q, zone, decides, ix }: Ctx, base: string, date: string
   );
 }
 
-async function commitmentPane({ q, zone, decides }: Ctx, base: string, id: string, color?: string) {
+async function commitmentPane({ q, zone, decides, userId, synthetic }: Ctx, base: string, id: string, color?: string) {
   const x = await loadCommitment(q, id);
   if (!x) return null;
   const { c } = x;
@@ -453,14 +456,16 @@ async function commitmentPane({ q, zone, decides }: Ctx, base: string, id: strin
   const owed = await owedOnCommitment(q, zone, c, b);
   // The form changes an entry that is still planned. An entry with an outcome is changed by a correction.
   const open = !c.withdrawn_at && c.execution === 'planned';
+  const plan = planFor(c.label, c.folder, synthetic);
+  const shown = shownLabel(c.label, c.folder);
   return {
-    label: c.label,
+    label: shown,
     date: c.on_date,
     node: (
       <>
         <div className="doc">
           <div className="doc-bar" style={fc(b.color)}>
-            <b>{c.label}</b>
+            <b>{shown}</b>
             <span className={`pt-chip ${o.tone}`}>{o.word}</span>
           </div>
           <dl className="fields">
@@ -468,11 +473,12 @@ async function commitmentPane({ q, zone, decides }: Ctx, base: string, id: strin
             <dt>Start</dt><dd>{c.start_min === null ? <Unknown /> : `${sayClock(c.start_min)}${rough}`}</dd>
             <dt>End</dt><dd>{c.end_min === null ? <Unknown /> : `${sayClock(c.end_min)}${rough}`}</dd>
             <Fixed b={b} status={`${statusOf(c)}${c.timing ? `, time ${c.timing.replace(/_/g, ' ')}` : ''}`} owed={owed} />
-            <dt>What counts as done</dt><dd>{c.completion || <Unknown />}</dd>
+            {!(plan && !c.completion) && <><dt>What counts as done</dt><dd>{c.completion || <Unknown />}</dd></>}
             {(c.actual_start_min !== null || c.actual_end_min !== null) && <><dt>Actual time</dt><dd>{spanWords(c.actual_start_min, c.actual_end_min)}</dd></>}
             {x.weekly && <><dt>Comes from</dt><dd><Link href={`${base}/weekly/${x.weekly.id}`}>{x.weekly.label}, {sayDays(x.weekly.days)}, in your routines</Link></dd></>}
             <dt>On file since</dt><dd>{localNow(zone, new Date(c.created_at)).label}</dd>
           </dl>
+          {plan && <PilotEntrySteps plan={plan} planKey={planKeyFor(userId, c.label, c.id)} start={`/portal/guided/${c.id}?date=${c.on_date}`} />}
           <Words label={c.basis === 'schedule' ? 'Your words for the weekly item' : 'Your words when it was filed'} quote={c.said} source={x.source} zone={zone} />
           {c.outcome_said && <Words label="Your words on the outcome" quote={c.outcome_said} source={x.outcomeSource} zone={zone} />}
           {c.withdrawn_said && <div className="words"><p className="flab">When it was taken off</p><p className="fq">{c.withdrawn_said}</p></div>}
@@ -514,18 +520,20 @@ async function weeklyPane({ q }: Ctx, base: string, color?: string) {
   );
 }
 
-async function weeklyItemPane({ q, zone }: Ctx, id: string, color?: string) {
+async function weeklyItemPane({ q, zone, userId, synthetic }: Ctx, id: string, color?: string) {
   const x = await loadWeeklyItem(q, id);
   if (!x) return null;
   const { s } = x;
   const b = belongsTo(s.folder, s.label);
   const owed = await owedOnWeekly(q, zone, s, b);
+  const plan = planFor(s.label, s.folder, synthetic);
+  const shown = shownLabel(s.label, s.folder);
   return {
-    label: s.label,
+    label: shown,
     node: (
       <div className="doc">
         <div className="doc-bar" style={fc(b.color)}>
-          <b>{s.label}</b>
+          <b>{shown}</b>
           <span className={`pt-chip ${s.state === 'current' ? 'filed' : 'unknown'}`}>{s.state === 'current' ? 'Repeats each week' : 'Ended'}</span>
         </div>
         <dl className="fields">
@@ -536,6 +544,7 @@ async function weeklyItemPane({ q, zone }: Ctx, id: string, color?: string) {
           <dt>On file since</dt><dd>{localNow(zone, new Date(s.created_at)).label}</dd>
           {s.ended_at && <><dt>Ended</dt><dd>{localNow(zone, new Date(s.ended_at)).label}</dd></>}
         </dl>
+        {plan && <PilotEntrySteps plan={plan} planKey={planKeyFor(userId, s.label, s.id)} start={`/portal/guided/${s.id}?weekly=1`} />}
         <Words label="Your words when it was filed" quote={s.said} source={x.source} zone={zone} />
         <History list={x.history} zone={zone} />
       </div>
@@ -743,7 +752,7 @@ export default async function FilePage({ params, searchParams }: { params: { pat
   const out = await withResident({ userId: w.userId, actor: 'resident' }, async q => {
     const ix = await loadIndex(q, zone);
     const ctx: Ctx = {
-      q, zone, ix, decides: w.access.decides_proposals,
+      q, zone, ix, decides: w.access.decides_proposals, userId: w.userId, synthetic: w.access.synthetic,
       view: searchParams?.view === 'month' ? 'month' : 'week',
       on: typeof searchParams?.on === 'string' && isDate(searchParams.on) ? searchParams.on : null
     };

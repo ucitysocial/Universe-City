@@ -22,3 +22,9 @@ export function planFor(label: string, folder: string | null, synthetic: boolean
   }
   return synthetic ? demoPlan(label) : null;
 }
+
+/** Where the steps of an entry are kept. A routine keeps one set of steps for every day it repeats. */
+export function planKeyFor(userId: string, label: string, id: string): string {
+  const r = routineName(label);
+  return r ? `uc:gl:plan:${userId}:${r.toLowerCase().replace(/ /g, '-')}` : `uc:gl:plan:${userId}:${id}`;
+}
