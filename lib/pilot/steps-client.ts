@@ -34,3 +34,7 @@ export function takeLegacy(key: string | undefined): DemoPlan | null {
     return p?.groups ? p : null;
   } catch { return null; }
 }
+
+export async function runRemote(entry: EntryRef, date: string, op: 'start' | 'end' | 'begin', extra: { step?: string; outcome?: 'done' | 'not_yet' } = {}): Promise<void> {
+  await post({ op, entry, date, ...extra });
+}

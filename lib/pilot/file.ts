@@ -55,7 +55,8 @@ export type FileView = {
   steps: StepListView[];           // the steps of routines and entries, with the checks of today
 };
 
-export type StepListView = { name: string; doneWhen: string | null; steps: { label: string; group: string | null; doneAt: string | null; sub: { label: string; done: boolean }[] }[] };
+export type StepListView = { name: string; doneWhen: string | null; run: { startedAt: string; endedAt: string | null; outcome: string | null } | null;
+  steps: { label: string; group: string | null; startedAt: string | null; doneAt: string | null; sub: { label: string; done: boolean }[] }[] };
 
 const STATEMENT_COLS = `id, said, entry, topic, folder, state, basis, filed_by, about_date::text as about_date, supersedes,
   ${TS('created_at')} as created_at, ${TS('ended_at')} as ended_at`;
@@ -145,14 +146,19 @@ async function loadStepLists(q: Q, today: string): Promise<StepListView[]> {
        left join uc_pilot.schedule_items s on s.id = l.schedule_item_id left join uc_pilot.commitments c on c.id = l.commitment_id
       order by l.created_at limit 20`);
   if (!lists.length) return [];
-  const rows = await q<{ id: string; list_id: string; parent_id: string | null; label: string; group_name: string | null; done_at: string | null }>(
-    `select st.id, st.list_id, st.parent_id, st.label, st.group_name, ${TS('m.marked_at')} as done_at from uc_pilot.steps st
-       left join uc_pilot.step_marks m on m.step_id = st.id and m.on_date = $1::date and m.done
+  const rows = await q<{ id: string; list_id: string; parent_id: string | null; label: string; group_name: string | null; done_at: string | null; started_at: string | null }>(
+    `select st.id, st.list_id, st.parent_id, st.label, st.group_name,
+            case when m.done then ${TS('m.marked_at')} end as done_at, ${TS('m.started_at')} as started_at
+       from uc_pilot.steps st
+       left join uc_pilot.step_marks m on m.step_id = st.id and m.on_date = $1::date
       where st.state = 'current' and st.list_id = any ($2::uuid[]) order by st.position`, [today, lists.map(l => l.id)]);
+  const runs = await q<{ list_id: string; started_at: string; ended_at: string | null; outcome: string | null }>(
+    `select list_id, ${TS('started_at')} as started_at, ${TS('ended_at')} as ended_at, outcome from uc_pilot.guided_runs where on_date = $1::date`, [today]);
   return lists.map(l => ({
     name: l.name, doneWhen: l.done_when,
+    run: (() => { const r = runs.find(x => x.list_id === l.id); return r ? { startedAt: r.started_at, endedAt: r.ended_at, outcome: r.outcome } : null; })(),
     steps: rows.filter(r => r.list_id === l.id && !r.parent_id).map(r => ({
-      label: r.label, group: r.group_name, doneAt: r.done_at,
+      label: r.label, group: r.group_name, startedAt: r.started_at, doneAt: r.done_at,
       sub: rows.filter(k => k.parent_id === r.id).map(k => ({ label: k.label, done: !!k.done_at }))
     }))
   }));
@@ -201,10 +207,14 @@ export function fileForModel(v: FileView, name: string | null): string {
   L.push('STEPS. Each list belongs to a routine or an entry. The resident checks a step on the screen or tells you. A check is today\'s:');
   if (v.steps.length === 0) L.push('  No steps are on file.');
   for (const l of v.steps) {
-    L.push(`  ${l.name}${l.doneWhen ? `, done when: ${l.doneWhen}` : ''}:`);
+    const at = (iso: string) => sayClock(localNow(n.zone, new Date(iso)).minutes);
+    const mins = (a: string, b: string) => Math.round((Date.parse(b) - Date.parse(a)) / 60000);
+    const run = l.run ? `Guided Life today: started ${at(l.run.startedAt)}${l.run.endedAt ? `, ended ${at(l.run.endedAt)} (${mins(l.run.startedAt, l.run.endedAt)} minutes), the resident answered ${l.run.outcome === 'done' ? 'that it is done' : 'not yet'}` : ', not ended'}` : 'Guided Life not started today';
+    L.push(`  ${l.name}${l.doneWhen ? `, done when: ${l.doneWhen}` : ''}. ${run}:`);
     if (!l.steps.length) L.push('    No step is kept.');
     for (const st of l.steps) {
-      const done = st.doneAt ? `done today at ${sayClock(localNow(n.zone, new Date(st.doneAt)).minutes)}` : 'not checked today';
+      const began = st.startedAt ? `started ${at(st.startedAt)}${l.run ? `, ${mins(l.run.startedAt, st.startedAt)} minutes after the run began` : ''}` : '';
+      const done = st.doneAt ? `${began ? `${began}, ` : ''}done ${at(st.doneAt)}${st.startedAt ? ` (${mins(st.startedAt, st.doneAt)} minutes)` : ''}` : began ? `${began}, not done yet` : 'not checked today';
       L.push(`    ${st.group ? `${st.group}: ` : ''}${st.label}, ${done}${st.sub.length ? `. Smaller steps: ${st.sub.map(x => `${x.label}${x.done ? ' (done)' : ''}`).join(', ')}` : ''}`);
     }
   }

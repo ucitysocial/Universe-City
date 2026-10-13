@@ -61,11 +61,19 @@ export async function loadSteps(q: Q, o: Owner, base: DemoPlan, date: string): P
   groups[groups.length - 1] = { ...groups[groups.length - 1], steps: [...groups[groups.length - 1].steps, ...sug] };
 
   const ids = rows.map(r => r.id);
-  const marks = ids.length ? await q<{ step_id: string; done: boolean; marked_at: string }>(
-    `select step_id, done, marked_at::text as marked_at from uc_pilot.step_marks where on_date = $1::date and step_id = any ($2::uuid[])`, [date, ids]) : [];
+  const marks = ids.length ? await q<{ step_id: string; done: boolean; marked_at: string; started_at: string | null }>(
+    `select step_id, done, marked_at::text as marked_at, started_at::text as started_at from uc_pilot.step_marks
+      where on_date = $1::date and step_id = any ($2::uuid[])`, [date, ids]) : [];
   const done = new Map(marks.filter(m => m.done).map(m => [m.step_id, new Date(m.marked_at).toISOString()]));
-  const plan: DemoPlan = { ...base, listId: list.id, doneWhen: list.done_when ?? base.doneWhen, groups, dismissed, marks: {}, subs: {} };
+  const begun = new Map(marks.filter(m => m.started_at).map(m => [m.step_id, new Date(m.started_at!).toISOString()]));
+  const run = (await q<{ started_at: string; ended_at: string | null; outcome: string | null }>(
+    `select started_at::text as started_at, ended_at::text as ended_at, outcome from uc_pilot.guided_runs where list_id = $1 and on_date = $2::date`, [list.id, date]))[0];
+  const plan: DemoPlan = {
+    ...base, listId: list.id, doneWhen: list.done_when ?? base.doneWhen, groups, dismissed, marks: {}, subs: {}, starts: {},
+    run: run ? { startedAt: new Date(run.started_at).toISOString(), endedAt: run.ended_at ? new Date(run.ended_at).toISOString() : null, outcome: run.outcome } : null
+  };
   for (const r of top) {
+    if (begun.has(r.id)) plan.starts![r.label] = begun.get(r.id)!;
     if (done.has(r.id)) plan.marks![r.label] = done.get(r.id)!;
     const k = kids(r.id);
     if (k.some(x => done.has(x.id))) plan.subs![r.label] = k.map(x => done.has(x.id));
@@ -149,4 +157,27 @@ export async function markStep(q: Q, stepId: string, date: string, done: boolean
     `insert into uc_pilot.step_marks (step_id, on_date, done, marked_at) values ($1, $2::date, $3, coalesce($4::timestamptz, now()))
      on conflict (user_id, step_id, on_date) do update set done = excluded.done, marked_at = excluded.marked_at`,
     [stepId, date, done, at ?? null]);
+}
+
+/** The resident started Guided Life through a list on a day. A second start on the same day keeps the first time. */
+export async function startRun(q: Q, listId: string, date: string): Promise<void> {
+  await q(`insert into uc_pilot.guided_runs (list_id, on_date) values ($1, $2::date) on conflict (user_id, list_id, on_date) do nothing`, [listId, date]);
+}
+
+/** A step became the current step. The first time on a day is kept. */
+export async function beginStep(q: Q, stepId: string, date: string): Promise<void> {
+  await q(
+    `insert into uc_pilot.step_marks (step_id, on_date, done, started_at) values ($1, $2::date, false, now())
+     on conflict (user_id, step_id, on_date) do update set started_at = coalesce(uc_pilot.step_marks.started_at, excluded.started_at)`,
+    [stepId, date]);
+}
+
+/** The resident answered the question at the end of the run. */
+export async function endRun(q: Q, listId: string, date: string, outcome: 'done' | 'not_yet'): Promise<void> {
+  await q(`update uc_pilot.guided_runs set ended_at = now(), outcome = $3 where list_id = $1 and on_date = $2::date`, [listId, date, outcome]);
+}
+
+/** The list of an owner, or null. */
+export async function listOf(q: Q, o: Owner): Promise<string | null> {
+  return (await findList(q, o))?.id ?? null;
 }

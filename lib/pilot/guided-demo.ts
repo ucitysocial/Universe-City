@@ -14,7 +14,9 @@ export type DemoGroup = { name: string | null; steps: PlanStep[] };
 /** listId: the list in the File, once saved. marks: the time each step was checked on the day shown, by name. subs: which
  * smaller steps are checked that day. */
 export type DemoPlan = { doneWhen: string; groups: DemoGroup[]; finish: string; dismissed?: string[]; listId?: string;
-  marks?: Record<string, string>; subs?: Record<string, boolean[]> };
+  marks?: Record<string, string>; subs?: Record<string, boolean[]>;
+  /** run: the day's run of Guided Life. starts: when each step was started that day, by name. */
+  run?: { startedAt: string; endedAt: string | null; outcome: string | null } | null; starts?: Record<string, string> };
 
 const s = (label: string, cue = '') => ({ label, cue });
 

@@ -669,11 +669,27 @@ create table if not exists uc_pilot.step_marks (
   step_id     uuid not null references uc_pilot.steps(id),
   on_date     date not null,
   done        boolean not null default true,
+  started_at  timestamptz,
   marked_at   timestamptz not null default now(),
   marked_by   text not null default 'resident',
   created_at  timestamptz not null default now(),
   updated_at  timestamptz not null default now(),
   unique (user_id, step_id, on_date)
+);
+
+-- One run of Guided Life through a list on one day: when the resident started it, when it ended, and how. With the
+-- time each step was started and done, the agent sees how long the resident took to begin and to finish each step.
+-- The founder set this on October 13, 2026.
+create table if not exists uc_pilot.guided_runs (
+  id          uuid primary key default gen_random_uuid(),
+  user_id     uuid not null default uc_pilot.uid(),
+  list_id     uuid not null references uc_pilot.step_lists(id),
+  on_date     date not null,
+  started_at  timestamptz not null default now(),
+  ended_at    timestamptz,
+  outcome     text check (outcome is null or outcome in ('done','not_yet')),
+  created_at  timestamptz not null default now(),
+  unique (user_id, list_id, on_date)
 );
 
 -- Who filed a step and who checked it come from the server's verified context.
@@ -690,14 +706,14 @@ begin
   if tg_table_name = 'step_marks' then
     new.marked_by := uc_pilot.actor();
     new.updated_at := now();
-  elsif tg_op = 'INSERT' then
+  elsif tg_op = 'INSERT' and tg_table_name in ('step_lists','steps') then
     new.filed_by := uc_pilot.actor();
     if new.source_message_id is null then new.source_message_id := uc_pilot.msg(); end if;
   end if;
   return new;
 end $$;
 
--- A list, a step, and a check name only rows of the same resident.
+-- A list, a step, a check, and a run name only rows of the same resident.
 create or replace function uc_pilot.step_refs() returns trigger
 language plpgsql as $$
 begin
@@ -719,6 +735,10 @@ begin
     if not exists (select 1 from uc_pilot.steps x where x.id = new.step_id) then
       raise exception 'A check belongs only to a step of the same resident.';
     end if;
+  elsif tg_table_name = 'guided_runs' then
+    if not exists (select 1 from uc_pilot.step_lists x where x.id = new.list_id) then
+      raise exception 'A run of Guided Life belongs only to a list of the same resident.';
+    end if;
   end if;
   return new;
 end $$;
@@ -726,7 +746,7 @@ end $$;
 do $$
 declare t text;
 begin
-  foreach t in array array['step_lists','steps','step_marks'] loop
+  foreach t in array array['step_lists','steps','step_marks','guided_runs'] loop
     execute format('drop trigger if exists %I on uc_pilot.%I', t || '_10_stamp', t);
     execute format('create trigger %I before insert or update on uc_pilot.%I for each row execute function uc_pilot.step_stamp()', t || '_10_stamp', t);
     execute format('drop trigger if exists %I on uc_pilot.%I', t || '_11_fixed', t);
@@ -751,7 +771,9 @@ grant update (done_when) on uc_pilot.step_lists to uc_pilot_resident;
 grant select, insert on uc_pilot.steps to uc_pilot_resident;
 grant update (parent_id, position, label, group_name, state) on uc_pilot.steps to uc_pilot_resident;
 grant select, insert on uc_pilot.step_marks to uc_pilot_resident;
-grant update (done, marked_at, marked_by, updated_at) on uc_pilot.step_marks to uc_pilot_resident;
+grant update (done, started_at, marked_at, marked_by, updated_at) on uc_pilot.step_marks to uc_pilot_resident;
+grant select, insert on uc_pilot.guided_runs to uc_pilot_resident;
+grant update (ended_at, outcome) on uc_pilot.guided_runs to uc_pilot_resident;
 
 alter function uc_pilot.step_stamp() set search_path = uc_pilot, pg_temp;
 alter function uc_pilot.step_refs() set search_path = uc_pilot, pg_temp;
@@ -776,7 +798,7 @@ begin
     raise exception 'No resident is set.';
   end if;
   update uc_pilot.turns set reply_id = null where user_id = u;
-  foreach t in array array['revisions','actions','work','follow_ups','pending','step_marks','steps','step_lists','commitments','plans','schedule_items','statements','turns','messages','sessions'] loop
+  foreach t in array array['revisions','actions','work','follow_ups','pending','guided_runs','step_marks','steps','step_lists','commitments','plans','schedule_items','statements','turns','messages','sessions'] loop
     execute format('delete from uc_pilot.%I where user_id = $1', t) using u;
     get diagnostics c = row_count;
     n := n || jsonb_build_object(t, c);

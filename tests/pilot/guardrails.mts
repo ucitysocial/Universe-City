@@ -1000,6 +1000,23 @@ const shift = (await asResident(A, q => q(`select id from uc_pilot.commitments w
     { med, by, e1: r1.effects, e2: r2.effects });
 }
 
+// ================================================================= 36. when a run and each step began
+{
+  const { routinePlan } = await import('../../lib/pilot/guided-demo');
+  const { saveSteps, startRun, beginStep, markStep, listOf } = await import('../../lib/pilot/steps');
+  const { loadFile, fileForModel } = await import('../../lib/pilot/file');
+  const asB = <T,>(fn: (q: any) => Promise<T>) => withResident({ userId: B, actor: 'resident' }, fn);
+  const base = routinePlan('Night routine', [])!;
+  const plan = JSON.parse(JSON.stringify(base));
+  const alarm = plan.groups[0].steps.find((x: any) => x.label === 'Set your alarm'); alarm.suggested = false; alarm.orig = 'Set your alarm';
+  const saved = await asB(q => saveSteps(q, { routine: 'Night routine' }, plan, base, today));
+  const st = saved.groups[0].steps.find((x: any) => x.label === 'Set your alarm')!;
+  await asB(async q => { const l = await listOf(q, { routine: 'Night routine' }); await startRun(q, l!, today); await beginStep(q, st.id!, today); await markStep(q, st.id!, today, true); });
+  const text = await asB(async q => fileForModel(await loadFile(q, zone), 'B'));
+  check('S-15', 'The File the agent reads says when Guided Life started today, and when each step started and was done, in minutes',
+    /Night routine[^\n]*Guided Life today: started/.test(text) && /Set your alarm, started .* minutes after the run began, done .* \(0 minutes\)/.test(text), text.split('STEPS')[1]?.slice(0, 500));
+}
+
 const failed = results.filter(r => !r.pass);
 console.log(`\n${results.length - failed.length} of ${results.length} passed`);
 if (failed.length) process.exit(1);

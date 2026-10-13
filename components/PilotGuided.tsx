@@ -8,7 +8,7 @@ import PilotGlyph from '@/components/PilotGlyph';
 import PilotGuidedSteps from '@/components/PilotGuidedSteps';
 import { pickNow, type NowItem, type NowPick } from '@/lib/pilot/now';
 import { flatSteps, joinPlan, type DemoPlan } from '@/lib/pilot/guided-demo';
-import { markRemote, saveRemote, stepByLabel, takeLegacy } from '@/lib/pilot/steps-client';
+import { markRemote, runRemote, saveRemote, stepByLabel, takeLegacy } from '@/lib/pilot/steps-client';
 import { TIME_PATH } from '@/lib/pilot/paths';
 import { localNow, sayClock } from '@/lib/pilot/time';
 
@@ -49,6 +49,8 @@ export default function PilotGuided({ sessionKey, planKey, href, label, when, da
   const [pick, setPick] = useState<NowPick>(null);
   const big = useRef<HTMLHeadingElement>(null);
   const [saveErr, setSaveErr] = useState<string | null>(null);
+  // When the resident started this run today. Opening the page starts nothing. The press on Start does.
+  const [startedAt, setStartedAt] = useState<string | null>(base.run?.startedAt ?? null);
   const entry = { id: entryId, weekly };
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const latest = useRef<DemoPlan>(base);
@@ -82,15 +84,31 @@ export default function PilotGuided({ sessionKey, planKey, href, label, when, da
     setPlanState(saved);
     return saved;
   }
-  async function check(label: string, done: boolean, subIndex?: number) {
+  async function check(label: string, done: boolean, subIndex?: number, next?: string) {
     try {
       const p = await withRows();
       const step = stepByLabel(p, label);
       const id = subIndex === undefined ? step?.id : step?.subIds?.[subIndex];
       if (id) await markRemote(entry, date, id, done);
+      // The next step starts the moment this one is done.
+      const nid = next ? stepByLabel(p, next)?.id : undefined;
+      if (nid) await runRemote(entry, date, 'begin', { step: nid });
       setSaveErr(null);
     } catch (e: any) { setSaveErr(String(e?.message || e)); }
   }
+  async function begin() {
+    const at = new Date().toISOString();
+    setStartedAt(at);
+    try {
+      const p = await withRows();
+      await runRemote(entry, date, 'start');
+      const first = flatSteps(p).find(z => !st.marks[z.label]);
+      if (first?.id) await runRemote(entry, date, 'begin', { step: first.id });
+      setSaveErr(null);
+    } catch (e: any) { setSaveErr(String(e?.message || e)); }
+  }
+  const finish = (outcome: 'done' | 'not_yet') => { runRemote(entry, date, 'end', { outcome }).catch(e => setSaveErr(String(e.message || e))); };
+  const clockAt = (iso: string) => new Date(iso).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: zone });
   useEffect(() => {
     const tick = () => {
       const l = localNow(zone);
@@ -149,7 +167,7 @@ export default function PilotGuided({ sessionKey, planKey, href, label, when, da
   const doneStep = () => {
     if (st.paused) return save({ ...st, paused: false });
     const marks = steps[st.i] ? { ...st.marks, [steps[st.i].label]: new Date().toISOString() } : st.marks;
-    if (steps[st.i]) void check(steps[st.i].label, true);
+    if (steps[st.i]) void check(steps[st.i].label, true, undefined, steps[st.i + 1]?.label);
     if (st.i >= n - 1) return save({ ...st, marks, i: n, done: true });
     save({ ...st, marks, i: st.i + 1 });
     big.current?.focus();
@@ -172,7 +190,7 @@ export default function PilotGuided({ sessionKey, planKey, href, label, when, da
       <div className="gl-head">
         <div>
           <h1>{label}</h1>
-          <p>{when}</p>
+          <p>{when}{startedAt ? `. Started ${clockAt(startedAt)}` : ''}</p>
         </div>
         <button type="button" className="gl-ghost" onClick={() => { save(START); setView('session'); }}>Start over</button>
       </div>
@@ -211,7 +229,15 @@ export default function PilotGuided({ sessionKey, planKey, href, label, when, da
               <div className="gl-row c"><button type="button" className="gl-done" onClick={() => setView('steps')}>Open the steps</button></div>
             </div>
           )}
-          {n > 0 && !st.done && (
+          {n > 0 && !st.done && !startedAt && Object.keys(st.marks).length === 0 && (
+            <div className="gl-end">
+              <PilotGlyph name="clock" size={52} className="gl-end-g" />
+              <h2>{n === 1 ? 'One step' : `${n} steps`}</h2>
+              <p>First: {steps[0].label}</p>
+              <div className="gl-row c"><button type="button" className="gl-done" onClick={() => void begin()}>Start {label.toLowerCase()}</button></div>
+            </div>
+          )}
+          {n > 0 && !st.done && (startedAt || Object.keys(st.marks).length > 0) && (
             <>
               <div className="gl-now">
                 <span className="gl-cap">{st.paused ? 'Paused' : `${x.group ? `${x.group}, step` : 'Step'} ${st.i + 1} of ${n}`}</span>
@@ -264,8 +290,8 @@ export default function PilotGuided({ sessionKey, planKey, href, label, when, da
               <h2>That is every step</h2>
               <p>{plan.finish}</p>
               <div className="gl-row c">
-                <button type="button" className="gl-done" onClick={() => save({ ...st, outcome: 'yes' })}>Yes</button>
-                <button type="button" className="gl-pause wide" onClick={() => { save({ ...st, outcome: 'not_yet' }); setMsg(`I did every step of ${label.toLowerCase()}. ${plan.finish} Not yet.`); setView('talk'); }}>Not yet</button>
+                <button type="button" className="gl-done" onClick={() => { save({ ...st, outcome: 'yes' }); finish('done'); }}>Yes</button>
+                <button type="button" className="gl-pause wide" onClick={() => { save({ ...st, outcome: 'not_yet' }); finish('not_yet'); setMsg(`I did every step of ${label.toLowerCase()}. ${plan.finish} Not yet.`); setView('talk'); }}>Not yet</button>
               </div>
             </div>
           )}

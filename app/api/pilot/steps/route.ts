@@ -3,7 +3,7 @@ import { loadCommitment, loadWeeklyItem } from '@/lib/pilot/browse';
 import { isUuid, withResident } from '@/lib/pilot/db';
 import type { DemoPlan } from '@/lib/pilot/guided-demo';
 import { ownerFor, planFor } from '@/lib/pilot/plan-for';
-import { markStep, saveSteps } from '@/lib/pilot/steps';
+import { beginStep, endRun, listOf, markStep, saveSteps, startRun } from '@/lib/pilot/steps';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,7 +11,8 @@ const isDate = (d: unknown): d is string => typeof d === 'string' && /^\d{4}-\d{
 
 /**
  * The steps of one entry. op save keeps the steps as the resident left them and answers with them as the File holds
- * them now. op mark checks one step, or a smaller step, on one day. The resident does both from the screen.
+ * them now. op mark checks one step, or a smaller step, on one day. op start and op end keep when a run of Guided Life
+ * began and ended, and op begin keeps when a step became the current step. The resident does each from the screen.
  */
 export async function POST(req: Request) {
   const a = await admit(req);
@@ -29,6 +30,19 @@ export async function POST(req: Request) {
       const base = planFor(e.label, e.folder ?? null, a.access.synthetic);
       if (!base) return { status: 404, body: { error: 'This entry holds no steps.' } };
       const owner = ownerFor(e.label, id, weekly);
+      // The run of Guided Life, and the step that became current. Both keep the time the resident pressed.
+      if (body?.op === 'start' || body?.op === 'end' || body?.op === 'begin') {
+        const list = await listOf(q, owner);
+        if (!list) return { status: 409, body: { error: 'Save the steps first.' } };
+        if (body.op === 'start') await startRun(q, list, date);
+        if (body.op === 'end') await endRun(q, list, date, body?.outcome === 'not_yet' ? 'not_yet' : 'done');
+        if (body.op === 'begin') {
+          const step = String(body?.step ?? '');
+          if (!isUuid(step)) return { status: 400, body: { error: 'The request named no step.' } };
+          await beginStep(q, step, date);
+        }
+        return { status: 200, body: { ok: true } };
+      }
       if (body?.op === 'mark') {
         const step = String(body?.step ?? '');
         if (!isUuid(step)) return { status: 400, body: { error: 'The request named no step.' } };
