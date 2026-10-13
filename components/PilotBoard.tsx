@@ -4,6 +4,7 @@ import PilotBoardDay from '@/components/PilotBoardDay';
 import PilotBoardTabs from '@/components/PilotBoardTabs';
 import { Countdown } from '@/components/PilotPanelBits';
 import PilotPending from '@/components/PilotPending';
+import PilotWaitTop from '@/components/PilotWaitTop';
 import { popData } from '@/app/(pilot)/portal/file/[[...path]]/calendar';
 import { spanWords } from '@/lib/pilot/browse';
 import type { Board } from '@/lib/pilot/board';
@@ -62,13 +63,8 @@ export default function PilotBoard({ board, wide = false }: { board: Board; wide
   if (!wide) {
     return (
       <div className="board side-clean">
+        <PilotWaitTop panel={panel} />
         <PilotBoardDay days={days} today={today} zone={board.zone} ghosts={ghostsOf(board.intake)} guided={board.guided} />
-        {waiting > 0 && (
-          <div className="dash-sec side-wait">
-            <div className="dash-h"><h2>Waiting for you</h2><span className="dash-count">{waiting}</span></div>
-            <div className="dash-pending"><PilotPending panel={panel} /></div>
-          </div>
-        )}
       </div>
     );
   }
