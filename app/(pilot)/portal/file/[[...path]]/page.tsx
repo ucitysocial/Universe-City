@@ -10,6 +10,7 @@ import { loadBoard } from '@/lib/pilot/board';
 import PilotCalFocus from '@/components/PilotCalFocus';
 import PilotDecide from '@/components/PilotDecide';
 import PilotEntry from '@/components/PilotEntry';
+import PilotGuidedLife from '@/components/PilotGuidedLife';
 import { DEPARTMENTS, FOLDERS, type Folder } from '@/lib/domain/folders';
 import { FOLDER_TEXT } from '@/lib/domain/folder-text';
 import { who } from '@/lib/pilot/auth';
@@ -487,6 +488,7 @@ async function commitmentPane({ q, zone, decides }: Ctx, base: string, id: strin
               ))}
             </div>
           )}
+          {!c.withdrawn_at && <PilotGuidedLife commitmentId={c.id} label={c.label} agentLink={decides} />}
           {open && <PilotEntry key={`${c.label} ${c.on_date} ${c.start_min} ${c.end_min}`} id={c.id} label={c.label} date={c.on_date} start={clock24(c.start_min)} end={clock24(c.end_min)} />}
           {!open && <p className="fb-note" style={{ padding: '10px 12px 0', margin: 0 }}>{c.withdrawn_at ? 'This entry was taken off its day, so its day and time stay as they are.' : 'This entry has an outcome on file, so its day and time stay as they are. Tell the agent to correct the outcome.'}</p>}
           <History list={x.history} zone={zone} />

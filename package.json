@@ -9,6 +9,7 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "test:pilot": "tsx tests/pilot/guardrails.mts",
+    "test:guided": "tsx tests/pilot/guided.mts",
     "pilot:schema": "node scripts/pilot-schema.mjs",
     "pilot:docs": "node scripts/pilot-docs.mjs",
     "pilot:folders": "node scripts/folder-text.mjs"

@@ -175,6 +175,7 @@ export default function PilotCalPop() {
             {brief.weekly && <p className="pop-meta">Tell the agent to change an item that repeats each week.</p>}
           </div>
         )}
+        {!brief.weekly && <Link className="pt-btn" style={{ display:'inline-block',marginTop:10 }} href={`${brief.href}#guided-life`} onClick={() => setBrief(null)}>Open Guided Life →</Link>}
         <Link className="pop-open" href={brief.href} onClick={() => setBrief(null)}>Open the whole entry{full && full.changes ? `, with ${full.changes} ${full.changes === 1 ? 'change' : 'changes'} in its history` : ''}</Link>
       </div>
     </div>
