@@ -48,14 +48,8 @@ export async function updateSession(request: NextRequest) {
     return redirect;
   }
 
-  if (user && path.startsWith('/agent')) {
-    const { data } = await supabase.from('profiles').select('role').eq('id', user.id).single();
-    if (data?.role !== 'agent') {
-      const url = request.nextUrl.clone();
-      url.pathname = '/portal';
-      return NextResponse.redirect(url);
-    }
-  }
+  // The Agent Portal checks who may open it in its own layout, against the founder test list. The founder set on
+  // October 13, 2026 that it opens for her login. The old check against public.profiles sent every login to /portal.
 
   return response;
 }

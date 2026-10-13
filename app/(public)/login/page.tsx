@@ -104,12 +104,12 @@ export default function Login() {
                    onChange={e => setPassword(e.target.value)} required />
           </div>
           <button className="btn" style={{ width: '100%' }} disabled={busy || opening}>
-            {opening ? 'Opening the Resident Portal' : busy ? 'Logging in' : 'Log in'}
+            {opening ? `Opening the ${agent ? 'Agent' : 'Resident'} Portal` : busy ? 'Logging in' : 'Log in'}
           </button>
           {opening && (
             <div className="opening">
-              <StarLoader label="The Resident Portal is loading" />
-              <p className="opening-line">You are logged in. The Resident Portal is loading.</p>
+              <StarLoader label={`The ${agent ? 'Agent' : 'Resident'} Portal is loading`} />
+              <p className="opening-line">You are logged in. The {agent ? 'Agent' : 'Resident'} Portal is loading.</p>
             </div>
           )}
           {showSend && (
