@@ -880,6 +880,18 @@ const shift = (await asResident(A, q => q(`select id from uc_pilot.commitments w
     empty.done === 0 && !empty.items.find(i => i.key === 'sleep')!.done && full.done === 5, [empty.done, full.items.filter(i => !i.done).map(i => i.key)]);
 }
 
+// ================================================================= 30. the agent's copilot
+{
+  const { askCopilot, contextOf } = await import('../../lib/agent/copilot');
+  const { demoClients } = await import('../../lib/agent/demo');
+  const dana = demoClients(today)[0];
+  queue = [call('case_reply', { reply: 'The grocery run at 4 PM leaves one hour after sleep.', message: 'Want to move the grocery run to 6:30 PM today?', case_notes: ['Plan: suggest errands after 6 PM on work days.'] })];
+  const r = await askCopilot(dana, [{ who: 'agent', text: 'groceries at 4 is too tight after sleep' }]);
+  const ctx = contextOf(dana);
+  check('A-01', 'The copilot returns its answer, a message to refine, and case file entries, and reads the client File',
+    /grocery/i.test(r.reply) && r.message === 'Want to move the grocery run to 6:30 PM today?' && r.caseNotes.length === 1 && /Grocery run/.test(ctx) && /Sleep/.test(ctx), r);
+}
+
 const failed = results.filter(r => !r.pass);
 console.log(`\n${results.length - failed.length} of ${results.length} passed`);
 if (failed.length) process.exit(1);

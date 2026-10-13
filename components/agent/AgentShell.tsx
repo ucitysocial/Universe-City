@@ -13,7 +13,8 @@ import { supabaseBrowser } from '@/lib/supabase/client';
 // Every change made to a made up client is kept here, in this browser only. Nothing in it reaches the database, the
 // live client, or any message service. Reset the demo clears it.
 
-export type Note = { id: string; kind: 'note' | 'client_said'; text: string; at: string };
+export type Note = { id: string; kind: 'note' | 'client_said' | 'copilot'; text: string; at: string; by?: string; about?: string; message?: string | null; caseNotes?: string[] };
+export type CaseEntry = { id: string; text: string; at: string; by: string };
 export type Proposal = { id: string; folder: string; text: string; from: string; state: 'open' | 'confirmed' | 'discarded' };
 export type Demo = {
   sent: Msg[];
@@ -22,8 +23,9 @@ export type Demo = {
   handled: Record<string, string>;     // a need, and what the agent did with it
   tasks: Record<string, boolean[]>;    // a task, and which steps are done
   draft: string;
+  caseFile: CaseEntry[];               // the agent's case file on this client
 };
-const EMPTY: Demo = { sent: [], notes: [], proposals: [], handled: {}, tasks: {}, draft: '' };
+const EMPTY: Demo = { sent: [], notes: [], proposals: [], handled: {}, tasks: {}, draft: '', caseFile: [] };
 const KEY = 'uc:agent-demo:v1';
 
 type Ctx = {
@@ -32,6 +34,8 @@ type Ctx = {
   demo: (id: string) => Demo;
   change: (id: string, fn: (d: Demo) => Demo) => void;
   view: (id: string) => Client | null;
+  addNote: (id: string, note: Note) => void;
+  addCase: (id: string, entry: CaseEntry) => void;
   reset: () => void;
 };
 const AgentCtx = createContext<Ctx | null>(null);
@@ -88,8 +92,26 @@ export default function AgentShell({ agentName, clients, children }: { agentName
     const c = clients.find(x => x.id === id);
     return c ? overlay(c, demo(id)) : null;
   }, [clients, demo]);
+  // Agent notes are the agent's own. They change nothing in the client's File, so the live client takes them too.
+  // For now they are kept in this browser.
+  const addNote = useCallback((id: string, note: Note) => {
+    setAll(prev => {
+      const cur = { ...EMPTY, ...(prev[id] || {}) };
+      const next = { ...prev, [id]: { ...cur, notes: [...cur.notes, note] } };
+      try { localStorage.setItem(KEY, JSON.stringify(next)); } catch { /* kept until the page reloads */ }
+      return next;
+    });
+  }, []);
+  const addCase = useCallback((id: string, entry: CaseEntry) => {
+    setAll(prev => {
+      const cur = { ...EMPTY, ...(prev[id] || {}) };
+      const next = { ...prev, [id]: { ...cur, caseFile: [...cur.caseFile, entry] } };
+      try { localStorage.setItem(KEY, JSON.stringify(next)); } catch { /* kept until the page reloads */ }
+      return next;
+    });
+  }, []);
   const reset = () => save({});
-  const ctx = useMemo(() => ({ agentName, clients, demo, change, view, reset }), [agentName, clients, demo, change, view]); // eslint-disable-line react-hooks/exhaustive-deps
+  const ctx = useMemo(() => ({ agentName, clients, demo, change, view, addNote, addCase, reset }), [agentName, clients, demo, change, view, addNote, addCase]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const path = usePathname() || '';
   const router = useRouter();
