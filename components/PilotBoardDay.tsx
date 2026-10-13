@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState, type CSSProperties } from 'react';
+import PilotGlyph from '@/components/PilotGlyph';
 import type { BoardDay } from '@/lib/pilot/board';
 import PilotGhost from '@/components/PilotGhost';
 import { withGhosts, type Ghost } from '@/lib/pilot/ghosts';
@@ -25,7 +26,7 @@ const WORD: Record<string, string> = { planned: 'Planned', executed: 'Executed',
  * one is marked Next. Pressing an entry opens the calendar window. Blocks are kept for the week and the month.
  * The founder set on October 12, 2026 that the overview holds the day and nothing more.
  */
-export default function PilotBoardDay({ days, today, zone, ghosts = [] }: { days: BoardDay[]; today: string; zone?: string; ghosts?: Ghost[] }) {
+export default function PilotBoardDay({ days, today, zone, ghosts = [], guided }: { days: BoardDay[]; today: string; zone?: string; ghosts?: Ghost[]; guided?: Record<string, string> }) {
   const [n, setN] = useState(0);
   const d = days[n];
   // The glow is worked out again each 15 seconds in the resident's time zone, so it moves on the minute an entry
@@ -64,13 +65,17 @@ export default function PilotBoardDay({ days, today, zone, ghosts = [] }: { days
             const i = r.item;
             const here = d.date === today && pick !== null && i.key === pick.key;
             const live = here && pick!.live;
+            const start = live && guided?.[i.key];
             return (
-              <a key={i.key} href={i.href} className={`ent d-${i.dept}${here ? (live ? ' is-now' : ' is-next') : ''}`} {...popData(i)}>
+              <Fragment key={i.key}>
+              <a href={i.href} className={`ent d-${i.dept}${here ? (live ? ' is-now' : ' is-next') : ''}`} {...popData(i)}>
                 <span className="fi i-page" />
                 <b>{here && <span className="day-flag">{live ? 'Now' : 'Next'}</span>}{i.label}</b>
                 <span className="sub sday-time">{i.start === null ? 'No time' : i.timeText.replace(/, end unknown$/, '')}</span>
                 <span className="sub"><span className={`pt-chip ${i.kind === 'executed' ? 'filed' : 'unknown'}`}>{WORD[i.kind] || 'Planned'}</span></span>
               </a>
+              {start && <Link href={start} className="ent-start" style={{ '--fc': `var(--${i.dept})` } as CSSProperties}><PilotGlyph name="clipboard" size={20} />Start {i.label.toLowerCase()}</Link>}
+              </Fragment>
             );
           })}
         </div>

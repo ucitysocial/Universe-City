@@ -3,6 +3,7 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import type { Need } from '@/lib/agent/types';
+import PilotGlyph from '@/components/PilotGlyph';
 
 type Action = { label: string; why: string; direction: string };
 type Line =
@@ -97,7 +98,7 @@ export default function AgencyGuide({ clientId, clientName, needs }: { clientId:
     <div className="gd">
       {needs.length > 0 && (
         <section className="win gd-wait">
-          <div className="win-bar">Waiting on {first}</div>
+          <div className="win-bar gd-bar"><PilotGlyph name="hand" size={26} />Waiting on {first}</div>
           <ul>
             {needs.map(n => (
               <li key={n.id}>

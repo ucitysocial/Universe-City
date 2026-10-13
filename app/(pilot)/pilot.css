@@ -1114,3 +1114,51 @@ html.uc-nav::after{content:"";position:fixed;left:0;top:0;height:3px;width:100%;
 .gp-list.sub{padding-left:34px}
 .gp-start{text-align:center}
 .gp-demo{margin:0;font-size:12px;color:var(--dim)}
+
+/* The small drawings. A black outline on white with the hard shadow of the cards. No color. */
+.glyph{flex:none;filter:drop-shadow(2px 2px 0 var(--ink));overflow:visible}
+.gp-h{display:flex;align-items:center;gap:8px}
+.gd-bar{display:flex;align-items:center;gap:9px}
+.gd-bar .glyph{filter:drop-shadow(2px 2px 0 var(--paper2));margin:-4px 0}
+.gl-end-g{justify-self:center;margin-bottom:4px}
+
+/* Start, under the entry that glows in the day at the right, when it has steps. */
+.ent-start{display:flex;align-items:center;gap:9px;margin:-1px 0 6px;padding:9px 12px;background:var(--ink);color:var(--paper);font-weight:700;font-size:14px;text-decoration:none;border:2px solid var(--fc,var(--ink));border-top:0;position:relative;z-index:1}
+.ent-start .glyph{filter:none}
+.ent-start:hover{background:var(--ink2)}
+
+/* A different entry is the one happening now. */
+.gl-other{display:flex;align-items:center;gap:11px;padding:11px 14px;background:#fff;border:2px solid var(--ink);box-shadow:4px 4px 0 var(--ink);color:var(--ink);text-decoration:none;animation:uc-glow-ink 2.6s ease-in-out infinite}
+.gl-other span{flex:1;font-size:14px}
+.gl-other em{font-style:normal;font-weight:700;font-size:13.5px;text-decoration:underline;text-underline-offset:3px}
+@keyframes uc-glow-ink{50%{box-shadow:4px 4px 0 var(--ink),0 0 18px 3px color-mix(in srgb,var(--II) 45%,transparent)}}
+@media (prefers-reduced-motion:reduce){.gl-other{animation:none}}
+
+/* Every step, clean. The handle and the remove mark show on hover and on focus. */
+.gs{display:grid;gap:2px}
+.gs-head{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.gs-head .gl-cap{flex:1}
+.gs-group{display:grid}
+.gs-g{display:flex;align-items:center;gap:8px;background:none;border:0;padding:12px 0 4px;font:inherit;font-size:14.5px;font-weight:700;color:var(--ink);cursor:pointer;text-align:left}
+.gs-g em{font-style:normal;font-weight:500;font-size:12.5px;color:var(--dim)}
+.gs-gname{font:inherit;font-size:14.5px;font-weight:700;border:0;border-bottom:1.5px dashed var(--rule);background:transparent;padding:10px 2px 4px;margin-bottom:2px}
+.gs-row{display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--rule);padding:2px 4px 2px 0;position:relative}
+.gs-row.over{box-shadow:inset 0 2px 0 var(--ink)}
+.gs-grip{width:14px;align-self:stretch;cursor:grab;opacity:0;background:radial-gradient(circle,var(--dim) 1.2px,transparent 1.6px) 0 50%/7px 6px;transition:opacity .12s}
+.gs-n{font-family:'VT323',monospace;font-size:18px;color:var(--dim);width:18px;text-align:center}
+.gs-row.did .gs-n{color:var(--ink)}
+.gs-name{flex:1;min-width:0;background:none;border:0;text-align:left;font:inherit;font-size:15px;padding:10px 4px;color:var(--ink);cursor:pointer}
+.gs-row.did .gs-name{color:var(--dim)}
+.gs-row.now{background:var(--paper2)}
+.gs-row.now .gs-name{font-weight:700}
+.gs-name em{font-style:normal;font-family:'VT323',monospace;font-size:16px;letter-spacing:.06em;margin-left:10px;color:var(--I)}
+input.gs-name{cursor:text;border-bottom:1.5px dashed var(--rule);padding:8px 4px}
+.gs-x{background:none;border:0;font-size:19px;line-height:1;color:var(--dim);cursor:pointer;padding:4px 6px;opacity:0;transition:opacity .12s}
+.gs-x:hover{color:var(--I)}
+.gs-row:hover .gs-grip,.gs-row:hover .gs-x,.gs-row:focus-within .gs-grip,.gs-row:focus-within .gs-x,.gs.editing .gs-x{opacity:1}
+.gs.editing .gs-grip{display:none}
+.gs-arrows{display:flex;gap:2px}
+.gs-arrows button{background:none;border:1.5px solid var(--rule);width:28px;height:28px;cursor:pointer;color:var(--ink);font-size:14px}
+.gs-arrows button:disabled{opacity:.3;cursor:default}
+.gs-add{justify-self:start;margin:4px 0 2px 26px}
+@media (hover:none){.gs-grip{display:none}.gs-x{opacity:0;pointer-events:none}.gs.editing .gs-x{opacity:1;pointer-events:auto}}

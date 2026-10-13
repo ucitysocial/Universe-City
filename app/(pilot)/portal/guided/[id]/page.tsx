@@ -5,6 +5,8 @@ import { who } from '@/lib/pilot/auth';
 import { loadCommitment, loadWeeklyItem, spanWords } from '@/lib/pilot/browse';
 import { isUuid, withResident } from '@/lib/pilot/db';
 import { demoPlan } from '@/lib/pilot/guided-demo';
+import { DAY_FIT, loadCalendar } from '@/lib/pilot/calendar';
+import type { TodayItem } from '@/components/PilotGuided';
 import { sayDate, localNow } from '@/lib/pilot/time';
 
 export const dynamic = 'force-dynamic';
@@ -41,13 +43,19 @@ export default async function GuidedPage({ params, searchParams }: { params: { i
     );
   }
   const date = /^\d{4}-\d{2}-\d{2}$/.test(searchParams.date || '') ? searchParams.date! : entry.date;
+  // The other entries of that day, so the session can say when a different entry is the one happening now.
+  const cal = await withResident({ userId: w.userId, actor: 'resident' }, q => loadCalendar(q, date, date, today, DAY_FIT));
+  const items: TodayItem[] = (cal.days[0] ? [...cal.days[0].untimed, ...cal.days[0].timed] : []).map(i => ({
+    key: i.key, start: i.start, end: i.end, kind: i.kind, label: i.label, time: i.timeText.replace(/, end unknown$/, ''),
+    go: w.access.synthetic && demoPlan(i.label) ? `/portal/guided/${i.key.split(':')[0]}?${i.kind === 'weekly' ? 'weekly=1&' : ''}date=${date}` : i.href
+  }));
   return (
     <PilotGuided
       sessionKey={`uc:gl:${w.userId}:${id}:${date}`}
-      href={`/portal/guided/${id}${weekly ? '?weekly=1' : `?date=${date}`}`}
+      href={`/portal/guided/${id}?${weekly ? 'weekly=1&' : ''}date=${date}`}
       label={entry.label}
       when={`${date === today ? 'Today' : sayDate(date)}, ${spanWords(entry.start, entry.end)}`}
-      date={date} end={entry.end} zone={zone} plan={plan}
+      date={date} end={entry.end} zone={zone} plan={plan} entryId={id} today={items}
     />
   );
 }

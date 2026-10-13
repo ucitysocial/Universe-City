@@ -19,6 +19,7 @@ import { loadBoard } from '@/lib/pilot/board';
 import { loadIndex } from '@/lib/pilot/browse';
 import { withResident } from '@/lib/pilot/db';
 import { loadAccess } from '@/lib/pilot/file';
+import { demoPlan } from '@/lib/pilot/guided-demo';
 import './pilot.css';
 
 export const dynamic = 'force-dynamic';
@@ -66,6 +67,13 @@ export default async function PilotLayout({ children }: { children: React.ReactN
     const index = await loadIndex(q, w.access.timezone);
     return { index, board: await loadBoard(q, w.access.timezone, index) };
   });
+  // The Guided Life demo: an entry today that has example steps gets a way to start them from the day at the right.
+  if (w.access.synthetic) {
+    board.guided = {};
+    for (const i of board.days.find(d => d.date === board.today)?.items ?? []) {
+      if (demoPlan(i.label)) board.guided[i.key] = `/portal/guided/${i.key.split(':')[0]}?${i.kind === 'weekly' ? 'weekly=1&' : ''}date=${board.today}`;
+    }
+  }
   // An agent who opened a client sees the frame the client sees. The founder set it on October 13, 2026: the same
   // tree, File, schedule, and conversation, with the client switcher at the top left and the Agency Guide on the right.
   if (w.agent) {

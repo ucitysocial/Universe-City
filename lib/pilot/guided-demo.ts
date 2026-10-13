@@ -128,7 +128,7 @@ const PLANS: { match: RegExp; plan: DemoPlan }[] = [
     }
   },
   {
-    match: /study|homework/i,
+    match: /study|homework|^class$/i,
     plan: {
       doneWhen: 'You finished the study block you planned.',
       finish: 'Did you finish the study block?',

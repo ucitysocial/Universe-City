@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import PilotGlyph from '@/components/PilotGlyph';
 import type { DemoPlan } from '@/lib/pilot/guided-demo';
 
 /**
@@ -18,7 +19,7 @@ export default function PilotGuidedPlan({ plan, label, href, onGo }: { plan: Dem
         <p>{plan.doneWhen}</p>
       </div>
       <div className="gp-steps">
-        <span className="gp-h">Steps <em>{count}</em></span>
+        <span className="gp-h"><PilotGlyph name="clipboard" size={22} />Steps <em>{count}</em></span>
         {plan.groups.map((g, i) => g.name ? (
           <div key={i}>
             <button type="button" className="gp-grp" aria-expanded={open[i]} onClick={() => setOpen(o => o.map((v, k) => (k === i ? !v : v)))}>
