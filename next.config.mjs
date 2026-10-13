@@ -12,6 +12,20 @@ export default {
     PILOT_CONTEXT: process.env.CONTEXT || '',
     PILOT_COMMIT: process.env.COMMIT_REF || ''
   },
+  // Keep the actual marketing site from ucitysocial/ at the public root,
+  // while /login, /apply, /auth, /api and /portal stay on this Next.js app.
+  // These files are copied by npm prebuild, with NO legacy stage redirects.
+  async rewrites() {
+    return { beforeFiles: [
+      { source: '/', destination: '/marketing-home.html' },
+      { source: '/residency', destination: '/residency.html' },
+      { source: '/founder', destination: '/founder.html' },
+      { source: '/agency-assessment', destination: '/agency-assessment.html' },
+      { source: '/housing-stability', destination: '/housing-stability.html' },
+      { source: '/career-development', destination: '/career-development.html' },
+      { source: '/life-management', destination: '/life-management.html' }
+    ] };
+  },
   // The Resident Portal used to live at /member. Old links keep working.
   async redirects() {
     return [
