@@ -149,7 +149,7 @@ export default function PilotGuidedLife({commitmentId,label,mode='resident',agen
           <h3>{agent?'Suggest a step':'Add a step'}</h3>
           <label htmlFor={agent?'gl-agent-label':'gl-res-label'}>What needs to happen?</label>
           <input id={agent?'gl-agent-label':'gl-res-label'} value={newLabel} maxLength={220}
-            onChange={e=>setNewLabel(e.target.value)} placeholder={agent?'A step to offer the resident':'For example, gather the materials'}/>
+            onChange={e=>setNewLabel(e.target.value)} placeholder={agent?'A step to offer the resident':'Gather the materials'}/>
           <label htmlFor={agent?'gl-agent-how':'gl-res-how'}>Helpful instructions (optional)</label>
           <textarea id={agent?'gl-agent-how':'gl-res-how'} value={newInstructions} maxLength={2000} rows={2}
             onChange={e=>setNewInstructions(e.target.value)} placeholder="Only what is known or confirmed about this task."/>
@@ -164,7 +164,7 @@ export default function PilotGuidedLife({commitmentId,label,mode='resident',agen
       {view==='guide'&&<div className="gl-guide">
         {agent&&<div className="gl-question">
           <strong>Support the resident's current work</strong>
-          <p>{active?active.label:approved.length?'The current step sequence has no remaining to-do steps.':'There are no accepted steps yet.'}</p>
+          <p>{active?active.label:approved.length?'The current step sequence has no remaining steps.':'There are no accepted steps yet.'}</p>
           <p className="gl-muted">Use Task plan to prepare a relevant question or propose another step. The resident controls the work.</p>
           <Link className="gl-link" href="/portal/home">Open the conversation →</Link>
         </div>}
