@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import PilotGlyph from '@/components/PilotGlyph';
-import type { DemoPlan } from '@/lib/pilot/guided-demo';
+import { joinPlan, type DemoPlan } from '@/lib/pilot/guided-demo';
 
 /**
  * What an entry needs, shown in the window that opens from the calendar: what counts as done, then the steps, then
@@ -14,7 +14,7 @@ export default function PilotGuidedPlan({ plan: base, planKey, label, href, onGo
   const [plan, setPlan] = useState<DemoPlan>(base);
   useEffect(() => {
     if (!planKey) return;
-    try { const p = JSON.parse(localStorage.getItem(planKey) || 'null'); if (p?.groups) setPlan(p); } catch { /* the steps as filed */ }
+    try { const p = JSON.parse(localStorage.getItem(planKey) || 'null'); setPlan(joinPlan(p, base)); } catch { /* the steps as filed */ }
   }, [planKey]);
   const [open, setOpen] = useState<boolean[]>(() => plan.groups.map((_, i) => i === 0));
   const count = plan.groups.reduce((n, g) => n + g.steps.filter(x => !x.suggested).length, 0);

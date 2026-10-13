@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import PilotGuidedSteps from '@/components/PilotGuidedSteps';
-import type { DemoPlan } from '@/lib/pilot/guided-demo';
+import { joinPlan, type DemoPlan } from '@/lib/pilot/guided-demo';
 
 /**
  * The steps of an entry, on the entry's own page. The founder set on October 13, 2026 that a resident sees and edits
@@ -13,7 +13,7 @@ import type { DemoPlan } from '@/lib/pilot/guided-demo';
 export default function PilotEntrySteps({ plan: base, planKey, start }: { plan: DemoPlan; planKey: string; start: string }) {
   const [plan, setPlan] = useState<DemoPlan>(base);
   useEffect(() => {
-    try { const p = JSON.parse(localStorage.getItem(planKey) || 'null'); if (p?.groups) setPlan(p); } catch { /* the steps as filed */ }
+    try { const p = JSON.parse(localStorage.getItem(planKey) || 'null'); setPlan(joinPlan(p, base)); } catch { /* the steps as filed */ }
   }, [planKey]);
   const edit = (next: DemoPlan) => {
     setPlan(next);

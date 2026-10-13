@@ -929,6 +929,20 @@ const shift = (await asResident(A, q => q(`select id from uc_pilot.commitments w
     shownLabel('Clean up office', 'Sanitation') === 'Clean up office', null);
 }
 
+// ================================================================= 33. steps are never lost by a press
+{
+  const { routinePlan, joinPlan } = await import('../../lib/pilot/guided-demo');
+  const base = routinePlan('Morning routine', ['Medication'])!;
+  const labels = (p: any) => p.groups[0].steps.map((x: any) => `${x.suggested ? '~' : ''}${x.label}`).join(', ');
+  // The resident added Wash your face, renamed it, then removed a step the old way, and took Eat breakfast out on purpose.
+  const saved = { ...base, dismissed: ['Eat breakfast'], groups: [{ name: null, steps: [
+    { label: 'Medication', cue: '' }, { label: 'Wash face', cue: '', orig: 'Wash your face' }
+  ] }] };
+  const joined = labels(joinPlan(saved as any, base));
+  check('S-10', 'A filed step and a suggestion not taken out on purpose come back. A renamed step stays renamed. A suggestion taken out stays out',
+    joined === 'Medication, Wash face, ~Brush your teeth, ~Shower, ~Skin care, ~Get dressed', joined);
+}
+
 const failed = results.filter(r => !r.pass);
 console.log(`\n${results.length - failed.length} of ${results.length} passed`);
 if (failed.length) process.exit(1);

@@ -7,7 +7,7 @@ import { DRAFT_KEY } from '@/components/PilotAsk';
 import PilotGlyph from '@/components/PilotGlyph';
 import PilotGuidedSteps from '@/components/PilotGuidedSteps';
 import { pickNow, type NowItem, type NowPick } from '@/lib/pilot/now';
-import { flatSteps, type DemoPlan } from '@/lib/pilot/guided-demo';
+import { flatSteps, joinPlan, type DemoPlan } from '@/lib/pilot/guided-demo';
 import { TIME_PATH } from '@/lib/pilot/paths';
 import { localNow, sayClock } from '@/lib/pilot/time';
 
@@ -50,7 +50,7 @@ export default function PilotGuided({ sessionKey, planKey, href, label, when, da
 
   useEffect(() => {
     setSt(read(sessionKey));
-    try { const p = JSON.parse(localStorage.getItem(planKey || `${sessionKey}:plan`) || 'null'); if (p?.groups) setPlanState(p); } catch { /* the steps as written */ }
+    try { const p = JSON.parse(localStorage.getItem(planKey || `${sessionKey}:plan`) || 'null'); setPlanState(joinPlan(p, base)); } catch { /* the steps as written */ }
     setLoaded(true);
   }, [sessionKey, planKey]);
   useEffect(() => {

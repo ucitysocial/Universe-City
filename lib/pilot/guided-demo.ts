@@ -6,9 +6,11 @@
 // pressed in the demo is filed. The session is kept in the browser that shows it.
 
 /** A step. suggested: the agent's suggestion, shown faded until the resident adds it. sub: the smaller steps inside it. */
-export type PlanStep = { label: string; cue: string; suggested?: boolean; sub?: string[] };
+/** orig: the name of the agent's suggestion a step was added from. Taking that step out puts the suggestion back. */
+export type PlanStep = { label: string; cue: string; suggested?: boolean; sub?: string[]; orig?: string };
 export type DemoGroup = { name: string | null; steps: PlanStep[] };
-export type DemoPlan = { doneWhen: string; groups: DemoGroup[]; finish: string };
+/** dismissed: the agent's suggestions the resident took out of the routine. */
+export type DemoPlan = { doneWhen: string; groups: DemoGroup[]; finish: string; dismissed?: string[] };
 
 const s = (label: string, cue = '') => ({ label, cue });
 
@@ -195,4 +197,20 @@ export function routinePlan(name: string, filed: string[]): DemoPlan | null {
   const mine: PlanStep[] = filed.map(label => ({ label, cue: label === 'Medication' ? 'Take your medication.' : '' }));
   const taken = new Set(filed.map(f => f.toLowerCase()));
   return { doneWhen: r.doneWhen, finish: r.finish, groups: [{ name: null, steps: [...mine, ...r.suggest.filter(x => !taken.has(x.label.toLowerCase()))] }] };
+}
+
+/**
+ * The steps kept on this device, joined with the steps the File and the agent hold now. A step filed in the File and a
+ * suggestion the resident did not take out show again when they are missing, so no step is lost by a press.
+ */
+export function joinPlan(saved: DemoPlan | null, base: DemoPlan): DemoPlan {
+  if (!saved?.groups?.length) return base;
+  const have = new Set(saved.groups.flatMap(g => g.steps.flatMap(x => [x.label.toLowerCase(), (x.orig || '').toLowerCase()])));
+  const gone = new Set((saved.dismissed || []).map(d => d.toLowerCase()));
+  const missing = base.groups.flatMap(g => g.steps).filter(x => !have.has(x.label.toLowerCase()) && !(x.suggested && gone.has(x.label.toLowerCase())));
+  if (!missing.length) return saved;
+  const filed = missing.filter(x => !x.suggested);
+  const sug = missing.filter(x => x.suggested);
+  const groups = saved.groups.map((g, i) => (i === 0 ? { ...g, steps: [...filed, ...g.steps, ...sug] } : g));
+  return { ...saved, groups };
 }

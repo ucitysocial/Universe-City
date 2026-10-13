@@ -26,10 +26,19 @@ export default function PilotGuidedSteps({ plan, current, marks = {}, zone, onEd
     G[to[0]].steps.splice(Math.max(0, at), 0, item);
     onEdit({ ...plan, groups: G });
   };
-  const remove = (g: number, k: number) => { const G = copy(); G[g].steps.splice(k, 1); onEdit({ ...plan, groups: G }); };
+  // Taking out a step that was added from a suggestion puts the suggestion back, faded, under its first name. Only
+  // the × on a faded suggestion takes it out of the routine.
+  const remove = (g: number, k: number) => {
+    const G = copy();
+    const x = G[g].steps[k];
+    if (!x.suggested && x.orig) G[g].steps[k] = { ...x, label: x.orig, suggested: true, orig: undefined };
+    else G[g].steps.splice(k, 1);
+    const dismissed = x.suggested ? [...(plan.dismissed || []), x.label] : plan.dismissed;
+    onEdit({ ...plan, groups: G, dismissed });
+  };
   const rename = (g: number, k: number, label: string) => { const G = copy(); G[g].steps[k] = { ...G[g].steps[k], label }; onEdit({ ...plan, groups: G }); };
   const renameGroup = (g: number, name: string) => { const G = copy(); G[g] = { ...G[g], name }; onEdit({ ...plan, groups: G }); };
-  const accept = (g: number, k: number) => { const G = copy(); G[g].steps[k] = { ...G[g].steps[k], suggested: false }; onEdit({ ...plan, groups: G }); };
+  const accept = (g: number, k: number) => { const G = copy(); G[g].steps[k] = { ...G[g].steps[k], suggested: false, orig: G[g].steps[k].label }; onEdit({ ...plan, groups: G }); };
   const at = (iso: string) => new Date(iso).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', ...(zone ? { timeZone: zone } : {}) });
   const add = (g: number) => { const G = copy(); G[g].steps.push({ label: 'New step', cue: '' }); onEdit({ ...plan, groups: G }); };
 
@@ -61,7 +70,7 @@ export default function PilotGuidedSteps({ plan, current, marks = {}, zone, onEd
                   <span className="gs-grip" aria-hidden="true" />
                   <button type="button" className="gs-plus" onClick={() => accept(gi, k)} aria-label={`Add ${s.label}`}>+</button>
                   <span className="gs-name">{s.label}{s.sub && <small>{s.sub.join(', ')}</small>}</span>
-                  <button type="button" className="gs-x" onClick={() => remove(gi, k)} aria-label={`Remove the suggestion ${s.label}`}>&times;</button>
+                  <button type="button" className="gs-x" onClick={() => remove(gi, k)} aria-label={`Take ${s.label} out of the routine`} title="Take it out of the routine">&times;</button>
                 </div>
               );
               const state = n < current ? 'did' : n === current ? 'now' : '';
@@ -83,7 +92,7 @@ export default function PilotGuidedSteps({ plan, current, marks = {}, zone, onEd
                       <button type="button" disabled={k === g.steps.length - 1} onClick={() => move([gi, k], [gi, k + 2])} aria-label="Move down">&#8595;</button>
                     </span>
                   )}
-                  <button type="button" className="gs-x" onClick={() => remove(gi, k)} aria-label={`Remove ${s.label}`}>&times;</button>
+                  <button type="button" className="gs-x" onClick={() => remove(gi, k)} aria-label={s.orig ? `Put ${s.orig} back as a suggestion` : `Remove ${s.label}`} title={s.orig ? 'Put it back as a suggestion' : 'Remove it'}>&times;</button>
                 </div>
               );
             })}
