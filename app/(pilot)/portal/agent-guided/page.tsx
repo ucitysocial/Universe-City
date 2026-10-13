@@ -34,6 +34,6 @@ export default async function AgentGuidedIndex() {
         </div>
       </div>)}
     </div>
-    <p className="gl-fine">This page reads only the founder's own File. It is not yet the full human-agent roster or a way to access another resident.</p>
+    <p className="gl-fine">This page reads only the founder's own File. It is not yet the full human agent roster or a way to access another resident.</p>
   </div>;
 }
