@@ -12,7 +12,7 @@ import { loadFile } from '../pilot/file';
 import { localNow, sayClock } from '../pilot/time';
 import type { Client, Msg, Need } from './types';
 
-export async function loadLiveClient(userId: string, access: Access): Promise<Client> {
+export async function loadLiveClient(userId: string, access: Access, as: { id: string; mode: 'live' | 'demo'; about?: string } = { id: 'live', mode: 'live' }): Promise<Client> {
   return withResident({ userId, actor: 'resident' }, async q => {
     const zone = access.timezone;
     const ix = await loadIndex(q, zone);
@@ -52,7 +52,7 @@ export async function loadLiveClient(userId: string, access: Access): Promise<Cl
     }
 
     return {
-      id: 'live', mode: 'live', name: access.display_name || 'Founder', about: 'Live founder test. Your own File, read only.',
+      id: as.id, mode: as.mode, name: access.display_name || 'Founder', about: as.about || (as.mode === 'live' ? 'Your own File.' : 'Made up resident of the founder test.'),
       zone, today: board.today,
       days: board.days.map(d => ({
         date: d.date,

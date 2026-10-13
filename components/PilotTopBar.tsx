@@ -23,7 +23,7 @@ const stamp = (zone: string) => {
  * The bar at the top of the center of the frame, the same on every page: where the resident is, and the date and
  * time in the resident's time zone. The time moves on each minute.
  */
-export default function PilotTopBar({ zone, waiting }: { zone: string; waiting: number }) {
+export default function PilotTopBar({ zone, waiting, side = 'overview', place }: { zone: string; waiting: number; side?: string; place?: string }) {
   const path = usePathname() || '';
   const router = useRouter();
   // Back goes to the page before, inside the Resident Portal. With no page before it, it goes to the parent place.
@@ -33,7 +33,8 @@ export default function PilotTopBar({ zone, waiting }: { zone: string; waiting: 
     const parts = path.split('/').filter(Boolean);
     router.push(parts.length > 2 ? `/${parts.slice(0, -1).join('/')}` : '/portal/home');
   };
-  const title = TITLE.find(([r]) => r.test(path))?.[1] ?? 'Resident Portal';
+  const found = TITLE.find(([r]) => r.test(path))?.[1] ?? 'Resident Portal';
+  const title = place ? `${place}, ${found === 'My File' ? 'File' : found}` : found;
   const [now, setNow] = useState('');
   // While the overview is folded, its star sits at the end of this bar, and the center reaches the right edge.
   const openSide = () => {
@@ -54,7 +55,7 @@ export default function PilotTopBar({ zone, waiting }: { zone: string; waiting: 
       )}
       <span className="topbar-t">{title}</span>
       <span className="topbar-n" suppressHydrationWarning>{now}</span>
-      <button type="button" className="topbar-star" onClick={openSide} aria-label={waiting ? `Open the overview. ${waiting} pending` : 'Open the overview'}>
+      <button type="button" className="topbar-star" onClick={openSide} aria-label={waiting ? `Open the ${side}. ${waiting} pending` : `Open the ${side}`}>
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1.6l3.1 6.6 7.2.9-5.3 5 1.4 7.1L12 17.7l-6.4 3.5 1.4-7.1-5.3-5 7.2-.9z" /></svg>
         {waiting > 0 && <i>{waiting}</i>}
       </button>

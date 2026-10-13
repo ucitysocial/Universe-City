@@ -478,3 +478,70 @@ export async function continueAfterPress(userId: string, pendingId: string): Pro
     return { state: 'written' as const, reply };
   });
 }
+
+
+/**
+ * A person on the team writes to the resident through the agent. The founder set on October 13, 2026 that the
+ * message is written by the same agent software, under the same rules and confirmations, and that the resident sees
+ * it as the agent. The person's words are the direction. The agent writes the message from them and from the File.
+ * It takes no action in this step. A change it proposes waits for the resident, as every proposal does.
+ */
+export async function sayThroughAgent(userId: string, direction: string, key: string): Promise<{ state: 'written' | 'already' | 'skipped'; reply: MessageView | null; why?: string }> {
+  if (!isUuid(userId) || !isUuid(key)) return { state: 'skipped', reply: null, why: 'No client.' };
+  const said = (direction || '').replace(/\r\n/g, '\n').trim().slice(0, 2000);
+  if (!said) return { state: 'skipped', reply: null, why: 'Write the message first.' };
+  const run = { userId, actor: 'software' as const };
+  const start = await withResident(run, async q => {
+    const access = await loadAccess(q);
+    if (!access) throw new NoAccess('This account is not part of the founder test.');
+    const existing = (await q<MessageView>(`select ${MESSAGE_COLS} from uc_pilot.messages where request_key = $1`, [key]))[0];
+    if (existing) return { existing };
+    const last = (await q<any>(`select id, last_at > now() - interval '4 hours' as live from uc_pilot.sessions order by last_at desc limit 1`))[0];
+    const sessionId = last?.live ? last.id : (await q<any>(`insert into uc_pilot.sessions default values returning id`))[0].id;
+    const spent = (await q<any>(
+      `select coalesce(sum(cost_micro), 0)::float8 as c from uc_pilot.turns where (started_at at time zone $1)::date = (now() at time zone $1)::date`, [access.timezone]))[0].c as number;
+    const view = await loadFile(q, access.timezone);
+    const recent = await q<MessageView>(
+      `select * from (select ${MESSAGE_COLS}, seq from uc_pilot.messages order by seq desc limit $1) t order by seq`, [LIMITS.recentMessages]);
+    const presses = await pressesSince(q, recent[0]?.created_at ?? null);
+    return { access, view, recent, presses, sessionId: sessionId as string, spent };
+  });
+  if ('existing' in start) return { state: 'already', reply: start.existing ?? null };
+  if (start.spent >= dailyCapMicro()) return { state: 'skipped', reply: null, why: 'The model limit for today is reached.' };
+  if (!modelAvailable()) return { state: 'skipped', reply: null, why: 'The language model is not connected.' };
+
+  const system = [
+    { type: 'text' as const, text: SYSTEM, cache_control: { type: 'ephemeral' as const } },
+    { type: 'text' as const, text: fileForModel(start.view, start.access.display_name) }
+  ];
+  const tools = TOOLS.filter(t => !RETIRED.has(t.name)).map(t => ({ name: t.name, description: t.description, input_schema: t.input_schema }));
+  const messages = historyFor(start.recent, start.access.timezone, start.presses);
+  const ask = `(A person on the Universe City team asks you to write to the resident now. Their direction, in their words: "${said.replace(/"/g, "'")}". Write your next message to the resident from it. Keep its meaning and every time and name it gives. Write it in your own voice and under your rules, as a short message. When it proposes a change to an entry, ask the resident; the resident decides. Take no action.)`;
+  const lastTurn = messages[messages.length - 1];
+  if (lastTurn && lastTurn.role === 'user') lastTurn.content = `${lastTurn.content as string}\n\n${ask}`;
+  else messages.push({ role: 'user', content: ask });
+
+  let body = '';
+  let usage = { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 };
+  let model = getModel().name();
+  try {
+    const res = await getModel().create({ system, tools, messages, maxTokens: 500, allowActions: false });
+    usage = res.usage;
+    model = res.model || model;
+    body = cleanReply(res.content.filter((b): b is Extract<Block, { type: 'text' }> => b.type === 'text').map(b => b.text).join('\n').trim());
+  } catch (e: any) { return { state: 'skipped', reply: null, why: `The agent did not answer. ${String(e?.message || '').slice(0, 120)}` }; }
+  if (!body) return { state: 'skipped', reply: null, why: 'The agent wrote no message.' };
+
+  return withResident(run, async q => {
+    await q(`update uc_pilot.sessions set last_at = now() where id = $1`, [start.sessionId]);
+    const reply = (await q<MessageView>(
+      `insert into uc_pilot.messages (session_id, body, request_key) values ($1, $2, $3)
+       on conflict (user_id, request_key) do nothing returning ${MESSAGE_COLS}`, [start.sessionId, body, key]))[0];
+    if (!reply) return { state: 'already' as const, reply: (await q<MessageView>(`select ${MESSAGE_COLS} from uc_pilot.messages where request_key = $1`, [key]))[0] || null };
+    await q(
+      `insert into uc_pilot.turns (message_id, prompt_version, state, finished_at, model, steps, input_tokens, output_tokens, cache_read_tokens, cache_write_tokens, cost_micro, reply_id)
+       values ($1, $2, 'done', now(), $3, 1, $4, $5, $6, $7, $8, $1)`,
+      [reply.id, PROMPT_VERSION, model, usage.input, usage.output, usage.cacheRead, usage.cacheWrite, costMicro(model, usage)]);
+    return { state: 'written' as const, reply };
+  });
+}

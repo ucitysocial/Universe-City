@@ -26,7 +26,8 @@ export default async function HomePage() {
           more: t.more,
           presses: t.presses,
           waiting: view.waitingResident.map(p => ({ id: p.id, kind: p.kind, summary: p.summary })),
-          noticeSeen: !!w.access.notice_seen_at,
+          noticeSeen: !!w.access.notice_seen_at || !!w.agent,
+          agentView: w.agent ? { name: (w.access.display_name || 'the resident').split(' ')[0] } : undefined,
           ownAccount: modelRoute() === 'own account'
         }}
       />

@@ -10,7 +10,7 @@ import { localMode } from '../pilot/local';
 export type AgentWho = Who | { ok: false; why: 'not_agent'; email: string | null };
 
 export async function whoAgent(): Promise<AgentWho> {
-  const w = await who();
+  const w = await who({ own: true });
   if (!w.ok) return w;
   const agent = w.access.decides_proposals && (!w.access.synthetic || localMode());
   return agent ? w : { ok: false, why: 'not_agent', email: w.email };

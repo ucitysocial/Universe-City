@@ -9,6 +9,10 @@ import { SearchBox, SearchResults, useSearch } from '@/components/PilotSearch';
 import { FILE_ROOT } from '@/lib/pilot/paths';
 import { treeRows } from '@/lib/pilot/tree';
 import { supabaseBrowser } from '@/lib/supabase/client';
+import type { RosterRow } from '@/lib/agent/roster';
+
+/** Set when a person on the team opened a client from the Agent Portal. */
+export type RailAgent = { name: string | null; clients: RosterRow[]; current: string };
 
 const PLACES = [
   { href: '/portal/home', name: 'Home' },
@@ -24,7 +28,7 @@ const PLACES = [
  * On a phone the left side folds into the bar at the top. The button at its left opens it as a drawer over the page,
  * with the search, Home, the File as one tree, Settings, and Log out. It closes when the page changes.
  */
-export default function PilotRail({ index, name, synthetic }: { index: FileIndex; name: string | null; synthetic: boolean }) {
+export default function PilotRail({ index, name, synthetic, agent }: { index: FileIndex; name: string | null; synthetic: boolean; agent?: RailAgent }) {
   const path = usePathname();
   const router = useRouter();
   const rows = useMemo(() => treeRows(index, path), [index, path]);
@@ -47,7 +51,7 @@ export default function PilotRail({ index, name, synthetic }: { index: FileIndex
 
   async function logOut() {
     try { await supabaseBrowser().auth.signOut(); } catch { /* the session is already closed */ }
-    router.push('/login');
+    router.push(agent ? '/login?next=/agent' : '/login');
     router.refresh();
   }
 
@@ -58,12 +62,24 @@ export default function PilotRail({ index, name, synthetic }: { index: FileIndex
           <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14M3 10h14M3 15h14" /></svg>
         </button>
         <Link href="/portal/home" className="pt-mark">universe&#9733;city</Link>
+        {agent && <span className="ag-tag">Agent</span>}
       </div>
       {open && <div className="rail-back" onClick={() => setOpen(false)} />}
       <div className="rail-body">
+      {agent && (
+        <div className="ag-switch">
+          <label htmlFor="ag-client">Client</label>
+          <select id="ag-client" value={agent.current} onChange={e => { window.location.href = `/agent/open/${e.target.value}`; }}>
+            {agent.clients.map(c => (
+              <option key={c.id} value={c.id}>{c.name}{c.mode === 'live' ? ' (you)' : ''}{c.waiting ? `, ${c.waiting} waiting` : ''}</option>
+            ))}
+          </select>
+          <a href="/agent" className="pt-link">All clients</a>
+        </div>
+      )}
       <SearchBox text={search.text} setText={search.setText} id="os-search-box" />
       <nav className="os-places" aria-label="Places">
-        {PLACES.map(p => (
+        {PLACES.filter(p => !agent || p.href !== '/portal/settings').map(p => (
           <Link key={p.href} href={p.href}
             className={[path === p.href || path.startsWith(`${p.href}/`) ? 'current' : '', p.narrow ? 'only-narrow' : ''].join(' ').trim() || undefined}>
             {p.name}
@@ -85,9 +101,19 @@ export default function PilotRail({ index, name, synthetic }: { index: FileIndex
         ))}
       </nav>
       <div className="os-rail-foot">
-        <span className="pt-who-name"><strong>{name || 'Resident'}</strong>{synthetic ? ' (made up resident)' : ''}</span>
-        <Link href="/portal/settings" className={path.startsWith('/portal/settings') ? 'pt-link current' : 'pt-link'}>Settings</Link>
-        <button type="button" className="pt-link" onClick={logOut}>Log out of the test</button>
+        {agent ? (
+          <>
+            <span className="pt-who-name"><strong>{agent.name || 'Agent'}</strong>, agent</span>
+            <a href="/agent/leave?to=portal" className="pt-link">Open your Resident Portal</a>
+            <button type="button" className="pt-link" onClick={logOut}>Log out</button>
+          </>
+        ) : (
+          <>
+            <span className="pt-who-name"><strong>{name || 'Resident'}</strong>{synthetic ? ' (made up resident)' : ''}</span>
+            <Link href="/portal/settings" className={path.startsWith('/portal/settings') ? 'pt-link current' : 'pt-link'}>Settings</Link>
+            <button type="button" className="pt-link" onClick={logOut}>Log out of the test</button>
+          </>
+        )}
       </div>
       </div>
     </aside>

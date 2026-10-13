@@ -970,3 +970,44 @@ html.uc-nav::after{content:"";position:fixed;left:0;top:0;height:3px;width:100%;
 .ent.ghost b{font-weight:600;font-style:italic}
 .ent.ghost .sub{grid-column:2;font-size:12.5px}
 .ghost-plus{grid-row:span 2;width:18px;height:18px;display:grid;place-items:center;border:1.5px dashed var(--ink2);font-size:14px;line-height:1;color:var(--ink2)}
+
+/* ---------------------------------------------------------------- the agent view
+   A person on the team who opened a client sees the client's frame. The rail holds the client switcher, and the
+   right part holds the Agency Guide in place of the overview. */
+.agv .ag-tag{font-family:'VT323',monospace;font-size:15px;letter-spacing:.06em;color:var(--ink);background:var(--II);padding:1px 7px 0;margin-left:8px;vertical-align:2px}
+.ag-switch{display:grid;grid-template-columns:1fr auto;align-items:center;gap:6px 10px;margin:0 14px 12px;padding:10px 12px;border:2px solid var(--II);background:var(--ink2)}
+.ag-switch label{grid-column:1/-1;font-family:'VT323',monospace;font-size:16px;letter-spacing:.06em;color:var(--II);line-height:1}
+.ag-switch select{min-width:0;width:100%;font:inherit;font-size:14.5px;font-weight:600;color:var(--ink);background:var(--paper);border:0;padding:7px 8px}
+.ag-switch .pt-link{white-space:nowrap}
+
+.gd{display:flex;flex-direction:column;gap:14px;min-height:100%}
+.gd section{padding:0}
+.gd-wait ul{list-style:none;margin:0;padding:4px 12px 8px}
+.gd-wait li{padding:9px 0 10px;border-bottom:1px solid var(--rule);font-size:13.5px;line-height:1.4}
+.gd-wait li:last-child{border-bottom:0}
+.gd-wait b{display:block;font-size:14px}
+.gd-wait p{margin:3px 0 7px;color:var(--ink2)}
+.gd-kind{display:block;font-family:'VT323',monospace;font-size:15px;letter-spacing:.04em;color:var(--I);line-height:1.1}
+.gd-src{color:var(--dim)}
+.gd .pt-btn{padding:6px 10px;font-size:13px}
+.gd-talk{display:flex;flex-direction:column;gap:10px;flex:1}
+.gd-empty p{margin:0;font-size:14px;line-height:1.5;color:var(--ink2)}
+.gd-me{align-self:flex-end;max-width:88%;margin:0;background:var(--ink);color:var(--paper);padding:8px 11px;font-size:14px;line-height:1.45;white-space:pre-wrap}
+.gd-says{border-left:4px solid var(--II);padding:2px 0 2px 11px;font-size:14px;line-height:1.5}
+.gd-says>p{margin:0}
+.gd-msg{margin-top:10px;background:#fff;border:2px solid var(--ink);box-shadow:3px 3px 0 var(--ink);padding:9px 11px}
+.gd-msg span,.gd-sent span{display:block;font-family:'VT323',monospace;font-size:15px;letter-spacing:.04em;color:var(--dim);line-height:1.1}
+.gd-msg p{margin:4px 0 0}
+.gd-acts{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:8px}
+.gd-acts li{border:1px solid var(--rule);background:var(--paper);padding:8px 10px}
+.gd-acts b{font-size:13.5px}
+.gd-acts p{margin:2px 0 7px;font-size:13px;color:var(--ink2)}
+.gd-sent{border:2px dashed var(--IV);padding:8px 11px;font-size:14px;line-height:1.45}
+.gd-sent.no{border-color:var(--I)}
+.gd-sent p{margin:4px 0 0}
+.gd-busy{margin:0;font-size:13.5px;color:var(--dim)}
+.gd-box{position:sticky;bottom:-24px;background:var(--paper2);padding:8px 0 12px;display:grid;gap:8px}
+.gd-box textarea{width:100%;box-sizing:border-box;resize:vertical;font:inherit;font-size:14.5px;line-height:1.4;padding:9px 10px;border:2px solid var(--ink);background:#fff;color:var(--ink)}
+.gd-box-row{display:flex;align-items:center;justify-content:flex-end;gap:12px}
+.gd-box-row .pt-link{color:var(--ink2);margin-right:auto}
+.pt-sheet .gd-box{bottom:-18px}

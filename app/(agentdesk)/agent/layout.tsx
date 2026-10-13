@@ -1,10 +1,8 @@
 import type { Viewport } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import AgentShell from '@/components/agent/AgentShell';
-import { demoClients } from '@/lib/agent/demo';
 import { whoAgent } from '@/lib/agent/gate';
-import { loadLiveClient } from '@/lib/agent/live';
-import { localNow } from '@/lib/pilot/time';
+import { roster } from '@/lib/agent/roster';
 import '../../(pilot)/pilot.css';
 import './agent.css';
 
@@ -13,9 +11,9 @@ export const metadata = { title: 'Agent Portal', robots: { index: false, follow:
 export const viewport: Viewport = { width: 'device-width', initialScale: 1, viewportFit: 'cover', interactiveWidget: 'resizes-content' };
 
 /**
- * The Agent Portal. The founder set it on October 13, 2026: the same frame as the Resident Portal, for the person who
- * serves the client. Left: the clients and the File of the one open. Center: the work. Right: what waits.
- * The founder's own File is the live client, read only. The made up clients are a demo that stays in the browser.
+ * The first page of the Agent Portal: the clients. The founder set on October 13, 2026 that opening a client opens the
+ * same frame the client sees in the Resident Portal, with the tools of the team in the Agency Guide on the right.
+ * The clients are the founder's own File and the made up residents of the test.
  */
 export default async function AgentLayout({ children }: { children: React.ReactNode }) {
   const w = await whoAgent();
@@ -39,7 +37,6 @@ export default async function AgentLayout({ children }: { children: React.ReactN
       </div>
     );
   }
-  const live = await loadLiveClient(w.userId, w.access);
-  const demos = demoClients(localNow(w.access.timezone).date);
-  return <AgentShell agentName={w.access.display_name || 'Agent'} clients={[live, ...demos]}>{children}</AgentShell>;
+  const clients = await roster(w.userId, w.access);
+  return <AgentShell agentName={w.access.display_name || 'Agent'} clients={clients}>{children}</AgentShell>;
 }

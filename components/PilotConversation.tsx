@@ -15,7 +15,7 @@ type Msg = {
 };
 type Press = { id: string; at: string; brief: string; href?: string | null };
 type Waiting = { id: string; kind: string; summary: string };
-type Thread = { messages: Msg[]; more: boolean; presses?: Press[]; waiting: Waiting[]; noticeSeen: boolean; ownAccount?: boolean };
+type Thread = { messages: Msg[]; more: boolean; presses?: Press[]; waiting: Waiting[]; noticeSeen: boolean; ownAccount?: boolean; agentView?: { name: string } };
 
 // The first word of a short line says what happened. It becomes the small label, and the rest is the line.
 const TONE: Record<string, string> = {
@@ -53,6 +53,7 @@ function Effects({ list }: { list: Effect[] }) {
 
 export default function PilotConversation({ initial }: { initial: Thread }) {
   const router = useRouter();
+  const agentView = initial.agentView;
 
   const [thread, setThread] = useState<Thread>(initial);
   const [draft, setDraft] = useState('');
@@ -133,7 +134,8 @@ export default function PilotConversation({ initial }: { initial: Thread }) {
   async function post(text: string, key: string, place: string | null = null) {
     setSending(true); setErr(null);
     try {
-      const res = await fetch('/api/pilot/message', {
+      // In the agent view the agent's words go to the agent software, which writes the message to the resident.
+      const res = await fetch(agentView ? '/api/agent/say' : '/api/pilot/message', {
         method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ text, key, viewing: place })
       });
       const data = await res.json().catch(() => ({}));
@@ -160,7 +162,7 @@ export default function PilotConversation({ initial }: { initial: Thread }) {
   function sendText(text: string, place: string | null = null) {
     const key = crypto.randomUUID();
     atEnd.current = true;
-    setUnsent({ id: key, key, speaker: 'resident', body: text, created_at: new Date().toISOString(), removed: null, reply_to: null, turn: null, unsent: true });
+    setUnsent({ id: key, key, speaker: agentView ? 'software' : 'resident', body: text, created_at: new Date().toISOString(), removed: null, reply_to: null, turn: null, unsent: true });
     void post(text, key, place);
   }
 
@@ -183,8 +185,9 @@ export default function PilotConversation({ initial }: { initial: Thread }) {
       const d = JSON.parse(held);
       const text = typeof d?.text === 'string' ? d.text.trim().slice(0, 4000) : '';
       const place = typeof d?.place === 'string' ? d.place.slice(0, 200) : null;
-      if (text && initial.noticeSeen) sendText(text, place);
-      else if (text) setDraft(text);
+      // In the agent view a message is put in the box to read and edit before it is sent.
+      if (text && initial.noticeSeen && !agentView) sendText(text, place);
+      else if (text) { setDraft(text); box.current?.focus(); }
     } catch { /* the browser keeps no storage for this page. The conversation opens as it is. */ }
   };
   useEffect(() => {
@@ -279,7 +282,9 @@ export default function PilotConversation({ initial }: { initial: Thread }) {
           )}
           {shown.length === 0 && (
             <p className="pt-empty">
-              No message is here yet. Write about any part of your day or your life. The agent answers, and each entry it files is listed under its reply.
+              {agentView
+                ? `No message is here yet. Write to ${agentView.name} below. The agent sends it in its own words, and ${agentView.name} sees one agent.`
+                : 'No message is here yet. Write about any part of your day or your life. The agent answers, and each entry it files is listed under its reply.'}
             </p>
           )}
           {line.map(item => {
@@ -300,19 +305,22 @@ export default function PilotConversation({ initial }: { initial: Thread }) {
               );
             }
             const m = item.m;
-            const mine = m.speaker === 'resident';
+            // The agent view is the mirror: the agent's side of the thread is on the right.
+            const mine = agentView ? m.speaker !== 'resident' : m.speaker === 'resident';
             const failed = mine && m.turn?.state === 'failed' && !shown.some(x => x.reply_to === m.id);
             const running = mine && ((m.unsent && sending) || m.turn?.state === 'running') && !shown.some(x => x.reply_to === m.id);
             return (
               <div key={m.id} style={{ display: 'contents' }}>
                 {newDay && <p className="pt-kick" style={{ alignSelf: 'center' }}>{day}</p>}
                 <div className={mine ? 'pt-msg me' : 'pt-msg'} id={`m-${m.id}`}>
-                  <p className="pt-who">{mine ? 'You' : m.speaker === 'agent' ? 'A person on the team' : 'Agent, software'} {clockOf(m.created_at)}</p>
+                  <p className="pt-who">{agentView
+                    ? (m.speaker === 'resident' ? agentView.name : m.unsent ? 'You, through the agent' : 'Agent')
+                    : (mine ? 'You' : m.speaker === 'agent' ? 'A person on the team' : 'Agent, software')} {clockOf(m.created_at)}</p>
                   <div className="pt-bubble">{m.body}</div>
                   {mine && m.removed && m.removed.length > 0 && (
                     <p className="pt-meta">Taken out before the message was kept: {m.removed.join(', ')}.</p>
                   )}
-                  {!mine && <Effects list={m.turn?.effects || []} />}
+                  {m.speaker !== 'resident' && <Effects list={m.turn?.effects || []} />}
                 </div>
                 {running && <p className="pt-thinking">The agent is writing a reply.</p>}
                 {failed && (
@@ -358,7 +366,7 @@ export default function PilotConversation({ initial }: { initial: Thread }) {
         <label htmlFor="pt-box" style={{ position: 'absolute', left: -9999 }}>Your message</label>
         <textarea
           id="pt-box" ref={box} value={draft} rows={1} maxLength={4000}
-          placeholder="Write to the agent" enterKeyHint="send"
+          placeholder={agentView ? `Write to ${agentView.name}. The agent sends it in its own words` : 'Write to the agent'} enterKeyHint="send"
           onChange={e => setDraft(e.target.value)}
           onFocus={() => { if (atEnd.current) setTimeout(toEnd, 250); }}
           onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) { e.preventDefault(); send(); } }}

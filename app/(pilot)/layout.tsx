@@ -10,10 +10,14 @@ import PilotRail from '@/components/PilotRail';
 import PilotSide from '@/components/PilotSide';
 import PilotSwitch from '@/components/PilotSwitch';
 import PilotViewport from '@/components/PilotViewport';
+import AgencyGuide from '@/components/agent/AgencyGuide';
+import { loadLiveClient } from '@/lib/agent/live';
+import { roster, rows } from '@/lib/agent/roster';
 import { who } from '@/lib/pilot/auth';
 import { loadBoard } from '@/lib/pilot/board';
 import { loadIndex } from '@/lib/pilot/browse';
 import { withResident } from '@/lib/pilot/db';
+import { loadAccess } from '@/lib/pilot/file';
 import './pilot.css';
 
 export const dynamic = 'force-dynamic';
@@ -61,6 +65,25 @@ export default async function PilotLayout({ children }: { children: React.ReactN
     const index = await loadIndex(q, w.access.timezone);
     return { index, board: await loadBoard(q, w.access.timezone, index) };
   });
+  // An agent who opened a client sees the frame the client sees. The founder set it on October 13, 2026: the same
+  // tree, File, schedule, and conversation, with the client switcher at the top left and the Agency Guide on the right.
+  if (w.agent) {
+    const own = await withResident({ userId: w.agent.userId, actor: 'resident' }, q => loadAccess(q));
+    const clients = own ? rows(await roster(w.agent.userId, own)) : [];
+    const client = await loadLiveClient(w.userId, w.access, { id: w.userId, mode: w.userId === w.agent.userId ? 'live' : 'demo' });
+    const first = (w.access.display_name || 'Client').split(' ')[0];
+    return (
+      <div className="os agv">
+        <PilotViewport />
+        <Suspense fallback={null}><PilotNav /></Suspense>
+        <PilotRail index={index} name={w.access.display_name} synthetic={w.access.synthetic} agent={{ name: w.agent.name, clients, current: w.userId }} />
+        <main className="os-main"><PilotTopBar zone={w.access.timezone} waiting={client.needs.length} side="Agency Guide" place={first} />{children}</main>
+        <PilotStar waiting={client.needs.length} title="Agency Guide"><AgencyGuide clientId={w.userId} clientName={w.access.display_name || 'Client'} needs={client.needs} /></PilotStar>
+        <PilotSide title="Agency Guide" waiting={client.needs.length}><AgencyGuide clientId={w.userId} clientName={w.access.display_name || 'Client'} needs={client.needs} /></PilotSide>
+        <PilotCalPop />
+      </div>
+    );
+  }
   return (
     <div className="os">
       <PilotViewport />
@@ -68,7 +91,7 @@ export default async function PilotLayout({ children }: { children: React.ReactN
       <PilotRail index={index} name={w.access.display_name} synthetic={w.access.synthetic} />
       <main className="os-main"><PilotTopBar zone={w.access.timezone} waiting={board.panel.pending.length} />{children}</main>
       <PilotStar waiting={board.panel.pending.length}><PilotBoard board={board} /></PilotStar>
-      <PilotSide board={board} />
+      <PilotSide waiting={board.panel.pending.length}><PilotBoard board={board} /></PilotSide>
       <PilotCalPop />
     </div>
   );
