@@ -44,3 +44,6 @@ __pycache__/
 
 # Supabase local state
 supabase/.temp/
+
+# The website, copied from ucitysocial/ at build time
+public/
