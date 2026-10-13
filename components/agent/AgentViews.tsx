@@ -90,61 +90,113 @@ function NeedCard({ c, n, inline = false, children }: { c: Client; n: Need; inli
 // conversation with the client, with the agent's own notes beside it. The right side is the client's day, what waits,
 // and their Guided Life. Their portal shows what the client sees.
 
-type Mode = 'chat' | 'notes' | 'case' | 'checkin' | 'portal' | 'file' | 'overview';
+type Mode = 'chat' | 'today' | 'case' | 'portal' | 'file' | 'copilot';
 const MODES: { key: Mode; label: string; narrow?: boolean }[] = [
   { key: 'chat', label: 'Conversation' },
-  { key: 'notes', label: 'Think it through' },
+  { key: 'today', label: 'Today' },
   { key: 'case', label: 'Case file' },
-  { key: 'checkin', label: 'Check in' },
   { key: 'portal', label: 'Their portal' },
   { key: 'file', label: 'File' },
-  { key: 'overview', label: 'Today', narrow: true }
+  { key: 'copilot', label: 'Copilot', narrow: true }
 ];
+const LEGACY: Record<string, Mode> = { conversation: 'chat', notes: 'copilot', checkin: 'copilot', overview: 'today', guided: 'today', waiting: 'today', schedule: 'today' };
+
+function useWide() {
+  const [wide, setWide] = useState(true);
+  useEffect(() => {
+    const m = window.matchMedia('(min-width: 861px)');
+    const on = () => setWide(m.matches);
+    on(); m.addEventListener('change', on);
+    return () => m.removeEventListener('change', on);
+  }, []);
+  return wide;
+}
 
 export function AgentClient({ id }: { id: string }) {
   const { view } = useAgent();
   const params = useSearchParams();
   const router = useRouter();
+  const wide = useWide();
   const c = view(id);
-  const asked = params.get('tab');
-  const legacy: Record<string, Mode> = { conversation: 'chat', guided: 'overview', waiting: 'overview', schedule: 'overview' };
-  const mode = (MODES.find(m => m.key === asked)?.key || (asked && legacy[asked]) || 'chat') as Mode;
+  const asked = params.get('tab') || '';
+  const picked = (MODES.find(m => m.key === asked)?.key || LEGACY[asked] || 'chat') as Mode;
+  // On a wide screen the copilot has the right side, so the center keeps the conversation.
+  const mode: Mode = picked === 'copilot' && wide ? 'chat' : picked;
   const go = (m: Mode) => router.replace(`/agent/c/${id}?tab=${m}`, { scroll: false });
   const [chatDraft, setChatDraft] = useState(params.get('q') || '');
   const [noteDraft, setNoteDraft] = useState('');
+  const [brief, setBrief] = useState(asked === 'checkin');
   if (!c) return <div className="fb-pane"><p className="fb-empty">No client with that name is in your list.</p></div>;
   const toChat = (t: string) => { setChatDraft(t); go('chat'); };
-  const toNotes = (t: string) => { setNoteDraft(t); go('notes'); };
+  const toNotes = (t: string) => { setNoteDraft(t); setBrief(false); go(wide ? mode : 'copilot'); };
   const first = c.name.split(' ')[0];
+  const initials = c.name.split(' ').map(w => w[0]).join('').slice(0, 2);
+  const task = c.tasks.find(t => t.steps.some(x => !x.done));
+  const label = (m: { key: Mode; label: string }) => (m.key === 'portal' ? `${first}'s portal` : m.label);
+  const count = (m: Mode) => (m === 'today' ? c.needs.length : 0);
+  const copilot = <Copilot c={c} draft={noteDraft} setDraft={setNoteDraft} onSend={toChat} brief={brief} setBrief={setBrief} />;
   return (
     <div className="ag-work">
       <div className="ag-center">
-        <div className="ag-strip">
-          <div className="ag-seg ag-modes" role="tablist" aria-label="Views">
-            {MODES.map(m => (
-              <button key={m.key} type="button" className={[mode === m.key ? 'on' : '', m.narrow ? 'only-narrow' : ''].join(' ').trim() || undefined} onClick={() => go(m.key)} aria-current={mode === m.key ? 'page' : undefined}>
-                {m.key === 'portal' ? `${first}'s portal` : m.label}
+        <header className="ag-chead">
+          <span className={`ag-avatar ${c.mode}`} aria-hidden="true">{initials}</span>
+          <div className="ag-cid">
+            <h1>{c.name}</h1>
+            <p>{c.about}</p>
+          </div>
+          <div className="ag-chips">
+            <span className={`ag-chip mode ${c.mode}`}>{c.mode === 'live' ? 'Live File, read only' : 'Demo client'}</span>
+            {c.needs.length > 0 && <button type="button" className="ag-chip wait" onClick={() => go('today')}>{c.needs.length} waiting</button>}
+            {task && <button type="button" className="ag-chip task" onClick={() => go('today')}>{task.label}: {task.steps.filter(x => x.done).length} of {task.steps.length}</button>}
+          </div>
+        </header>
+        <nav className="ag-tabsbar" aria-label="Views">
+          <div className="ag-utabs" role="tablist">
+            {MODES.filter(m => !m.narrow).map(m => (
+              <button key={m.key} type="button" role="tab" aria-selected={mode === m.key} className={mode === m.key ? 'on' : undefined} onClick={() => go(m.key)}>
+                {label(m)}{count(m.key) ? <i>{count(m.key)}</i> : null}
               </button>
             ))}
           </div>
-          <span className="ag-strip-note">{c.mode === 'demo' ? 'Made up client. Nothing here reaches anyone.' : 'Your live File, read only.'}</span>
-        </div>
+          <label className="ag-pick">
+            <span className="vh">View</span>
+            <select value={mode} onChange={e => go(e.target.value as Mode)}>
+              {MODES.map(m => <option key={m.key} value={m.key}>{label(m)}{count(m.key) ? ` (${count(m.key)})` : ''}</option>)}
+            </select>
+          </label>
+        </nav>
         {mode === 'chat' && <Conversation c={c} draft={chatDraft} setDraft={setChatDraft} />}
-        {mode === 'notes' && <AgentNotes c={c} draft={noteDraft} setDraft={setNoteDraft} onSend={toChat} />}
+        {mode === 'today' && <div className="ag-scroll"><Overview c={c} onChat={toChat} onNote={toNotes} /></div>}
         {mode === 'case' && <div className="ag-scroll"><CaseFile c={c} /></div>}
-        {mode === 'checkin' && <div className="ag-scroll"><CheckIn c={c} onUse={toChat} /></div>}
         {mode === 'portal' && <div className="ag-scroll"><TheirPortal c={c} /></div>}
         {mode === 'file' && <div className="ag-scroll"><FileView c={c} folder={params.get('folder')} /></div>}
-        {mode === 'overview' && <div className="ag-scroll"><Overview c={c} onChat={toChat} onNote={toNotes} /></div>}
+        {mode === 'copilot' && !wide && copilot}
       </div>
-      <aside className="ag-right" aria-label={`${first} today`}>
-        <Overview c={c} onChat={toChat} onNote={toNotes} />
-      </aside>
+      {wide && <aside className="ag-right ag-copilot-side" aria-label="Copilot">{copilot}</aside>}
     </div>
   );
 }
 
-/** The right side: the client's day, what waits, and Guided Life. Each entry can start a message or a note. */
+/** The copilot: the agent's private thread about the client, with the check in a press away. */
+function Copilot({ c, draft, setDraft, onSend, brief, setBrief }: { c: Client; draft: string; setDraft: (t: string) => void; onSend: (t: string) => void; brief: boolean; setBrief: (b: boolean) => void }) {
+  const first = c.name.split(' ')[0];
+  return (
+    <div className="ag-copilot">
+      <div className="ag-cp-head">
+        <div>
+          <b>Copilot</b>
+          <span>Think it through. Only agents see this. {first} never does.</span>
+        </div>
+        <button type="button" className={brief ? 'pt-btn ghost ag-small' : 'pt-btn ag-small'} onClick={() => setBrief(!brief)}>{brief ? 'Back to the thread' : 'Prepare the check in'}</button>
+      </div>
+      {brief
+        ? <div className="ag-scroll ag-cp-brief"><CheckIn c={c} onUse={onSend} /></div>
+        : <AgentNotes c={c} draft={draft} setDraft={setDraft} onSend={onSend} />}
+    </div>
+  );
+}
+
+/** Today: the client's day, Guided Life, and what waits. Each entry can start a message or a note. */
 function Overview({ c, onChat, onNote }: { c: Client; onChat: (t: string) => void; onNote: (t: string) => void }) {
   const [open, setOpen] = useState<string | null>(null);
   const [n, setN] = useState(0);
@@ -295,7 +347,7 @@ function AgentNotes({ c, draft, setDraft, onSend }: { c: Client; draft: string; 
   return (
     <div className="ag-chat notes">
       <div className="ag-msgs">
-        <p className="ag-private">Think it through with the copilot. Only agents see this thread. {first} never sees it, and nothing here is sent or filed until you choose. Notes are kept in this browser for now.</p>
+        <p className="ag-private">Nothing here is sent or filed until you choose. Kept in this browser for now.</p>
         {d.notes.length === 0 && <p className="dash-empty">Write what you notice and how you could support {first} today. The copilot reads {first}&apos;s File, answers, and drafts a message you can refine.</p>}
         {d.notes.map(n => n.kind === 'copilot' ? (
           <div key={n.id} className="ag-msg copilot">

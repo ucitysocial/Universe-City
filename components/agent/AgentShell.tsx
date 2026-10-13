@@ -195,8 +195,7 @@ export default function AgentShell({ agentName, clients, children }: { agentName
         </aside>
         <main className="os-main">
           <div className="topbar ag-topbar">
-            <span className="topbar-t">{open ? open.name : 'Agent Portal'}</span>
-            {open && <span className={`ag-mode big ${open.mode}`}>{open.mode === 'live' ? 'Live, read only' : 'Demo data'}</span>}
+            <span className="topbar-t">Agent Portal</span>
             <span className="topbar-n" suppressHydrationWarning>{now}</span>
             <Link href="/agent" className="topbar-star ag-star" aria-label={`${waiting} waiting`}>
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1.6l3.1 6.6 7.2.9-5.3 5 1.4 7.1L12 17.7l-6.4 3.5 1.4-7.1-5.3-5 7.2-.9z" /></svg>
