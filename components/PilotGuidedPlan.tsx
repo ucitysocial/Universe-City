@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import PilotGlyph from '@/components/PilotGlyph';
 import type { DemoPlan } from '@/lib/pilot/guided-demo';
 
@@ -9,7 +9,13 @@ import type { DemoPlan } from '@/lib/pilot/guided-demo';
  * What an entry needs, shown in the window that opens from the calendar: what counts as done, then the steps, then
  * the button that starts Guided Life. Groups of steps open and close. In the demo the steps are written for it.
  */
-export default function PilotGuidedPlan({ plan, label, href, onGo }: { plan: DemoPlan; label: string; href: string; onGo?: () => void }) {
+export default function PilotGuidedPlan({ plan: base, planKey, label, href, onGo }: { plan: DemoPlan; planKey?: string; label: string; href: string; onGo?: () => void }) {
+  // The steps as the resident last changed them on the entry page or in Guided Life, on this device.
+  const [plan, setPlan] = useState<DemoPlan>(base);
+  useEffect(() => {
+    if (!planKey) return;
+    try { const p = JSON.parse(localStorage.getItem(planKey) || 'null'); if (p?.groups) setPlan(p); } catch { /* the steps as filed */ }
+  }, [planKey]);
   const [open, setOpen] = useState<boolean[]>(() => plan.groups.map((_, i) => i === 0));
   const count = plan.groups.reduce((n, g) => n + g.steps.filter(x => !x.suggested).length, 0);
   return (

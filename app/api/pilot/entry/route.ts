@@ -7,7 +7,7 @@ import { removeNumbers } from '@/lib/pilot/guard';
 import { folderOf, statusOf } from '@/lib/pilot/owed';
 import { sayDate, sayDays } from '@/lib/pilot/time';
 import { Refusal } from '@/lib/pilot/tools';
-import { planFor } from '@/lib/pilot/plan-for';
+import { planFor, planKeyFor } from '@/lib/pilot/plan-for';
 import { shownLabel } from '@/lib/pilot/private';
 
 export const dynamic = 'force-dynamic';
@@ -52,7 +52,7 @@ export async function GET(req: Request) {
     if (!body) return Response.json({ error: 'That entry is not on file.' }, { status: 404 });
     // Guided Life: a routine in every File, example steps in the File of a made up resident. See plan-for.ts.
     const plan = planFor(body.label, body.source ?? null, a.access.synthetic);
-    return Response.json({ ...body, plan, shown: shownLabel(body.label, body.source ?? null) }, { headers: { 'cache-control': 'no-store' } });
+    return Response.json({ ...body, plan, planKey: plan ? planKeyFor(a.userId, body.label, body.id) : null, shown: shownLabel(body.label, body.source ?? null) }, { headers: { 'cache-control': 'no-store' } });
   } catch {
     return Response.json({ error: 'The entry was not loaded, because the database did not answer.' }, { status: 503 });
   }

@@ -32,10 +32,22 @@ function parts(brief: string): { word: string; tone: string; line: string } {
 const dayOf = (iso: string) => new Date(iso).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
 const clockOf = (iso: string) => new Date(iso).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
 
-/** One short line for each action of a reply. A line leads to its entry in the File. A refused action is left to the Activity screen. */
+/** One short line for the action of a reply, which leads to its entry in the File. Two or more show as one line. A refused action is left to the Activity screen. */
 function Effects({ list }: { list: Effect[] }) {
   const shown = list.filter(e => e.outcome !== 'refused');
   if (!shown.length) return null;
+  // The founder set on October 13, 2026 that a reply never carries a stack of lines. Two or more actions show as one
+  // line that leads to Activity, where each one is listed.
+  if (shown.length > 1) {
+    return (
+      <ul className="pt-effects">
+        <li>
+          <span className="pt-chip filed">{shown.length}</span>
+          <Link href="/portal/settings#activity">{shown.length} changes to your File. See them in Activity</Link>
+        </li>
+      </ul>
+    );
+  }
   return (
     <ul className="pt-effects">
       {shown.map((e, i) => {
