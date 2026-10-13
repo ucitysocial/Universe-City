@@ -13,6 +13,7 @@ jobs:
         with:
           node-version: 22
       - run: npm install --ignore-scripts
+      - run: npm run prebuild && test -s public/marketing-home.html && test -s public/account.js && test -s public/brittnay.jpg && test ! -e public/_redirects
       - run: npm run typecheck
       - run: npm run test:pilot
       - run: python3 scripts/language-check.py
