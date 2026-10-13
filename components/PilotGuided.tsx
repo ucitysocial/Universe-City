@@ -13,8 +13,9 @@ import { localNow, sayClock } from '@/lib/pilot/time';
 
 type Level = 'quiet' | 'steps' | 'guided';
 type View = 'session' | 'steps' | 'talk';
-type State = { i: number; done: boolean; paused: boolean; level: Level; outcome: 'yes' | 'not_yet' | null };
-const START: State = { i: 0, done: false, paused: false, level: 'guided', outcome: null };
+// marks: the time each step was reported done, by its name. subs: which smaller steps inside a step are checked.
+type State = { i: number; done: boolean; paused: boolean; level: Level; outcome: 'yes' | 'not_yet' | null; marks: Record<string, string>; subs: Record<string, boolean[]> };
+const START: State = { i: 0, done: false, paused: false, level: 'guided', outcome: null, marks: {}, subs: {} };
 export const ACTIVE_KEY = 'uc:gl:active';
 export type Active = { key: string; href: string; label: string; step: string; i: number; n: number; paused: boolean };
 /** An entry of today, so the session can say when a different entry is the one happening now. */
@@ -31,8 +32,8 @@ const read = (k: string): State => {
  * so it is the same after the page changes. Leaving the page shows a bar at the top of the frame that leads back.
  * The founder set it on October 13, 2026, as a demo: nothing pressed here is filed.
  */
-export default function PilotGuided({ sessionKey, href, label, when, date, end, zone, plan: base, entryId, today = NONE }:
-  { sessionKey: string; href: string; label: string; when: string; date: string; end: number | null; zone: string; plan: DemoPlan; entryId: string; today?: TodayItem[] }) {
+export default function PilotGuided({ sessionKey, planKey, href, label, when, date, end, zone, plan: base, entryId, today = NONE }:
+  { sessionKey: string; planKey?: string; href: string; label: string; when: string; date: string; end: number | null; zone: string; plan: DemoPlan; entryId: string; today?: TodayItem[] }) {
   const router = useRouter();
   const [plan, setPlanState] = useState<DemoPlan>(base);
   const steps = flatSteps(plan);
@@ -49,9 +50,9 @@ export default function PilotGuided({ sessionKey, href, label, when, date, end, 
 
   useEffect(() => {
     setSt(read(sessionKey));
-    try { const p = JSON.parse(localStorage.getItem(`${sessionKey}:plan`) || 'null'); if (p?.groups) setPlanState(p); } catch { /* the steps as written */ }
+    try { const p = JSON.parse(localStorage.getItem(planKey || `${sessionKey}:plan`) || 'null'); if (p?.groups) setPlanState(p); } catch { /* the steps as written */ }
     setLoaded(true);
-  }, [sessionKey]);
+  }, [sessionKey, planKey]);
   useEffect(() => {
     const tick = () => {
       const l = localNow(zone);
@@ -92,18 +93,21 @@ export default function PilotGuided({ sessionKey, href, label, when, date, end, 
     const was = steps[st.i]?.label;
     const list = flatSteps(next);
     setPlanState(next);
-    try { localStorage.setItem(`${sessionKey}:plan`, JSON.stringify(next)); } catch { /* kept until the page reloads */ }
-    const at = was ? list.findIndex(z => z.label === was) : -1;
+    try { localStorage.setItem(planKey || `${sessionKey}:plan`, JSON.stringify(next)); } catch { /* kept until the page reloads */ }
+    // Before the first step is done, the session starts from the first step. After that, the current step stays.
+    const started = Object.keys(st.marks).length > 0;
+    const at = !started ? 0 : was ? list.findIndex(z => z.label === was) : -1;
     const i = at >= 0 ? at : Math.max(0, Math.min(st.i, list.length - 1));
-    save({ ...st, i, done: list.length === 0 ? true : st.done && i >= list.length });
+    save({ ...st, i, done: list.length > 0 && st.done && i >= list.length });
   }
   // The entry happening now, when it is a different entry from this one.
   const elsewhere = pick && pick.live ? today.find(t => t.key === pick.key && t.key.split(':')[0] !== entryId) ?? null : null;
 
   const doneStep = () => {
     if (st.paused) return save({ ...st, paused: false });
-    if (st.i >= n - 1) return save({ ...st, i: n, done: true });
-    save({ ...st, i: st.i + 1 });
+    const marks = steps[st.i] ? { ...st.marks, [steps[st.i].label]: new Date().toISOString() } : st.marks;
+    if (st.i >= n - 1) return save({ ...st, marks, i: n, done: true });
+    save({ ...st, marks, i: st.i + 1 });
     big.current?.focus();
   };
   const toAgent = (text: string) => {
@@ -120,7 +124,7 @@ export default function PilotGuided({ sessionKey, href, label, when, date, end, 
       <div className="gl-top">
         <span className="gl-cap">Guided Life</span>
         <span className={`gl-chip ${st.paused ? 'p' : st.done ? 'd' : ''}`}>{status}</span>
-        <span className="gl-chip demo">Demo</span>
+        <span className="gl-chip demo">Kept on this device</span>
       </div>
       <div className="gl-head">
         <div>
@@ -154,7 +158,15 @@ export default function PilotGuided({ sessionKey, href, label, when, date, end, 
             <i style={{ width: `${(100 * Math.min(st.i, n)) / n}%` }} />
           </div>
 
-          {!st.done && (
+          {n === 0 && (
+            <div className="gl-end">
+              <PilotGlyph name="clipboard" size={52} className="gl-end-g" />
+              <h2>No steps yet</h2>
+              <p>Your agent suggested steps. Add the ones you do.</p>
+              <div className="gl-row c"><button type="button" className="gl-done" onClick={() => setView('steps')}>Open the steps</button></div>
+            </div>
+          )}
+          {n > 0 && !st.done && (
             <>
               <div className="gl-now">
                 <span className="gl-cap">{st.paused ? 'Paused' : `${x.group ? `${x.group}, step` : 'Step'} ${st.i + 1} of ${n}`}</span>
@@ -163,6 +175,25 @@ export default function PilotGuided({ sessionKey, href, label, when, date, end, 
                   ? <p>Your place is kept.</p>
                   : st.level !== 'quiet' && <p>{st.i + 1 < n ? `Next: ${steps[st.i + 1].label}` : 'This is the last step'}</p>}
               </div>
+              {x.sub && x.sub.length > 0 && !st.paused && (
+                <ul className="gl-sub">
+                  {x.sub.map((t, k) => {
+                    const on = !!st.subs[x.label]?.[k];
+                    return (
+                      <li key={t}>
+                        <label className={on ? 'on' : undefined}>
+                          <input type="checkbox" checked={on} onChange={() => {
+                            const cur = [...(st.subs[x.label] ?? x.sub!.map(() => false))];
+                            cur[k] = !cur[k];
+                            save({ ...st, subs: { ...st.subs, [x.label]: cur } });
+                          }} />
+                          {t}
+                        </label>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
               {st.level === 'guided' && !st.paused && x.cue && (
                 <div className="gl-cue"><i aria-hidden="true">&#9733;</i><p>{x.cue}</p></div>
               )}
@@ -181,7 +212,7 @@ export default function PilotGuided({ sessionKey, href, label, when, date, end, 
             </>
           )}
 
-          {st.done && !st.outcome && (
+          {n > 0 && st.done && !st.outcome && (
             <div className="gl-end">
               <PilotGlyph name={/leave/i.test(plan.finish) ? 'door' : 'check'} size={52} className="gl-end-g" />
               <h2>That is every step</h2>
@@ -205,7 +236,7 @@ export default function PilotGuided({ sessionKey, href, label, when, date, end, 
 
       {view === 'steps' && (
         <div className="gl-list">
-          <PilotGuidedSteps plan={plan} current={st.done ? n : st.i} onEdit={editPlan}
+          <PilotGuidedSteps plan={plan} current={st.done ? n : st.i} marks={st.marks} zone={zone} onEdit={editPlan}
             onJump={idx => { save({ ...st, i: idx, done: false, outcome: null, paused: false }); setView('session'); }} />
           <button type="button" className="gl-pause wide" onClick={() => setView('session')}>Go to the current step</button>
         </div>

@@ -7,7 +7,8 @@ import { removeNumbers } from '@/lib/pilot/guard';
 import { folderOf, statusOf } from '@/lib/pilot/owed';
 import { sayDate, sayDays } from '@/lib/pilot/time';
 import { Refusal } from '@/lib/pilot/tools';
-import { demoPlan } from '@/lib/pilot/guided-demo';
+import { planFor } from '@/lib/pilot/plan-for';
+import { shownLabel } from '@/lib/pilot/private';
 
 export const dynamic = 'force-dynamic';
 
@@ -32,7 +33,7 @@ export async function GET(req: Request) {
         const b = belongsTo(s.folder, s.label);
         return {
           id: s.id, label: s.label, date: '', start: s.start_min, end: s.end_min, day: sayDays(s.days), time: spanWords(s.start_min, s.end_min),
-          dept: b.deptName, folder: folderOf(b), color: b.color, status: s.state === 'current' ? 'Repeats each week' : 'Ended',
+          dept: b.deptName, folder: folderOf(b), source: s.folder, color: b.color, status: s.state === 'current' ? 'Repeats each week' : 'Ended',
           pending: (await owedOnWeekly(q, zone, s, b)).map(o => o.folder), editable: false, notes: [], changes: x.history.length
         };
       }
@@ -42,16 +43,16 @@ export async function GET(req: Request) {
       const b = belongsTo(c.folder, c.label);
       return {
         id: c.id, label: c.label, date: c.on_date, start: c.start_min, end: c.end_min, day: sayDate(c.on_date), time: spanWords(c.start_min, c.end_min),
-        dept: b.deptName, folder: folderOf(b), color: b.color, status: statusOf(c),
+        dept: b.deptName, folder: folderOf(b), source: c.folder, color: b.color, status: statusOf(c),
         pending: (await owedOnCommitment(q, zone, c, b)).map(o => o.folder),
         editable: !c.withdrawn_at && c.execution === 'planned',
         notes: x.notes.map(n => ({ id: n.id, said: n.said })), changes: x.history.length
       };
     });
     if (!body) return Response.json({ error: 'That entry is not on file.' }, { status: 404 });
-    // The Guided Life demo shows only in the File of a made up resident. The founder set this on October 13, 2026.
-    const plan = a.access.synthetic ? demoPlan(body.label) : null;
-    return Response.json({ ...body, plan }, { headers: { 'cache-control': 'no-store' } });
+    // Guided Life: a routine in every File, example steps in the File of a made up resident. See plan-for.ts.
+    const plan = planFor(body.label, body.source ?? null, a.access.synthetic);
+    return Response.json({ ...body, plan, shown: shownLabel(body.label, body.source ?? null) }, { headers: { 'cache-control': 'no-store' } });
   } catch {
     return Response.json({ error: 'The entry was not loaded, because the database did not answer.' }, { status: 503 });
   }

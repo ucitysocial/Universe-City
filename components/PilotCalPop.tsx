@@ -10,7 +10,7 @@ type Brief = { id: string; weekly: boolean; label: string; time: string; belongs
 type Full = {
   label: string; date: string; start: number | null; end: number | null; day: string; time: string;
   dept: string; folder: string; color: string; status: string; pending: string[];
-  editable: boolean; notes: { id: string; said: string }[]; changes: number; plan?: DemoPlan | null;
+  editable: boolean; notes: { id: string; said: string }[]; changes: number; plan?: DemoPlan | null; shown?: string;
 };
 
 const clock24 = (min: number | null) => (min === null ? '' : `${String(Math.floor((min % 1440) / 60)).padStart(2, '0')}:${String(min % 60).padStart(2, '0')}`);
@@ -121,7 +121,8 @@ export default function PilotCalPop() {
     const left = right + W < window.innerWidth - 12 ? right : Math.max(12, brief.x - W - 10);
     return { left, top: top ?? Math.max(12, brief.y), width: W };
   })() : undefined;
-  const label = full?.label ?? brief.label;
+  // A medication or a part of a routine shows by the name it has on the calendar. See private.ts.
+  const label = full?.shown ?? full?.label ?? brief.label;
 
   return (
     <div className={wide ? 'pop' : 'pop sheet'} style={style} role="dialog" aria-modal="false" aria-label={label} tabIndex={-1} ref={box}>
@@ -131,7 +132,7 @@ export default function PilotCalPop() {
       </div>
       <div className="pop-body">
         {mode === 'view' && full?.plan && (
-          <PilotGuidedPlan plan={full.plan} label={full.label} href={`/portal/guided/${brief.id}${brief.weekly ? '?weekly=1' : `?date=${full.date}`}`} onGo={() => setBrief(null)} />
+          <PilotGuidedPlan plan={full.plan} label={label} href={`/portal/guided/${brief.id}${brief.weekly ? '?weekly=1' : `?date=${full.date}`}`} onGo={() => setBrief(null)} />
         )}
         {mode !== 'view' && <p className="pop-line">{full?.day ?? ''}. {full ? full.time : brief.time}.</p>}
         <dl className="pop-fields" hidden={mode !== 'view'}>

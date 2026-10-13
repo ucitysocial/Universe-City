@@ -1174,3 +1174,17 @@ input.gs-name{cursor:text;border-bottom:1.5px dashed var(--rule);padding:8px 4px
 .wait-top-h b{flex:1;font-size:15px}
 .wait-top-h .gl-ghost{font-size:13px;padding:2px 0}
 .wait-top .win-wait:first-child{padding-top:0}
+
+/* Suggested steps, faded until the resident adds them. Smaller steps inside a step. */
+.gs-row.sug{opacity:.62;border-bottom-style:dashed}
+.gs-row.sug:hover,.gs-row.sug:focus-within{opacity:1}
+.gs-row.sug .gs-name{font-style:italic;cursor:default}
+.gs-plus{width:22px;height:22px;flex:none;border:1.5px dashed var(--ink2);background:none;font-size:15px;line-height:1;color:var(--ink);cursor:pointer;padding:0;margin-left:-2px}
+.gs-plus:hover{border-style:solid;background:var(--paper2)}
+.gs-name small{display:block;font-size:12.5px;font-style:normal;color:var(--dim);margin-top:2px}
+.gs-name em.t{color:var(--IV)}
+.gp-list li.sug{opacity:.55;font-style:italic}
+.gl-sub{list-style:none;margin:0;padding:0;display:grid;gap:4px;max-width:420px;justify-self:center;width:100%}
+.gl-sub label{display:flex;align-items:center;gap:10px;padding:8px 12px;background:#fff;border:1.5px solid var(--rule);font-size:15px;cursor:pointer}
+.gl-sub label.on{color:var(--dim);text-decoration:line-through;border-color:var(--ink)}
+.gl-sub input{width:18px;height:18px;accent-color:var(--ink)}

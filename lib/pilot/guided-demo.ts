@@ -5,7 +5,9 @@
 // only in the File of a made up resident of the founder test, and in the Agent Portal when an agent opens one. Nothing
 // pressed in the demo is filed. The session is kept in the browser that shows it.
 
-export type DemoGroup = { name: string | null; steps: { label: string; cue: string }[] };
+/** A step. suggested: the agent's suggestion, shown faded until the resident adds it. sub: the smaller steps inside it. */
+export type PlanStep = { label: string; cue: string; suggested?: boolean; sub?: string[] };
+export type DemoGroup = { name: string | null; steps: PlanStep[] };
 export type DemoPlan = { doneWhen: string; groups: DemoGroup[]; finish: string };
 
 const s = (label: string, cue = '') => ({ label, cue });
@@ -148,6 +150,49 @@ export function demoPlan(label: string): DemoPlan | null {
 }
 
 /** Every step in order, with the name of its group. */
-export function flatSteps(plan: DemoPlan): { label: string; cue: string; group: string | null }[] {
-  return plan.groups.flatMap(g => g.steps.map(x => ({ ...x, group: g.name })));
+/** Every step the resident keeps, in order, with the name of its group. A suggestion not added yet is left out. */
+export function flatSteps(plan: DemoPlan): (PlanStep & { group: string | null })[] {
+  return plan.groups.flatMap(g => g.steps.filter(x => !x.suggested).map(x => ({ ...x, group: g.name })));
+}
+
+// ---------------------------------------------------------------- routines, in every File
+//
+// The founder set on October 13, 2026 that a routine opens with its steps, and that the agent's suggestions show as
+// faded steps the resident can add. The steps the resident filed come first. A suggestion is never a fact about the
+// resident: it shows faded until the resident adds it.
+
+const ROUTINES: Record<'Morning routine' | 'Night routine', { doneWhen: string; finish: string; suggest: PlanStep[] }> = {
+  'Morning routine': {
+    doneWhen: 'You are up, washed, dressed, and ready for the day.',
+    finish: 'Is your morning routine done?',
+    suggest: [
+      { label: 'Wash your face', cue: 'Wash your face with warm water.', suggested: true },
+      { label: 'Brush your teeth', cue: 'Brush for two minutes.', suggested: true },
+      { label: 'Shower', cue: 'One part at a time.', suggested: true, sub: ['Start the water', 'Wash your hair', 'Wash your body', 'Rinse', 'Dry off'] },
+      { label: 'Skin care', cue: 'The products you use, in order.', suggested: true, sub: ['Cleanser', 'Moisturizer', 'Sunscreen'] },
+      { label: 'Get dressed', cue: 'Put on the clothes for today.', suggested: true },
+      { label: 'Eat breakfast', cue: 'Eat before you leave.', suggested: true }
+    ]
+  },
+  'Night routine': {
+    doneWhen: 'Tomorrow is set up and you are in bed at the time you chose.',
+    finish: 'Are you in bed?',
+    suggest: [
+      { label: 'Put your phone on the charger', cue: '', suggested: true },
+      { label: 'Lay out clothes for tomorrow', cue: '', suggested: true },
+      { label: 'Wash your face', cue: '', suggested: true },
+      { label: 'Brush your teeth', cue: '', suggested: true },
+      { label: 'Skin care', cue: '', suggested: true, sub: ['Cleanser', 'Moisturizer'] },
+      { label: 'Set your alarm', cue: '', suggested: true }
+    ]
+  }
+};
+
+/** The steps of a routine: what the resident filed for it first, then the agent's suggestions, faded. */
+export function routinePlan(name: string, filed: string[]): DemoPlan | null {
+  const r = ROUTINES[name as keyof typeof ROUTINES];
+  if (!r) return null;
+  const mine: PlanStep[] = filed.map(label => ({ label, cue: label === 'Medication' ? 'Take your medication.' : '' }));
+  const taken = new Set(filed.map(f => f.toLowerCase()));
+  return { doneWhen: r.doneWhen, finish: r.finish, groups: [{ name: null, steps: [...mine, ...r.suggest.filter(x => !taken.has(x.label.toLowerCase()))] }] };
 }
