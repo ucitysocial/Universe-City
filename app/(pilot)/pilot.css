@@ -1011,3 +1011,106 @@ html.uc-nav::after{content:"";position:fixed;left:0;top:0;height:3px;width:100%;
 .gd-box-row{display:flex;align-items:center;justify-content:flex-end;gap:12px}
 .gd-box-row .pt-link{color:var(--ink2);margin-right:auto}
 .pt-sheet .gd-box{bottom:-18px}
+
+/* ---------------------------------------------------------------- Guided Life
+   One entry, one step at a time, in the center of the frame. The founder approved the look on October 13, 2026:
+   a calm panel, the current step large, one dark Done button, and the rest quiet. */
+.os-main:has(.gl){overflow-y:auto}
+.gl{width:100%;max-width:640px;margin:0 auto;padding:22px 22px 40px;box-sizing:border-box;display:grid;gap:16px;align-content:start}
+.gl-cap{font-family:'VT323',monospace;font-size:16px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);line-height:1}
+.gl-top{display:flex;align-items:center;gap:8px}
+.gl-top .gl-cap{margin-right:auto}
+.gl-chip{font-size:12.5px;font-weight:600;padding:3px 10px;background:var(--paper2);color:var(--ink2)}
+.gl-chip.p{background:color-mix(in srgb,var(--II) 22%,var(--paper));color:var(--ink)}
+.gl-chip.d{background:color-mix(in srgb,var(--IV) 18%,var(--paper));color:var(--IV)}
+.gl-chip.demo{border:1.5px dashed var(--dim);background:transparent;color:var(--dim)}
+.gl-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.gl-head h1{margin:0;font-size:30px;line-height:1.1;font-weight:700;letter-spacing:-.01em}
+.gl-head p{margin:5px 0 0;font-size:14px;color:var(--ink2)}
+.gl-ghost{background:none;border:0;padding:6px 2px;font:inherit;font-size:13.5px;font-weight:600;color:var(--ink2);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.gl-ghost:disabled{color:var(--rule);cursor:default;text-decoration:none}
+.gl-tabs{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--paper2);padding:3px;gap:3px}
+.gl-tabs button{border:0;background:transparent;font:inherit;font-size:14px;font-weight:600;padding:8px 4px;color:var(--ink2);cursor:pointer}
+.gl-tabs button.on{background:#fff;color:var(--ink);box-shadow:0 0 0 1.5px var(--ink)}
+.gl-tabs.small button{font-size:12.5px;padding:6px 4px}
+.gl-panel{background:var(--paper2);padding:20px;display:grid;gap:16px}
+.gl-nums{display:flex;justify-content:space-between}
+.gl-nums b{display:block;font-size:22px;margin-top:4px;font-variant-numeric:tabular-nums}
+.gl-nums .r{text-align:right}
+.gl-bar{height:6px;background:var(--paper3);overflow:hidden}
+.gl-bar i{display:block;height:100%;background:var(--ink);transition:width .25s ease-out}
+.gl-now{text-align:center;padding:18px 0 6px;border-top:1px solid var(--rule)}
+.gl-now h2{margin:12px 0 10px;font-size:30px;line-height:1.2;font-weight:700;outline:none}
+.gl-now p{margin:0;font-size:14.5px;color:var(--ink2)}
+.gl-cue{display:flex;gap:10px;align-items:flex-start;background:#fff;border:1.5px solid var(--ink);padding:12px 14px}
+.gl-cue i{font-style:normal;color:var(--II);font-size:16px;line-height:1.4}
+.gl-cue p{margin:0;font-size:14.5px;line-height:1.5}
+.gl-acts{display:flex;gap:8px}
+.gl-done{flex:1;background:var(--ink);color:var(--paper);border:2px solid var(--ink);font:inherit;font-size:16px;font-weight:700;padding:13px 18px;cursor:pointer;text-align:center;text-decoration:none}
+.gl-done:hover{background:var(--ink2)}
+.gl-pause{width:56px;flex:none;background:transparent;border:2px solid var(--ink);color:var(--ink);cursor:pointer;display:grid;place-items:center;font:inherit;font-size:15px;font-weight:600}
+.gl-pause svg{width:16px;height:16px;fill:currentColor}
+.gl-pause.wide{width:auto;flex:1;padding:13px 16px;font-size:16px;font-weight:700}
+.gl-row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.gl-row.c{justify-content:center}
+.gl-row.c .gl-done,.gl-row.c .gl-pause{flex:0 1 180px}
+.gl-end{text-align:center;padding:14px 0 4px;border-top:1px solid var(--rule);display:grid;gap:10px}
+.gl-end h2{margin:0;font-size:24px}
+.gl-end p{margin:0;font-size:14.5px;color:var(--ink2)}
+.gl-level{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:10px 14px}
+.gl-level>span{font-size:14px;font-weight:600}
+.gl-aloud{grid-column:2;font-size:13.5px;color:var(--ink2);display:flex;align-items:center;gap:7px}
+.gl-list{display:grid;gap:4px}
+.gl-grp{margin:12px 0 6px}
+.gl-step{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:transparent;border:0;border-bottom:1px solid var(--rule);padding:11px 10px;font:inherit;cursor:pointer;color:var(--ink)}
+.gl-step:hover{background:var(--paper2)}
+.gl-step.on{background:var(--paper2);box-shadow:inset 4px 0 0 var(--ink)}
+.gl-step i{width:20px;height:20px;flex:none;border:2px solid var(--ink2);display:grid;place-items:center;font-style:normal;font-size:13px;font-weight:700}
+.gl-step.did i{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.gl-step.on i{border-color:var(--ink);box-shadow:inset 0 0 0 3px var(--paper2),inset 0 0 0 10px var(--ink)}
+.gl-step span{display:grid}
+.gl-step b{font-size:15px;font-weight:600}
+.gl-step.did b{color:var(--ink2);font-weight:500}
+.gl-step em{font-style:normal;font-size:12.5px;color:var(--dim)}
+.gl-list>.gl-pause{margin-top:12px}
+.gl-talk{display:grid;gap:10px}
+.gl-ctx{background:var(--paper2);padding:12px 14px}
+.gl-ctx p{margin:6px 0 0;font-size:15px}
+.gl-note{margin:0;font-size:13.5px;color:var(--ink2)}
+.gl-talk textarea{width:100%;box-sizing:border-box;font:inherit;font-size:15px;padding:10px 12px;border:2px solid var(--ink);background:#fff;resize:vertical}
+.gl-talk .gl-done{flex:0 1 auto}
+.gl-none{max-width:560px;margin:40px auto;padding:0 22px}
+.gl-none h1{font-size:24px}
+.gl-strip{display:flex;align-items:center;gap:10px;background:var(--ink);color:var(--paper);padding:9px 12px 9px 16px;font-size:14px;border-bottom:3px solid var(--II)}
+.gl-dot{width:9px;height:9px;flex:none;background:#6fbf8a;border-radius:50%}
+.gl-dot.p{background:var(--II)}
+.gl-strip-t{min-width:0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gl-strip-go{color:var(--ink);background:var(--paper);font-weight:700;font-size:13px;padding:5px 10px;text-decoration:none;white-space:nowrap}
+.gl-strip-x{background:none;border:0;color:var(--paper);font-size:20px;line-height:1;cursor:pointer;padding:0 2px}
+@media (max-width:860px){
+  .gl{padding:16px 14px 32px;gap:14px}
+  .gl-head h1{font-size:25px}
+  .gl-now h2{font-size:25px}
+  .gl-panel{padding:16px}
+  .gl-level{grid-template-columns:1fr}
+  .gl-aloud{grid-column:1}
+  .gl-strip-t b{display:block}
+  .gl-strip-t{white-space:normal}
+}
+@media (prefers-reduced-motion:reduce){.gl-bar i{transition:none}}
+
+/* The plan of an entry, in the window that opens from the calendar. */
+.gp{display:grid;gap:10px;padding-bottom:4px;border-bottom:1px solid var(--rule)}
+.gp-done{background:var(--paper2);padding:9px 11px}
+.gp-done span,.gp-h{font-family:'VT323',monospace;font-size:16px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);line-height:1}
+.gp-done p{margin:5px 0 0;font-size:14px;line-height:1.4}
+.gp-h em{font-style:normal;margin-left:4px}
+.gp-steps{display:grid;gap:2px}
+.gp-grp{display:flex;align-items:center;gap:7px;width:100%;background:none;border:0;padding:5px 0;font:inherit;font-size:14px;font-weight:700;cursor:pointer;color:var(--ink);text-align:left}
+.gp-grp em{margin-left:auto;font-style:normal;font-weight:500;font-size:12.5px;color:var(--dim)}
+.gp-tri{width:0;height:0;border-left:6px solid var(--ink);border-top:4px solid transparent;border-bottom:4px solid transparent;transition:transform .12s}
+.gp-tri.on{transform:rotate(90deg)}
+.gp-list{margin:2px 0 4px;padding-left:22px;font-size:13.5px;line-height:1.5;color:var(--ink2)}
+.gp-list.sub{padding-left:34px}
+.gp-start{text-align:center}
+.gp-demo{margin:0;font-size:12px;color:var(--dim)}

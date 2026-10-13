@@ -2,6 +2,7 @@ import type { Viewport } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import PilotBoard from '@/components/PilotBoard';
 import PilotCalPop from '@/components/PilotCalPop';
+import PilotGuidedBar from '@/components/PilotGuidedBar';
 import PilotStar from '@/components/PilotStar';
 import PilotTopBar from '@/components/PilotTopBar';
 import { Suspense } from 'react';
@@ -77,7 +78,7 @@ export default async function PilotLayout({ children }: { children: React.ReactN
         <PilotViewport />
         <Suspense fallback={null}><PilotNav /></Suspense>
         <PilotRail index={index} name={w.access.display_name} synthetic={w.access.synthetic} agent={{ name: w.agent.name, clients, current: w.userId }} />
-        <main className="os-main"><PilotTopBar zone={w.access.timezone} waiting={client.needs.length} side="Agency Guide" place={first} />{children}</main>
+        <main className="os-main"><PilotTopBar zone={w.access.timezone} waiting={client.needs.length} side="Agency Guide" place={first} /><PilotGuidedBar />{children}</main>
         <PilotStar waiting={client.needs.length} title="Agency Guide"><AgencyGuide clientId={w.userId} clientName={w.access.display_name || 'Client'} needs={client.needs} /></PilotStar>
         <PilotSide title="Agency Guide" waiting={client.needs.length}><AgencyGuide clientId={w.userId} clientName={w.access.display_name || 'Client'} needs={client.needs} /></PilotSide>
         <PilotCalPop />
@@ -89,7 +90,7 @@ export default async function PilotLayout({ children }: { children: React.ReactN
       <PilotViewport />
       <Suspense fallback={null}><PilotNav /></Suspense>
       <PilotRail index={index} name={w.access.display_name} synthetic={w.access.synthetic} />
-      <main className="os-main"><PilotTopBar zone={w.access.timezone} waiting={board.panel.pending.length} />{children}</main>
+      <main className="os-main"><PilotTopBar zone={w.access.timezone} waiting={board.panel.pending.length} /><PilotGuidedBar />{children}</main>
       <PilotStar waiting={board.panel.pending.length}><PilotBoard board={board} /></PilotStar>
       <PilotSide waiting={board.panel.pending.length}><PilotBoard board={board} /></PilotSide>
       <PilotCalPop />

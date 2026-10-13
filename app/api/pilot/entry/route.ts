@@ -7,6 +7,7 @@ import { removeNumbers } from '@/lib/pilot/guard';
 import { folderOf, statusOf } from '@/lib/pilot/owed';
 import { sayDate, sayDays } from '@/lib/pilot/time';
 import { Refusal } from '@/lib/pilot/tools';
+import { demoPlan } from '@/lib/pilot/guided-demo';
 
 export const dynamic = 'force-dynamic';
 
@@ -48,7 +49,9 @@ export async function GET(req: Request) {
       };
     });
     if (!body) return Response.json({ error: 'That entry is not on file.' }, { status: 404 });
-    return Response.json(body, { headers: { 'cache-control': 'no-store' } });
+    // The Guided Life demo shows only in the File of a made up resident. The founder set this on October 13, 2026.
+    const plan = a.access.synthetic ? demoPlan(body.label) : null;
+    return Response.json({ ...body, plan }, { headers: { 'cache-control': 'no-store' } });
   } catch {
     return Response.json({ error: 'The entry was not loaded, because the database did not answer.' }, { status: 503 });
   }

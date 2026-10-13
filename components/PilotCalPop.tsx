@@ -3,12 +3,14 @@
 import Link from 'next/link';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import PilotGuidedPlan from '@/components/PilotGuidedPlan';
+import type { DemoPlan } from '@/lib/pilot/guided-demo';
 
 type Brief = { id: string; weekly: boolean; label: string; time: string; belongs: string; href: string; kind: string; x: number; y: number; w: number; h: number };
 type Full = {
   label: string; date: string; start: number | null; end: number | null; day: string; time: string;
   dept: string; folder: string; color: string; status: string; pending: string[];
-  editable: boolean; notes: { id: string; said: string }[]; changes: number;
+  editable: boolean; notes: { id: string; said: string }[]; changes: number; plan?: DemoPlan | null;
 };
 
 const clock24 = (min: number | null) => (min === null ? '' : `${String(Math.floor((min % 1440) / 60)).padStart(2, '0')}:${String(min % 60).padStart(2, '0')}`);
@@ -128,6 +130,9 @@ export default function PilotCalPop() {
         <button type="button" className="pop-x" onClick={() => setBrief(null)} aria-label="Close this window">×</button>
       </div>
       <div className="pop-body">
+        {mode === 'view' && full?.plan && (
+          <PilotGuidedPlan plan={full.plan} label={full.label} href={`/portal/guided/${brief.id}${brief.weekly ? '?weekly=1' : `?date=${full.date}`}`} onGo={() => setBrief(null)} />
+        )}
         {mode !== 'view' && <p className="pop-line">{full?.day ?? ''}. {full ? full.time : brief.time}.</p>}
         <dl className="pop-fields" hidden={mode !== 'view'}>
           <dt>Day</dt><dd>{full?.day ?? ''}</dd>

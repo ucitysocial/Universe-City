@@ -7,7 +7,8 @@ const TITLE: [RegExp, string][] = [
   [/^\/portal\/home/, 'Conversation'],
   [/^\/portal\/file/, 'My File'],
   [/^\/portal\/search/, 'Search'],
-  [/^\/portal\/settings/, 'Settings']
+  [/^\/portal\/settings/, 'Settings'],
+  [/^\/portal\/guided/, 'Guided Life']
 ];
 
 const stamp = (zone: string) => {
