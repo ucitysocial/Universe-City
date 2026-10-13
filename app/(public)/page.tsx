@@ -1,6 +1,8 @@
 import { redirect } from 'next/navigation';
 
+// The public homepage comes from the canonical ucitysocial/index.html.
+// next.config.mjs rewrites / internally to the build-time marketing copy.
+// If that rewrite is ever absent, avoid redirecting to this same URL forever.
 export default function Home() {
-  const mainSiteUrl = process.env.NEXT_PUBLIC_MARKETING_SITE_URL ?? 'https://ucitysocial.com';
-  redirect(mainSiteUrl);
+  redirect('/marketing-home.html');
 }
