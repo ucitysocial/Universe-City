@@ -435,8 +435,8 @@ export async function loadPanel(q: Q, zone: string): Promise<PanelView> {
   for (const c of passed) {
     // An unfinished task from an earlier day is shown again on today. See carry.ts. It is asked about there.
     if (c.on_date < today && carries(c as Entry & { schedule_item_id: string | null })) continue;
-    // Sleep is asked about as wake and bed times, never as a question each day.
-    if (/\b(sleep|nap)\b/i.test(c.label)) continue;
+    // Sleep and waking up are never asked about each day.
+    if (/\b(sleep|nap|wake|waking|woke|bedtime)\b/i.test(c.label)) continue;
     const over = c.on_date < today || (c.start_min !== null && (c.end_min ?? c.start_min + 60) <= n.minutes);
     if (!over) continue;
     asks.push({

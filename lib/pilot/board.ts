@@ -11,6 +11,7 @@ import { DAY_FIT, loadCalendar, type CalItem } from './calendar';
 import type { Q } from './db';
 import { belongsTo } from './dept';
 import { folderPath, TIME_PATH } from './paths';
+import { dayOrder } from './ghosts';
 import { loadIntake, type Intake } from './intake';
 import { addDays, localNow } from './time';
 
@@ -23,7 +24,7 @@ export async function loadBoard(q: Q, zone: string, ix: FileIndex): Promise<Boar
   const today = localNow(zone).date;
   const panel = await loadPanel(q, zone);
   const cal = await loadCalendar(q, today, addDays(today, 6), today, DAY_FIT);
-  const days = cal.days.map(d => ({ date: d.date, items: [...d.untimed, ...d.timed].sort((a, b) => (a.start ?? -1) - (b.start ?? -1)) }));
+  const days = cal.days.map(d => ({ date: d.date, items: dayOrder([...d.untimed, ...d.timed]) }));
 
   const names = FOLDERS.filter(f => f.name !== 'Time')
     .filter(f => { const x = ix.folders[f.name]; return !!x && x.said + x.work + x.cal > 0; })

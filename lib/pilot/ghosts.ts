@@ -50,3 +50,8 @@ export function withGhosts<T extends { start: number | null; end?: number | null
   ];
   return rows.sort((a, b) => a.at - b.at).map(r => ('item' in r ? { item: r.item } : { ghost: r.ghost }));
 }
+
+/** The entries of one day in the order the resident lives them: entries with no time after waking. */
+export function dayOrder<T extends { start: number | null; end?: number | null; label?: string }>(items: T[]): T[] {
+  return withGhosts(items, []).flatMap(r => ('item' in r ? [r.item] : []));
+}

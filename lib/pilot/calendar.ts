@@ -132,6 +132,11 @@ export async function loadCalendar(q: Q, from: string, to: string, today: string
         });
       }
     }
+    // Waking up is the end of sleep. The founder set on October 13, 2026 that it is no entry of its own: on a day that
+    // holds sleep, an entry named for waking up is left off the calendar.
+    if (items.some(i => /\bsleep\b/i.test(i.label))) {
+      for (const i of items.filter(x => /^\s*(wake ?up|waking up|get up|woke up|wake time)\s*$/i.test(x.label))) items.splice(items.indexOf(i), 1);
+    }
     // Parts of one routine that were filed as entries of their own show as one routine, with each part as a step.
     for (const name of ['Morning routine', 'Night routine']) {
       const parts = items.filter(i => i.label === name);
