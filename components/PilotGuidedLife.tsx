@@ -89,7 +89,7 @@ export default function PilotGuidedLife({commitmentId,label,mode='resident',agen
 
   const hidden=data.steps.filter(s=>s.state==='rejected');
   return (
-    <section className="gl" aria-label="Guided Life">
+    <section id="guided-life" className="gl" aria-label="Guided Life">
       <header className="gl-header">
         <div><p className="gl-overline">{agent?'AGENT SUPPORT':'YOUR COMMITMENT'} / GUIDED LIFE</p>
           <h2>{label}</h2><p className="gl-muted">{agent?'Help prepare the steps. The resident reports their own progress.':'A plan for carrying out this commitment, at your own pace.'}</p>
