@@ -10,6 +10,7 @@
 import type { DeptKey } from '../domain/folders';
 import type { Q } from './db';
 import { loadCarried } from './carry';
+import { routineOf, shownLabel, stepName } from './private';
 import { belongsTo } from './dept';
 import { TIME_PATH } from './paths';
 import { addDays, sayClock, weekdayOf } from './time';
@@ -31,6 +32,7 @@ export type CalItem = {
   timeText: string;         // 6:00 PM to 8:00 PM
   timeShort: string;        // 6 to 8 PM
   carriedFrom?: string;     // carried: the day the unfinished task was planned for
+  steps?: string[];         // a routine shown as one entry: the parts filed as entries of their own
 };
 
 export type Placed = CalItem & {
@@ -98,7 +100,7 @@ export async function loadCalendar(q: Q, from: string, to: string, today: string
       const end = r.actual_end_min ?? r.end_min;
       const b = belongsTo(r.folder, r.label);
       return {
-        key: r.id, href: `${TIME_PATH}/${date}/${r.id}`, label: r.label, kind: KIND[r.execution] || 'planned',
+        key: r.id, href: `${TIME_PATH}/${date}/${r.id}`, label: shownLabel(r.label, r.folder), steps: routineOf(r.label) ? [stepName(r.label, r.folder)] : undefined, kind: KIND[r.execution] || 'planned',
         dept: b.dept, belongs: b.folder ? `${b.folder}, in ${b.deptName}` : b.deptName,
         start, end, rough: !!r.time_is_estimate, reported, fromWeekly: !!r.schedule_item_id,
         timeText: timeText(start, end), timeShort: timeShort(start, end)
@@ -111,7 +113,7 @@ export async function loadCalendar(q: Q, from: string, to: string, today: string
         if (mine.some((r: any) => r.schedule_item_id === s.id)) continue;
         const b = belongsTo(s.folder, s.label);
         items.push({
-          key: `${s.id}:${date}`, href: `${TIME_PATH}/weekly/${s.id}`, label: s.label, kind: 'weekly',
+          key: `${s.id}:${date}`, href: `${TIME_PATH}/weekly/${s.id}`, label: shownLabel(s.label, s.folder), steps: routineOf(s.label) ? [stepName(s.label, s.folder)] : undefined, kind: 'weekly',
           dept: b.dept, belongs: b.folder ? `${b.folder}, in ${b.deptName}` : b.deptName,
           start: s.start_min, end: s.end_min, rough: false, reported: false, fromWeekly: true,
           timeText: timeText(s.start_min, s.end_min), timeShort: timeShort(s.start_min, s.end_min)
@@ -123,12 +125,20 @@ export async function loadCalendar(q: Q, from: string, to: string, today: string
       for (const c of carried) {
         const b = belongsTo(c.folder, c.label);
         items.push({
-          key: `${c.id}:carried`, href: `${TIME_PATH}/${c.on_date}/${c.id}`, label: c.label, kind: 'carried',
+          key: `${c.id}:carried`, href: `${TIME_PATH}/${c.on_date}/${c.id}`, label: shownLabel(c.label, c.folder), kind: 'carried',
           dept: b.dept, belongs: b.folder ? `${b.folder}, in ${b.deptName}` : b.deptName,
           start: null, end: null, rough: false, reported: false, fromWeekly: false,
           timeText: 'No time yet', timeShort: 'No time yet', carriedFrom: c.on_date
         });
       }
+    }
+    // Parts of one routine that were filed as entries of their own show as one routine, with each part as a step.
+    for (const name of ['Morning routine', 'Night routine']) {
+      const parts = items.filter(i => i.label === name);
+      if (parts.length < 2) continue;
+      const keep = parts.find(i => i.start !== null) ?? parts[0];
+      keep.steps = parts.flatMap(i => i.steps ?? []);
+      for (const i of parts) if (i !== keep) items.splice(items.indexOf(i), 1);
     }
     const timed: Placed[] = items.filter(i => i.start !== null || i.end !== null).map(i => {
       // An unknown end is drawn as one hour with an open lower edge. An unknown start, as the hour before the end.

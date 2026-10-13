@@ -72,6 +72,7 @@ export default function PilotBoardDay({ days, today, zone, ghosts = [], guided }
                 <span className="fi i-page" />
                 <b>{here && <span className="day-flag">{live ? 'Now' : 'Next'}</span>}{i.label}</b>
                 <span className="sub sday-time">{i.carriedFrom ? 'Not done yet. No time today' : i.start === null ? 'No time' : i.timeText.replace(/, end unknown$/, '')}</span>
+                {i.steps && i.steps.length > 0 && <span className="sub sday-steps">Steps: {i.steps.join(', ')}</span>}
                 <span className="sub"><span className={`pt-chip ${i.kind === 'executed' ? 'filed' : 'unknown'}`}>{i.carriedFrom ? `From ${WEEKDAY[new Date(`${i.carriedFrom}T12:00:00Z`).getUTCDay()]}` : WORD[i.kind] || 'Planned'}</span></span>
               </a>
               {start && <Link href={start} className="ent-start" style={{ '--fc': `var(--${i.dept})` } as CSSProperties}><PilotGlyph name="clipboard" size={20} />Start {i.label.toLowerCase()}</Link>}

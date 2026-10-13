@@ -917,10 +917,16 @@ const shift = (await asResident(A, q => q(`select id from uc_pilot.commitments w
     { key: 'morning', label: 'Morning routine', ask: '', at: -2 }, { key: 'meals', label: 'Meals', ask: '', at: 720 },
     { key: 'night', label: 'Night routine', ask: '', at: 1438 }
   ];
-  const day = [{ label: 'Sleep', start: 240, end: 720 }, { label: 'Pick up a prescription', start: 780, end: null }, { label: 'Sleep', start: 1380, end: 1860 }];
+  const day = [{ label: 'Clean up office', start: null, end: null }, { label: 'Sleep', start: 240, end: 720 }, { label: 'Pick up a prescription', start: 780, end: null }, { label: 'Sleep', start: 1380, end: 1860 }];
   const order = withGhosts(day, ghosts).map(r => ('item' in r ? r.item.label : r.ghost.label));
-  check('I-02', 'The morning routine sits after sleep that ends at noon, and the night routine sits before sleep that starts at night',
-    order.join(' / ') === 'Sleep / Morning routine / Meals / Pick up a prescription / Night routine / Sleep', order);
+  check('I-02', 'The morning routine and entries with no time sit after sleep that ends at noon, and the night routine sits before sleep that starts at night',
+    order.join(' / ') === 'Sleep / Morning routine / Clean up office / Meals / Pick up a prescription / Night routine / Sleep', order);
+  const { shownLabel, stepName } = await import('../../lib/pilot/private');
+  check('P-01', 'A medication shows as medication, and a part of the morning routine shows as the morning routine with Medication as its step',
+    shownLabel('Pick up Wellbutrin prescription at 16th Street Walgreens', 'Health') === 'Pick up a prescription' &&
+    shownLabel('Take Wellbutrin first thing after waking (morning routine)', 'Health') === 'Morning routine' &&
+    stepName('Take Wellbutrin first thing after waking (morning routine)', 'Health') === 'Medication' &&
+    shownLabel('Clean up office', 'Sanitation') === 'Clean up office', null);
 }
 
 const failed = results.filter(r => !r.pass);
