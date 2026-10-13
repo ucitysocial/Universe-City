@@ -238,8 +238,12 @@ const shift = (await asResident(A, q => q(`select id from uc_pilot.commitments w
 {
   const key = randomUUID();
   const before = await count(A, 'messages');
+  // The resident works weekdays in this fixture. Six days from Tuesday lands
+  // on Monday and conflicts with work. Use the next real Saturday instead.
+  const weekday = new Date(today + 'T12:00:00Z').getUTCDay();
+  const daysToSaturday = (6 - weekday + 7) % 7 || 7;
   const first = await send(A, 'Add a haircut on Saturday at 11.', [
-    call('add_commitment', { date: addDays(today, 6), label: 'Haircut', start: '11:00', quote: 'Add a haircut on Saturday at 11' }), say('The haircut is on file.')
+    call('add_commitment', { date: addDays(today, daysToSaturday), label: 'Haircut', start: '11:00', quote: 'Add a haircut on Saturday at 11' }), say('The haircut is on file.')
   ], key);
   const callsBefore = calls;
   const second = await send(A, 'Add a haircut on Saturday at 11.', [say('THIS MUST NOT BE USED')], key);
