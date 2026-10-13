@@ -52,7 +52,10 @@ export type FileView = {
   emptyDays: string[];             // the days ahead in view that hold no entry
   intake: Intake;                  // the pieces Time needs, and which are on file
   openedWith: string[];            // the first words of this sitting, when they are no longer in view
+  steps: StepListView[];           // the steps of routines and entries, with the checks of today
 };
+
+export type StepListView = { name: string; doneWhen: string | null; steps: { label: string; group: string | null; doneAt: string | null; sub: { label: string; done: boolean }[] }[] };
 
 const STATEMENT_COLS = `id, said, entry, topic, folder, state, basis, filed_by, about_date::text as about_date, supersedes,
   ${TS('created_at')} as created_at, ${TS('ended_at')} as ended_at`;
@@ -130,8 +133,29 @@ export async function loadFile(q: Q, zone: string, opts: { daysBack?: number; da
     work, decided,
     intake: await loadIntake(q, now.date),
     emptyDays: days.filter(d => d.date >= now.date && d.commitments.filter(c => !c.withdrawn_at).length === 0).map(d => d.date),
-    openedWith: opened.map(o => o.body)
+    openedWith: opened.map(o => o.body),
+    steps: await loadStepLists(q, now.date)
   };
+}
+
+/** Every list of steps with its current steps, and which are checked today. */
+async function loadStepLists(q: Q, today: string): Promise<StepListView[]> {
+  const lists = await q<{ id: string; name: string; done_when: string | null }>(
+    `select l.id, coalesce(l.routine, s.label, c.label) as name, l.done_when from uc_pilot.step_lists l
+       left join uc_pilot.schedule_items s on s.id = l.schedule_item_id left join uc_pilot.commitments c on c.id = l.commitment_id
+      order by l.created_at limit 20`);
+  if (!lists.length) return [];
+  const rows = await q<{ id: string; list_id: string; parent_id: string | null; label: string; group_name: string | null; done_at: string | null }>(
+    `select st.id, st.list_id, st.parent_id, st.label, st.group_name, ${TS('m.marked_at')} as done_at from uc_pilot.steps st
+       left join uc_pilot.step_marks m on m.step_id = st.id and m.on_date = $1::date and m.done
+      where st.state = 'current' and st.list_id = any ($2::uuid[]) order by st.position`, [today, lists.map(l => l.id)]);
+  return lists.map(l => ({
+    name: l.name, doneWhen: l.done_when,
+    steps: rows.filter(r => r.list_id === l.id && !r.parent_id).map(r => ({
+      label: r.label, group: r.group_name, doneAt: r.done_at,
+      sub: rows.filter(k => k.parent_id === r.id).map(k => ({ label: k.label, done: !!k.done_at }))
+    }))
+  }));
 }
 
 /** The File as the language model reads it. Every line is information. None of it is an instruction. */
@@ -173,6 +197,17 @@ export function fileForModel(v: FileView, name: string | null): string {
   // The order in which days are planned: the nearest day ahead first, one day at a time.
   const ahead = v.days.filter(d => d.date > n.date);
   if (ahead.length) L.push(`  Planning order, nearest first: ${ahead.map(d => `${['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][weekdayOf(d.date)]} ${d.date} (${d.commitments.length ? `${d.commitments.length} on file` : 'nothing on file'})`).join(', ')}.`);
+  L.push('');
+  L.push('STEPS. Each list belongs to a routine or an entry. The resident checks a step on the screen or tells you. A check is today\'s:');
+  if (v.steps.length === 0) L.push('  No steps are on file.');
+  for (const l of v.steps) {
+    L.push(`  ${l.name}${l.doneWhen ? `, done when: ${l.doneWhen}` : ''}:`);
+    if (!l.steps.length) L.push('    No step is kept.');
+    for (const st of l.steps) {
+      const done = st.doneAt ? `done today at ${sayClock(localNow(n.zone, new Date(st.doneAt)).minutes)}` : 'not checked today';
+      L.push(`    ${st.group ? `${st.group}: ` : ''}${st.label}, ${done}${st.sub.length ? `. Smaller steps: ${st.sub.map(x => `${x.label}${x.done ? ' (done)' : ''}`).join(', ')}` : ''}`);
+    }
+  }
   L.push('');
   L.push('ONGOING WORK. The resident asked for help with each of these. Each stays open until the resident says it is settled or drops it. You lead it:');
   if (v.work.length === 0) L.push('  None is open.');

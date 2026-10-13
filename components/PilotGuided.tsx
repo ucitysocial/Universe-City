@@ -8,6 +8,7 @@ import PilotGlyph from '@/components/PilotGlyph';
 import PilotGuidedSteps from '@/components/PilotGuidedSteps';
 import { pickNow, type NowItem, type NowPick } from '@/lib/pilot/now';
 import { flatSteps, joinPlan, type DemoPlan } from '@/lib/pilot/guided-demo';
+import { markRemote, saveRemote, stepByLabel, takeLegacy } from '@/lib/pilot/steps-client';
 import { TIME_PATH } from '@/lib/pilot/paths';
 import { localNow, sayClock } from '@/lib/pilot/time';
 
@@ -28,12 +29,12 @@ const read = (k: string): State => {
 
 /**
  * Guided Life for one entry. The center of the frame shows one step at a time, with Done, Pause, and a way back one
- * step. The tabs show every step, and the conversation with the agent. The place in the steps is kept in this browser,
- * so it is the same after the page changes. Leaving the page shows a bar at the top of the frame that leads back.
- * The founder set it on October 13, 2026, as a demo: nothing pressed here is filed.
+ * step. The tabs show every step, and the conversation with the agent. The steps and each check, with its time, are
+ * kept in the File, so every screen and the agent see the same. The place in the session and the pause are kept in
+ * this browser. Leaving the page shows a bar at the top of the frame that leads back.
  */
-export default function PilotGuided({ sessionKey, planKey, href, label, when, date, end, zone, plan: base, entryId, today = NONE }:
-  { sessionKey: string; planKey?: string; href: string; label: string; when: string; date: string; end: number | null; zone: string; plan: DemoPlan; entryId: string; today?: TodayItem[] }) {
+export default function PilotGuided({ sessionKey, planKey, href, label, when, date, end, zone, plan: base, entryId, weekly = false, today = NONE }:
+  { sessionKey: string; planKey?: string; href: string; label: string; when: string; date: string; end: number | null; zone: string; plan: DemoPlan; entryId: string; weekly?: boolean; today?: TodayItem[] }) {
   const router = useRouter();
   const [plan, setPlanState] = useState<DemoPlan>(base);
   const steps = flatSteps(plan);
@@ -47,12 +48,49 @@ export default function PilotGuided({ sessionKey, planKey, href, label, when, da
   const [now, setNow] = useState<number | null>(null);
   const [pick, setPick] = useState<NowPick>(null);
   const big = useRef<HTMLHeadingElement>(null);
+  const [saveErr, setSaveErr] = useState<string | null>(null);
+  const entry = { id: entryId, weekly };
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const latest = useRef<DemoPlan>(base);
+  latest.current = plan;
 
+  // The steps and the checks of the day come from the File. Steps kept on this device before the File held steps are
+  // saved to the File once. The place in the session, the pause, and the level stay on this device.
   useEffect(() => {
-    setSt(read(sessionKey));
-    try { const p = JSON.parse(localStorage.getItem(planKey || `${sessionKey}:plan`) || 'null'); setPlanState(joinPlan(p, base)); } catch { /* the steps as written */ }
+    const local = read(sessionKey);
+    const marks = { ...local.marks, ...(base.marks || {}) };
+    const subs = { ...local.subs, ...(base.subs || {}) };
+    const list = flatSteps(base);
+    const first = list.findIndex(z => !marks[z.label]);
+    const i = Object.keys(base.marks || {}).length ? (first < 0 ? list.length : Math.max(first, Math.min(local.i, list.length))) : local.i;
+    setSt({ ...local, marks, subs, i, done: list.length > 0 && (local.done || first < 0 && Object.keys(base.marks || {}).length > 0) });
+    const legacy = base.listId ? null : takeLegacy(planKey || `${sessionKey}:plan`);
+    if (legacy) {
+      const joined = joinPlan(legacy, base);
+      setPlanState(joined);
+      saveRemote(entry, date, joined).then(p => setPlanState(p)).catch(e => setSaveErr(String(e.message || e)));
+    }
     setLoaded(true);
-  }, [sessionKey, planKey]);
+  }, [sessionKey, planKey]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // A plan read back from the File, with a row for each step. A step with no row yet is saved first.
+  async function withRows(): Promise<DemoPlan> {
+    if (timer.current) { clearTimeout(timer.current); timer.current = null; }
+    const p = latest.current;
+    if (p.listId && flatSteps(p).every(z => z.id && (!z.sub || z.subIds?.length === z.sub.length))) return p;
+    const saved = await saveRemote(entry, date, p);
+    setPlanState(saved);
+    return saved;
+  }
+  async function check(label: string, done: boolean, subIndex?: number) {
+    try {
+      const p = await withRows();
+      const step = stepByLabel(p, label);
+      const id = subIndex === undefined ? step?.id : step?.subIds?.[subIndex];
+      if (id) await markRemote(entry, date, id, done);
+      setSaveErr(null);
+    } catch (e: any) { setSaveErr(String(e?.message || e)); }
+  }
   useEffect(() => {
     const tick = () => {
       const l = localNow(zone);
@@ -93,7 +131,12 @@ export default function PilotGuided({ sessionKey, planKey, href, label, when, da
     const was = steps[st.i]?.label;
     const list = flatSteps(next);
     setPlanState(next);
-    try { localStorage.setItem(planKey || `${sessionKey}:plan`, JSON.stringify(next)); } catch { /* kept until the page reloads */ }
+    // The change is saved to the File a moment after the last key press.
+    if (timer.current) clearTimeout(timer.current);
+    timer.current = setTimeout(() => {
+      timer.current = null;
+      saveRemote(entry, date, latest.current).then(p => { setPlanState(p); setSaveErr(null); }).catch(e => setSaveErr(String(e.message || e)));
+    }, 700);
     // Before the first step is done, the session starts from the first step. After that, the current step stays.
     const started = Object.keys(st.marks).length > 0;
     const at = !started ? 0 : was ? list.findIndex(z => z.label === was) : -1;
@@ -106,6 +149,7 @@ export default function PilotGuided({ sessionKey, planKey, href, label, when, da
   const doneStep = () => {
     if (st.paused) return save({ ...st, paused: false });
     const marks = steps[st.i] ? { ...st.marks, [steps[st.i].label]: new Date().toISOString() } : st.marks;
+    if (steps[st.i]) void check(steps[st.i].label, true);
     if (st.i >= n - 1) return save({ ...st, marks, i: n, done: true });
     save({ ...st, marks, i: st.i + 1 });
     big.current?.focus();
@@ -124,7 +168,6 @@ export default function PilotGuided({ sessionKey, planKey, href, label, when, da
       <div className="gl-top">
         <span className="gl-cap">Guided Life</span>
         <span className={`gl-chip ${st.paused ? 'p' : st.done ? 'd' : ''}`}>{status}</span>
-        <span className="gl-chip demo">Kept on this device</span>
       </div>
       <div className="gl-head">
         <div>
@@ -141,6 +184,8 @@ export default function PilotGuided({ sessionKey, planKey, href, label, when, da
           <em>Go to it</em>
         </a>
       )}
+
+      {saveErr && <p className="pt-err">{saveErr}</p>}
 
       <div className="gl-tabs" role="tablist" aria-label="Guided Life">
         {([['session', 'Guided Life'], ['steps', 'Steps'], ['talk', 'Conversation']] as [View, string][]).map(([v, t]) => (
@@ -186,6 +231,7 @@ export default function PilotGuided({ sessionKey, planKey, href, label, when, da
                             const cur = [...(st.subs[x.label] ?? x.sub!.map(() => false))];
                             cur[k] = !cur[k];
                             save({ ...st, subs: { ...st.subs, [x.label]: cur } });
+                            void check(x.label, cur[k], k);
                           }} />
                           {t}
                         </label>

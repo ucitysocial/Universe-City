@@ -25,7 +25,7 @@ import { isDate, localNow, sayClock, sayDate, sayDays } from '@/lib/pilot/time';
 import { dayLabel, totalEntries } from '@/lib/pilot/tree';
 import { DAY_FIT, loadCalendar, MONTH_FIT, WEEK_FIT, weekStart } from '@/lib/pilot/calendar';
 import PilotEntrySteps from '@/components/PilotEntrySteps';
-import { planFor, planKeyFor } from '@/lib/pilot/plan-for';
+import { loadPlan, planKeyFor } from '@/lib/pilot/plan-for';
 import { shownLabel } from '@/lib/pilot/private';
 import { belongsTo } from '@/lib/pilot/dept';
 import { folderOf, statusOf, type Owed } from '@/lib/pilot/owed';
@@ -456,7 +456,7 @@ async function commitmentPane({ q, zone, decides, userId, synthetic }: Ctx, base
   const owed = await owedOnCommitment(q, zone, c, b);
   // The form changes an entry that is still planned. An entry with an outcome is changed by a correction.
   const open = !c.withdrawn_at && c.execution === 'planned';
-  const plan = planFor(c.label, c.folder, synthetic);
+  const plan = await loadPlan(q, { id: c.id, weekly: false, label: c.label, folder: c.folder, synthetic, date: c.on_date });
   const shown = shownLabel(c.label, c.folder);
   return {
     label: shown,
@@ -478,7 +478,7 @@ async function commitmentPane({ q, zone, decides, userId, synthetic }: Ctx, base
             {x.weekly && <><dt>Comes from</dt><dd><Link href={`${base}/weekly/${x.weekly.id}`}>{x.weekly.label}, {sayDays(x.weekly.days)}, in your routines</Link></dd></>}
             <dt>On file since</dt><dd>{localNow(zone, new Date(c.created_at)).label}</dd>
           </dl>
-          {plan && <PilotEntrySteps plan={plan} planKey={planKeyFor(userId, c.label, c.id)} start={`/portal/guided/${c.id}?date=${c.on_date}`} />}
+          {plan && <PilotEntrySteps plan={plan} planKey={planKeyFor(userId, c.label, c.id)} start={`/portal/guided/${c.id}?date=${c.on_date}`} entry={{ id: c.id, weekly: false }} date={c.on_date} zone={zone} />}
           <Words label={c.basis === 'schedule' ? 'Your words for the weekly item' : 'Your words when it was filed'} quote={c.said} source={x.source} zone={zone} />
           {c.outcome_said && <Words label="Your words on the outcome" quote={c.outcome_said} source={x.outcomeSource} zone={zone} />}
           {c.withdrawn_said && <div className="words"><p className="flab">When it was taken off</p><p className="fq">{c.withdrawn_said}</p></div>}
@@ -526,7 +526,8 @@ async function weeklyItemPane({ q, zone, userId, synthetic }: Ctx, id: string, c
   const { s } = x;
   const b = belongsTo(s.folder, s.label);
   const owed = await owedOnWeekly(q, zone, s, b);
-  const plan = planFor(s.label, s.folder, synthetic);
+  const today = localNow(zone).date;
+  const plan = await loadPlan(q, { id: s.id, weekly: true, label: s.label, folder: s.folder, synthetic, date: today });
   const shown = shownLabel(s.label, s.folder);
   return {
     label: shown,
@@ -544,7 +545,7 @@ async function weeklyItemPane({ q, zone, userId, synthetic }: Ctx, id: string, c
           <dt>On file since</dt><dd>{localNow(zone, new Date(s.created_at)).label}</dd>
           {s.ended_at && <><dt>Ended</dt><dd>{localNow(zone, new Date(s.ended_at)).label}</dd></>}
         </dl>
-        {plan && <PilotEntrySteps plan={plan} planKey={planKeyFor(userId, s.label, s.id)} start={`/portal/guided/${s.id}?weekly=1`} />}
+        {plan && <PilotEntrySteps plan={plan} planKey={planKeyFor(userId, s.label, s.id)} start={`/portal/guided/${s.id}?weekly=1&date=${today}`} entry={{ id: s.id, weekly: true }} date={today} zone={zone} />}
         <Words label="Your words when it was filed" quote={s.said} source={x.source} zone={zone} />
         <History list={x.history} zone={zone} />
       </div>

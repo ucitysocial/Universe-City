@@ -7,10 +7,14 @@
 
 /** A step. suggested: the agent's suggestion, shown faded until the resident adds it. sub: the smaller steps inside it. */
 /** orig: the name of the agent's suggestion a step was added from. Taking that step out puts the suggestion back. */
-export type PlanStep = { label: string; cue: string; suggested?: boolean; sub?: string[]; orig?: string };
+/** id: the step's row in the File, once it is saved. subIds: the rows of its smaller steps, in the order of sub. */
+export type PlanStep = { label: string; cue: string; suggested?: boolean; sub?: string[]; orig?: string; id?: string; subIds?: string[] };
 export type DemoGroup = { name: string | null; steps: PlanStep[] };
 /** dismissed: the agent's suggestions the resident took out of the routine. */
-export type DemoPlan = { doneWhen: string; groups: DemoGroup[]; finish: string; dismissed?: string[] };
+/** listId: the list in the File, once saved. marks: the time each step was checked on the day shown, by name. subs: which
+ * smaller steps are checked that day. */
+export type DemoPlan = { doneWhen: string; groups: DemoGroup[]; finish: string; dismissed?: string[]; listId?: string;
+  marks?: Record<string, string>; subs?: Record<string, boolean[]> };
 
 const s = (label: string, cue = '') => ({ label, cue });
 

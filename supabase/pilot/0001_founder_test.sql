@@ -624,6 +624,142 @@ revoke execute on all functions in schema uc_pilot from public;
 revoke execute on all functions in schema uc_pilot from uc_pilot_resident;
 grant execute on function uc_pilot.uid(), uc_pilot.actor(), uc_pilot.msg(), uc_pilot.turn(), uc_pilot.allowed() to uc_pilot_resident;
 
+-- ---------------------------------------------------------------- steps
+
+-- The founder set on October 13, 2026 that a routine and an entry hold steps the resident sees, edits, and checks off,
+-- and that the steps are the same on every screen, in Guided Life, and for the agent. A list of steps belongs to one
+-- routine, one weekly item, or one entry. A step can hold smaller steps. A suggestion of the agent that the resident
+-- took out is kept as a dismissed step, so it is not suggested again. A step is checked on one day, with the time it
+-- was done, so each day keeps its own progress.
+create table if not exists uc_pilot.step_lists (
+  id                uuid primary key default gen_random_uuid(),
+  user_id           uuid not null default uc_pilot.uid(),
+  routine           text check (routine is null or routine in ('Morning routine','Night routine')),
+  schedule_item_id  uuid references uc_pilot.schedule_items(id),
+  commitment_id     uuid references uc_pilot.commitments(id),
+  done_when         text check (done_when is null or length(done_when) between 1 and 400),
+  filed_by          text not null default 'resident',
+  source_message_id uuid references uc_pilot.messages(id),
+  created_at        timestamptz not null default now(),
+  check (num_nonnulls(routine, schedule_item_id, commitment_id) = 1)
+);
+create unique index if not exists step_lists_routine on uc_pilot.step_lists (user_id, routine) where routine is not null;
+create unique index if not exists step_lists_weekly on uc_pilot.step_lists (user_id, schedule_item_id) where schedule_item_id is not null;
+create unique index if not exists step_lists_entry on uc_pilot.step_lists (user_id, commitment_id) where commitment_id is not null;
+
+create table if not exists uc_pilot.steps (
+  id                uuid primary key default gen_random_uuid(),
+  user_id           uuid not null default uc_pilot.uid(),
+  list_id           uuid not null references uc_pilot.step_lists(id),
+  parent_id         uuid references uc_pilot.steps(id),
+  position          int not null check (position between 1 and 400),
+  label             text not null check (length(label) between 1 and 120),
+  group_name        text check (group_name is null or length(group_name) between 1 and 60),
+  origin            text check (origin is null or length(origin) between 1 and 120),
+  state             text not null default 'current' check (state in ('current','removed','dismissed')),
+  filed_by          text not null default 'resident',
+  source_message_id uuid references uc_pilot.messages(id),
+  created_at        timestamptz not null default now()
+);
+create index if not exists steps_list on uc_pilot.steps (user_id, list_id, state);
+
+create table if not exists uc_pilot.step_marks (
+  id          uuid primary key default gen_random_uuid(),
+  user_id     uuid not null default uc_pilot.uid(),
+  step_id     uuid not null references uc_pilot.steps(id),
+  on_date     date not null,
+  done        boolean not null default true,
+  marked_at   timestamptz not null default now(),
+  marked_by   text not null default 'resident',
+  created_at  timestamptz not null default now(),
+  updated_at  timestamptz not null default now(),
+  unique (user_id, step_id, on_date)
+);
+
+-- Who filed a step and who checked it come from the server's verified context.
+create or replace function uc_pilot.step_stamp() returns trigger
+language plpgsql as $$
+begin
+  if uc_pilot.uid() is null then
+    raise exception 'No resident is set for this write.';
+  end if;
+  if tg_op = 'INSERT' then
+    new.user_id := uc_pilot.uid();
+    new.created_at := now();
+  end if;
+  if tg_table_name = 'step_marks' then
+    new.marked_by := uc_pilot.actor();
+    new.updated_at := now();
+  elsif tg_op = 'INSERT' then
+    new.filed_by := uc_pilot.actor();
+    if new.source_message_id is null then new.source_message_id := uc_pilot.msg(); end if;
+  end if;
+  return new;
+end $$;
+
+-- A list, a step, and a check name only rows of the same resident.
+create or replace function uc_pilot.step_refs() returns trigger
+language plpgsql as $$
+begin
+  if tg_table_name = 'step_lists' then
+    if new.schedule_item_id is not null and not exists (select 1 from uc_pilot.schedule_items x where x.id = new.schedule_item_id) then
+      raise exception 'A list of steps belongs only to a weekly item of the same resident.';
+    end if;
+    if new.commitment_id is not null and not exists (select 1 from uc_pilot.commitments x where x.id = new.commitment_id) then
+      raise exception 'A list of steps belongs only to an entry of the same resident.';
+    end if;
+  elsif tg_table_name = 'steps' then
+    if not exists (select 1 from uc_pilot.step_lists x where x.id = new.list_id) then
+      raise exception 'A step belongs only to a list of the same resident.';
+    end if;
+    if new.parent_id is not null and not exists (select 1 from uc_pilot.steps x where x.id = new.parent_id and x.list_id = new.list_id) then
+      raise exception 'A smaller step belongs only to a step of the same list.';
+    end if;
+  elsif tg_table_name = 'step_marks' then
+    if not exists (select 1 from uc_pilot.steps x where x.id = new.step_id) then
+      raise exception 'A check belongs only to a step of the same resident.';
+    end if;
+  end if;
+  return new;
+end $$;
+
+do $$
+declare t text;
+begin
+  foreach t in array array['step_lists','steps','step_marks'] loop
+    execute format('drop trigger if exists %I on uc_pilot.%I', t || '_10_stamp', t);
+    execute format('create trigger %I before insert or update on uc_pilot.%I for each row execute function uc_pilot.step_stamp()', t || '_10_stamp', t);
+    execute format('drop trigger if exists %I on uc_pilot.%I', t || '_11_fixed', t);
+    execute format('create trigger %I before update on uc_pilot.%I for each row execute function uc_pilot.fixed_columns()', t || '_11_fixed', t);
+    execute format('drop trigger if exists %I on uc_pilot.%I', t || '_15_refs', t);
+    execute format('create trigger %I before insert or update on uc_pilot.%I for each row execute function uc_pilot.refs_guard()', t || '_15_refs', t);
+    execute format('drop trigger if exists %I on uc_pilot.%I', t || '_16_steprefs', t);
+    execute format('create trigger %I before insert or update on uc_pilot.%I for each row execute function uc_pilot.step_refs()', t || '_16_steprefs', t);
+    execute format('drop trigger if exists %I on uc_pilot.%I', t || '_90_revision', t);
+    execute format('create trigger %I after update on uc_pilot.%I for each row execute function uc_pilot.keep_revision()', t || '_90_revision', t);
+    execute format('alter table uc_pilot.%I enable row level security', t);
+    execute format('alter table uc_pilot.%I force row level security', t);
+    execute format('revoke all on uc_pilot.%I from public', t);
+    execute format('drop policy if exists own_rows on uc_pilot.%I', t);
+    execute format('create policy own_rows on uc_pilot.%I for all to uc_pilot_resident using (user_id = uc_pilot.uid() and uc_pilot.allowed()) with check (user_id = uc_pilot.uid() and uc_pilot.allowed())', t);
+  end loop;
+end $$;
+
+-- No delete is granted. A step taken out keeps its row with the state removed or dismissed.
+grant select, insert on uc_pilot.step_lists to uc_pilot_resident;
+grant update (done_when) on uc_pilot.step_lists to uc_pilot_resident;
+grant select, insert on uc_pilot.steps to uc_pilot_resident;
+grant update (parent_id, position, label, group_name, state) on uc_pilot.steps to uc_pilot_resident;
+grant select, insert on uc_pilot.step_marks to uc_pilot_resident;
+grant update (done, marked_at, marked_by, updated_at) on uc_pilot.step_marks to uc_pilot_resident;
+
+alter function uc_pilot.step_stamp() set search_path = uc_pilot, pg_temp;
+alter function uc_pilot.step_refs() set search_path = uc_pilot, pg_temp;
+revoke execute on function uc_pilot.step_stamp() from public;
+revoke execute on function uc_pilot.step_refs() from public;
+revoke execute on function uc_pilot.step_stamp() from uc_pilot_resident;
+revoke execute on function uc_pilot.step_refs() from uc_pilot_resident;
+
 -- ---------------------------------------------------------------- clearing the test
 
 -- Removes every row the test holds for the resident who asks. The login in auth stays.
@@ -640,7 +776,7 @@ begin
     raise exception 'No resident is set.';
   end if;
   update uc_pilot.turns set reply_id = null where user_id = u;
-  foreach t in array array['revisions','actions','work','follow_ups','pending','commitments','plans','schedule_items','statements','turns','messages','sessions'] loop
+  foreach t in array array['revisions','actions','work','follow_ups','pending','step_marks','steps','step_lists','commitments','plans','schedule_items','statements','turns','messages','sessions'] loop
     execute format('delete from uc_pilot.%I where user_id = $1', t) using u;
     get diagnostics c = row_count;
     n := n || jsonb_build_object(t, c);

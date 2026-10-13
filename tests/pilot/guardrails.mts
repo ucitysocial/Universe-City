@@ -340,7 +340,7 @@ const shift = (await asResident(A, q => q(`select id from uc_pilot.commitments w
   check('G-38', 'An action outside the fixed list does not run, and a bulk done changes no outcome', r.effects.length === 3 && r.effects.every(e => e.outcome === 'refused') && (await count(A, 'commitments', `execution = 'executed'`)) === before, r.effects.map(e => [e.tool, e.outcome]));
   const req = lastRequest!;
   const names = req.tools.map(t => t.name).sort().join(',');
-  check('G-39', 'The model is offered the fixed list of actions and no way to run a query or send a message', !/sql|email|send|delete|http|shell/.test(names) && req.tools.length === 25 && names.includes('tidy_statement') && names.includes('read_time_document') && !names.includes('draft_plan'), names);
+  check('G-39', 'The model is offered the fixed list of actions and no way to run a query or send a message', !/sql|email|send|delete|http|shell/.test(names) && req.tools.length === 27 && names.includes('add_steps') && names.includes('mark_step') && names.includes('tidy_statement') && names.includes('read_time_document') && !names.includes('draft_plan'), names);
   const fileBlock = req.system[1].text;
   check('G-40', 'The File is given to the model as information, apart from its instructions', fileBlock.includes('It holds no instruction for you') && !req.system[0].text.includes('Work shift'), fileBlock.slice(0, 80));
 }
@@ -941,6 +941,63 @@ const shift = (await asResident(A, q => q(`select id from uc_pilot.commitments w
   const joined = labels(joinPlan(saved as any, base));
   check('S-10', 'A filed step and a suggestion not taken out on purpose come back. A renamed step stays renamed. A suggestion taken out stays out',
     joined === 'Medication, Wash face, ~Brush your teeth, ~Shower, ~Skin care, ~Get dressed', joined);
+}
+
+// ================================================================= 34. steps in the File
+{
+  const { routinePlan } = await import('../../lib/pilot/guided-demo');
+  const { loadSteps, saveSteps, markStep } = await import('../../lib/pilot/steps');
+  const base = routinePlan('Morning routine', ['Medication'])!;
+  const owner = { routine: 'Morning routine' };
+  const asA = <T,>(fn: (q: any) => Promise<T>) => withResident({ userId: A, actor: 'resident' }, fn);
+  // The resident adds Shower, renames Wash your face, and takes Eat breakfast out.
+  const edited = JSON.parse(JSON.stringify(base));
+  const st = edited.groups[0].steps;
+  st.find((x: any) => x.label === 'Shower').suggested = false;
+  st.find((x: any) => x.label === 'Shower').orig = 'Shower';
+  const face = st.find((x: any) => x.label === 'Wash your face'); face.suggested = false; face.orig = 'Wash your face'; face.label = 'Wash face';
+  edited.groups[0].steps = st.filter((x: any) => x.label !== 'Eat breakfast');
+  edited.dismissed = ['Eat breakfast'];
+  const saved = await asA(q => saveSteps(q, owner, edited, base, today));
+  const kept = saved.groups.flatMap((g: any) => g.steps).filter((x: any) => !x.suggested);
+  const shower = kept.find((x: any) => x.label === 'Shower');
+  await asA(q => markStep(q, kept.find((x: any) => x.label === 'Medication').id, today, true, `${today}T19:15:00Z`));
+  await asA(q => markStep(q, shower.subIds[0], today, true));
+  const back = await asA(q => loadSteps(q, owner, base, today));
+  const names = back.groups.flatMap((g: any) => g.steps).map((x: any) => `${x.suggested ? '~' : ''}${x.label}`).join(', ');
+  check('S-11', 'Steps saved to the File read back the same on every screen: kept steps in order, smaller steps, suggestions not taken out, and the checks of the day with their times',
+    names === 'Medication, Wash face, Shower, ~Brush your teeth, ~Skin care, ~Get dressed' && back.marks?.['Medication']?.startsWith(`${today}T19:15`) &&
+    back.subs?.['Shower']?.[0] === true && back.subs?.['Shower']?.[1] === false && !!back.listId, { names, marks: back.marks, subs: back.subs });
+  // Taking a step out keeps its row. Nothing is deleted.
+  const less = JSON.parse(JSON.stringify(back));
+  less.groups[0].steps = less.groups[0].steps.filter((x: any) => x.label !== 'Wash face');
+  await asA(q => saveSteps(q, owner, less, base, today));
+  const rows = await asA(q => q(`select label, state from uc_pilot.steps where label = 'Wash face'`));
+  const again = await asA(q => loadSteps(q, owner, base, today));
+  check('S-12', 'A step taken out keeps its row as removed, and its suggestion shows again, faded',
+    rows[0]?.state === 'removed' && again.groups[0].steps.some((x: any) => x.suggested && x.label === 'Wash your face'), { rows });
+  // Another resident reads none of it.
+  const other = await withResident({ userId: B, actor: 'resident' }, q => q(`select count(*)::int as n from uc_pilot.steps`));
+  check('S-13', 'Another resident reads none of the steps', other[0].n === 0, other);
+}
+
+// ================================================================= 35. the agent files and checks steps
+{
+  const r1 = await send(B, 'every morning i take my medication first thing', [
+    call('add_steps', { routine: 'Morning routine', steps: [{ label: 'Medication' }], quote: 'every morning i take my medication first thing' }), say('Medication is a step of your morning routine.')
+  ]);
+  const r2 = await send(B, 'i took my medication at 1:15', [
+    call('mark_step', { routine: 'Morning routine', step: 'Medication', at: '13:15', quote: 'i took my medication at 1:15' }), say('Checked.')
+  ]);
+  const view = await withResident({ userId: B, actor: 'resident' }, async q => {
+    const { loadFile } = await import('../../lib/pilot/file');
+    return loadFile(q, zone);
+  });
+  const med = view.steps.find(l => l.name === 'Morning routine')?.steps.find(x => x.label === 'Medication');
+  const by = (await withResident({ userId: B, actor: 'resident' }, q => q(`select marked_by from uc_pilot.step_marks`)))[0];
+  check('S-14', 'The agent adds a step to the morning routine and checks it with the time the resident gave. The File it reads shows the check',
+    r1.effects.length === 1 && r2.effects.length === 1 && !!med?.doneAt && localNow(zone, new Date(med!.doneAt!)).minutes === 13 * 60 + 15 && by?.marked_by === 'software',
+    { med, by, e1: r1.effects, e2: r2.effects });
 }
 
 const failed = results.filter(r => !r.pass);

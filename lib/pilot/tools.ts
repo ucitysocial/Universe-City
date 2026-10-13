@@ -1323,8 +1323,92 @@ export const TOOLS: Tool[] = [
       await env.q(`update uc_pilot.follow_ups set state = $2, closed_said = $3, closed_message_id = $4 where id = $1`, [id, how, said, env.messageId]);
       return { outcome: 'filed', detail: `Follow up closed as ${how}: ${old.what}${inWords(said)}`, brief: `Closed: a follow up. ${clip(old.what, 110)}`, target: 'follow_ups', targetId: id };
     }
+  },
+
+  // ---------------------------------------------------------------- steps
+  {
+    name: 'add_steps',
+    group: 'file',
+    description: 'Adds steps the resident named to a routine or to one entry, in order, after the steps already there. The founder set on October 13, 2026 that what the resident does inside a routine is a step of it. Use routine for the morning or night routine. Use ref for a weekly item or an entry. A step can hold smaller steps.',
+    input_schema: obj({
+      routine: { type: 'string', enum: ['Morning routine', 'Night routine'] },
+      ref: REF('the weekly item or the entry'),
+      steps: { type: 'array', items: obj({ label: { type: 'string', description: 'The step in a few plain words. A medication is named Medication.' }, sub: { type: 'array', items: { type: 'string' } } }, ['label']) },
+      quote: QUOTE
+    }, ['steps', 'quote']),
+    async run(env, a) {
+      words(env, a, { minWords: 2 });
+      const list = await stepList(env, a);
+      const want = (Array.isArray(a.steps) ? a.steps : []).map((x: any) => ({ label: clip(String(x?.label || '').replace(/\s+/g, ' ').trim(), 120), sub: Array.isArray(x?.sub) ? x.sub.map((y: any) => clip(String(y).trim(), 120)).filter(Boolean).slice(0, 20) : [] })).filter((x: any) => x.label).slice(0, 30);
+      if (!want.length) throw new Refusal('Not done. Name at least one step.');
+      const have = await env.q<{ label: string }>(`select label from uc_pilot.steps where list_id = $1 and state = 'current' and parent_id is null`, [list.id]);
+      const top = (await env.q<{ n: number }>(`select coalesce(max(position), 0)::int as n from uc_pilot.steps where list_id = $1`, [list.id]))[0].n;
+      let pos = top;
+      const added: string[] = [];
+      for (const x of want) {
+        if (have.some(h => h.label.toLowerCase() === x.label.toLowerCase())) continue;
+        pos += 1;
+        const id = (await env.q<{ id: string }>(`insert into uc_pilot.steps (list_id, position, label, origin) values ($1, $2, $3, $3) returning id`, [list.id, Math.min(pos, 400), x.label]))[0].id;
+        for (const y of x.sub) { pos += 1; await env.q(`insert into uc_pilot.steps (list_id, parent_id, position, label, origin) values ($1, $2, $3, $4, $4)`, [list.id, id, Math.min(pos, 400), y]); }
+        added.push(x.label);
+      }
+      if (!added.length) return { outcome: 'unchanged', detail: `Nothing changed. Each step is already in ${list.name}.`, brief: 'No change: those steps are already on file.', target: 'step_lists', targetId: list.id, data: { nothing_changed: true } };
+      return { outcome: 'filed', detail: `Steps added to ${list.name}: ${added.join(', ')}.`, brief: `Filed: ${added.length === 1 ? 'a step' : `${added.length} steps`} in ${list.name}.`, target: 'step_lists', targetId: list.id };
+    }
+  },
+  {
+    name: 'mark_step',
+    group: 'file',
+    description: 'Checks one step of a routine or an entry as done on a day, because the resident said it is done. at: the clock time the resident gave, as 13:15, when the resident gave one. Checking a step is never an outcome of the whole routine or entry.',
+    input_schema: obj({
+      routine: { type: 'string', enum: ['Morning routine', 'Night routine'] },
+      ref: REF('the weekly item or the entry'),
+      step: { type: 'string', description: 'The name of the step, as it is on file.' },
+      date: DATE('The day it was done. Today when the resident does not say'),
+      at: CLOCK('The time it was done'),
+      quote: QUOTE
+    }, ['step', 'quote']),
+    async run(env, a) {
+      words(env, a, { minWords: 2 });
+      const list = await stepList(env, a, false);
+      const name = String(a.step || '').trim().toLowerCase();
+      const step = (await env.q<{ id: string; label: string }>(
+        `select id, label from uc_pilot.steps where list_id = $1 and state = 'current' and (lower(label) = $2 or lower(origin) = $2) order by parent_id nulls first limit 1`, [list.id, name]))[0];
+      if (!step) throw new Refusal(`Not done. No step named ${clip(String(a.step), 60)} is in ${list.name}. Add it first with add_steps, or use the name on file.`);
+      const date = typeof a.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(a.date) ? a.date : env.now.date;
+      let at: string | null = null;
+      if (typeof a.at === 'string' && /^\d{1,2}:\d{2}$/.test(a.at)) {
+        const [h, m] = a.at.split(':').map(Number);
+        const off = new Date(`${date}T12:00:00Z`).getTime() - Date.parse(new Date(`${date}T12:00:00Z`).toLocaleString('en-US', { timeZone: env.now.zone }));
+        at = new Date(Date.parse(`${date}T${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:00Z`) + off).toISOString();
+      }
+      await env.q(
+        `insert into uc_pilot.step_marks (step_id, on_date, done, marked_at) values ($1, $2::date, true, coalesce($3::timestamptz, now()))
+         on conflict (user_id, step_id, on_date) do update set done = true, marked_at = excluded.marked_at`, [step.id, date, at]);
+      return { outcome: 'filed', detail: `Checked: ${step.label} in ${list.name}, ${date}${a.at ? ` at ${a.at}` : ''}.`, brief: `Filed: ${step.label} done${a.at ? ` at ${a.at}` : ''}.`, target: 'step_lists', targetId: list.id };
+    }
   }
 ];
+
+/** The list a step action works on, made when it is missing and make is true. */
+async function stepList(env: Env, a: Args, make = true): Promise<{ id: string; name: string }> {
+  let col: string, val: string, name: string;
+  if (a.routine === 'Morning routine' || a.routine === 'Night routine') { col = 'routine'; val = a.routine; name = a.routine; }
+  else if (typeof a.ref === 'string' && a.ref.trim()) {
+    const r = a.ref.trim().toLowerCase();
+    const weekly = (await env.q<{ id: string; label: string }>(`select id, label from uc_pilot.schedule_items where id::text like $1 limit 2`, [`${r}%`]));
+    if (weekly.length === 1) { col = 'schedule_item_id'; val = weekly[0].id; name = weekly[0].label; }
+    else {
+      const id = await find(env, 'commitment', a.ref);
+      col = 'commitment_id'; val = id; name = (await env.q<{ label: string }>(`select label from uc_pilot.commitments where id = $1`, [id]))[0].label;
+    }
+  } else throw new Refusal('Not done. Name the routine, or the reference of the weekly item or the entry.');
+  const found = (await env.q<{ id: string }>(`select id from uc_pilot.step_lists where ${col} = $1 limit 1`, [val]))[0];
+  if (found) return { id: found.id, name };
+  if (!make) throw new Refusal(`Not done. ${name} holds no steps yet.`);
+  const id = (await env.q<{ id: string }>(`insert into uc_pilot.step_lists (${col}) values ($1) returning id`, [val]))[0].id;
+  return { id, name };
+}
 
 const PREPARABLE = new Set(['file_statement', 'set_schedule_item', 'change_schedule_item', 'end_schedule_item', 'add_commitment', 'change_commitment', 'withdraw_commitment']);
 

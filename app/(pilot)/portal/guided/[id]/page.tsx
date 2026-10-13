@@ -4,7 +4,7 @@ import PilotGuided from '@/components/PilotGuided';
 import { who } from '@/lib/pilot/auth';
 import { loadCommitment, loadWeeklyItem, spanWords } from '@/lib/pilot/browse';
 import { isUuid, withResident } from '@/lib/pilot/db';
-import { planFor, planKeyFor } from '@/lib/pilot/plan-for';
+import { loadPlan, planFor, planKeyFor } from '@/lib/pilot/plan-for';
 import { shownLabel } from '@/lib/pilot/private';
 import { DAY_FIT, loadCalendar } from '@/lib/pilot/calendar';
 import type { TodayItem } from '@/components/PilotGuided';
@@ -50,9 +50,11 @@ export default async function GuidedPage({ params, searchParams }: { params: { i
     key: i.key, start: i.start, end: i.end, kind: i.kind, label: i.label, time: i.timeText.replace(/, end unknown$/, ''),
     go: planFor(i.label, null, w.access.synthetic, i.steps) ? `/portal/guided/${i.key.split(':')[0]}?${i.kind === 'weekly' ? 'weekly=1&' : ''}date=${date}` : i.href
   }));
-  // A routine whose parts were filed as entries of their own opens with every part as a step.
+  // A routine whose parts were filed as entries of their own opens with every part as a step. The steps and the checks
+  // of the day are read from the File, so they are the same on every screen and for the agent.
   const here = cal.days[0] ? [...cal.days[0].untimed, ...cal.days[0].timed].find(i => i.key.split(':')[0] === id) : undefined;
-  const steps = here?.steps ? planFor(entry.label, entry.folder, w.access.synthetic, here.steps) ?? plan : plan;
+  const steps = await withResident({ userId: w.userId, actor: 'resident' }, q =>
+    loadPlan(q, { id, weekly, label: entry.label, folder: entry.folder, synthetic: w.access.synthetic, date, steps: here?.steps })) ?? plan;
   return (
     <PilotGuided
       sessionKey={`uc:gl:${w.userId}:${id}:${date}`}
@@ -60,7 +62,7 @@ export default async function GuidedPage({ params, searchParams }: { params: { i
       href={`/portal/guided/${id}?${weekly ? 'weekly=1&' : ''}date=${date}`}
       label={shownLabel(entry.label, entry.folder)}
       when={`${date === today ? 'Today' : sayDate(date)}, ${spanWords(entry.start, entry.end)}`}
-      date={date} end={entry.end} zone={zone} plan={steps} entryId={id} today={items}
+      date={date} end={entry.end} zone={zone} plan={steps} entryId={id} weekly={weekly} today={items}
     />
   );
 }

@@ -4,7 +4,9 @@
 // founder set this on October 13, 2026. Other entries open with example steps only in the File of a made up resident.
 // Steps for a work shift, a class, or an errand are never invented for a real resident.
 
+import type { Q } from './db';
 import { demoPlan, routinePlan, type DemoPlan } from './guided-demo';
+import { loadSteps, type Owner } from './steps';
 import { routineOf, stepName } from './private';
 
 export function routineName(label: string): 'Morning routine' | 'Night routine' | null {
@@ -27,4 +29,18 @@ export function planFor(label: string, folder: string | null, synthetic: boolean
 export function planKeyFor(userId: string, label: string, id: string): string {
   const r = routineName(label);
   return r ? `uc:gl:plan:${userId}:${r.toLowerCase().replace(/ /g, '-')}` : `uc:gl:plan:${userId}:${id}`;
+}
+
+/** Whose steps these are: the routine, or the weekly item, or the entry. */
+export function ownerFor(label: string, id: string, weekly: boolean): Owner {
+  const r = routineName(label);
+  if (r) return { routine: r };
+  return weekly ? { scheduleItemId: id } : { commitmentId: id };
+}
+
+/** The steps of an entry from the File, built over what the agent suggests. Null when the entry opens no steps. */
+export async function loadPlan(q: Q, e: { id: string; weekly: boolean; label: string; folder: string | null; synthetic: boolean; date: string; steps?: string[] }): Promise<DemoPlan | null> {
+  const base = planFor(e.label, e.folder, e.synthetic, e.steps);
+  if (!base) return null;
+  return loadSteps(q, ownerFor(e.label, e.id, e.weekly), base, e.date);
 }
