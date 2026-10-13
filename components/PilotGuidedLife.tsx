@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { guidedProgress } from '@/lib/pilot/guided';
 
 export type GuidedStep = {
   id:string; label:string; instructions:string|null; position:number;
@@ -44,10 +45,11 @@ export default function PilotGuidedLife({commitmentId,label,mode='resident',agen
 
   const approved=useMemo(()=>data.steps.filter(s=>s.state==='ready'||s.state==='done'||s.state==='skipped'),[data.steps]);
   const proposed=data.steps.filter(s=>s.state==='proposed');
-  const done=approved.filter(s=>s.state==='done').length;
-  const handled=approved.filter(s=>s.state==='done'||s.state==='skipped').length;
-  const active=approved.find(s=>s.state==='ready');
-  const pct=approved.length?100*handled/approved.length:0;
+  const progress=guidedProgress(data.steps);
+  const done=progress.done;
+  const handled=progress.handled;
+  const active=approved.find(s=>s.id===progress.currentId);
+  const pct=progress.percentHandled;
 
   async function act(action:'add'|'decision'|'step'|'session', values:Record<string,unknown>) {
     if(busy)return;
