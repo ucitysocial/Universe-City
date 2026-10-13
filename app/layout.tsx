@@ -7,10 +7,10 @@ export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://ucitysocial.com'),
   icons: {
     icon: [
-      { url: 'https://ucitysocial.com/favicon.ico', sizes: 'any' },
-      { url: 'https://ucitysocial.com/favicon-32.png', type: 'image/png', sizes: '32x32' }
+      { url: '/favicon.ico?v=2', sizes: 'any' },
+      { url: '/favicon-32.png?v=2', type: 'image/png', sizes: '32x32' }
     ],
-    apple: 'https://ucitysocial.com/apple-touch-icon.png'
+    apple: '/apple-touch-icon.png?v=2'
   },
   openGraph: {
     type: 'website',
