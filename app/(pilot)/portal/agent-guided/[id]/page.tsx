@@ -23,7 +23,7 @@ export default async function AgentGuidedPage({ params }: { params:{id:string} }
       <p className="pt-lede">You are viewing the founder's existing File. An agent can prepare proposed steps; the resident chooses the plan and reports what happened.</p>
       <p className="gl-back"><Link href={`${TIME_PATH}/${item.c.on_date}/${item.c.id}`}>← Open resident commitment</Link></p>
       <PilotGuidedLife commitmentId={item.c.id} label={item.c.label} mode="agent" />
-      <p className="gl-fine">This founder-only view does not grant access to other residents' Files. Human agent assignments and approvals need their own rules before wider release.</p>
+      <p className="gl-fine">This founder test view does not grant access to other residents' Files. Human agent assignments and approvals need their own rules before wider release.</p>
     </div>
   );
 }
