@@ -9,11 +9,12 @@
 
 import type { DeptKey } from '../domain/folders';
 import type { Q } from './db';
+import { loadCarried } from './carry';
 import { belongsTo } from './dept';
 import { TIME_PATH } from './paths';
 import { addDays, sayClock, weekdayOf } from './time';
 
-export type CalKind = 'planned' | 'executed' | 'partly' | 'missed' | 'weekly';
+export type CalKind = 'planned' | 'executed' | 'partly' | 'missed' | 'weekly' | 'carried';
 
 export type CalItem = {
   key: string;
@@ -29,6 +30,7 @@ export type CalItem = {
   fromWeekly: boolean;
   timeText: string;         // 6:00 PM to 8:00 PM
   timeShort: string;        // 6 to 8 PM
+  carriedFrom?: string;     // carried: the day the unfinished task was planned for
 };
 
 export type Placed = CalItem & {
@@ -72,7 +74,7 @@ const timeShort = (start: number | null, end: number | null) => {
 };
 
 const KIND: Record<string, CalKind> = { planned: 'planned', executed: 'executed', partly_executed: 'partly', did_not_happen: 'missed' };
-export const KIND_WORD: Record<CalKind, string> = { planned: '', executed: 'executed', partly: 'partly executed', missed: 'did not happen', weekly: '' };
+export const KIND_WORD: Record<CalKind, string> = { planned: '', executed: 'executed', partly: 'partly executed', missed: 'did not happen', weekly: '', carried: '' };
 
 /** Reads the days from one date to another, with each entry and where it is drawn. */
 export async function loadCalendar(q: Q, from: string, to: string, today: string, fit: Fit): Promise<Calendar> {
@@ -86,6 +88,7 @@ export async function loadCalendar(q: Q, from: string, to: string, today: string
   const weekly = await q<{ id: string; label: string; days: number[]; start_min: number | null; end_min: number | null; folder: string | null }>(
     `select id, label, days, start_min, end_min, folder from uc_pilot.schedule_items where state = 'current' order by start_min nulls last, label`);
 
+  const carried = today >= from && today <= to ? await loadCarried(q, today) : [];
   const days: CalDay[] = [];
   for (let date = from; date <= to; date = addDays(date, 1)) {
     const mine = rows.filter((r: any) => r.on_date === date);
@@ -112,6 +115,18 @@ export async function loadCalendar(q: Q, from: string, to: string, today: string
           dept: b.dept, belongs: b.folder ? `${b.folder}, in ${b.deptName}` : b.deptName,
           start: s.start_min, end: s.end_min, rough: false, reported: false, fromWeekly: true,
           timeText: timeText(s.start_min, s.end_min), timeShort: timeShort(s.start_min, s.end_min)
+        });
+      }
+    }
+    // Unfinished tasks from earlier days show again on today, with no time, marked with the day they came from.
+    if (date === today && carried.length) {
+      for (const c of carried) {
+        const b = belongsTo(c.folder, c.label);
+        items.push({
+          key: `${c.id}:carried`, href: `${TIME_PATH}/${c.on_date}/${c.id}`, label: c.label, kind: 'carried',
+          dept: b.dept, belongs: b.folder ? `${b.folder}, in ${b.deptName}` : b.deptName,
+          start: null, end: null, rough: false, reported: false, fromWeekly: false,
+          timeText: 'No time yet', timeShort: 'No time yet', carriedFrom: c.on_date
         });
       }
     }

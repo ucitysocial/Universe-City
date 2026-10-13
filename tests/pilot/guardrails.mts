@@ -910,6 +910,19 @@ const shift = (await asResident(A, q => q(`select id from uc_pilot.commitments w
     at(1100)?.key === 'dinner' && at(1141)?.key === 'shift' && at(1400) === null, [860, 900, 950, 990, 1100, 1141, 1400].map(m => at(m)));
 }
 
+// ================================================================= 32. the morning comes after sleep
+{
+  const { withGhosts } = await import('../../lib/pilot/ghosts');
+  const ghosts = [
+    { key: 'morning', label: 'Morning routine', ask: '', at: -2 }, { key: 'meals', label: 'Meals', ask: '', at: 720 },
+    { key: 'night', label: 'Night routine', ask: '', at: 1438 }
+  ];
+  const day = [{ label: 'Sleep', start: 240, end: 720 }, { label: 'Pick up a prescription', start: 780, end: null }, { label: 'Sleep', start: 1380, end: 1860 }];
+  const order = withGhosts(day, ghosts).map(r => ('item' in r ? r.item.label : r.ghost.label));
+  check('I-02', 'The morning routine sits after sleep that ends at noon, and the night routine sits before sleep that starts at night',
+    order.join(' / ') === 'Sleep / Morning routine / Meals / Pick up a prescription / Night routine / Sleep', order);
+}
+
 const failed = results.filter(r => !r.pass);
 console.log(`\n${results.length - failed.length} of ${results.length} passed`);
 if (failed.length) process.exit(1);

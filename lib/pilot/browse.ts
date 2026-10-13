@@ -4,6 +4,7 @@
 // The browser shows what is on file. It builds no entry and changes none.
 
 import { FOLDERS } from '../domain/folders';
+import { carries } from './carry';
 import type { Q } from './db';
 import { isUuid, TS } from './db';
 import { belongsTo, type Belongs } from './dept';
@@ -428,10 +429,12 @@ export async function loadPanel(q: Q, zone: string): Promise<PanelView> {
   // An entry that has passed with its end or its outcome unknown, in the last seven days.
   const asks: PendingItem[] = [];
   const passed = await q<Entry>(
-    `select id, label, on_date::text as on_date, start_min, end_min, folder, execution from uc_pilot.commitments
+    `select id, label, on_date::text as on_date, start_min, end_min, folder, execution, schedule_item_id from uc_pilot.commitments
       where withdrawn_at is null and execution = 'planned' and on_date between $1::date and $2::date
       order by on_date desc, start_min nulls last`, [addDays(today, -7), today]);
   for (const c of passed) {
+    // An unfinished task from an earlier day is shown again on today. See carry.ts. It is asked about there.
+    if (c.on_date < today && carries(c as Entry & { schedule_item_id: string | null })) continue;
     const over = c.on_date < today || (c.start_min !== null && (c.end_min ?? c.start_min + 60) <= n.minutes);
     if (!over) continue;
     asks.push({

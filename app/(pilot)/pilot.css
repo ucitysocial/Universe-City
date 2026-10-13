@@ -1162,3 +1162,7 @@ input.gs-name{cursor:text;border-bottom:1.5px dashed var(--rule);padding:8px 4px
 .gs-arrows button:disabled{opacity:.3;cursor:default}
 .gs-add{justify-self:start;margin:4px 0 2px 26px}
 @media (hover:none){.gs-grip{display:none}.gs-x{opacity:0;pointer-events:none}.gs.editing .gs-x{opacity:1;pointer-events:auto}}
+
+/* An unfinished task from an earlier day, shown again on today. */
+.cal-chip.carried{background:#fff;color:var(--ink);border:2px solid var(--fc);box-shadow:inset 6px 0 0 var(--fc);padding-left:13px}
+.chip-from{display:block;font-family:'VT323',monospace;font-size:14px;font-weight:400;letter-spacing:.04em;color:var(--I);line-height:1.1}

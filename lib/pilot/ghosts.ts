@@ -25,11 +25,25 @@ export function ghostsOf(intake: Intake): Ghost[] {
   return out;
 }
 
-/** Entries and faded rows in one order: by time, with an entry that has no time near the top. */
-export function withGhosts<T extends { start: number | null }>(items: T[], ghosts: Ghost[]): ({ item: T } | { ghost: Ghost })[] {
+/**
+ * Entries and faded rows in one order: by time, with an entry that has no time near the top.
+ * The founder set on October 13, 2026 that the morning comes after sleep: when the day holds sleep that ends in the
+ * morning or the afternoon, Wake up and the morning routine sit right after it, and Meals after them. When the day holds sleep that starts
+ * in the evening, the night routine and Bedtime sit right before it.
+ */
+export function withGhosts<T extends { start: number | null; end?: number | null; label?: string }>(items: T[], ghosts: Ghost[]): ({ item: T } | { ghost: Ghost })[] {
+  const sleeps = items.filter(i => i.start !== null && /\bsleep\b/i.test(i.label ?? ''));
+  const woke = sleeps.find(i => (i.start as number) < 720 && i.end != null && i.end <= 1080);
+  const bed = sleeps.filter(i => (i.start as number) >= 1080).sort((a, b) => (a.start as number) - (b.start as number))[0];
+  const placed = (g: Ghost): number => {
+    if (woke && (g.key === 'wake' || g.key === 'morning')) return (woke.end as number) + (g.key === 'wake' ? 0.1 : 0.2);
+    if (woke && g.key === 'meals') return Math.max(g.at, (woke.end as number) + 0.3);
+    if (bed && (g.key === 'night' || g.key === 'bed')) return (bed.start as number) - (g.key === 'night' ? 0.2 : 0.1);
+    return g.at;
+  };
   const rows = [
     ...items.map(item => ({ item, at: item.start ?? -1 })),
-    ...ghosts.map(ghost => ({ ghost, at: ghost.at }))
+    ...ghosts.map(ghost => ({ ghost, at: placed(ghost) }))
   ];
   return rows.sort((a, b) => a.at - b.at).map(r => ('item' in r ? { item: r.item } : { ghost: r.ghost }));
 }

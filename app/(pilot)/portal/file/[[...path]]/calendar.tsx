@@ -14,8 +14,11 @@ import { addDays, sayDate, sayDay, weekdayName, weekdayOf } from '@/lib/pilot/ti
 export type CalView = 'day' | 'week' | 'month';
 
 const WORD: Record<string, string> = {
-  planned: 'Planned', executed: 'Executed', partly: 'Partly executed', missed: 'Did not happen', weekly: 'From your routines'
+  planned: 'Planned', executed: 'Executed', partly: 'Partly executed', missed: 'Did not happen', weekly: 'From your routines',
+  carried: 'Not done yet'
 };
+
+const fromDay = (d: string) => new Date(`${d}T12:00:00Z`).toLocaleDateString('en-US', { weekday: 'long', timeZone: 'UTC' });
 
 export const weekHref = (on: string) => `${SCHEDULE_PATH}?view=week&on=${on}`;
 export const monthHref = (on: string) => `${SCHEDULE_PATH}?view=month&on=${on}`;
@@ -104,7 +107,7 @@ function Untimed({ list }: { list: CalItem[] }) {
   return (
     <>
       {list.map(i => (
-        <Link key={i.key} href={i.href} className={`cal-chip d-${i.dept} ${i.kind}`} {...popData(i)} title={`${i.label}. Time unknown. ${WORD[i.kind]}. ${i.belongs}.`}>{i.label}</Link>
+        <Link key={i.key} href={i.href} className={`cal-chip d-${i.dept} ${i.kind}`} {...popData(i)} title={`${i.label}. ${i.carriedFrom ? `Not done yet, from ${fromDay(i.carriedFrom)}` : `Time unknown. ${WORD[i.kind]}`}. ${i.belongs}.`}>{i.carriedFrom && <span className="chip-from">From {fromDay(i.carriedFrom)}</span>}{i.label}</Link>
       ))}
     </>
   );

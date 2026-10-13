@@ -17,7 +17,7 @@ const say = (date: string) => {
   return `${WEEKDAY[d.getUTCDay()]}, ${MONTH[d.getUTCMonth()]} ${d.getUTCDate()}`;
 };
 
-const WORD: Record<string, string> = { planned: 'Planned', executed: 'Executed', partly: 'Partly executed', missed: 'Did not happen', weekly: 'Routine' };
+const WORD: Record<string, string> = { planned: 'Planned', executed: 'Executed', partly: 'Partly executed', missed: 'Did not happen', weekly: 'Routine', carried: 'Not done yet' };
 
 /**
  * The schedule in the overview at the right, in the same form as the day in the schedule: one day at a time, in order
@@ -71,8 +71,8 @@ export default function PilotBoardDay({ days, today, zone, ghosts = [], guided }
               <a href={i.href} className={`ent d-${i.dept}${here ? (live ? ' is-now' : ' is-next') : ''}`} {...popData(i)}>
                 <span className="fi i-page" />
                 <b>{here && <span className="day-flag">{live ? 'Now' : 'Next'}</span>}{i.label}</b>
-                <span className="sub sday-time">{i.start === null ? 'No time' : i.timeText.replace(/, end unknown$/, '')}</span>
-                <span className="sub"><span className={`pt-chip ${i.kind === 'executed' ? 'filed' : 'unknown'}`}>{WORD[i.kind] || 'Planned'}</span></span>
+                <span className="sub sday-time">{i.carriedFrom ? 'Not done yet. No time today' : i.start === null ? 'No time' : i.timeText.replace(/, end unknown$/, '')}</span>
+                <span className="sub"><span className={`pt-chip ${i.kind === 'executed' ? 'filed' : 'unknown'}`}>{i.carriedFrom ? `From ${WEEKDAY[new Date(`${i.carriedFrom}T12:00:00Z`).getUTCDay()]}` : WORD[i.kind] || 'Planned'}</span></span>
               </a>
               {start && <Link href={start} className="ent-start" style={{ '--fc': `var(--${i.dept})` } as CSSProperties}><PilotGlyph name="clipboard" size={20} />Start {i.label.toLowerCase()}</Link>}
               </Fragment>
