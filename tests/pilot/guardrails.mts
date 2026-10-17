@@ -892,7 +892,7 @@ const shift = (await asResident(A, q => q(`select id from uc_pilot.commitments w
   const sys = (lastRequest?.system || []).map((b: any) => b.text).join('\n');
   check('A-01', 'The Agency Guide reads the automated agent instructions, what it can do, and the client File, and returns its answer, a message, and moves with a label',
     /grocery/i.test(r.reply) && r.message === 'Want to move the grocery run to 6:30 PM today?' && r.actions.length === 1 &&
-    /You are the agent in Universe City/.test(sys) && /set_schedule_item/.test(sys) && /NOW: /.test(sys), r);
+    /You are Universe City software speaking with one resident/.test(sys) && /The agent is a person\. You are software/.test(sys) && /set_schedule_item/.test(sys) && /NOW: /.test(sys), r);
 }
 
 // ================================================================= 31. the glow on the entry happening now
